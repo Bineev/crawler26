@@ -26,6 +26,32 @@ enum ModifierStat {
 	DAMAGE_FLAT_BONUS,         # СИЛА (+X к урону)
 }
 
+enum GrowType {
+	NONE,       # не растёт
+	ADD,        # +value_grow_value каждый раз
+	SUBTRACT,   # -value_grow_value каждый раз
+	MULTIPLY,   # × value_grow_value каждый раз
+	DIVIDE,     # / value_grow_value каждый раз
+}
+
+enum GrowTarget {
+	VALUE,      # растёт value (стаки или величина эффекта)
+	DURATION,   # растёт длительность
+	BASE_VALUE, # растёт base_value (для DAMAGE/BLOCK/HEAL)
+	BOTH,       # растёт и value, и duration
+}
+
+enum PassiveTrigger {
+	ON_TAKE_DAMAGE,
+	ON_DEAL_DAMAGE,
+	ON_PLAY_CARD,
+	ON_APPLY_STATUS,
+	ON_GAIN_BLOCK,
+	ON_TURN_START,
+	ON_TURN_END,
+	ON_KILL_ENEMY,
+	ON_STATUS_TICK,
+}
 ## Типы эффектов карт
 enum EffectCategory {
 	DAMAGE,          # прямой урон
@@ -41,7 +67,22 @@ enum EffectCategory {
 	CONVERT,         # конвертировать одно в другое
 	CONDITIONAL,     # условный эффект
 }
+## Тип цикла намерений
+enum IntentCycleType {
+	SEQUENTIAL,           # последовательно
+	RANDOM,               # случайно
+	RANDOM_WITHOUT_REPEAT,# случайно без повтора
+}
 
+## Тип намерения врага
+enum IntentType {
+	ATTACK,
+	DEFEND,
+	BUFF,
+	DEBUFF,
+	APPLY_STATUS,
+	APPLY_PASSIVE,
+}
 ## Цель эффекта
 enum EffectTarget {
 	SELF,           # на себя
@@ -67,11 +108,6 @@ enum Passive {
 	WRATH,              # Злость (+1 силы/ход)
 	FREEZING_GROUND,    # Обмерзание
 	DENIAL,             # Отрицание
-	
-	# Сломленный
-	SHAME,              # Стыд
-	DESPAIR,            # Отчаяние
-	
 	# Пещеры плоти
 	FLESH_WARD,
 	CRIMSON_FRENZY,
@@ -86,7 +122,7 @@ enum Status {
 	WEAKNESS,       # Слабость
 	VULNERABILITY,  # Уязвимость
 	SHAME,          # Стыд (Сломленный)
-	DESPAIR,        # Отчаяние (Сломленный)
+	STRENGTH		# Сила
 }
 
 ## Классы персонажей
@@ -264,7 +300,6 @@ func is_negative_status(status: Status) -> bool:
 		Status.ICE,
 		Status.WEAKNESS,
 		Status.VULNERABILITY,
-		Status.DESPAIR,
 	]
 
 ## Получить название статуса (для дебага)
@@ -277,5 +312,4 @@ func get_status_name(status: Status) -> String:
 		Status.WEAKNESS: return "Weakness"
 		Status.VULNERABILITY: return "Vulnerability"
 		Status.SHAME: return "Shame"
-		Status.DESPAIR: return "Despair"
 		_: return "Unknown"
