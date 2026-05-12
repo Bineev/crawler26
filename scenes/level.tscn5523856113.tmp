@@ -1,0 +1,24 @@
+[gd_scene load_steps=4 format=3 uid="uid://n417ulkok0xv"]
+
+[ext_resource type="PackedScene" uid="uid://coec2fnqd70g0" path="res://scenes/card.tscn" id="1_2q6dc"]
+[ext_resource type="Texture2D" uid="uid://5w7346fvlwek" path="res://img/level_back.png" id="1_w7c3h"]
+[ext_resource type="Script" uid="uid://bq6p8atu7x0hc" path="res://scripts/other/level.gd" id="1_w8frs"]
+
+[node name="Level" type="Node2D"]
+script = ExtResource("1_w8frs")
+
+[node name="sprite_back" type="Sprite2D" parent="."]
+texture = ExtResource("1_w7c3h")
+centered = false
+
+[node name="Card" parent="." instance=ExtResource("1_2q6dc")]
+position = Vector2(70, 19)
+
+[node name="Card2" parent="." instance=ExtResource("1_2q6dc")]
+position = Vector2(153, 23)
+
+[node name="Card3" parent="." instance=ExtResource("1_2q6dc")]
+position = Vector2(240, 23)
+
+[node name="Card4" parent="." instance=ExtResource("1_2q6dc")]
+position = Vector2(333, 30)

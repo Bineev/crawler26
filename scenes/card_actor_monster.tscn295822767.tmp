@@ -1,0 +1,37 @@
+[gd_scene load_steps=4 format=3 uid="uid://22qo63jqb87q"]
+
+[ext_resource type="PackedScene" uid="uid://dv1lj8l5ryf51" path="res://scenes/card_actor.tscn" id="1_gkcy4"]
+[ext_resource type="Script" uid="uid://cfnbmna8drwsc" path="res://scripts/other/card_actor_monster.gd" id="2_87efw"]
+[ext_resource type="Script" uid="uid://bll44gw1l0di2" path="res://resources/res_scripts/part_res.gd" id="3_rkygk"]
+
+[node name="CardActorMonster" instance=ExtResource("1_gkcy4")]
+script = ExtResource("2_87efw")
+monster_res = null
+monster_perc = 0
+monster_parts = Array[ExtResource("3_rkygk")]([])
+is_can_love = true
+
+[node name="rect_main_img" parent="panel_back/container_content" index="1"]
+custom_minimum_size = Vector2(64, 64)
+
+[node name="sprite_container" type="Node2D" parent="panel_back/container_content" index="2"]
+unique_name_in_owner = true
+position = Vector2(45, 55)
+
+[node name="sprite_rhand" type="Sprite2D" parent="panel_back/container_content/sprite_container" index="0"]
+unique_name_in_owner = true
+
+[node name="sprite_foot" type="Sprite2D" parent="panel_back/container_content/sprite_container" index="1"]
+unique_name_in_owner = true
+
+[node name="sprite_body" type="Sprite2D" parent="panel_back/container_content/sprite_container" index="2"]
+unique_name_in_owner = true
+
+[node name="sprite_head" type="Sprite2D" parent="panel_back/container_content/sprite_container" index="3"]
+unique_name_in_owner = true
+
+[node name="sprite_lhand" type="Sprite2D" parent="panel_back/container_content/sprite_container" index="4"]
+unique_name_in_owner = true
+
+[node name="HBoxContainer" parent="panel_back/container_content/MarginContainer" index="0"]
+size_flags_horizontal = 4

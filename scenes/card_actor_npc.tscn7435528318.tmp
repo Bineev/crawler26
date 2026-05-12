@@ -1,0 +1,23 @@
+[gd_scene load_steps=4 format=3 uid="uid://bwn5fje2gf83u"]
+
+[ext_resource type="PackedScene" uid="uid://dv1lj8l5ryf51" path="res://scenes/card_actor.tscn" id="1_1th0d"]
+[ext_resource type="Script" uid="uid://maeamy8altuc" path="res://scripts/other/card_actor_npc.gd" id="2_i0fe0"]
+[ext_resource type="PackedScene" uid="uid://pig5inkb3apw" path="res://scenes/shop_lot.tscn" id="3_bco72"]
+
+[node name="CardActorNPC" node_paths=PackedStringArray("lots") instance=ExtResource("1_1th0d")]
+script = ExtResource("2_i0fe0")
+lot_scene = ExtResource("3_bco72")
+npc_res = null
+npc_type = 0
+npc_quest_name = ""
+npc_quest_desc = ""
+replics = Array[String]([])
+npc_quest_part_conditions = Array[String]([])
+npc_quest_grade_conditions = 0
+npc_quest_family_conditions = Array[String]([])
+npc_shop_content = Array[String]([])
+ncp_shop_lots_count = 0
+npc_mood = 0
+npc_wait_timer = 0.0
+lots = Array[String]([])
+lots_offset = 20.0

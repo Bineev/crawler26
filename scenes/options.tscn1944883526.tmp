@@ -1,0 +1,212 @@
+[gd_scene load_steps=11 format=3 uid="uid://ctde77udes0sw"]
+
+[ext_resource type="Script" uid="uid://bbqal2qf2x75l" path="res://scripts/other/options_menu.gd" id="1_gyu1t"]
+[ext_resource type="PackedScene" path="res://scenes/VolumeSlider.tscn" id="3_rftt1"]
+[ext_resource type="LabelSettings" uid="uid://3uwccgdeeovy" path="res://styles/label_header.tres" id="3_uon5e"]
+[ext_resource type="Texture2D" uid="uid://bokdniykdsbyn" path="res://img/slider_hand_def.png" id="4_0un6s"]
+[ext_resource type="Texture2D" uid="uid://dofs0uxk8arjf" path="res://img/slider_hand.png" id="5_kywri"]
+[ext_resource type="StyleBox" path="res://styles/slider_back_dark.tres" id="7_85aq5"]
+[ext_resource type="StyleBox" path="res://img/slider_fill_gold.tres" id="8_gycth"]
+[ext_resource type="FontFile" uid="uid://co45erws16hd7" path="res://styles/DigitalPixelV124-Regular.otf" id="8_tvlg4"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_g5hix"]
+bg_color = Color(0.84313726, 0.70980394, 0.5803922, 1)
+
+[sub_resource type="LabelSettings" id="LabelSettings_g5hix"]
+font = ExtResource("8_tvlg4")
+font_size = 7
+font_color = Color(0.20392157, 0.10980392, 0.15294118, 1)
+
+[node name="Options" type="PanelContainer"]
+process_mode = 3
+z_index = 4096
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -90.0
+offset_top = -111.50001
+offset_right = 90.0
+offset_bottom = 111.50001
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+script = ExtResource("1_gyu1t")
+
+[node name="MarginContainer2" type="MarginContainer" parent="."]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/margin_left = 5
+theme_override_constants/margin_top = 5
+theme_override_constants/margin_right = 5
+theme_override_constants/margin_bottom = 5
+
+[node name="close_button" type="Button" parent="MarginContainer2"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 8
+size_flags_vertical = 0
+focus_mode = 0
+mouse_filter = 1
+theme_override_colors/font_color = Color(0.87058824, 0.61960787, 0.25490198, 1)
+theme_override_colors/font_focus_color = Color(0.87058824, 0.61960787, 0.25490198, 1)
+theme_override_colors/font_pressed_color = Color(0.87058824, 0.61960787, 0.25490198, 1)
+theme_override_colors/font_hover_color = Color(0.20392157, 0.10980392, 0.15294118, 1)
+theme_override_colors/font_hover_pressed_color = Color(0.20392157, 0.10980392, 0.15294118, 1)
+theme_override_colors/font_disabled_color = Color(0.7529412, 0.5803922, 0.4509804, 1)
+theme_override_fonts/font = ExtResource("8_tvlg4")
+theme_override_font_sizes/font_size = 5
+text = "X"
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/margin_left = 40
+theme_override_constants/margin_top = 40
+theme_override_constants/margin_right = 40
+theme_override_constants/margin_bottom = 40
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="filler2" type="Control" parent="MarginContainer/VBoxContainer"]
+visible = false
+custom_minimum_size = Vector2(0, 20)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Buttons" type="VBoxContainer" parent="MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+mouse_filter = 2
+
+[node name="MusicLabel" type="Label" parent="MarginContainer/VBoxContainer/Buttons"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "МУЗЫКА"
+label_settings = ExtResource("3_uon5e")
+
+[node name="MusicSlider" parent="MarginContainer/VBoxContainer/Buttons" instance=ExtResource("3_rftt1")]
+layout_mode = 2
+theme_override_icons/grabber = ExtResource("4_0un6s")
+theme_override_icons/grabber_highlight = ExtResource("5_kywri")
+theme_override_styles/slider = ExtResource("7_85aq5")
+theme_override_styles/grabber_area = ExtResource("8_gycth")
+theme_override_styles/grabber_area_highlight = ExtResource("8_gycth")
+value = 0.1
+audio_bus_name = "Music"
+
+[node name="SFXLabel" type="Label" parent="MarginContainer/VBoxContainer/Buttons"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "ЗВУКИ"
+label_settings = ExtResource("3_uon5e")
+
+[node name="SFXSlider" parent="MarginContainer/VBoxContainer/Buttons" instance=ExtResource("3_rftt1")]
+layout_mode = 2
+theme_override_icons/grabber = ExtResource("4_0un6s")
+theme_override_icons/grabber_highlight = ExtResource("5_kywri")
+audio_bus_name = "SFX"
+
+[node name="shake_check" type="CheckBox" parent="MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+focus_mode = 0
+mouse_filter = 1
+theme_override_colors/font_color = Color(0.20392157, 0.10980392, 0.15294118, 1)
+theme_override_colors/font_pressed_color = Color(0.20392157, 0.10980392, 0.15294118, 1)
+theme_override_colors/font_hover_color = Color(0.20392157, 0.10980392, 0.15294118, 1)
+theme_override_colors/font_hover_pressed_color = Color(0.20392157, 0.10980392, 0.15294118, 1)
+theme_override_colors/icon_normal_color = Color(0.20392157, 0.10980392, 0.15294118, 1)
+theme_override_colors/icon_pressed_color = Color(0.20392157, 0.10980392, 0.15294118, 1)
+theme_override_colors/icon_hover_color = Color(0.20392157, 0.10980392, 0.15294118, 1)
+theme_override_colors/icon_hover_pressed_color = Color(0.20392157, 0.10980392, 0.15294118, 1)
+theme_override_fonts/font = ExtResource("8_tvlg4")
+theme_override_font_sizes/font_size = 10
+theme_override_styles/normal = SubResource("StyleBoxFlat_g5hix")
+theme_override_colors/checkbox_checked_color = Color(0.92156863, 0.92941177, 0.9137255, 1)
+theme_override_colors/checkbox_unchecked_color = Color(0.92156863, 0.92941177, 0.9137255, 1)
+text = "UI_SHAKE_NAME"
+alignment = 1
+
+[node name="filler" type="Control" parent="MarginContainer/VBoxContainer"]
+custom_minimum_size = Vector2(0, 20)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="to_lobby_button" type="Button" parent="MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+focus_mode = 0
+mouse_filter = 1
+theme_override_colors/font_color = Color(0.87058824, 0.61960787, 0.25490198, 1)
+theme_override_colors/font_focus_color = Color(0.87058824, 0.61960787, 0.25490198, 1)
+theme_override_colors/font_pressed_color = Color(0.87058824, 0.61960787, 0.25490198, 1)
+theme_override_colors/font_hover_color = Color(0.20392157, 0.10980392, 0.15294118, 1)
+theme_override_colors/font_hover_pressed_color = Color(0.20392157, 0.10980392, 0.15294118, 1)
+theme_override_colors/font_disabled_color = Color(0.7529412, 0.5803922, 0.4509804, 1)
+theme_override_fonts/font = ExtResource("8_tvlg4")
+theme_override_font_sizes/font_size = 5
+text = "ВЫЙТИ"
+
+[node name="confirmed_container" type="VBoxContainer" parent="MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 10
+
+[node name="label_confirmed" type="Label" parent="MarginContainer/VBoxContainer/confirmed_container"]
+layout_mode = 2
+text = "Вы уверены, что хотите покинуть игру?"
+label_settings = SubResource("LabelSettings_g5hix")
+autowrap_mode = 2
+
+[node name="hb" type="HBoxContainer" parent="MarginContainer/VBoxContainer/confirmed_container"]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="yes_button" type="Button" parent="MarginContainer/VBoxContainer/confirmed_container/hb"]
+unique_name_in_owner = true
+layout_mode = 2
+focus_mode = 0
+mouse_filter = 1
+theme_override_colors/font_color = Color(0.87058824, 0.61960787, 0.25490198, 1)
+theme_override_colors/font_focus_color = Color(0.87058824, 0.61960787, 0.25490198, 1)
+theme_override_colors/font_pressed_color = Color(0.87058824, 0.61960787, 0.25490198, 1)
+theme_override_colors/font_hover_color = Color(0.20392157, 0.10980392, 0.15294118, 1)
+theme_override_colors/font_hover_pressed_color = Color(0.20392157, 0.10980392, 0.15294118, 1)
+theme_override_colors/font_disabled_color = Color(0.7529412, 0.5803922, 0.4509804, 1)
+theme_override_fonts/font = ExtResource("8_tvlg4")
+theme_override_font_sizes/font_size = 5
+text = "Да"
+
+[node name="filler" type="Control" parent="MarginContainer/VBoxContainer/confirmed_container/hb"]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+
+[node name="no_button" type="Button" parent="MarginContainer/VBoxContainer/confirmed_container/hb"]
+unique_name_in_owner = true
+layout_mode = 2
+focus_mode = 0
+mouse_filter = 1
+theme_override_colors/font_color = Color(0.87058824, 0.61960787, 0.25490198, 1)
+theme_override_colors/font_focus_color = Color(0.87058824, 0.61960787, 0.25490198, 1)
+theme_override_colors/font_pressed_color = Color(0.87058824, 0.61960787, 0.25490198, 1)
+theme_override_colors/font_hover_color = Color(0.20392157, 0.10980392, 0.15294118, 1)
+theme_override_colors/font_hover_pressed_color = Color(0.20392157, 0.10980392, 0.15294118, 1)
+theme_override_colors/font_disabled_color = Color(0.7529412, 0.5803922, 0.4509804, 1)
+theme_override_fonts/font = ExtResource("8_tvlg4")
+theme_override_font_sizes/font_size = 5
+text = "Нет"
+
+[connection signal="pressed" from="MarginContainer2/close_button" to="." method="_on_close_button_pressed"]
+[connection signal="pressed" from="MarginContainer/VBoxContainer/shake_check" to="." method="_on_shake_check_pressed"]
+[connection signal="pressed" from="MarginContainer/VBoxContainer/to_lobby_button" to="." method="_on_to_lobby_button_pressed"]
+[connection signal="pressed" from="MarginContainer/VBoxContainer/confirmed_container/hb/yes_button" to="." method="_on_yes_button_pressed"]
+[connection signal="pressed" from="MarginContainer/VBoxContainer/confirmed_container/hb/no_button" to="." method="_on_no_button_pressed"]
