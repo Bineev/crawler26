@@ -1,0 +1,91 @@
+[gd_scene load_steps=2 format=3 uid="uid://coec2fnqd70g0"]
+
+[ext_resource type="Script" uid="uid://b7y61xslq656g" path="res://scripts/other/card_ui.gd" id="1_d81rb"]
+
+[node name="Card" type="Node2D"]
+script = ExtResource("1_d81rb")
+
+[node name="CardTemplate" type="MarginContainer" parent="."]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(234, 330)
+offset_right = 40.0
+offset_bottom = 40.0
+theme_override_constants/margin_left = 5
+theme_override_constants/margin_top = 5
+theme_override_constants/margin_right = 5
+theme_override_constants/margin_bottom = 5
+
+[node name="CardBackground" type="TextureRect" parent="CardTemplate"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="MainLayout" type="VBoxContainer" parent="CardTemplate"]
+unique_name_in_owner = true
+layout_mode = 2
+alignment = 1
+
+[node name="HeaderLayout" type="HBoxContainer" parent="CardTemplate/MainLayout"]
+unique_name_in_owner = true
+layout_mode = 2
+alignment = 1
+
+[node name="CostLabel" type="Label" parent="CardTemplate/MainLayout/HeaderLayout"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(28, 28)
+layout_mode = 2
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="CardName" type="Label" parent="CardTemplate/MainLayout/HeaderLayout"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="MiddleLayout" type="HBoxContainer" parent="CardTemplate/MainLayout"]
+unique_name_in_owner = true
+layout_mode = 2
+alignment = 1
+
+[node name="LeftIcons" type="VBoxContainer" parent="CardTemplate/MainLayout/MiddleLayout"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 4
+alignment = 1
+
+[node name="ArtContainer" type="Control" parent="CardTemplate/MainLayout/MiddleLayout"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(164, 164)
+layout_mode = 2
+
+[node name="ArtBackground" type="ColorRect" parent="CardTemplate/MainLayout/MiddleLayout/ArtContainer"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="ArtImage" type="TextureRect" parent="CardTemplate/MainLayout/MiddleLayout/ArtContainer"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+expand_mode = 3
+stretch_mode = 5
+
+[node name="RightIcons" type="VBoxContainer" parent="CardTemplate/MainLayout/MiddleLayout"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 4
+alignment = 1
+
+[node name="DesccriptionContainer" type="MarginContainer" parent="CardTemplate/MainLayout"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="CardDescription" type="RichTextLabel" parent="CardTemplate/MainLayout/DesccriptionContainer"]
+unique_name_in_owner = true
+layout_mode = 2

@@ -1,9 +1,0 @@
-[gd_resource type="Resource" script_class="ModifierEntry" load_steps=2 format=3 uid="uid://dikb8pen263iv"]
-
-[ext_resource type="Script" uid="uid://0mjn55jcxdti" path="res://resousces/res_scripts/modifier_entry.gd" id="1_ulf7x"]
-
-[resource]
-script = ExtResource("1_ulf7x")
-stat = 5
-flat_bonus = 1
-metadata/_custom_type_script = "uid://0mjn55jcxdti"

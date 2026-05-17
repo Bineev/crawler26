@@ -22,3 +22,15 @@ func spend_atonement(amount: int) -> bool:
 
 func get_atonement() -> int:
 	return atonement
+
+func modify_stat(stat: DataManager.FlatStat, delta: int):
+	match stat:
+		DataManager.FlatStat.ATONEMENT:
+			atonement = clamp(atonement + delta, 0, max_atonement)
+			SignalManager.atonement_changed.emit(atonement, max_atonement)
+		_:
+			super.modify_stat(stat, delta)
+
+
+func get_atonement_tier() -> int:
+	return atonement / 10  # 0, 1, 2, 3 (макс 3)

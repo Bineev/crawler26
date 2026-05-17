@@ -2,54 +2,39 @@
 extends Resource
 class_name ModifierEntry
 
-## ============================================================
-## МОДИФИКАТОР СТАТА
-## ============================================================
+## Какой модификатор меняем (может быть ModifierStat или FlatStat)
+@export var stat: int  # DataManager.ModifierStat или DataManager.FlatStat
 
-## Какой модификатор меняем (из DataManager.ModifierStat)
-@export var stat: DataManager.ModifierStat
+## Тип изменения (MULTIPLIER, FLAT_BONUS, PERCENT)
+@export var change_type: DataManager.ModifierChangeType = DataManager.ModifierChangeType.MULTIPLIER
 
-## Множитель (1.25 = +25%, 0.75 = -25%)
-@export var multiplier: float = 1.0
+## Значение (1.25 = +25%, 5 = +5)
+@export var value: float = 1.0
 
-## Флэт-бонус (например, +2 к урону для Силы)
-@export var flat_bonus: int = 0
+## Длительность в ходах (0 = постоянно)
+@export var duration: int = 0
 
+func apply_to_flat(current: int) -> int:
+	if change_type == DataManager.ModifierChangeType.FLAT_BONUS:
+		return current + int(value)
+	return current
 
-## ============================================================
-## МЕТОДЫ
-## ============================================================
+func apply_to_modifier(current: float) -> float:
+	match change_type:
+		DataManager.ModifierChangeType.MULTIPLIER:
+			return current * value
+		DataManager.ModifierChangeType.PERCENT:
+			return current + value
+		_:
+			return current
 
-## Применить модификатор к текущему значению
-func apply_to_value(current_value: float) -> float:
-	var result = current_value
-	if flat_bonus != 0:
-		result += flat_bonus
-	if multiplier != 1.0:
-		result *= multiplier
-	return result
-
-## Получить итоговое значение модификатора (для отображения в UI)
-func get_total_modifier() -> float:
-	var total = 1.0
-	if multiplier != 1.0:
-		total = multiplier
-	if flat_bonus != 0:
-		total += flat_bonus
-	return total
-
-## Получить строковое представление (для UI)
 func get_modifier_string() -> String:
-	var parts = []
-	if multiplier != 1.0:
-		var percent = (multiplier - 1.0) * 100
-		if percent > 0:
-			parts.append("+%.0f%%" % percent)
-		else:
-			parts.append("%.0f%%" % percent)
-	if flat_bonus != 0:
-		if flat_bonus > 0:
-			parts.append("+%d" % flat_bonus)
-		else:
-			parts.append("%d" % flat_bonus)
-	return " ".join(parts)
+	match change_type:
+		DataManager.ModifierChangeType.MULTIPLIER:
+			var percent = (value - 1.0) * 100
+			return "+%.0f%%" % percent if percent > 0 else "%.0f%%" % percent
+		DataManager.ModifierChangeType.PERCENT:
+			return "+%.0f%%" % value if value > 0 else "%.0f%%" % value
+		DataManager.ModifierChangeType.FLAT_BONUS:
+			return "+%d" % int(value) if value > 0 else "%d" % int(value)
+	return ""

@@ -14,8 +14,15 @@ enum FlatStat {
 	BLOCK,
 	HAND_SIZE,
 	DRAW_PER_TURN,
+	ATONEMENT,        # ← добавить
+	MAX_ATONEMENT
 }
 
+enum ModifierChangeType {
+	MULTIPLIER,   # умножение (1.25 = +25%)
+	PERCENT,      # процентное изменение (0.25 = +25%)
+	FLAT_BONUS,   # флэт-бонус (+5)
+}
 ## Модификаторы статов (проценты / множители)
 enum ModifierStat {
 	DAMAGE_DEALT_PERCENT,      # +X% урона
@@ -54,19 +61,32 @@ enum PassiveTrigger {
 }
 ## Типы эффектов карт
 enum EffectCategory {
-	DAMAGE,          # прямой урон
-	BLOCK,           # блок
-	HEAL,            # лечение
-	MODIFY_STAT,     # изменить флэт-стат
-	MODIFY_MODIFIER, # изменить модификатор
-	APPLY_STATUS,    # наложить статус
-	APPLY_PASSIVE,   # наложить пассивку
-	DRAW_CARD,       # добор карт
-	GAIN_ENERGY,     # получить энергию
-	SACRIFICE_CARD,  # сжечь карту
-	CONVERT,         # конвертировать одно в другое
-	CONDITIONAL,     # условный эффект
+	DAMAGE,
+	BLOCK,
+	HEAL,
+	SCALED_VALUE,
+	APPLY_STATUS,
+	APPLY_PASSIVE,
+	MODIFY_STAT,
+	MODIFY_MODIFIER,
+	DRAW_CARD,
+	GAIN_ENERGY,
+	SACRIFICE_CARD,
+	CONVERT,
+	CONVERT_EXCESS_TO_BLOCK,
+	CONDITIONAL,
+	CUSTOM,              # ← добавить
 }
+
+## Тип значения для SCALED_VALUE эффекта
+enum ScaledType {
+	DAMAGE,
+	BLOCK,
+	HEAL,
+	GAIN_ENERGY,
+	DRAW_CARD,
+}
+
 ## Тип цикла намерений
 enum IntentCycleType {
 	SEQUENTIAL,           # последовательно
@@ -144,10 +164,13 @@ enum CardGrade {
 
 ## Типы карт
 enum CardType {
-	ATTACK,
-	BLOCK,
-	SKILL,
-	POWER,
+	ATTACK,     # наносит урон
+	BLOCK,      # даёт блок
+	BUFF_SELF,  # бафф на себя
+	DEBUFF,     # дебафф на врага
+	HEAL,       # лечение
+	RESOURCE,   # операция с ресурсом (Искупление)
+	UTILITY,    # добор карт, энергия
 }
 
 
@@ -313,3 +336,64 @@ func get_status_name(status: Status) -> String:
 		Status.VULNERABILITY: return "Vulnerability"
 		Status.SHAME: return "Shame"
 		_: return "Unknown"
+
+
+
+## ============================================================
+## РАЗМЕРЫ ЭКРАНА
+## ============================================================
+
+const SCREEN_WIDTH: int = 1920
+const SCREEN_HEIGHT: int = 1080
+
+# Левая зона
+const PORTRAIT_POS: Vector2 = Vector2(50, 80)
+const PORTRAIT_SIZE: Vector2 = Vector2(200, 200)
+const ARTIFACT_POS: Vector2 = Vector2(50, 300)
+const ARTIFACT_ICON_SIZE: Vector2 = Vector2(48, 48)
+const RESOURCE_PANEL_POS: Vector2 = Vector2(50, 860)
+const RESOURCE_PANEL_SIZE: Vector2 = Vector2(200, 60)
+
+# Центральная зона
+const BATTLE_SCENE_POS: Vector2 = Vector2(448, 80)
+const BATTLE_SCENE_SIZE: Vector2 = Vector2(1024, 768)
+
+const ENEMY_INTENT_POS: Vector2 = Vector2(312, 138)      # над врагом
+const ENEMY_SPRITE_SIZE: Vector2 = Vector2(400, 500)
+const ENEMY_POS_IN_SCENE: Vector2 = Vector2(312, 188)
+const ENEMY_STATUS_POS: Vector2 = Vector2(312, 688)      # под врагом
+
+const HAND_POS: Vector2 = Vector2(448, 860)
+const HAND_SIZE: Vector2 = Vector2(1024, 220)
+
+
+# Правая зона
+const LOG_PANEL_POS: Vector2 = Vector2(1520, 80)
+const LOG_PANEL_SIZE: Vector2 = Vector2(350, 500)
+const HINT_PANEL_POS: Vector2 = Vector2(1520, 580)
+const HINT_PANEL_SIZE: Vector2 = Vector2(350, 268)
+
+# Локация (фон)
+const LOCATION_SPRITE_SIZE: Vector2 = Vector2(1024, 768)
+
+
+const CARD_WIDTH: int = 234
+const CARD_HEIGHT: int = 330
+const CARD_ART_SIZE: int = 164
+const CARD_ICON_SIZE: int = 24
+const CARD_ICON_SOURCE_SIZE: int = 64
+const CARD_SCALE_NORMAL: float = 1.0
+const CARD_SCALE_HOVER: float = 1.05
+const CARD_SCALE_IN_HAND: float = 0.7
+
+## ============================================================
+## ИКОНКИ ДЛЯ ПРАВОЙ КОЛОНКИ
+## ============================================================
+
+#const ICON_DAMAGE: Texture2D = preload("res://ui/icons/damage.png")
+#const ICON_BLOCK: Texture2D = preload("res://ui/icons/block.png")
+#const ICON_HEAL: Texture2D = preload("res://ui/icons/heal.png")
+#const ICON_RESOURCE: Texture2D = preload("res://ui/icons/resource.png")
+#const ICON_BUFF: Texture2D = preload("res://ui/icons/buff.png")
+#const ICON_DEBUFF: Texture2D = preload("res://ui/icons/debuff.png")
+#const ICON_UTILITY: Texture2D = preload("res://ui/icons/utility.png")

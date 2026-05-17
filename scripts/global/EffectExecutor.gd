@@ -9,6 +9,8 @@ extends Node
 ## Поддерживает:
 ## - вложенные эффекты (CONDITIONAL)
 ## - рост значений (grow_type, grow_target, grow_value)
+## - масштабируемые значения (SCALED_VALUE) по tier ресурса
+## - кастомные скрипты (CUSTOM)
 ## - модификаторы источника и цели
 ## - копии ресурсов для уникальных экземпляров
 ## - передачу контекста пассивки для счётчиков роста
@@ -39,6 +41,9 @@ func execute(effect: EffectEntry, source: Node, targets: Array, card_info: Dicti
 		DataManager.EffectCategory.HEAL:
 			_execute_heal(effect, source, targets)
 		
+		DataManager.EffectCategory.SCALED_VALUE:
+			_execute_scaled_value(effect, source, targets)
+		
 		DataManager.EffectCategory.APPLY_STATUS:
 			_execute_apply_status(effect, source, targets, passive_context)
 		
@@ -63,8 +68,14 @@ func execute(effect: EffectEntry, source: Node, targets: Array, card_info: Dicti
 		DataManager.EffectCategory.CONVERT:
 			_execute_convert(effect, source, targets)
 		
+		DataManager.EffectCategory.CONVERT_EXCESS_TO_BLOCK:
+			_execute_convert_excess_to_block(effect, source, targets)
+		
 		DataManager.EffectCategory.CONDITIONAL:
 			_execute_conditional(effect, source, targets, card_info, passive_context)
+		
+		DataManager.EffectCategory.CUSTOM:
+			_execute_custom(effect, source, targets, card_info, passive_context)
 		
 		_:
 			printerr("Unknown effect category: ", effect.category)
@@ -120,6 +131,30 @@ func _execute_heal(effect: EffectEntry, source, targets: Array) -> void:
 	for target in targets:
 		if target.has_method("heal"):
 			target.heal(heal)
+
+
+func _execute_scaled_value(effect: EffectEntry, source, targets: Array) -> void:
+	# Получаем tier ресурса (для Сломленного это Atonement / 10)
+	var tier = 0
+	if source.has_method("get_atonement_tier"):
+		tier = source.get_atonement_tier()
+	
+	var value = effect.get_scaled_value(tier)
+	
+	match effect.scaled_type:
+		DataManager.ScaledType.DAMAGE:
+			for target in targets:
+				target.take_damage(value)
+		DataManager.ScaledType.BLOCK:
+			for target in targets:
+				target.add_block(value)
+		DataManager.ScaledType.HEAL:
+			for target in targets:
+				target.heal(value)
+		DataManager.ScaledType.GAIN_ENERGY:
+			source.gain_energy(value)
+		DataManager.ScaledType.DRAW_CARD:
+			source.draw_cards(value)
 
 
 func _execute_apply_status(effect: EffectEntry, source, targets: Array, passive_context: PassiveResource = null) -> void:
@@ -181,8 +216,22 @@ func _execute_convert(effect: EffectEntry, source, targets: Array) -> void:
 	for target in targets:
 		if target.has_method("get_stat") and target.has_method("modify_stat"):
 			var value = target.get_stat(effect.from_stat)
+			var converted = floor(value * effect.conversion_ratio)
 			target.modify_stat(effect.from_stat, -value)
-			target.modify_stat(effect.to_stat, value)
+			target.modify_stat(effect.to_stat, converted)
+
+
+func _execute_convert_excess_to_block(effect: EffectEntry, source, targets: Array) -> void:
+	if not source.has_method("get_flat") or not source.has_method("modify_flat"):
+		return
+	
+	var current = source.get_flat(DataManager.FlatStat.ATONEMENT)
+	var max_val = source.get_flat(DataManager.FlatStat.MAX_ATONEMENT)
+	var excess = max(0, current - max_val)
+	
+	if excess > 0:
+		source.modify_flat(DataManager.FlatStat.ATONEMENT, -excess)
+		source.modify_flat(DataManager.FlatStat.BLOCK, excess)
 
 
 func _execute_conditional(effect: EffectEntry, source, targets: Array, card_info: Dictionary = {}, passive_context: PassiveResource = null) -> void:
@@ -196,6 +245,18 @@ func _execute_conditional(effect: EffectEntry, source, targets: Array, card_info
 		execute(effect.true_effect, source, targets, card_info, passive_context)
 	elif not condition_met and effect.false_effect:
 		execute(effect.false_effect, source, targets, card_info, passive_context)
+
+
+func _execute_custom(effect: EffectEntry, source, targets: Array, card_info: Dictionary = {}, passive_context: PassiveResource = null) -> void:
+	if not effect.custom_script:
+		printerr("CUSTOM effect has no custom_script")
+		return
+	
+	var custom_instance = effect.custom_script.new()
+	if custom_instance.has_method("apply"):
+		custom_instance.apply(effect, source, targets, card_info, passive_context)
+	else:
+		printerr("CUSTOM script missing 'apply' method")
 
 
 ## ============================================================

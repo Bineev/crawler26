@@ -333,3 +333,8 @@ func process_end_of_turn():
 	for passive in active_passives:
 		if passive.trigger == DataManager.PassiveTrigger.ON_TURN_END and passive.is_active():
 			_execute_passive_effects(passive)
+
+
+func modify_stat(stat: DataManager.FlatStat, delta: int):
+	flats[stat] = flats.get(stat, 0) + delta
+	_emit_flat_signal(stat)
