@@ -2,8 +2,8 @@
 extends Resource
 class_name ModifierEntry
 
-## Какой модификатор меняем (DataManager.ModifierStat или DataManager.FlatStat)
-@export var stat: int
+## Какой модификатор меняем (используем существующий ModifierStat)
+@export var stat: DataManager.ModifierStat
 
 ## Тип изменения
 @export var change_type: DataManager.ModifierChangeType = DataManager.ModifierChangeType.MULTIPLIER
@@ -43,12 +43,10 @@ func get_modifier_string() -> String:
 	return ""
 
 
-## Проверка, является ли модификатор постоянным
 func is_permanent() -> bool:
 	return duration == 0
 
 
-## Создаёт копию модификатора
 func duplicate_for_instance() -> ModifierEntry:
 	var copy = ModifierEntry.new()
 	copy.stat = stat

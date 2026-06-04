@@ -11,7 +11,6 @@ class_name StatusResource
 @export var is_ticking: bool = false
 @export var tick_interval: int = 1
 @export var ignore_block: bool = false
-@export var damage_owner: bool = false
 
 ## Стаки
 @export var is_stacking: bool = false
@@ -75,15 +74,20 @@ func _generate_default_description() -> String:
 			return ""
 
 
-## Получает урон за тик
-func get_tick_damage(stacks: int) -> int:
+## Получает урон/лечение за тик
+## @param stacks: int - количество стаков
+## @param caster: CharacterStats - источник, наложивший статус (для учёта силы)
+func get_tick_value(stacks: int, caster: CharacterStats = null) -> int:
 	match id:
 		DataManager.Status.BLEED:
 			return stacks * DataManager.BLEED_BASE_DAMAGE_PER_STACK
 		DataManager.Status.POISON:
 			return stacks * DataManager.POISON_BASE_DAMAGE_PER_STACK
 		DataManager.Status.BURN:
-			return stacks * DataManager.BURN_BASE_DAMAGE_PER_STACK
+			var base_val = stacks * DataManager.BURN_BASE_DAMAGE_PER_STACK
+			if caster and caster.has_method("get_strength_bonus"):
+				return base_val + caster.get_strength_bonus()
+			return base_val
 		DataManager.Status.REGEN:
 			return stacks * DataManager.REGEN_HEAL_PER_STACK
 		_:
@@ -113,7 +117,6 @@ func duplicate_for_instance() -> StatusResource:
 	copy.is_ticking = is_ticking
 	copy.tick_interval = tick_interval
 	copy.ignore_block = ignore_block
-	copy.damage_owner = damage_owner
 	copy.is_stacking = is_stacking
 	copy.max_stacks = max_stacks
 	copy.effect_per_stack = effect_per_stack
@@ -130,4 +133,4 @@ func duplicate_for_instance() -> StatusResource:
 
 ## Очищает состояние копии (если нужно)
 func clear_instance_state():
-	pass  # У статусов нет состояния, всё в CharacterStats
+	pass

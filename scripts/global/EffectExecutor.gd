@@ -27,7 +27,6 @@ func execute(effect: EffectEntry, source: Node, targets: Array, card_info: Dicti
 	if not effect:
 		return
 	
-	# Если эффект имеет рост, применяем его с учётом контекста пассивки
 	if effect.has_growth():
 		_apply_effect_growth(effect, passive_context)
 	
@@ -88,22 +87,21 @@ func execute(effect: EffectEntry, source: Node, targets: Array, card_info: Dicti
 func _execute_damage(effect: EffectEntry, source, targets: Array) -> void:
 	var damage = effect.base_value
 	
-	# Применяем множитель от стата (если указан)
 	if effect.stat_multiplier != null and effect.stat_divisor > 0:
 		if source.has_method("get_stat"):
 			var stat_value = source.get_stat(effect.stat_multiplier)
 			damage += stat_value / effect.stat_divisor
 	
-	# Применяем модификаторы источника (Сила, +% урона)
+	if source.has_method("get_strength_bonus"):
+		damage += source.get_strength_bonus()
+	
 	if source.has_method("get_modifier"):
-		var flat_bonus = source.get_modifier(DataManager.ModifierStat.DAMAGE_FLAT_BONUS)
-		damage += flat_bonus
+		damage += source.get_modifier(DataManager.ModifierStat.DAMAGE_FLAT_BONUS)
 		damage *= source.get_modifier(DataManager.ModifierStat.DAMAGE_DEALT_PERCENT)
 	
 	for target in targets:
 		if target.has_method("take_damage"):
 			var final_damage = damage
-			# Применяем модификаторы цели (Уязвимость)
 			if target.has_method("get_modifier"):
 				final_damage *= target.get_modifier(DataManager.ModifierStat.DAMAGE_TAKEN_PERCENT)
 			target.take_damage(floor(final_damage))
@@ -134,7 +132,6 @@ func _execute_heal(effect: EffectEntry, source, targets: Array) -> void:
 
 
 func _execute_scaled_value(effect: EffectEntry, source, targets: Array) -> void:
-	# Получаем tier ресурса (для Сломленного это Atonement / 10)
 	var tier = 0
 	if source.has_method("get_atonement_tier"):
 		tier = source.get_atonement_tier()
@@ -161,20 +158,18 @@ func _execute_apply_status(effect: EffectEntry, source, targets: Array, passive_
 	var value = effect.get_current_value()
 	var duration = effect.get_current_duration()
 	
-	# Применяем множитель от стата к длительности
 	if effect.stat_multiplier != null and effect.stat_divisor > 0:
 		if source.has_method("get_stat"):
 			duration += source.get_stat(effect.stat_multiplier) / effect.stat_divisor
 	
 	for target in targets:
 		if target.has_method("add_status"):
-			target.add_status(effect.status, value, max(1, duration), passive_context)
+			target.add_status(effect.status, value, max(1, duration), source, passive_context)
 
 
 func _execute_apply_passive(effect: EffectEntry, source, targets: Array) -> void:
 	for target in targets:
 		if target.has_method("apply_passive"):
-			# Создаём копию пассивки для цели
 			var passive_copy = effect.passive.duplicate_for_instance() if effect.passive else null
 			if passive_copy:
 				passive_copy.init_instance()
@@ -263,25 +258,20 @@ func _execute_custom(effect: EffectEntry, source, targets: Array, card_info: Dic
 ## ВСПОМОГАТЕЛЬНЫЕ МЕТОДЫ
 ## ============================================================
 
-## Применяет рост эффекта с учётом контекста пассивки
 func _apply_effect_growth(effect: EffectEntry, passive_context: PassiveResource = null) -> void:
 	if not effect.has_growth():
 		return
 	
-	# Если есть контекст пассивки, используем счётчик из неё
 	if passive_context:
 		var counter = passive_context.get_effect_counter(effect)
 		effect.application_counter = counter
 	
-	# Применяем рост
 	effect.apply_growth()
 	
-	# Обновляем счётчик в контексте
 	if passive_context:
 		passive_context.increment_effect_counter(effect)
 
 
-## Применяет математическую операцию роста к значению
 func _apply_growth_to_value(current_value: int, grow_type: int, grow_value: int) -> int:
 	match grow_type:
 		DataManager.GrowType.ADD:

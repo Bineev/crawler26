@@ -51,7 +51,7 @@ var modifiers: Dictionary = {
 ## СТАТУСЫ
 ## ============================================================
 
-## Активные статусы: { status_id: { stacks: int, duration: int, resource: StatusResource } }
+## Активные статусы: { status_id: { stacks: int, duration: int, resource: StatusResource, caster: CharacterStats } }
 var active_statuses: Dictionary = {}
 
 
@@ -159,9 +159,7 @@ func take_damage(amount: int, ignore_block: bool = false):
 	
 	if damage > 0:
 		modify_flat(DataManager.FlatStat.HEALTH, -damage)
-		# Получение классового ресурса (переопределяется в PenitentStats)
 		on_take_damage_gain_resource(damage)
-		# Обработка пассивок ON_TAKE_DAMAGE
 		_process_passive_triggers(DataManager.PassiveTrigger.ON_TAKE_DAMAGE, damage)
 
 
@@ -206,15 +204,18 @@ func get_applied_statuses() -> Array:
 	return active_statuses.keys()
 
 
-func add_status(status: StatusResource, value: int, duration: int, passive_context: PassiveResource = null):
+func get_status_caster(status_id: DataManager.Status) -> CharacterStats:
+	var data = active_statuses.get(status_id)
+	return data.get("caster", null) if data else null
+
+
+func add_status(status: StatusResource, value: int, duration: int, caster: CharacterStats = null, passive_context: PassiveResource = null):
 	if not status:
 		return
 	
-	# Проверка иммунитета
 	if _check_denial(status):
 		return
 	
-	# Проверка возможности наложения через StatusInteractionManager
 	if not StatusInteractionManager.can_apply(self, status.id):
 		return
 	
@@ -222,25 +223,22 @@ func add_status(status: StatusResource, value: int, duration: int, passive_conte
 	var existing = active_statuses.get(status_id)
 	
 	if existing:
-		# Обновляем существующий статус
 		existing.stacks += value
 		existing.duration = max(existing.duration, duration)
 	else:
-		# Новый статус
 		active_statuses[status_id] = {
 			"stacks": value,
 			"duration": duration,
-			"resource": status
+			"resource": status,
+			"caster": caster if caster else self
 		}
 		_apply_status_modifiers(status)
 		StatusInteractionManager.on_status_applied(self, status_id, value)
 	
-	# Особые эффекты статусов
 	if status_id == DataManager.Status.BURN:
-		# Горение даёт +1 Силы при наложении
 		var strength_status = _get_strength_status_resource()
 		if strength_status:
-			add_status(strength_status, DataManager.BURN_STRENGTH_STACKS, DataManager.BURN_STRENGTH_DURATION)
+			add_status(strength_status, DataManager.BURN_STRENGTH_STACKS, DataManager.BURN_STRENGTH_DURATION, self, passive_context)
 	
 	signal_emit(status_added, status_id, value, duration)
 
@@ -283,7 +281,6 @@ func reduce_status_stacks(status_id: DataManager.Status, amount: int):
 
 
 func freeze_poison():
-	# Яд не тикает, пока есть холод
 	pass
 
 
@@ -292,7 +289,6 @@ func unfreeze_poison():
 
 
 func trigger_poison_immediately():
-	# Мгновенная активация всего яда
 	if has_status(DataManager.Status.POISON):
 		var stacks = get_status_stacks(DataManager.Status.POISON)
 		var damage = stacks * DataManager.POISON_BASE_DAMAGE_PER_STACK
@@ -376,51 +372,33 @@ func process_end_of_turn():
 		var data = active_statuses[status_id]
 		var status = data["resource"]
 		
-		# Тикающие статусы
 		if status.is_ticking:
 			data.duration -= 1
 			
-			# Наносим урон/лечение от статуса
 			if status.tick_effect:
 				var tick_effect = status.tick_effect.duplicate_for_instance()
-				tick_effect.value = status.get_tick_damage(data.stacks)
-				
-				if status.damage_owner:
-					# Урон владельцу (Горение)
-					EffectExecutor.execute(tick_effect, self, [self])
-				else:
-					# Урон врагам (Яд, Кровотечение) или лечение (Регенерация)
-					if status.id == DataManager.Status.REGEN:
-						# Регенерация лечит владельца
-						EffectExecutor.execute(tick_effect, self, [self])
-					else:
-						var enemies = get_tree().get_nodes_in_group("enemies")
-						EffectExecutor.execute(tick_effect, self, enemies)
+				var caster = data.get("caster", null)
+				tick_effect.value = status.get_tick_value(data.stacks, caster)
+				EffectExecutor.execute(tick_effect, self, [self])
 			
-			# Проверка взрыва Горения
 			if status.id == DataManager.Status.BURN and data.stacks >= DataManager.BURN_THRESHOLD_STACKS:
 				_trigger_burn_explosion(data.stacks)
 				statuses_to_remove.append(status_id)
 			
-			# Удаляем, если длительность истекла
 			if data.duration <= 0:
 				statuses_to_remove.append(status_id)
 	
-	# Удаляем истекшие статусы
 	for status_id in statuses_to_remove:
 		remove_status(status_id)
 	
-	# Обновляем иммунитеты
 	_update_immunity_timer()
 	
-	# Тик пассивок
 	for passive in active_passives:
 		if passive.charge_type == DataManager.PassiveChargeType.TURN_BASED and passive.current_charges > 0:
 			passive.current_charges -= 1
 			if passive.current_charges <= 0:
 				remove_passive(passive)
 	
-	# Триггер ON_TURN_END
 	_process_passive_triggers(DataManager.PassiveTrigger.ON_TURN_END)
 
 
@@ -438,14 +416,13 @@ func _trigger_burn_explosion(stacks: int):
 
 
 ## ============================================================
-## МОДИФИКАТОР ИСХОДЯЩЕГО УРОНА (для Холода и других)
+## МОДИФИКАТОР ИСХОДЯЩЕГО УРОНА
 ## ============================================================
 
 func get_damage_multiplier() -> float:
 	var multiplier = 1.0
 	multiplier *= get_modifier(DataManager.ModifierStat.DAMAGE_DEALT_PERCENT)
 	
-	# Применяем Холод (уменьшает исходящий урон)
 	if has_status(DataManager.Status.COLD):
 		var cold_stacks = get_status_stacks(DataManager.Status.COLD)
 		var cold_multiplier = 1.0 - (cold_stacks * DataManager.COLD_EFFECT_PERCENT_PER_STACK)
@@ -467,3 +444,11 @@ func signal_emit(sig: Signal, arg1 = null, arg2 = null, arg3 = null):
 		sig.emit(arg1)
 	else:
 		sig.emit()
+
+
+## ============================================================
+## БОНУС ОТ СИЛЫ (STRENGTH)
+## ============================================================
+
+func get_strength_bonus() -> int:
+	return get_status_stacks(DataManager.Status.STRENGTH)
