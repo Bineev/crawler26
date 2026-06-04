@@ -20,7 +20,7 @@ var current_state: BattleState = BattleState.IDLE
 ## ============================================================
 
 var player: CharacterStats = null
-var enemies: Array[CharacterStats] = []
+var enemies: Array = []  # Array[EnemyInstance]
 
 ## ============================================================
 ## КОЛОДА
@@ -29,14 +29,22 @@ var enemies: Array[CharacterStats] = []
 var battle_deck: BattleDeck = null
 var hand_ui: HandUI = null
 
+
 ## ============================================================
 ## ИНИЦИАЛИЗАЦИЯ БОЯ
 ## ============================================================
 
-func start_battle(player_stats: CharacterStats, enemy_stats: Array[CharacterStats], master_deck: DeckData, hand_ui_node: HandUI):
+func start_battle(player_stats: CharacterStats, enemy_instances: Array, master_deck: DeckData, hand_ui_node: HandUI, floor_level: int = 1, biome_index: int = 1):
 	player = player_stats
-	enemies = enemy_stats
+	enemies = enemy_instances
 	hand_ui = hand_ui_node
+	
+	# Инициализируем каждого врага с учётом скейлинга
+	for enemy in enemies:
+		if enemy.has_method("init"):
+			enemy.init(floor_level, biome_index)
+		if enemy.has_method("load_intents"):
+			enemy.load_intents()
 	
 	# Создаём колоду для боя
 	battle_deck = master_deck.create_battle_copy()
@@ -47,6 +55,7 @@ func start_battle(player_stats: CharacterStats, enemy_stats: Array[CharacterStat
 	
 	# Начинаем ход игрока
 	start_player_turn()
+
 
 ## ============================================================
 ## ХОД ИГРОКА
@@ -101,8 +110,6 @@ func start_enemy_turn():
 		var intent = null
 		if enemy.has_method("select_next_intent"):
 			intent = enemy.select_next_intent()
-		elif enemy.has_method("select_intent"):
-			intent = enemy.select_intent()
 		
 		if intent:
 			SignalManager.enemy_intent_changed.emit(enemy, intent)
@@ -113,7 +120,7 @@ func start_enemy_turn():
 			defeat()
 			return
 		
-		# Проверка победы после каждого врага (если враг умер от собственного эффекта)
+		# Проверка победы после каждого врага
 		check_victory()
 		if current_state == BattleState.VICTORY:
 			return
@@ -134,9 +141,9 @@ func start_enemy_turn():
 	start_player_turn()
 
 
-func execute_enemy_action(enemy: CharacterStats, intent: IntentEntry):
+func execute_enemy_action(enemy, intent: IntentEntry):
 	for effect in intent.effects:
-		EffectExecutor.execute(effect, enemy, [player])
+		EffectExecutor.execute(effect, enemy.stats, [player])
 
 
 ## ============================================================
@@ -215,7 +222,7 @@ func get_player() -> CharacterStats:
 	return player
 
 
-func get_enemies() -> Array[CharacterStats]:
+func get_enemies() -> Array:
 	return enemies
 
 

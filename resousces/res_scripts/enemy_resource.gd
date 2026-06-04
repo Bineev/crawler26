@@ -2,87 +2,33 @@
 extends Resource
 class_name EnemyResource
 
-## ============================================================
-## ИДЕНТИФИКАЦИЯ
-## ============================================================
+## ID врага (из енама MoleEnemy или другого биома)
+@export var enemy_id: DataManager.MoleEnemy = DataManager.MoleEnemy.MOLE_MUTANT
 
-## Уникальный ID врага
-@export var id: String = ""
+## ID биома (из енама Biome)
+@export var biome: DataManager.Biome = DataManager.Biome.MOLE_TUNNELS
 
-## Ключи локализации
-@export var name_key: String = ""
-@export var description_key: String = ""
+## Базовое здоровье (будет умножено на скейлинг)
+@export var base_max_health: int = 30
 
-## Иконка / портрет врага
-@export var icon: Texture2D
-
-## Спрайт врага (для боя)
-@export var sprite: Texture2D
-
-
-## ============================================================
-## БАЗОВЫЕ ХАРАКТЕРИСТИКИ
-## ============================================================
-
-## Максимальное здоровье
-@export var max_health: int = 30
-
-## Базовая сила атаки (может меняться от статусов)
+## Базовая сила (будет умножена на скейлинг)
 @export var base_strength: int = 5
 
-
-## ============================================================
-## ПАССИВКИ (постоянные эффекты)
-## ============================================================
-
-## Пассивки, которые есть у врага с самого начала боя
+## Стартовые пассивки (копируются при инициализации врага)
 @export var starting_passives: Array[PassiveResource] = []
 
 
-## ============================================================
-## НАМЕРЕНИЯ (действия по ходам)
-## ============================================================
-
-## Цикл намерений (последовательность или случайная)
-@export var intent_cycle: Array[IntentEntry] = []
-
-## Тип цикла (SEQUENTIAL, RANDOM, RANDOM_WITHOUT_REPEAT)
-@export var cycle_type: DataManager.IntentCycleType = DataManager.IntentCycleType.SEQUENTIAL
+func get_enemy_id() -> int:
+	return enemy_id
 
 
-## ============================================================
-## МЕТОДЫ
-## ============================================================
+func get_biome() -> int:
+	return biome
 
-## Возвращает локализованное название
-func get_localized_name() -> String:
-	if name_key.is_empty():
-		return id.capitalize()
-	return tr(name_key)
 
-## Возвращает локализованное описание
-func get_localized_description() -> String:
-	if description_key.is_empty():
-		return ""
-	return tr(description_key)
+func get_base_max_health() -> int:
+	return base_max_health
 
-## Создаёт копию врага для боя
-func create_instance() -> EnemyInstance:
-	var instance = EnemyInstance.new()
-	instance.resource = self
-	instance.max_health = max_health
-	instance.current_health = max_health
-	instance.base_strength = base_strength
-	
-	# Копируем пассивки
-	for passive in starting_passives:
-		instance.starting_passives.append(passive.duplicate_for_instance())
-	
-	# Копируем намерения
-	for intent in intent_cycle:
-		instance.intent_cycle.append(intent.duplicate_for_instance())
-	
-	instance.cycle_type = cycle_type
-	instance.current_cycle_index = 0
-	
-	return instance
+
+func get_base_strength() -> int:
+	return base_strength

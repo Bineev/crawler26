@@ -1,0 +1,16 @@
+[gd_resource type="Resource" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://resources/passives/passive_resource.gd" id="1"]
+
+[resource]
+script = ExtResource("id_1")
+id = 4
+name_key = "passive_denial_name"
+description_key = "passive_denial_desc"
+icon = null
+charge_type = 2
+starting_charges = 3
+trigger = 3
+effects = []
+modifiers = []
+custom_logic_script = null

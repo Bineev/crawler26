@@ -181,7 +181,30 @@ enum IntentType {
 	DEBUFF,         # ослабление игрока (включая статусы и пассивки)
 	UNKNOWN,        # неизвестное намерение (знак вопроса)
 	SUMMON,         # призыв союзников
-	HEAL			# лечение
+	HEAL,           # лечение
+}
+
+## ============================================================
+## БИОМЫ И ВРАГИ
+## ============================================================
+
+enum Biome {
+	MOLE_TUNNELS,       # Кротовые норы
+	FLESH_CAVES,        # Пещеры плоти
+	BONE_LABYRINTH,     # Костяной лабиринт
+	FROZEN_DEPTHS,      # Ледяные глубины (на будущее)
+	MAGMA_CORE,         # Ядро магмы (на будущее)
+}
+
+## Враги Кротовых нор
+enum MoleEnemy {
+	MOLE_MUTANT,        # Слепыш-мутант
+	STRONG_MOLE,        # Крот-силач
+	RABID_RAT,          # Бешеная крыса
+	MOLE_FUNGUS,        # Крот-гриб
+	MANY_HEADED_MOLE,   # Многоголовый слепыш
+	FUNGAL_MINER,       # Шахтёр-гриб
+	RODENT_MOUND,       # Гора грызунов (босс)
 }
 
 
@@ -201,15 +224,12 @@ const PENITENT_ATONEMENT_GAIN_PER_DAMAGE: int = 1
 
 ## === Статусы ===
 
-# Poison
 const POISON_BASE_DAMAGE_PER_STACK: int = 1
 const POISON_TICK_INTERVAL: int = 1
 
-# Bleed
 const BLEED_BASE_DAMAGE_PER_STACK: int = 5
 const BLEED_TICK_INTERVAL: int = 2
 
-# Burn
 const BURN_BASE_DAMAGE_PER_STACK: int = 2
 const BURN_TICK_INTERVAL: int = 1
 const BURN_THRESHOLD_STACKS: int = 10
@@ -217,17 +237,12 @@ const BURN_EXPLOSION_DAMAGE_PER_STACK: int = 3
 const BURN_STRENGTH_STACKS: int = 1
 const BURN_STRENGTH_DURATION: int = 2
 
-# Cold
 const COLD_EFFECT_PERCENT_PER_STACK: float = 0.01
 const COLD_MIN_EFFECT_MULTIPLIER: float = 0.75
 
-# Weakness
 const WEAKNESS_DAMAGE_MULTIPLIER: float = 0.75
-
-# Vulnerability
 const VULNERABILITY_DAMAGE_MULTIPLIER: float = 1.5
 
-# Despair
 const DESPAIR_DURATION: int = 2
 const DESPAIR_DAMAGE_DEALT_MULTIPLIER: float = 0.75
 
@@ -246,13 +261,9 @@ const FREEZING_GROUND_RECHARGE_TURN: int = 6
 
 const DENIAL_STARTING_CHARGES: int = 3
 
-# Strength
 const STRENGTH_FLAT_BONUS_PER_STACK: int = 1
-
-# Regen
 const REGEN_HEAL_PER_STACK: int = 1
 
-# Shame (пассивка)
 const SHAME_DURATION: int = 2
 const SHAME_DAMAGE_TAKEN_MULTIPLIER: float = 1.25
 const SHAME_ATONEMENT_MULTIPLIER: float = 2.0
@@ -397,7 +408,6 @@ func get_status_name(status: Status) -> String:
 ## 7. ИКОНКИ
 ## ============================================================
 
-## Иконки намерений (IntentType)
 const INTENT_ICONS: Dictionary = {
 	IntentType.ATTACK: preload("res://img/icons/intents/attack.png"),
 	IntentType.DEFEND: preload("res://img/icons/intents/defend.png"),
@@ -408,7 +418,6 @@ const INTENT_ICONS: Dictionary = {
 	IntentType.HEAL: preload("res://img/icons/intents/heal.png"),
 }
 
-## Иконки типов карт (CardType)
 const CARD_TYPE_ICONS: Dictionary = {
 	CardType.ATTACK: preload("res://img/icons/card_types/attack.png"),
 	CardType.DEFEND: preload("res://img/icons/card_types/defend.png"),
@@ -419,7 +428,6 @@ const CARD_TYPE_ICONS: Dictionary = {
 	CardType.UTILITY: preload("res://img/icons/card_types/utility.png"),
 }
 
-## Иконки статусов (Status)
 const STATUS_ICONS: Dictionary = {
 	Status.POISON: preload("res://img/icons/statuses/poison.png"),
 	Status.BLEED: preload("res://img/icons/statuses/bleed.png"),
@@ -432,7 +440,6 @@ const STATUS_ICONS: Dictionary = {
 	Status.SHIELD: preload("res://img/icons/statuses/shield.png"),
 }
 
-## Иконки пассивок (Passive)
 const PASSIVE_ICONS: Dictionary = {
 	Passive.REGROWTH: preload("res://img/icons/passives/regrowth.png"),
 	Passive.VENOMOUS_SHIELD: preload("res://img/icons/passives/venomous_shield.png"),
@@ -467,7 +474,6 @@ func get_passive_icon(passive: Passive) -> Texture2D:
 var _status_resources: Dictionary = {}
 var _status_resources_loaded: bool = false
 
-## Загружает все ресурсы статусов
 func load_status_resources():
 	if _status_resources_loaded:
 		return
@@ -484,16 +490,78 @@ func load_status_resources():
 	
 	_status_resources_loaded = true
 
-## Возвращает ресурс статуса
 func get_status_resource(status: Status) -> StatusResource:
 	if not _status_resources_loaded:
 		load_status_resources()
 	return _status_resources.get(status, null)
 
+func get_status_by_enum(status: Status) -> StatusResource:
+	return get_status_resource(status)
+
 
 ## ============================================================
-## 10. ИНИЦИАЛИЗАЦИЯ
+## 10. ЗАГРУЗКА РЕСУРСОВ ПАССИВОК
+## ============================================================
+
+var _passive_resources: Dictionary = {}
+var _passive_resources_loaded: bool = false
+
+func load_passive_resources():
+	if _passive_resources_loaded:
+		return
+	
+	_passive_resources[Passive.REGROWTH] = load("res://resources/passives/regrowth.tres")
+	_passive_resources[Passive.VENOMOUS_SHIELD] = load("res://resources/passives/venomous_shield.tres")
+	_passive_resources[Passive.WRATH] = load("res://resources/passives/wrath.tres")
+	_passive_resources[Passive.FREEZING_GROUND] = load("res://resources/passives/freezing_ground.tres")
+	_passive_resources[Passive.DENIAL] = load("res://resources/passives/denial.tres")
+	_passive_resources[Passive.SHAME] = load("res://resources/passives/shame.tres")
+	
+	_passive_resources_loaded = true
+
+func get_passive_resource(passive: Passive) -> PassiveResource:
+	if not _passive_resources_loaded:
+		load_passive_resources()
+	return _passive_resources.get(passive, null)
+
+func get_passive_by_enum(passive: Passive) -> PassiveResource:
+	return get_passive_resource(passive)
+
+
+## ============================================================
+## 11. ДАННЫЕ ВРАГОВ ДЛЯ БИОМОВ
+## ============================================================
+
+var _current_enemies_data: Resource = null
+
+func load_biome_enemies(biome: Biome):
+	match biome:
+		Biome.MOLE_TUNNELS:
+			_current_enemies_data = preload("res://data/biomes/mole_tunnels_enemies.gd").new()
+		# Biome.FLESH_CAVES:
+		#     _current_enemies_data = preload("res://data/biomes/flesh_caves_enemies.gd").new()
+		# Biome.BONE_LABYRINTH:
+		#     _current_enemies_data = preload("res://data/biomes/bone_labyrinth_enemies.gd").new()
+
+func get_enemy_intents(enemy_id: int) -> Dictionary:
+	if _current_enemies_data and _current_enemies_data.has_constant("INTENTS"):
+		var intents_dict = _current_enemies_data.get_constant("INTENTS")
+		return intents_dict.get(enemy_id, {})
+	return {}
+
+func get_enemy_intents_list(enemy_id: int) -> Array:
+	var data = get_enemy_intents(enemy_id)
+	return data.get("intents", [])
+
+func get_enemy_cycle_type(enemy_id: int) -> int:
+	var data = get_enemy_intents(enemy_id)
+	return data.get("cycle_type", IntentCycleType.SEQUENTIAL)
+
+
+## ============================================================
+## 12. ИНИЦИАЛИЗАЦИЯ
 ## ============================================================
 
 func _ready():
 	load_status_resources()
+	load_passive_resources()

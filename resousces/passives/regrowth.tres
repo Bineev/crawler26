@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="PassiveResource" load_steps=4 format=3 uid="uid://bsr7h14ni8cod"]
+
+[ext_resource type="Script" uid="uid://cmra25r1r3ivt" path="res://resousces/res_scripts/effect_entry.gd" id="1_vkuvm"]
+[ext_resource type="Script" uid="uid://0mjn55jcxdti" path="res://resousces/res_scripts/modifier_entry.gd" id="2_b5rmu"]
+[ext_resource type="Script" uid="uid://br4ase11y58nd" path="res://resousces/res_scripts/passive_resource.gd" id="3_bip7e"]
+
+[resource]
+script = ExtResource("3_bip7e")
+charge_type = 1
+starting_charges = 5
+trigger = 6
+metadata/_custom_type_script = "uid://br4ase11y58nd"

@@ -1,0 +1,16 @@
+[gd_resource type="Resource" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://resources/passives/passive_resource.gd" id="1"]
+
+[resource]
+script = ExtResource("id_1")
+id = 6
+name_key = "passive_shame_name"
+description_key = "passive_shame_desc"
+icon = null
+charge_type = 1
+starting_charges = 2
+trigger = 2
+effects = []
+modifiers = []
+custom_logic_script = null
