@@ -2,39 +2,62 @@
 extends Resource
 class_name PassiveResource
 
+## ============================================================
+## ОСНОВНЫЕ ПАРАМЕТРЫ
+## ============================================================
+
+## Уникальный ID пассивки (из DataManager.Passive)
 @export var id: DataManager.Passive
+
+## Ключи локализации
 @export var name_key: String = ""
 @export var description_key: String = ""
+
+## Иконка пассивки (64×64)
 @export var icon: Texture2D
 
+
+## ============================================================
+## ТИП ПАССИВКИ
+## ============================================================
+
+## Тип зарядов (PERMANENT, TURN_BASED, USAGE_BASED, CONDITIONAL)
 @export var charge_type: DataManager.PassiveChargeType = DataManager.PassiveChargeType.PERMANENT
+
+## Стартовое количество зарядов (0 = безлимит для PERMANENT)
 @export var starting_charges: int = 0
 
 ## Триггер активации
 @export var trigger: DataManager.PassiveTrigger = DataManager.PassiveTrigger.ON_TAKE_DAMAGE
 
-## Эффекты, которые активируются
+
+## ============================================================
+## ЭФФЕКТЫ
+## ============================================================
+
+## Эффекты, которые активируются при срабатывании триггера
 @export var effects: Array[EffectEntry] = []
 
-## Постоянные модификаторы
+## Постоянные модификаторы (действуют, пока активна пассивка)
 @export var modifiers: Array[ModifierEntry] = []
 
-## Сложная логика
+## Сложная логика (для пассивок, которые не покрываются эффектами/модификаторами)
 @export var custom_logic_script: Script = null
+
 
 ## ============================================================
 ## СОСТОЯНИЕ (для копий ресурса)
 ## ============================================================
 
-## Текущие заряды (для копий)
+## Текущие заряды
 var current_charges: int = 0
 
-## Счётчик применения эффектов (для роста)
-var effect_application_counters: Dictionary = {}  # key: EffectEntry, value: counter
+## Счётчик применений эффектов (для роста)
+var effect_application_counters: Dictionary = {}  # key: EffectEntry.get_instance_id(), value: counter
 
 
 ## ============================================================
-## МЕТОДЫ
+## МЕТОДЫ КОПИРОВАНИЯ
 ## ============================================================
 
 ## Создаёт копию пассивки для использования на конкретной цели
@@ -55,7 +78,7 @@ func duplicate_for_instance() -> PassiveResource:
 	for effect in effects:
 		instance.effects.append(effect.duplicate_for_instance())
 	
-	# Копируем модификаторы
+	# Копируем модификаторы (глубокое копирование)
 	for mod in modifiers:
 		instance.modifiers.append(mod.duplicate(true))
 	
@@ -76,6 +99,16 @@ func init_instance():
 	current_charges = starting_charges
 	effect_application_counters.clear()
 
+
+## Очищает состояние (при удалении пассивки)
+func clear_instance_state():
+	current_charges = 0
+	effect_application_counters.clear()
+
+
+## ============================================================
+## ЛОКАЛИЗАЦИЯ
+## ============================================================
 
 ## Возвращает локализованное название
 func get_localized_name() -> String:
@@ -104,11 +137,17 @@ func _generate_default_description() -> String:
 			return "При получении атаки накладывает Лёд на атакующего. 3 заряда."
 		DataManager.Passive.DENIAL:
 			return "Блокирует первые 3 негативных статуса."
+		DataManager.Passive.SHAME:
+			return "Увеличивает входящий урон на 25%% и удваивает получаемое Искупление."
 		_:
 			return ""
 
 
-## Проверяет, имеет ли пассивка постоянные заряды
+## ============================================================
+## УПРАВЛЕНИЕ ЗАРЯДАМИ
+## ============================================================
+
+## Проверяет, имеет ли пассивка заряды
 func has_charges() -> bool:
 	return charge_type != DataManager.PassiveChargeType.PERMANENT
 
@@ -125,12 +164,21 @@ func consume_charge() -> bool:
 	return true
 
 
+## Восстанавливает заряды до стартового значения
+func restore_charges():
+	current_charges = starting_charges
+
+
 ## Получает количество оставшихся зарядов (для UI)
 func get_remaining_charges() -> int:
 	return current_charges
 
 
-## Получает счётчик применений для эффекта (для роста)
+## ============================================================
+## СЧЁТЧИКИ ДЛЯ РОСТА ЭФФЕКТОВ
+## ============================================================
+
+## Получает счётчик применений для эффекта
 func get_effect_counter(effect: EffectEntry) -> int:
 	return effect_application_counters.get(effect.get_instance_id(), 0)
 
@@ -146,8 +194,33 @@ func reset_effect_counter(effect: EffectEntry):
 	effect_application_counters.erase(effect.get_instance_id())
 
 
+## ============================================================
+## ПРОВЕРКИ
+## ============================================================
+
 ## Проверяет, активна ли пассивка (есть ли заряды)
 func is_active() -> bool:
 	if not has_charges():
 		return true
 	return current_charges > 0
+
+
+## Возвращает триггер активации
+func get_trigger() -> DataManager.PassiveTrigger:
+	return trigger
+
+
+## ============================================================
+## UI МЕТОДЫ
+## ============================================================
+
+## Возвращает иконку пассивки (через DataManager)
+func get_icon() -> Texture2D:
+	return DataManager.get_passive_icon(id)
+
+
+## Возвращает строковое представление зарядов (для UI)
+func get_charges_string() -> String:
+	if not has_charges():
+		return ""
+	return str(current_charges) + "/" + str(starting_charges)

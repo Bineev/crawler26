@@ -24,6 +24,8 @@ GameManager="*res://scripts/global/game_manager.gd"
 EntityManager="*res://scripts/global/entity_manager.gd"
 StatusInteractionManager="*res://scripts/global/status_interaction_manager.gd"
 EffectExecutor="*res://scripts/global/EffectExecutor.gd"
+BattleDeck="*res://scripts/global/battle_deck.gd"
+BattleManager="*res://scripts/global/battle_manager.gd"
 
 [display]
 

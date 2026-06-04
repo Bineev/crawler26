@@ -6,13 +6,10 @@ class_name IntentEntry
 ## НАМЕРЕНИЕ ВРАГА
 ## ============================================================
 
-## Тип намерения (ATTACK, DEFEND, BUFF, DEBUFF, APPLY_STATUS, APPLY_PASSIVE)
+## Тип намерения (ATTACK, DEFEND, BUFF, DEBUFF, APPLY_STATUS, APPLY_PASSIVE, UNKNOWN, SUMMON)
 @export var intent_type: DataManager.IntentType = DataManager.IntentType.ATTACK
 
-## Иконка намерения (для UI)
-@export var icon: Texture2D
-
-## Ключ локализации для описания
+## Ключ локализации для описания (опционально, если нужен уникальный текст)
 @export var description_key: String = ""
 
 ## Эффекты, которые выполняются при действии
@@ -25,9 +22,9 @@ class_name IntentEntry
 
 ## Возвращает локализованное описание
 func get_localized_description() -> String:
-	if description_key.is_empty():
-		return _generate_default_description()
-	return tr(description_key)
+	if not description_key.is_empty():
+		return tr(description_key)
+	return _generate_default_description()
 
 func _generate_default_description() -> String:
 	match intent_type:
@@ -38,19 +35,22 @@ func _generate_default_description() -> String:
 		DataManager.IntentType.BUFF:
 			return "Усиливается"
 		DataManager.IntentType.DEBUFF:
-			return "Ослабляет"
-		DataManager.IntentType.APPLY_STATUS:
-			return "Накладывает статус"
-		DataManager.IntentType.APPLY_PASSIVE:
-			return "Накладывает пассивку"
+			return "Ослабляет игрока"
+		DataManager.IntentType.UNKNOWN:
+			return "??? (неизвестно)"
+		DataManager.IntentType.SUMMON:
+			return "Призывает союзников"
 		_:
-			return ""
+			return "Действует"
+
+## Получить иконку через DataManager (вместо прямого поля)
+func get_icon() -> Texture2D:
+	return DataManager.get_intent_icon(intent_type)
 
 ## Создаёт копию намерения для экземпляра врага
 func duplicate_for_instance() -> IntentEntry:
 	var copy = IntentEntry.new()
 	copy.intent_type = intent_type
-	copy.icon = icon
 	copy.description_key = description_key
 	
 	for effect in effects:

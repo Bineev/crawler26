@@ -29,8 +29,8 @@ class_name CardUI
 
 const ICON_SIZE: int = DataManager.CARD_ICON_SIZE
 const ART_SIZE: int = DataManager.CARD_ART_SIZE
-const CARD_WIDTH: int = DataManager.CARD_WIDTH
-const CARD_HEIGHT: int = DataManager.CARD_HEIGHT
+const CARD_BASE_WIDTH: int = DataManager.CARD_BASE_WIDTH
+const CARD_BASE_HEIGHT: int = DataManager.CARD_BASE_HEIGHT
 const CARD_SCALE_NORMAL: float = DataManager.CARD_SCALE_NORMAL
 const CARD_SCALE_HOVER: float = DataManager.CARD_SCALE_HOVER
 const CARD_SCALE_IN_HAND: float = DataManager.CARD_SCALE_IN_HAND
@@ -42,6 +42,9 @@ const CARD_SCALE_IN_HAND: float = DataManager.CARD_SCALE_IN_HAND
 
 var is_hovered: bool = false
 var original_scale: Vector2 = Vector2.ONE
+var is_in_hand: bool = false
+var is_selectable: bool = true
+var is_being_played: bool = false  # защита от двойного клика
 
 
 ## ============================================================
@@ -61,16 +64,12 @@ func display():
 	if not card_data:
 		return
 	
-	# Базовые поля
 	cost_label.text = str(card_data.cost)
 	name_label.text = card_data.get_localized_name()
 	art_image.texture = card_data.texture
 	description_label.text = card_data.get_localized_description()
-	
-	# Цвет подложки иллюстрации (из персонажа / биома)
 	art_background.color = card_data.get_base_color()
 	
-	# Очистка и заполнение иконок
 	clear_icons()
 	fill_left_icons()
 	fill_right_icons()
@@ -88,7 +87,7 @@ func clear_icons():
 
 
 ## ============================================================
-## ЛЕВАЯ КОЛОНКА (статусы и пассивки, которые карта накладывает)
+## ЛЕВАЯ КОЛОНКА (статусы и пассивки)
 ## ============================================================
 
 func fill_left_icons():
@@ -97,7 +96,6 @@ func fill_left_icons():
 	
 	_collect_left_icons_from_effects(card_data.effects, icons, tooltips)
 	
-	# Убираем дубликаты (по текстуре)
 	var unique_icons = _unique_icons(icons, tooltips)
 	
 	for i in range(unique_icons.size()):
@@ -108,13 +106,17 @@ func _collect_left_icons_from_effects(effects: Array[EffectEntry], icons: Array[
 	for effect in effects:
 		match effect.category:
 			DataManager.EffectCategory.APPLY_STATUS:
-				if effect.status and effect.status.icon:
-					icons.append(effect.status.icon)
-					tooltips.append(effect.status.get_localized_name())
+				if effect.status:
+					var icon = DataManager.get_status_icon(effect.status.id)
+					if icon:
+						icons.append(icon)
+						tooltips.append(effect.status.get_localized_name())
 			DataManager.EffectCategory.APPLY_PASSIVE:
-				if effect.passive and effect.passive.icon:
-					icons.append(effect.passive.icon)
-					tooltips.append(effect.passive.get_localized_name())
+				if effect.passive:
+					var icon = DataManager.get_passive_icon(effect.passive.id)
+					if icon:
+						icons.append(icon)
+						tooltips.append(effect.passive.get_localized_name())
 			DataManager.EffectCategory.CONDITIONAL:
 				if effect.true_effect:
 					_collect_left_icons_from_effects([effect.true_effect], icons, tooltips)
@@ -123,7 +125,7 @@ func _collect_left_icons_from_effects(effects: Array[EffectEntry], icons: Array[
 
 
 ## ============================================================
-## ПРАВАЯ КОЛОНКА (глобальные категории действий)
+## ПРАВАЯ КОЛОНКА (типы действий)
 ## ============================================================
 
 func fill_right_icons():
@@ -131,21 +133,25 @@ func fill_right_icons():
 	var tooltips: Array[String] = []
 	
 	for card_type in card_data.get_card_types():
+		var icon = DataManager.get_card_type_icon(card_type)
+		if not icon:
+			continue
+		
 		match card_type:
 			DataManager.CardType.ATTACK:
-				_add_right_icon(DataManager.ICON_DAMAGE, "Атака", icons, tooltips)
-			DataManager.CardType.BLOCK:
-				_add_right_icon(DataManager.ICON_BLOCK, "Защита", icons, tooltips)
+				_add_right_icon(icon, "Атака", icons, tooltips)
+			DataManager.CardType.DEFEND:
+				_add_right_icon(icon, "Защита", icons, tooltips)
 			DataManager.CardType.HEAL:
-				_add_right_icon(DataManager.ICON_HEAL, "Лечение", icons, tooltips)
+				_add_right_icon(icon, "Лечение", icons, tooltips)
 			DataManager.CardType.RESOURCE:
-				_add_right_icon(DataManager.ICON_RESOURCE, "Ресурс (Искупление)", icons, tooltips)
+				_add_right_icon(icon, "Ресурс (Искупление)", icons, tooltips)
 			DataManager.CardType.BUFF_SELF:
-				_add_right_icon(DataManager.ICON_BUFF, "Бафф на себя", icons, tooltips)
+				_add_right_icon(icon, "Бафф на себя", icons, tooltips)
 			DataManager.CardType.DEBUFF:
-				_add_right_icon(DataManager.ICON_DEBUFF, "Дебафф на врага", icons, tooltips)
+				_add_right_icon(icon, "Дебафф на врага", icons, tooltips)
 			DataManager.CardType.UTILITY:
-				_add_right_icon(DataManager.ICON_UTILITY, "Утилити", icons, tooltips)
+				_add_right_icon(icon, "Утилити", icons, tooltips)
 	
 	var unique_icons = _unique_icons(icons, tooltips)
 	
@@ -160,7 +166,7 @@ func _add_right_icon(icon: Texture2D, tooltip: String, icons: Array[Texture2D], 
 
 
 ## ============================================================
-## ДОБАВЛЕНИЕ ИКОНКИ В КОНТЕЙНЕР
+## ДОБАВЛЕНИЕ ИКОНКИ
 ## ============================================================
 
 func add_icon(container: VBoxContainer, texture: Texture2D, tooltip: String):
@@ -191,23 +197,128 @@ func _unique_icons(icons: Array[Texture2D], tooltips: Array[String]) -> Array[Di
 
 
 ## ============================================================
+## МАСШТАБИРОВАНИЕ
+## ============================================================
+
+func set_hand_scale():
+	is_in_hand = true
+	original_scale = Vector2(CARD_SCALE_IN_HAND, CARD_SCALE_IN_HAND)
+	scale = original_scale
+
+
+func set_normal_scale():
+	is_in_hand = false
+	original_scale = Vector2(CARD_SCALE_NORMAL, CARD_SCALE_NORMAL)
+	scale = original_scale
+
+
+## ============================================================
 ## АНИМАЦИИ И ВЗАИМОДЕЙСТВИЕ
 ## ============================================================
 
 func _on_mouse_entered():
-	is_hovered = true
-	var tween = create_tween()
-	tween.tween_property(self, "scale", Vector2(CARD_SCALE_HOVER, CARD_SCALE_HOVER), 0.1)
+	if not is_hovered:
+		is_hovered = true
+		var tween = create_tween()
+		tween.tween_property(self, "scale", Vector2(CARD_SCALE_HOVER, CARD_SCALE_HOVER), 0.1)
+
 
 func _on_mouse_exited():
-	is_hovered = false
-	var tween = create_tween()
-	tween.tween_property(self, "scale", original_scale, 0.1)
+	if is_hovered:
+		is_hovered = false
+		var tween = create_tween()
+		tween.tween_property(self, "scale", original_scale, 0.1)
 
-func set_hand_scale():
-	original_scale = Vector2(CARD_SCALE_IN_HAND, CARD_SCALE_IN_HAND)
-	scale = original_scale
 
-func set_normal_scale():
-	original_scale = Vector2(CARD_SCALE_NORMAL, CARD_SCALE_NORMAL)
-	scale = original_scale
+func _on_gui_input(event: InputEvent):
+	if not is_selectable:
+		return
+	if is_being_played:
+		return
+	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
+		on_card_clicked()
+
+
+func on_card_clicked():
+	if not is_selectable:
+		return
+	if is_being_played:
+		return
+	
+	if not BattleManager.is_player_turn():
+		return
+	
+	var player_stats = BattleManager.get_player()
+	if not player_stats:
+		return
+	
+	if player_stats.get_flat(DataManager.FlatStat.ENERGY) < card_data.cost:
+		SignalManager.log_message.emit("Недостаточно энергии!")
+		return
+	
+	play_card()
+
+
+func play_card(target = null):
+	if is_being_played:
+		return
+	
+	is_being_played = true
+	
+	var player_stats = BattleManager.get_player()
+	if not player_stats:
+		is_being_played = false
+		return
+	
+	# Списываем энергию
+	player_stats.modify_flat(DataManager.FlatStat.ENERGY, -card_data.cost)
+	
+	# Выполняем эффекты карты
+	for effect in card_data.effects:
+		var targets = _get_targets_for_effect(effect, target)
+		EffectExecutor.execute(effect, player_stats, targets, {"card": card_data})
+	
+	# Отправляем карту в сброс или удаляем
+	var battle_deck = BattleManager.get_battle_deck()
+	if battle_deck:
+		battle_deck.play_card(self, card_data, target)
+	else:
+		queue_free()
+	
+	SignalManager.card_played.emit(card_data)
+	
+	is_being_played = false
+
+
+func _get_targets_for_effect(effect: EffectEntry, selected_target) -> Array:
+	match effect.target:
+		DataManager.EffectTarget.SELF:
+			return [BattleManager.get_player()]
+		DataManager.EffectTarget.ENEMY:
+			if selected_target:
+				return [selected_target]
+			var enemies = BattleManager.get_enemies()
+			if enemies.size() > 0:
+				return [enemies[0]]
+			return []
+		DataManager.EffectTarget.ALL_ENEMIES:
+			return BattleManager.get_enemies()
+		DataManager.EffectTarget.ALL_ALLIES:
+			return [BattleManager.get_player()]
+		DataManager.EffectTarget.ANY:
+			if selected_target:
+				return [selected_target]
+			return []
+	return []
+
+
+## ============================================================
+## ДОПОЛНИТЕЛЬНЫЕ МЕТОДЫ
+## ============================================================
+
+func set_selectable(selectable: bool):
+	is_selectable = selectable
+
+
+func get_card_data() -> CardData:
+	return card_data

@@ -6,7 +6,7 @@ extends Node
 ## ============================================================
 ## Отвечает за:
 ## - проверку возможности наложения статусов (исключающие пары)
-## - обработку взаимодействий при наложении (яд ↔ кровотечение, огонь ↔ лёд)
+## - обработку взаимодействий при наложении (яд ↔ кровотечение, огонь ↔ холод)
 ## - управление иммунитетом
 ## ============================================================
 
@@ -28,12 +28,12 @@ func can_apply(target, new_status: DataManager.Status) -> bool:
 	
 	# === Исключающие пары ===
 	
-	# Огонь и лёд не могут быть вместе
+	# Огонь (Burn) и Холод (Cold) не могут быть вместе
 	if new_status == DataManager.Status.BURN:
-		if DataManager.Status.ICE in current_statuses:
+		if DataManager.Status.COLD in current_statuses:
 			return false
 	
-	if new_status == DataManager.Status.ICE:
+	if new_status == DataManager.Status.COLD:
 		if DataManager.Status.BURN in current_statuses:
 			return false
 	
@@ -51,10 +51,10 @@ func can_apply(target, new_status: DataManager.Status) -> bool:
 func on_status_applied(target, new_status: DataManager.Status, stacks: int = 0):
 	var current_statuses = target.get_applied_statuses()
 	
-	# === Горение → Лёд (снимает 3 стака) ===
+	# === Горение → Холод (снимает 3 стака) ===
 	if new_status == DataManager.Status.BURN:
-		if DataManager.Status.ICE in current_statuses:
-			target.reduce_status_stacks(DataManager.Status.ICE, 3)
+		if DataManager.Status.COLD in current_statuses:
+			target.reduce_status_stacks(DataManager.Status.COLD, 3)
 	
 	# === Яд → Кровотечение (снимает 1 стак) ===
 	if new_status == DataManager.Status.POISON:
@@ -72,10 +72,10 @@ func on_status_applied(target, new_status: DataManager.Status, stacks: int = 0):
 			target.apply_immunity(DataManager.Status.POISON, 2)
 			target.apply_immunity(DataManager.Status.BLEED, 2)
 	
-	# === Лёд замораживает действие Яда ===
-	if new_status == DataManager.Status.ICE:
+	# === Холод замораживает действие Яда ===
+	if new_status == DataManager.Status.COLD:
 		if DataManager.Status.POISON in current_statuses:
-			target.freeze_poison()   # Яд не тикает, пока есть лёд
+			target.freeze_poison()   # Яд не тикает, пока есть холод
 
 
 ## ============================================================
@@ -86,8 +86,8 @@ func on_status_applied(target, new_status: DataManager.Status, stacks: int = 0):
 ## @param target: CharacterStats - цель, с которой сняли статус
 ## @param removed_status: DataManager.Status - ID снятого статуса
 func on_status_removed(target, removed_status: DataManager.Status):
-	# Если сняли лёд, разморозить яд
-	if removed_status == DataManager.Status.ICE:
+	# Если сняли холод, разморозить яд
+	if removed_status == DataManager.Status.COLD:
 		if DataManager.Status.POISON in target.get_applied_statuses():
 			target.unfreeze_poison()
 
@@ -129,6 +129,10 @@ func on_status_tick(target, status: DataManager.Status, stacks: int, damage: int
 ## Взрыв горения (наносит урон всем врагам)
 func _trigger_burn_explosion(target, stacks: int):
 	var explosion_damage = stacks * DataManager.BURN_EXPLOSION_DAMAGE_PER_STACK
-	target.take_damage(explosion_damage, false)
+	# Наносим урон всем врагам (получаем их через группу "enemies")
+	var enemies = target.get_tree().get_nodes_in_group("enemies")
+	for enemy in enemies:
+		if enemy.has_method("take_damage"):
+			enemy.take_damage(explosion_damage)
 	# Снимаем все стаки горения после взрыва
 	target.remove_status(DataManager.Status.BURN)

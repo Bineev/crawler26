@@ -14,7 +14,7 @@ enum FlatStat {
 	BLOCK,
 	HAND_SIZE,
 	DRAW_PER_TURN,
-	ATONEMENT,        # ← добавить
+	ATONEMENT,
 	MAX_ATONEMENT
 }
 
@@ -23,6 +23,7 @@ enum ModifierChangeType {
 	PERCENT,      # процентное изменение (0.25 = +25%)
 	FLAT_BONUS,   # флэт-бонус (+5)
 }
+
 ## Модификаторы статов (проценты / множители)
 enum ModifierStat {
 	DAMAGE_DEALT_PERCENT,      # +X% урона
@@ -59,6 +60,7 @@ enum PassiveTrigger {
 	ON_KILL_ENEMY,
 	ON_STATUS_TICK,
 }
+
 ## Типы эффектов карт
 enum EffectCategory {
 	DAMAGE,
@@ -75,7 +77,7 @@ enum EffectCategory {
 	CONVERT,
 	CONVERT_EXCESS_TO_BLOCK,
 	CONDITIONAL,
-	CUSTOM,              # ← добавить
+	CUSTOM,
 }
 
 ## Тип значения для SCALED_VALUE эффекта
@@ -89,45 +91,37 @@ enum ScaledType {
 
 ## Тип цикла намерений
 enum IntentCycleType {
-	SEQUENTIAL,           # последовательно
-	RANDOM,               # случайно
-	RANDOM_WITHOUT_REPEAT,# случайно без повтора
+	SEQUENTIAL,
+	RANDOM,
+	RANDOM_WITHOUT_REPEAT,
 }
 
-## Тип намерения врага
-enum IntentType {
-	ATTACK,
-	DEFEND,
-	BUFF,
-	DEBUFF,
-	APPLY_STATUS,
-	APPLY_PASSIVE,
-}
 ## Цель эффекта
 enum EffectTarget {
-	SELF,           # на себя
-	ENEMY,          # на врага
-	ALL_ENEMIES,    # на всех врагов
-	ALL_ALLIES,     # на всех союзников
-	ANY,            # выбор цели
+	SELF,
+	ENEMY,
+	ALL_ENEMIES,
+	ALL_ALLIES,
+	ANY,
 }
 
 ## Типы зарядов пассивок
 enum PassiveChargeType {
-	PERMANENT,      # постоянная
-	TURN_BASED,     # тикает по ходам
-	USAGE_BASED,    # тратится при активации
-	CONDITIONAL,    # особые условия
+	PERMANENT,
+	TURN_BASED,
+	USAGE_BASED,
+	CONDITIONAL,
 }
 
 ## Все возможные пассивки
 enum Passive {
 	# Кротовые норы
-	REGROWTH,           # Оживление (растущая регенерация)
-	VENOMOUS_SHIELD,    # Ядовитый щит
-	WRATH,              # Злость (+1 силы/ход)
-	FREEZING_GROUND,    # Обмерзание
-	DENIAL,             # Отрицание
+	REGROWTH,
+	VENOMOUS_SHIELD,
+	WRATH,
+	FREEZING_GROUND,
+	DENIAL,
+	SHAME,
 	# Пещеры плоти
 	FLESH_WARD,
 	CRIMSON_FRENZY,
@@ -135,22 +129,23 @@ enum Passive {
 
 ## Все возможные статусы
 enum Status {
-	POISON,         # Яд
-	BLEED,          # Кровотечение
-	BURN,           # Горение
-	ICE,            # Лёд
-	WEAKNESS,       # Слабость
-	VULNERABILITY,  # Уязвимость
-	SHAME,          # Стыд (Сломленный)
-	STRENGTH		# Сила
+	POISON,
+	BLEED,
+	BURN,
+	COLD,
+	WEAKNESS,
+	VULNERABILITY,
+	STRENGTH,
+	REGEN,
+	SHIELD,
 }
 
 ## Классы персонажей
 enum CharacterClass {
-	PENITENT,       # Сломленный
-	WARRIOR,        # Воитель
-	MYSTIC,         # Мистик
-	ROGUE,          # Плут
+	PENITENT,
+	WARRIOR,
+	MYSTIC,
+	ROGUE,
 }
 
 ## Грейды карт
@@ -164,13 +159,29 @@ enum CardGrade {
 
 ## Типы карт
 enum CardType {
-	ATTACK,     # наносит урон
-	BLOCK,      # даёт блок
-	BUFF_SELF,  # бафф на себя
-	DEBUFF,     # дебафф на врага
-	HEAL,       # лечение
-	RESOURCE,   # операция с ресурсом (Искупление)
-	UTILITY,    # добор карт, энергия
+	ATTACK,
+	DEFEND,
+	BUFF_SELF,
+	DEBUFF,
+	HEAL,
+	RESOURCE,
+	UTILITY,
+}
+
+## Теги карт
+enum CardTag {
+	BURNS,      # сгорающая (не попадает в сброс)
+}
+
+## Намерения врагов
+enum IntentType {
+	ATTACK,         # атака
+	DEFEND,         # защита (блок)
+	BUFF,           # усиление себя
+	DEBUFF,         # ослабление игрока (включая статусы и пассивки)
+	UNKNOWN,        # неизвестное намерение (знак вопроса)
+	SUMMON,         # призыв союзников
+	HEAL			# лечение
 }
 
 
@@ -179,7 +190,6 @@ enum CardType {
 ## ============================================================
 
 ## === Основные лимиты ===
-const MAX_HAND_SIZE: int = 10
 const STARTING_HAND_SIZE: int = 5
 const STARTING_ENERGY: int = 3
 const MAX_ENERGY: int = 3
@@ -191,69 +201,67 @@ const PENITENT_ATONEMENT_GAIN_PER_DAMAGE: int = 1
 
 ## === Статусы ===
 
-# Poison (Яд)
+# Poison
 const POISON_BASE_DAMAGE_PER_STACK: int = 1
 const POISON_TICK_INTERVAL: int = 1
 
-# Bleed (Кровотечение)
+# Bleed
 const BLEED_BASE_DAMAGE_PER_STACK: int = 5
 const BLEED_TICK_INTERVAL: int = 2
 
-# Burn (Горение)
-const BURN_BASE_DAMAGE_PER_STACK: int = 1
+# Burn
+const BURN_BASE_DAMAGE_PER_STACK: int = 2
 const BURN_TICK_INTERVAL: int = 1
 const BURN_THRESHOLD_STACKS: int = 10
 const BURN_EXPLOSION_DAMAGE_PER_STACK: int = 3
+const BURN_STRENGTH_STACKS: int = 1
+const BURN_STRENGTH_DURATION: int = 2
 
-# Ice (Лёд)
-const ICE_EFFECT_PERCENT_PER_STACK: float = 0.01   # 1% за стак
-const ICE_MAX_EFFECT_PERCENT: float = 0.25        # макс 25%
-const ICE_MIN_EFFECT_MULTIPLIER: float = 0.75
+# Cold
+const COLD_EFFECT_PERCENT_PER_STACK: float = 0.01
+const COLD_MIN_EFFECT_MULTIPLIER: float = 0.75
 
-# Weakness (Слабость)
-const WEAKNESS_DAMAGE_MULTIPLIER: float = 0.75    # -25% урона
+# Weakness
+const WEAKNESS_DAMAGE_MULTIPLIER: float = 0.75
 
-# Vulnerability (Уязвимость)
-const VULNERABILITY_DAMAGE_MULTIPLIER: float = 1.5   # +50% урона
+# Vulnerability
+const VULNERABILITY_DAMAGE_MULTIPLIER: float = 1.5
 
-# Shame (Стыд) — для Сломленного
-const SHAME_DURATION: int = 2
-const SHAME_DAMAGE_TAKEN_MULTIPLIER: float = 1.25  # +25% входящего урона
-const SHAME_ATONEMENT_MULTIPLIER: float = 2.0
-
-# Despair (Отчаяние) — для Сломленного
+# Despair
 const DESPAIR_DURATION: int = 2
-const DESPAIR_DAMAGE_DEALT_MULTIPLIER: float = 0.75   # -25% исходящего урона
+const DESPAIR_DAMAGE_DEALT_MULTIPLIER: float = 0.75
 
 ## === Пассивки ===
 
-# Regrowth (Оживление)
 const REGROWTH_STARTING_HEAL: int = 2
 const REGROWTH_INCREMENT: int = 1
 
-# Venomous Shield (Ядовитый щит)
 const VENOMOUS_SHIELD_POISON_STACKS: int = 1
 const VENOMOUS_SHIELD_POISON_DURATION: int = 2
 
-# Wrath (Злость)
 const WRATH_STRENGTH_GAIN_PER_TURN: int = 1
 
-# Freezing Ground (Обмерзание)
 const FREEZING_GROUND_ICE_STACKS: int = 5
 const FREEZING_GROUND_RECHARGE_TURN: int = 6
 
-# Denial (Отрицание)
 const DENIAL_STARTING_CHARGES: int = 3
+
+# Strength
+const STRENGTH_FLAT_BONUS_PER_STACK: int = 1
+
+# Regen
+const REGEN_HEAL_PER_STACK: int = 1
+
+# Shame (пассивка)
+const SHAME_DURATION: int = 2
+const SHAME_DAMAGE_TAKEN_MULTIPLIER: float = 1.25
+const SHAME_ATONEMENT_MULTIPLIER: float = 2.0
 
 ## === Карты Сломленного ===
 
-# Удар расплаты (Atonement Strike)
 const ATONEMENT_STRIKE_DAMAGE: int = 8
-
-# Греховный выпад (Sinful Strike)
 const SINFUL_STRIKE_DAMAGE: int = 10
 
-# Покаянное откровение (Penitent Revelation)
 const PENITENT_REVELATION_THRESHOLD_1: int = 10
 const PENITENT_REVELATION_THRESHOLD_2: int = 20
 const PENITENT_REVELATION_THRESHOLD_3: int = 30
@@ -261,49 +269,36 @@ const PENITENT_REVELATION_DRAW_1: int = 1
 const PENITENT_REVELATION_DRAW_2: int = 2
 const PENITENT_REVELATION_DRAW_3: int = 3
 
-# Искупительный барьер (Redemptive Barrier)
 const REDEMPTIVE_BARRIER_SELF_DAMAGE: int = 5
 const REDEMPTIVE_BARRIER_BLOCK_TIER_1: int = 10
 const REDEMPTIVE_BARRIER_BLOCK_TIER_2: int = 16
 const REDEMPTIVE_BARRIER_BLOCK_TIER_3: int = 22
-const REDEMPTIVE_BARRIER_THRESHOLD_1: int = 10
-const REDEMPTIVE_BARRIER_THRESHOLD_2: int = 20
-const REDEMPTIVE_BARRIER_THRESHOLD_3: int = 30
 
-# Кровавая жертва (Blood Sacrifice)
 const BLOOD_SACRIFICE_SELF_DAMAGE: int = 5
 const BLOOD_SACRIFICE_ATONEMENT_GAIN: int = 30
-const BLOOD_SACRIFICE_MAX_ATONEMENT: int = 30
 
-# Цена отчаяния (Price of Despair)
 const PRICE_OF_DESPAIR_HEAL_TIER_1: int = 6
 const PRICE_OF_DESPAIR_HEAL_TIER_2: int = 11
 const PRICE_OF_DESPAIR_HEAL_TIER_3: int = 15
 
-# Очищающее пламя (Scouring Flame)
 const SCOURING_FLAME_SELF_DAMAGE_PER_STATUS: int = 3
 const SCOURING_FLAME_ATONEMENT_PER_STATUS: int = 5
 
-# Грех тщеславия (Sin of Vanity)
 const SIN_OF_VANITY_BASE_DAMAGE: int = 4
 const SIN_OF_VANITY_BONUS_PER_STATUS: int = 2
 
-# Жажда кары (Thirst for Punishment)
 const THIRST_FOR_PUNISHMENT_SELF_DAMAGE: int = 5
 const THIRST_FOR_PUNISHMENT_ENERGY_TIER_1: int = 1
 const THIRST_FOR_PUNISHMENT_ENERGY_TIER_2: int = 2
 const THIRST_FOR_PUNISHMENT_ENERGY_TIER_3: int = 3
 
-# Щит покаяния (Shield of Penance)
 const SHIELD_OF_PENANCE_BASE_BLOCK: int = 5
 const SHIELD_OF_PENANCE_BONUS_BLOCK: int = 5
 const SHIELD_OF_PENANCE_STATUS_THRESHOLD: int = 2
 
-# Удар пустоты (Void Strike)
 const VOID_STRIKE_BASE_DAMAGE: int = 6
 const VOID_STRIKE_BONUS_DAMAGE_IF_ZERO_ATONEMENT: int = 4
 
-# Крик отчаяния (Cry of Despair)
 const CRY_OF_DESPAIR_DAMAGE: int = 5
 const CRY_OF_DESPAIR_HEAL_TIER_1: int = 5
 const CRY_OF_DESPAIR_HEAL_TIER_2: int = 10
@@ -311,42 +306,31 @@ const CRY_OF_DESPAIR_HEAL_TIER_3: int = 15
 
 
 ## ============================================================
-## 3. ВСПОМОГАТЕЛЬНЫЕ МЕТОДЫ
+## 3. РАЗМЕРЫ КАРТ
 ## ============================================================
 
-## Проверка, является ли статус негативным
-func is_negative_status(status: Status) -> bool:
-	return status in [
-		Status.POISON,
-		Status.BLEED,
-		Status.BURN,
-		Status.ICE,
-		Status.WEAKNESS,
-		Status.VULNERABILITY,
-	]
+const CARD_BASE_WIDTH: int = 234
+const CARD_BASE_HEIGHT: int = 330
+const CARD_ART_SIZE: int = 164
+const CARD_ICON_SIZE: int = 24
+const CARD_ICON_SOURCE_SIZE: int = 64
 
-## Получить название статуса (для дебага)
-func get_status_name(status: Status) -> String:
-	match status:
-		Status.POISON: return "Poison"
-		Status.BLEED: return "Bleed"
-		Status.BURN: return "Burn"
-		Status.ICE: return "Ice"
-		Status.WEAKNESS: return "Weakness"
-		Status.VULNERABILITY: return "Vulnerability"
-		Status.SHAME: return "Shame"
-		_: return "Unknown"
+const CARD_SCALE_NORMAL: float = 1.0
+const CARD_SCALE_IN_HAND: float = 0.7
+const CARD_SCALE_HOVER: float = 1.05
 
+const CARD_HAND_WIDTH: int = int(CARD_BASE_WIDTH * CARD_SCALE_IN_HAND)
+const CARD_HAND_HEIGHT: int = int(CARD_BASE_HEIGHT * CARD_SCALE_IN_HAND)
+const CARD_SPACING: int = 20
 
 
 ## ============================================================
-## РАЗМЕРЫ ЭКРАНА
+## 4. РАЗМЕРЫ ЭКРАНА
 ## ============================================================
 
 const SCREEN_WIDTH: int = 1920
 const SCREEN_HEIGHT: int = 1080
 
-# Левая зона
 const PORTRAIT_POS: Vector2 = Vector2(50, 80)
 const PORTRAIT_SIZE: Vector2 = Vector2(200, 200)
 const ARTIFACT_POS: Vector2 = Vector2(50, 300)
@@ -354,46 +338,162 @@ const ARTIFACT_ICON_SIZE: Vector2 = Vector2(48, 48)
 const RESOURCE_PANEL_POS: Vector2 = Vector2(50, 860)
 const RESOURCE_PANEL_SIZE: Vector2 = Vector2(200, 60)
 
-# Центральная зона
 const BATTLE_SCENE_POS: Vector2 = Vector2(448, 80)
 const BATTLE_SCENE_SIZE: Vector2 = Vector2(1024, 768)
 
-const ENEMY_INTENT_POS: Vector2 = Vector2(312, 138)      # над врагом
+const ENEMY_INTENT_POS: Vector2 = Vector2(312, 138)
 const ENEMY_SPRITE_SIZE: Vector2 = Vector2(400, 500)
 const ENEMY_POS_IN_SCENE: Vector2 = Vector2(312, 188)
-const ENEMY_STATUS_POS: Vector2 = Vector2(312, 688)      # под врагом
+const ENEMY_STATUS_POS: Vector2 = Vector2(312, 688)
 
 const HAND_POS: Vector2 = Vector2(448, 860)
 const HAND_SIZE: Vector2 = Vector2(1024, 220)
 
-
-# Правая зона
 const LOG_PANEL_POS: Vector2 = Vector2(1520, 80)
 const LOG_PANEL_SIZE: Vector2 = Vector2(350, 500)
 const HINT_PANEL_POS: Vector2 = Vector2(1520, 580)
 const HINT_PANEL_SIZE: Vector2 = Vector2(350, 268)
 
-# Локация (фон)
 const LOCATION_SPRITE_SIZE: Vector2 = Vector2(1024, 768)
 
 
-const CARD_WIDTH: int = 234
-const CARD_HEIGHT: int = 330
-const CARD_ART_SIZE: int = 164
-const CARD_ICON_SIZE: int = 24
-const CARD_ICON_SOURCE_SIZE: int = 64
-const CARD_SCALE_NORMAL: float = 1.0
-const CARD_SCALE_HOVER: float = 1.05
-const CARD_SCALE_IN_HAND: float = 0.7
-
 ## ============================================================
-## ИКОНКИ ДЛЯ ПРАВОЙ КОЛОНКИ
+## 5. КОЛОДА
 ## ============================================================
 
-#const ICON_DAMAGE: Texture2D = preload("res://ui/icons/damage.png")
-#const ICON_BLOCK: Texture2D = preload("res://ui/icons/block.png")
-#const ICON_HEAL: Texture2D = preload("res://ui/icons/heal.png")
-#const ICON_RESOURCE: Texture2D = preload("res://ui/icons/resource.png")
-#const ICON_BUFF: Texture2D = preload("res://ui/icons/buff.png")
-#const ICON_DEBUFF: Texture2D = preload("res://ui/icons/debuff.png")
-#const ICON_UTILITY: Texture2D = preload("res://ui/icons/utility.png")
+const MAX_HAND_SIZE: int = 5
+const CARDS_TO_DRAW_PER_TURN: int = 5
+
+
+## ============================================================
+## 6. ВСПОМОГАТЕЛЬНЫЕ МЕТОДЫ
+## ============================================================
+
+func is_negative_status(status: Status) -> bool:
+	return status in [
+		Status.POISON,
+		Status.BLEED,
+		Status.BURN,
+		Status.COLD,
+		Status.WEAKNESS,
+		Status.VULNERABILITY,
+	]
+
+func get_status_name(status: Status) -> String:
+	match status:
+		Status.POISON: return "Poison"
+		Status.BLEED: return "Bleed"
+		Status.BURN: return "Burn"
+		Status.COLD: return "Cold"
+		Status.WEAKNESS: return "Weakness"
+		Status.VULNERABILITY: return "Vulnerability"
+		Status.STRENGTH: return "Strength"
+		Status.REGEN: return "Regeneration"
+		Status.SHIELD: return "Shield"
+		_: return "Unknown"
+
+
+## ============================================================
+## 7. ИКОНКИ
+## ============================================================
+
+## Иконки намерений (IntentType)
+const INTENT_ICONS: Dictionary = {
+	IntentType.ATTACK: preload("res://img/icons/intents/attack.png"),
+	IntentType.DEFEND: preload("res://img/icons/intents/defend.png"),
+	IntentType.BUFF: preload("res://img/icons/intents/buff.png"),
+	IntentType.DEBUFF: preload("res://img/icons/intents/debuff.png"),
+	IntentType.UNKNOWN: preload("res://img/icons/intents/unknown.png"),
+	IntentType.SUMMON: preload("res://img/icons/intents/summon.png"),
+	IntentType.HEAL: preload("res://img/icons/intents/heal.png"),
+}
+
+## Иконки типов карт (CardType)
+const CARD_TYPE_ICONS: Dictionary = {
+	CardType.ATTACK: preload("res://img/icons/card_types/attack.png"),
+	CardType.DEFEND: preload("res://img/icons/card_types/defend.png"),
+	CardType.BUFF_SELF: preload("res://img/icons/card_types/buff.png"),
+	CardType.DEBUFF: preload("res://img/icons/card_types/debuff.png"),
+	CardType.HEAL: preload("res://img/icons/card_types/heal.png"),
+	CardType.RESOURCE: preload("res://img/icons/card_types/resource.png"),
+	CardType.UTILITY: preload("res://img/icons/card_types/utility.png"),
+}
+
+## Иконки статусов (Status)
+const STATUS_ICONS: Dictionary = {
+	Status.POISON: preload("res://img/icons/statuses/poison.png"),
+	Status.BLEED: preload("res://img/icons/statuses/bleed.png"),
+	Status.BURN: preload("res://img/icons/statuses/burn.png"),
+	Status.COLD: preload("res://img/icons/statuses/cold.png"),
+	Status.WEAKNESS: preload("res://img/icons/statuses/weakness.png"),
+	Status.VULNERABILITY: preload("res://img/icons/statuses/vulnerability.png"),
+	Status.STRENGTH: preload("res://img/icons/statuses/strength.png"),
+	Status.REGEN: preload("res://img/icons/statuses/regen.png"),
+	Status.SHIELD: preload("res://img/icons/statuses/shield.png"),
+}
+
+## Иконки пассивок (Passive)
+const PASSIVE_ICONS: Dictionary = {
+	Passive.REGROWTH: preload("res://img/icons/passives/regrowth.png"),
+	Passive.VENOMOUS_SHIELD: preload("res://img/icons/passives/venomous_shield.png"),
+	Passive.WRATH: preload("res://img/icons/passives/wrath.png"),
+	Passive.FREEZING_GROUND: preload("res://img/icons/passives/freezing_ground.png"),
+	Passive.DENIAL: preload("res://img/icons/passives/denial.png"),
+	Passive.SHAME: preload("res://img/icons/passives/shame.png"),
+}
+
+
+## ============================================================
+## 8. МЕТОДЫ ДЛЯ ПОЛУЧЕНИЯ ИКОНОК
+## ============================================================
+
+func get_intent_icon(intent_type: IntentType) -> Texture2D:
+	return INTENT_ICONS.get(intent_type, INTENT_ICONS.get(IntentType.UNKNOWN))
+
+func get_card_type_icon(card_type: CardType) -> Texture2D:
+	return CARD_TYPE_ICONS.get(card_type, null)
+
+func get_status_icon(status: Status) -> Texture2D:
+	return STATUS_ICONS.get(status, null)
+
+func get_passive_icon(passive: Passive) -> Texture2D:
+	return PASSIVE_ICONS.get(passive, null)
+
+
+## ============================================================
+## 9. ЗАГРУЗКА РЕСУРСОВ СТАТУСОВ
+## ============================================================
+
+var _status_resources: Dictionary = {}
+var _status_resources_loaded: bool = false
+
+## Загружает все ресурсы статусов
+func load_status_resources():
+	if _status_resources_loaded:
+		return
+	
+	_status_resources[Status.POISON] = load("res://resources/statuses/poison.tres")
+	_status_resources[Status.BLEED] = load("res://resources/statuses/bleed.tres")
+	_status_resources[Status.BURN] = load("res://resources/statuses/burn.tres")
+	_status_resources[Status.COLD] = load("res://resources/statuses/cold.tres")
+	_status_resources[Status.WEAKNESS] = load("res://resources/statuses/weakness.tres")
+	_status_resources[Status.VULNERABILITY] = load("res://resources/statuses/vulnerability.tres")
+	_status_resources[Status.STRENGTH] = load("res://resources/statuses/strength.tres")
+	_status_resources[Status.REGEN] = load("res://resources/statuses/regen.tres")
+	_status_resources[Status.SHIELD] = load("res://resources/statuses/shield.tres")
+	
+	_status_resources_loaded = true
+
+## Возвращает ресурс статуса
+func get_status_resource(status: Status) -> StatusResource:
+	if not _status_resources_loaded:
+		load_status_resources()
+	return _status_resources.get(status, null)
+
+
+## ============================================================
+## 10. ИНИЦИАЛИЗАЦИЯ
+## ============================================================
+
+func _ready():
+	load_status_resources()

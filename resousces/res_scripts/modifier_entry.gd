@@ -2,10 +2,10 @@
 extends Resource
 class_name ModifierEntry
 
-## Какой модификатор меняем (может быть ModifierStat или FlatStat)
-@export var stat: int  # DataManager.ModifierStat или DataManager.FlatStat
+## Какой модификатор меняем (DataManager.ModifierStat или DataManager.FlatStat)
+@export var stat: int
 
-## Тип изменения (MULTIPLIER, FLAT_BONUS, PERCENT)
+## Тип изменения
 @export var change_type: DataManager.ModifierChangeType = DataManager.ModifierChangeType.MULTIPLIER
 
 ## Значение (1.25 = +25%, 5 = +5)
@@ -14,10 +14,12 @@ class_name ModifierEntry
 ## Длительность в ходах (0 = постоянно)
 @export var duration: int = 0
 
+
 func apply_to_flat(current: int) -> int:
 	if change_type == DataManager.ModifierChangeType.FLAT_BONUS:
 		return current + int(value)
 	return current
+
 
 func apply_to_modifier(current: float) -> float:
 	match change_type:
@@ -27,6 +29,7 @@ func apply_to_modifier(current: float) -> float:
 			return current + value
 		_:
 			return current
+
 
 func get_modifier_string() -> String:
 	match change_type:
@@ -38,3 +41,18 @@ func get_modifier_string() -> String:
 		DataManager.ModifierChangeType.FLAT_BONUS:
 			return "+%d" % int(value) if value > 0 else "%d" % int(value)
 	return ""
+
+
+## Проверка, является ли модификатор постоянным
+func is_permanent() -> bool:
+	return duration == 0
+
+
+## Создаёт копию модификатора
+func duplicate_for_instance() -> ModifierEntry:
+	var copy = ModifierEntry.new()
+	copy.stat = stat
+	copy.change_type = change_type
+	copy.value = value
+	copy.duration = duration
+	return copy

@@ -2,35 +2,64 @@
 extends CharacterStats
 class_name PenitentStats
 
-var atonement: int = 0
-var max_atonement: int = 30
+## ============================================================
+## СПЕЦИФИЧЕСКИЕ ПЕРЕМЕННЫЕ
+## ============================================================
 
-## Переопределяем метод получения ресурса
-func on_take_damage_gain_resource(amount: int):
-	gain_atonement(amount)
+var max_atonement: int = DataManager.PENITENT_MAX_ATONEMENT
+
+
+## ============================================================
+## ИНИЦИАЛИЗАЦИЯ
+## ============================================================
+
+func _init():
+	# Устанавливаем максимальное Искупление
+	set_flat(DataManager.FlatStat.MAX_ATONEMENT, max_atonement)
+	set_flat(DataManager.FlatStat.ATONEMENT, 0)
+
+
+## ============================================================
+## МЕТОДЫ ДОСТУПА К ИСКУПЛЕНИЮ
+## ============================================================
+
+func get_atonement() -> int:
+	return get_flat(DataManager.FlatStat.ATONEMENT)
+
+
+func get_max_atonement() -> int:
+	return get_flat(DataManager.FlatStat.MAX_ATONEMENT)
+
+
+## ============================================================
+## ПОЛУЧЕНИЕ TIER (для SCALED_VALUE эффектов)
+## ============================================================
+
+func get_atonement_tier() -> int:
+	return get_atonement() / 10
+
+
+## ============================================================
+## ОПЕРАЦИИ С ИСКУПЛЕНИЕМ
+## ============================================================
 
 func gain_atonement(amount: int):
-	atonement = min(atonement + amount, max_atonement)
-	SignalManager.atonement_changed.emit(atonement, max_atonement)
+	modify_flat(DataManager.FlatStat.ATONEMENT, amount)
+
 
 func spend_atonement(amount: int) -> bool:
-	if atonement >= amount:
-		atonement -= amount
-		SignalManager.atonement_changed.emit(atonement, max_atonement)
+	var current = get_atonement()
+	if current >= amount:
+		modify_flat(DataManager.FlatStat.ATONEMENT, -amount)
 		return true
 	return false
 
-func get_atonement() -> int:
-	return atonement
 
-func modify_stat(stat: DataManager.FlatStat, delta: int):
-	match stat:
-		DataManager.FlatStat.ATONEMENT:
-			atonement = clamp(atonement + delta, 0, max_atonement)
-			SignalManager.atonement_changed.emit(atonement, max_atonement)
-		_:
-			super.modify_stat(stat, delta)
+## ============================================================
+## ПЕРЕОПРЕДЕЛЕНИЕ on_take_damage_gain_resource
+## ============================================================
 
-
-func get_atonement_tier() -> int:
-	return atonement / 10  # 0, 1, 2, 3 (макс 3)
+func on_take_damage_gain_resource(amount: int):
+	var gain = floor(amount * get_modifier(DataManager.ModifierStat.ATONEMENT_GAIN_MULTIPLIER))
+	if gain > 0:
+		gain_atonement(gain)

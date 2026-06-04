@@ -23,13 +23,10 @@ class_name EffectEntry
 
 
 ## ============================================================
-## ДЛЯ SCALED_VALUE (значение зависит от tier ресурса)
+## ДЛЯ SCALED_VALUE
 ## ============================================================
 
-## Значения для каждого tier (индекс = tier)
 @export var scaled_values: Array[int] = [0, 0, 0, 0]
-
-## Тип значения (DAMAGE, BLOCK, HEAL, GAIN_ENERGY, DRAW_CARD)
 @export var scaled_type: DataManager.ScaledType = DataManager.ScaledType.BLOCK
 
 
@@ -38,7 +35,7 @@ class_name EffectEntry
 ## ============================================================
 
 @export var status: StatusResource = null
-@export var value: int = 1          # стаки или величина эффекта
+@export var value: int = 1
 @export var duration: int = 0
 
 
@@ -51,7 +48,7 @@ class_name EffectEntry
 
 
 ## ============================================================
-## ДЛЯ MODIFY_STAT (изменение FlatStat)
+## ДЛЯ MODIFY_STAT
 ## ============================================================
 
 @export var target_stat: DataManager.FlatStat = DataManager.FlatStat.HEALTH
@@ -59,7 +56,7 @@ class_name EffectEntry
 
 
 ## ============================================================
-## ДЛЯ MODIFY_MODIFIER (временное изменение ModifierStat)
+## ДЛЯ MODIFY_MODIFIER
 ## ============================================================
 
 @export var target_modifier: DataManager.ModifierStat = DataManager.ModifierStat.DAMAGE_DEALT_PERCENT
@@ -80,40 +77,27 @@ class_name EffectEntry
 
 @export var from_stat: DataManager.FlatStat = DataManager.FlatStat.BLOCK
 @export var to_stat: DataManager.FlatStat = DataManager.FlatStat.HEALTH
-@export var conversion_ratio: float = 1.0   # коэффициент (1.0 = 1:1)
-
-## ============================================================
-## ДЛЯ CONVERT_EXCESS_TO_BLOCK
-## ============================================================
-
-## Специализированный эффект для Кровавой жертвы
-## Автоматически конвертирует излишек ATONEMENT в BLOCK
+@export var conversion_ratio: float = 1.0
 
 
 ## ============================================================
 ## ДЛЯ CONDITIONAL
 ## ============================================================
 
-## Скрипт условия (должен возвращать bool)
 @export var condition_script: Script = null
-
-## Эффект, если условие истинно
 @export var true_effect: EffectEntry = null
-
-## Эффект, если условие ложно
 @export var false_effect: EffectEntry = null
 
 
 ## ============================================================
-## ДЛЯ CUSTOM (сложная логика)
+## ДЛЯ CUSTOM
 ## ============================================================
 
-## Скрипт с кастомной логикой (должен иметь метод apply)
 @export var custom_script: Script = null
 
 
 ## ============================================================
-## ДЛЯ РОСТА ЗНАЧЕНИЙ (для пассивок)
+## ДЛЯ РОСТА ЗНАЧЕНИЙ
 ## ============================================================
 
 @export var grow_type: DataManager.GrowType = DataManager.GrowType.NONE
@@ -122,7 +106,7 @@ class_name EffectEntry
 
 
 ## ============================================================
-## СОСТОЯНИЕ (для копий ресурса)
+## СОСТОЯНИЕ
 ## ============================================================
 
 var current_value: int = 0
@@ -135,11 +119,9 @@ var application_counter: int = 0
 ## МЕТОДЫ
 ## ============================================================
 
-## Создаёт копию эффекта для использования на конкретной цели
 func duplicate_for_instance() -> EffectEntry:
 	var copy = EffectEntry.new()
 	
-	# Копируем основные поля
 	copy.category = category
 	copy.target = target
 	copy.base_value = base_value
@@ -160,19 +142,18 @@ func duplicate_for_instance() -> EffectEntry:
 	copy.amount = amount
 	copy.from_stat = from_stat
 	copy.to_stat = to_stat
+	copy.conversion_ratio = conversion_ratio
 	copy.condition_script = condition_script
 	copy.custom_script = custom_script
 	copy.grow_type = grow_type
 	copy.grow_value = grow_value
 	copy.grow_target = grow_target
 	
-	# Копируем состояние
 	copy.current_value = current_value if uses_custom_values else value
 	copy.current_duration = current_duration if uses_custom_values else duration
 	copy.uses_custom_values = uses_custom_values
 	copy.application_counter = application_counter
 	
-	# Копируем вложенные эффекты (рекурсивно)
 	if true_effect:
 		copy.true_effect = true_effect.duplicate_for_instance()
 	if false_effect:
@@ -181,7 +162,6 @@ func duplicate_for_instance() -> EffectEntry:
 	return copy
 
 
-## Возвращает значение для SCALED_TYPE (на основе tier)
 func get_scaled_value(tier: int) -> int:
 	if scaled_values.is_empty():
 		return 0
@@ -189,7 +169,6 @@ func get_scaled_value(tier: int) -> int:
 	return scaled_values[index]
 
 
-## Применяет рост значения
 func apply_growth():
 	if grow_type == DataManager.GrowType.NONE:
 		return
@@ -219,8 +198,7 @@ func _apply(val: int) -> int:
 			return val * grow_value
 		DataManager.GrowType.DIVIDE:
 			return max(1, val / grow_value)
-		_:
-			return val
+	return val
 
 
 func get_current_value() -> int:
@@ -240,3 +218,18 @@ func clear_instance_state():
 	current_value = value
 	current_duration = duration
 	application_counter = 0
+
+
+## Проверка, является ли эффект условным
+func is_conditional() -> bool:
+	return category == DataManager.EffectCategory.CONDITIONAL
+
+
+## Проверка, является ли эффект кастомным
+func is_custom() -> bool:
+	return category == DataManager.EffectCategory.CUSTOM
+
+
+## Проверка, является ли эффект масштабируемым (scaled_value)
+func is_scaled() -> bool:
+	return category == DataManager.EffectCategory.SCALED_VALUE
