@@ -173,6 +173,29 @@ enum CardTag {
 	BURNS,      # сгорающая (не попадает в сброс)
 }
 
+enum CardId {
+	# Сломленный (Penitent) - 12 карт
+	ATONEMENT_STRIKE,      # Удар расплаты
+	SINFUL_STRIKE,         # Греховный выпад
+	PENITENT_REVELATION,   # Покаянное откровение
+	ATONEMENT_BARRIER,     # Искупительный барьер
+	BLOOD_SACRIFICE,       # Кровавая жертва
+	PRICE_OF_DESPAIR,      # Цена отчаяния
+	SCOURING_FLAME,        # Очищающее пламя
+	SIN_OF_VANITY,         # Грех тщеславия
+	THIRST_FOR_PUNISHMENT, # Жажда кары
+	SHIELD_OF_PENANCE,     # Щит покаяния
+	VOID_STRIKE,           # Удар пустоты
+	CRY_OF_DESPAIR,        # Крик отчаяния
+	
+	# Кротовые норы (Mole Tunnels) - 5 карт
+	BLIND_FURY,            # Слепая ярость
+	SMELL_OF_BLOOD,        # Запах крови
+	MOLERAT_HIDE,          # Шкура кротокрыса
+	TUNNEL_AMBUSH,         # Туннельная засада
+	BLOODLETTING,          # Кровопускание
+}
+
 ## Намерения врагов
 enum IntentType {
 	ATTACK,         # атака
@@ -565,3 +588,51 @@ func get_enemy_cycle_type(enemy_id: int) -> int:
 func _ready():
 	load_status_resources()
 	load_passive_resources()
+
+
+## ============================================================
+## НАЗВАНИЯ КАРТ (для fallback, если нет локализации)
+## ============================================================
+
+func get_card_default_name(card_id: CardId) -> String:
+	match card_id:
+		# Сломленный
+		CardId.ATONEMENT_STRIKE:
+			return "Atonement Strike"
+		CardId.SINFUL_STRIKE:
+			return "Sinful Strike"
+		CardId.PENITENT_REVELATION:
+			return "Penitent Revelation"
+		CardId.ATONEMENT_BARRIER:
+			return "Atonement Barrier"
+		CardId.BLOOD_SACRIFICE:
+			return "Blood Sacrifice"
+		CardId.PRICE_OF_DESPAIR:
+			return "Price of Despair"
+		CardId.SCOURING_FLAME:
+			return "Scouring Flame"
+		CardId.SIN_OF_VANITY:
+			return "Sin of Vanity"
+		CardId.THIRST_FOR_PUNISHMENT:
+			return "Thirst for Punishment"
+		CardId.SHIELD_OF_PENANCE:
+			return "Shield of Penance"
+		CardId.VOID_STRIKE:
+			return "Void Strike"
+		CardId.CRY_OF_DESPAIR:
+			return "Cry of Despair"
+		
+		# Кротовые норы
+		CardId.BLIND_FURY:
+			return "Blind Fury"
+		CardId.SMELL_OF_BLOOD:
+			return "Smell of Blood"
+		CardId.MOLERAT_HIDE:
+			return "Molerat Hide"
+		CardId.TUNNEL_AMBUSH:
+			return "Tunnel Ambush"
+		CardId.BLOODLETTING:
+			return "Bloodletting"
+		
+		_:
+			return "Unknown Card"

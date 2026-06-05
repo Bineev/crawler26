@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="PassiveResource" load_steps=6 format=3 uid="uid://cnan73vx33ytl"]
+
+[ext_resource type="Script" uid="uid://cmra25r1r3ivt" path="res://resources/res_scripts/effect_entry.gd" id="1_tclb4"]
+[ext_resource type="Script" uid="uid://0mjn55jcxdti" path="res://resources/res_scripts/modifier_entry.gd" id="2_dhq2r"]
+[ext_resource type="Resource" uid="uid://bdcq3ygqk011b" path="res://resources/modifiers/shame1_modifier.tres" id="3_3r6n7"]
+[ext_resource type="Script" uid="uid://br4ase11y58nd" path="res://resources/res_scripts/passive_resource.gd" id="3_gpp6c"]
+[ext_resource type="Resource" uid="uid://co2c1rxq8l5mx" path="res://resources/modifiers/shame2_modifier.tres" id="4_mqnsa"]
+
+[resource]
+script = ExtResource("3_gpp6c")
+id = 5
+name_key = "passive_shame_name"
+description_key = "passive_shame_desc"
+charge_type = 1
+starting_charges = 2
+trigger = 1
+modifiers = Array[ExtResource("2_dhq2r")]([ExtResource("3_3r6n7"), ExtResource("4_mqnsa")])
+metadata/_custom_type_script = "uid://br4ase11y58nd"

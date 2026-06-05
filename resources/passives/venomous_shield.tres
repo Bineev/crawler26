@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="PassiveResource" load_steps=5 format=3 uid="uid://bfmovyf6o1c8g"]
+
+[ext_resource type="Script" uid="uid://cmra25r1r3ivt" path="res://resources/res_scripts/effect_entry.gd" id="1_7dxoh"]
+[ext_resource type="Resource" uid="uid://bv05iufioo56h" path="res://resources/effects/effect_venomous_shield.tres" id="2_e83qd"]
+[ext_resource type="Script" uid="uid://0mjn55jcxdti" path="res://resources/res_scripts/modifier_entry.gd" id="2_m7aj1"]
+[ext_resource type="Script" uid="uid://br4ase11y58nd" path="res://resources/res_scripts/passive_resource.gd" id="3_e83qd"]
+
+[resource]
+script = ExtResource("3_e83qd")
+id = 1
+name_key = "passive_venomous_shield_name"
+description_key = "passive_venomous_shield_desc"
+charge_type = 1
+starting_charges = 2
+effects = Array[ExtResource("1_7dxoh")]([ExtResource("2_e83qd")])
+metadata/_custom_type_script = "uid://br4ase11y58nd"

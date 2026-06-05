@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="PassiveResource" load_steps=5 format=3 uid="uid://cjgmceou5cois"]
+
+[ext_resource type="Script" uid="uid://cmra25r1r3ivt" path="res://resources/res_scripts/effect_entry.gd" id="1_87o0r"]
+[ext_resource type="Script" uid="uid://0mjn55jcxdti" path="res://resources/res_scripts/modifier_entry.gd" id="2_2ibix"]
+[ext_resource type="Resource" uid="uid://bsct464lvp3pn" path="res://resources/effects/effect_wrath.tres" id="2_anw7l"]
+[ext_resource type="Script" uid="uid://br4ase11y58nd" path="res://resources/res_scripts/passive_resource.gd" id="3_anw7l"]
+
+[resource]
+script = ExtResource("3_anw7l")
+id = 2
+name_key = "passive_wrath_name"
+description_key = "passive_wrath_desc"
+trigger = 6
+effects = Array[ExtResource("1_87o0r")]([ExtResource("2_anw7l")])
+metadata/_custom_type_script = "uid://br4ase11y58nd"

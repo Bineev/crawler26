@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="EffectEntry" load_steps=3 format=3 uid="uid://dcylbatyr1u7s"]
+
+[ext_resource type="Script" uid="uid://cmra25r1r3ivt" path="res://resources/res_scripts/effect_entry.gd" id="1_di00n"]
+[ext_resource type="Resource" uid="uid://43fdfybkbvp" path="res://resources/statuses/cold.tres" id="2_sffj8"]
+
+[resource]
+script = ExtResource("1_di00n")
+category = 4
+target = 4
+status = ExtResource("2_sffj8")
+value = 5
+duration = 2
+metadata/_custom_type_script = "uid://cmra25r1r3ivt"

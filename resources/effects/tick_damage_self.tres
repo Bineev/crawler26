@@ -1,0 +1,8 @@
+[gd_resource type="Resource" script_class="EffectEntry" load_steps=2 format=3 uid="uid://t3b4jhx1u810"]
+
+[ext_resource type="Script" uid="uid://cmra25r1r3ivt" path="res://resources/res_scripts/effect_entry.gd" id="1_kkexd"]
+
+[resource]
+script = ExtResource("1_kkexd")
+target = 0
+metadata/_custom_type_script = "uid://cmra25r1r3ivt"

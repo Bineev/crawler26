@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="CardData" load_steps=5 format=3 uid="uid://cskhsp8mrol20"]
+
+[ext_resource type="Script" uid="uid://cmra25r1r3ivt" path="res://resources/res_scripts/effect_entry.gd" id="1_u70qq"]
+[ext_resource type="Resource" uid="uid://dbh0ocdo3khrj" path="res://resources/effects/effect_sinful_strike.tres" id="2_j24b0"]
+[ext_resource type="Script" uid="uid://badcs22cck6n5" path="res://resources/res_scripts/card_data.gd" id="2_mratp"]
+[ext_resource type="Resource" uid="uid://dsbkp0lxuuakv" path="res://resources/effects/effect_sinful_strike2.tres" id="3_u5fds"]
+
+[resource]
+script = ExtResource("2_mratp")
+id = 1
+name_key = "card_sinful_strike_name"
+description_key = "card_sinful_strike_desc"
+effects = Array[ExtResource("1_u70qq")]([ExtResource("2_j24b0"), ExtResource("3_u5fds")])
+metadata/_custom_type_script = "uid://badcs22cck6n5"
