@@ -1,0 +1,53 @@
+[gd_scene load_steps=2 format=3 uid="uid://rfsuaeky3l17"]
+
+[ext_resource type="Script" uid="uid://cujnkju5sswv0" path="res://scripts/other/enemy_instance.gd" id="1_7p1mj"]
+
+[node name="Enemy" type="Node2D"]
+
+[node name="EnemyInstance" type="Node" parent="."]
+script = ExtResource("1_7p1mj")
+
+[node name="EnemyUI" type="Control" parent="."]
+custom_minimum_size = Vector2(1024, 800)
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="EnemyUI"]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+theme_override_constants/separation = 10
+alignment = 1
+
+[node name="IntentsContainer" type="HBoxContainer" parent="EnemyUI/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 10
+alignment = 1
+
+[node name="SpriteContainer" type="CenterContainer" parent="EnemyUI/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="EnemySprite" type="TextureRect" parent="EnemyUI/VBoxContainer/SpriteContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="HealthBar" type="TextureProgressBar" parent="EnemyUI/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="BottomPanel" type="HBoxContainer" parent="EnemyUI/VBoxContainer"]
+layout_mode = 2
+
+[node name="StatusContainer" type="HBoxContainer" parent="EnemyUI/VBoxContainer/BottomPanel"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="PassiveContainer" type="HBoxContainer" parent="EnemyUI/VBoxContainer/BottomPanel"]
+unique_name_in_owner = true
+layout_mode = 2

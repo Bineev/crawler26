@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="EnemyResource" load_steps=3 format=3 uid="uid://dtcp1xuy6ruak"]
+
+[ext_resource type="Script" uid="uid://beudtcsu45bk7" path="res://resources/res_scripts/enemy_resource.gd" id="1_evpgb"]
+[ext_resource type="Script" uid="uid://br4ase11y58nd" path="res://resources/res_scripts/passive_resource.gd" id="2_gbh45"]
+
+[resource]
+script = ExtResource("1_evpgb")
+enemy_id = 1
+name_key = "enemy_strong_mole_name"
+description_key = "enemy_strong_mole_desc"
+base_max_health = 40
+base_strength = 8
+metadata/_custom_type_script = "uid://beudtcsu45bk7"

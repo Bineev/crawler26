@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="CardData" load_steps=5 format=3 uid="uid://xfs365lx8av8"]
+
+[ext_resource type="Script" uid="uid://cmra25r1r3ivt" path="res://resources/res_scripts/effect_entry.gd" id="1_mofk5"]
+[ext_resource type="Script" uid="uid://badcs22cck6n5" path="res://resources/res_scripts/card_data.gd" id="2_dl0ou"]
+[ext_resource type="Resource" uid="uid://e2kya1kjmt6" path="res://resources/effects/effect_penitent_revelation.tres" id="2_te7es"]
+[ext_resource type="Resource" uid="uid://cic6cvpby2bnd" path="res://resources/effects/effect_penitent_revelation2.tres" id="3_h30dn"]
+
+[resource]
+script = ExtResource("2_dl0ou")
+id = 2
+name_key = "card_penitent_revelation_name"
+description_key = "card_penitent_revelation_desc"
+effects = Array[ExtResource("1_mofk5")]([ExtResource("2_te7es"), ExtResource("3_h30dn")])
+metadata/_custom_type_script = "uid://badcs22cck6n5"

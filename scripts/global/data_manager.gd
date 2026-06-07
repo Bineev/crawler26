@@ -230,7 +230,61 @@ enum MoleEnemy {
 	RODENT_MOUND,       # Гора грызунов (босс)
 }
 
+## Тип комнаты
+enum RoomType {
+	COMBAT,      # бой
+	EVENT,       # эвент (нарратив)
+	OBJECT,      # объект (интерактив)
+}
 
+## Тип боя
+enum CombatType {
+	NORMAL,           # обычный бой
+	ELITE,            # элитный бой
+	LIMITED_TURNS,    # бой с ограниченным количеством ходов
+	BOSS,             # босс файт
+}
+
+## Тип эвента
+enum EventType {
+	NARRATIVE,       # чистый нарратив (диалог, выбор)
+	# при необходимости можно расширять
+}
+
+## Тип объекта
+enum ObjectType {
+	SHOP,            # магазин
+	IDOL,            # идол (алтарь)
+	TRAP,            # ловушка
+	CHEST,           # сундук
+	CAULDRON,        # котел
+	TORTURE_RACK,    # пыточный стол
+	BONFIRE,         # костер
+}
+
+enum EnemySize {
+	WEAK,      # 192x192
+	NORMAL,    # 256x256
+	ELITE,     # 320x320
+	BOSS,      # 460x460
+}
+## ============================================================
+## КОМНАТЫ И РАЗВИЛКИ
+## ============================================================
+
+enum RoomReveal {
+	KNOWN,      # тип комнаты виден игроку
+	HIDDEN,     # знак вопроса
+}
+
+## ============================================================
+## НАСТРОЙКИ ЭТАЖА
+## ============================================================
+
+const FLOOR_ROOMS_PER_PATH: int = 3           # комнат в одном пути
+const FLOOR_VISIBLE_ROOMS: int = 1            # видимых комнат в пути
+const FLOOR_PATHS_COUNT: int = 2              # количество путей на развилке
+const FLOOR_SEGMENTS_BEFORE_BOSS: int = 3     # сегментов (развилок) до босса
 ## ============================================================
 ## 2. БАЛАНСНЫЕ КОНСТАНТЫ
 ## ============================================================
@@ -397,7 +451,38 @@ const LOCATION_SPRITE_SIZE: Vector2 = Vector2(1024, 768)
 
 const MAX_HAND_SIZE: int = 5
 const CARDS_TO_DRAW_PER_TURN: int = 5
+## ============================================================
+## НАСТРОЙКИ ПОДБОРА ВРАГОВ
+## ============================================================
 
+# Сложность (прогресс на этаже)
+const DIFFICULTY_MAX_PROGRESS: int = 10  # максимальный прогресс для фактора сложности
+
+# Пороги сложности для обычных боёв
+const NORMAL_DIFFICULTY_EARLY: float = 0.2   # 0-20% - начало этажа
+const NORMAL_DIFFICULTY_MID: float = 0.5     # 20-50% - середина этажа
+const NORMAL_DIFFICULTY_LATE: float = 0.8    # 50-80% - поздний этаж
+
+# Пороги сложности для элитных боёв
+const ELITE_DIFFICULTY_EARLY: float = 0.3    # 0-30% - начало этажа
+const ELITE_DIFFICULTY_LATE: float = 0.7     # 30-70% - середина
+
+# Количество врагов в обычных боях
+const NORMAL_ENEMY_COUNT_EARLY: int = 1      # первая комната
+const NORMAL_ENEMY_COUNT_MID: int = 2        # середина
+const NORMAL_ENEMY_COUNT_LATE_MIN: int = 2   # минимум в поздней
+const NORMAL_ENEMY_COUNT_LATE_MAX: int = 3   # максимум в поздней
+
+# Количество врагов в элитных боях
+const ELITE_ENEMY_COUNT_EARLY: int = 1       # начало
+const ELITE_ENEMY_COUNT_MID: int = 2         # середина
+const ELITE_ENEMY_COUNT_LATE: int = 2        # конец
+
+# Этаж появления миньонов у босса
+const BOSS_ADD_MINIONS_FROM_FLOOR: int = 3
+
+# Этаж появления элитных врагов Fungal Miner
+const ELITE_MINER_APPEARS_FROM_FLOOR: int = 3
 
 ## ============================================================
 ## 6. ВСПОМОГАТЕЛЬНЫЕ МЕТОДЫ
@@ -542,6 +627,43 @@ func load_passive_resources():
 	
 	_passive_resources_loaded = true
 
+## ============================================================
+## БЭКГРАУНДЫ КОМНАТ
+## ============================================================
+
+var _biome_backgrounds: Dictionary = {}  # Biome -> Array[Texture2D]
+
+func load_biome_backgrounds():
+	# Кротовые норы
+	_biome_backgrounds[DataManager.Biome.MOLE_TUNNELS] = [
+		preload("res://img/backgrounds/mole_tunnels/mole_tunnels_1.png"),
+		preload("res://img/backgrounds/mole_tunnels/mole_tunnels_2.png"),
+		preload("res://img/backgrounds/mole_tunnels/mole_tunnels_3.png"),
+		preload("res://img/backgrounds/mole_tunnels/mole_tunnels_4.png")
+	]
+	
+	# Пещеры плоти (позже)
+	# _biome_backgrounds[DataManager.Biome.FLESH_CAVES] = [...]
+	
+	# Костяной лабиринт (позже)
+	# _biome_backgrounds[DataManager.Biome.BONE_LABYRINTH] = [...]
+
+func get_biome_backgrounds(biome: DataManager.Biome) -> Array[Texture2D]:
+	if _biome_backgrounds.is_empty():
+		load_biome_backgrounds()
+	return _biome_backgrounds.get(biome, [])
+
+	
+func get_random_background(biome: Biome) -> Texture2D:
+	if _biome_backgrounds.is_empty():
+		load_biome_backgrounds()
+	
+	var backgrounds = _biome_backgrounds.get(biome, [])
+	if backgrounds.is_empty():
+		return null
+	
+	return backgrounds[randi() % backgrounds.size()]
+
 func get_passive_resource(passive: Passive) -> PassiveResource:
 	if not _passive_resources_loaded:
 		load_passive_resources()
@@ -636,3 +758,108 @@ func get_card_default_name(card_id: CardId) -> String:
 		
 		_:
 			return "Unknown Card"
+
+## ============================================================
+## СПРАЙТЫ ВРАГОВ
+## ============================================================
+
+var _enemy_sprites: Dictionary = {}  # "biome_enemy" -> Texture2D
+
+func load_enemy_sprites():
+	# Кротовые норы (Mole Tunnels)
+	_register_enemy_sprite(DataManager.Biome.MOLE_TUNNELS, DataManager.MoleEnemy.MOLE_MUTANT, "res://img/enemies/mole_tunnels/mole_mutant.png")
+	_register_enemy_sprite(DataManager.Biome.MOLE_TUNNELS, DataManager.MoleEnemy.STRONG_MOLE, "res://img/enemies/mole_tunnels/strong_mole.png")
+	_register_enemy_sprite(DataManager.Biome.MOLE_TUNNELS, DataManager.MoleEnemy.RABID_RAT, "res://img/enemies/mole_tunnels/rabid_rat.png")
+	_register_enemy_sprite(DataManager.Biome.MOLE_TUNNELS, DataManager.MoleEnemy.MOLE_FUNGUS, "res://img/enemies/mole_tunnels/mole_fungus.png")
+	_register_enemy_sprite(DataManager.Biome.MOLE_TUNNELS, DataManager.MoleEnemy.MANY_HEADED_MOLE, "res://img/enemies/mole_tunnels/many_headed_mole.png")
+	_register_enemy_sprite(DataManager.Biome.MOLE_TUNNELS, DataManager.MoleEnemy.FUNGAL_MINER, "res://img/enemies/mole_tunnels/fungal_miner.png")
+	_register_enemy_sprite(DataManager.Biome.MOLE_TUNNELS, DataManager.MoleEnemy.RODENT_MOUND, "res://img/enemies/mole_tunnels/rodent_mound.png")
+
+func _register_enemy_sprite(biome: DataManager.Biome, enemy_id, path: String):
+	var key = str(biome) + "_" + str(enemy_id)
+	if ResourceLoader.exists(path):
+		_enemy_sprites[key] = load(path)
+	else:
+		printerr("Enemy sprite not found: ", path)
+
+func get_enemy_sprite(enemy_id, biome: DataManager.Biome) -> Texture2D:
+	if _enemy_sprites.is_empty():
+		load_enemy_sprites()
+	
+	var key = str(biome) + "_" + str(enemy_id)
+	var sprite = _enemy_sprites.get(key)
+	
+	# Если спрайт не найден, возвращаем заглушку
+	if not sprite:
+		printerr("Missing sprite for enemy: ", enemy_id, " in biome: ", biome)
+		return _get_fallback_sprite()
+	
+	return sprite
+
+func _get_fallback_sprite() -> Texture2D:
+	# Заглушка на случай отсутствия спрайта
+	return load("res://img/enemies/fallback.png")
+## ============================================================
+## РЕСУРСЫ ВРАГОВ
+## ============================================================
+
+var _enemy_resources: Dictionary = {}  # MoleEnemy -> EnemyResource
+var _enemy_resources_loaded: bool = false
+
+func load_enemy_resources():
+	if _enemy_resources_loaded:
+		return
+	
+	# Кротовые норы
+	_enemy_resources[MoleEnemy.MOLE_MUTANT] = load("res://resources/enemies/mole_tunnels/mole_mutant.tres")
+	_enemy_resources[MoleEnemy.STRONG_MOLE] = load("res://resources/enemies/mole_tunnels/strong_mole.tres")
+	_enemy_resources[MoleEnemy.RABID_RAT] = load("res://resources/enemies/mole_tunnels/rabid_rat.tres")
+	_enemy_resources[MoleEnemy.MOLE_FUNGUS] = load("res://resources/enemies/mole_tunnels/mole_fungus.tres")
+	_enemy_resources[MoleEnemy.MANY_HEADED_MOLE] = load("res://resources/enemies/mole_tunnels/many_headed_mole.tres")
+	_enemy_resources[MoleEnemy.FUNGAL_MINER] = load("res://resources/enemies/mole_tunnels/fungal_miner.tres")
+	_enemy_resources[MoleEnemy.RODENT_MOUND] = load("res://resources/enemies/mole_tunnels/rodent_mound.tres")
+	
+	_enemy_resources_loaded = true
+
+
+# DataManager.gd
+
+func get_enemy_resource_name(enemy: MoleEnemy) -> String:
+	match enemy:
+		MoleEnemy.MOLE_MUTANT:
+			return "Mole Mutant"
+		MoleEnemy.STRONG_MOLE:
+			return "Strong Mole"
+		MoleEnemy.RABID_RAT:
+			return "Rabid Rat"
+		MoleEnemy.MOLE_FUNGUS:
+			return "Mole Fungus"
+		MoleEnemy.MANY_HEADED_MOLE:
+			return "Many-Headed Mole"
+		MoleEnemy.FUNGAL_MINER:
+			return "Fungal Miner"
+		MoleEnemy.RODENT_MOUND:
+			return "Rodent Mound"
+		_:
+			return "Unknown"
+
+func get_enemy_resource(enemy: MoleEnemy) -> EnemyResource:
+	if not _enemy_resources_loaded:
+		load_enemy_resources()
+	
+	var resource = _enemy_resources.get(enemy)
+	if not resource:
+		printerr("Enemy resource not found for: ", enemy)
+	return resource
+
+func _get_enemy_size_pixels(size: DataManager.EnemySize) -> Vector2:
+	match size:
+		DataManager.EnemySize.WEAK:
+			return Vector2(192, 192)
+		DataManager.EnemySize.NORMAL:
+			return Vector2(256, 256)
+		DataManager.EnemySize.ELITE:
+			return Vector2(320, 320)
+		DataManager.EnemySize.BOSS:
+			return Vector2(460, 460)
+	return Vector2(256, 256)

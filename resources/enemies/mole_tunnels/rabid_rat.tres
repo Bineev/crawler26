@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="EnemyResource" load_steps=3 format=3 uid="uid://ch6782hwe0suk"]
+
+[ext_resource type="Script" uid="uid://beudtcsu45bk7" path="res://resources/res_scripts/enemy_resource.gd" id="1_vbpok"]
+[ext_resource type="Script" uid="uid://br4ase11y58nd" path="res://resources/res_scripts/passive_resource.gd" id="2_jdqpp"]
+
+[resource]
+script = ExtResource("1_vbpok")
+enemy_id = 2
+size = 0
+name_key = "enemy_rabid_rat_name"
+description_key = "enemy_rabid_rat_desc"
+base_max_health = 25
+base_strength = 10
+metadata/_custom_type_script = "uid://beudtcsu45bk7"

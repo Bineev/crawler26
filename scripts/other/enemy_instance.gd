@@ -254,3 +254,9 @@ func get_active_passives_for_ui() -> Array[Dictionary]:
 				"description": passive.get_localized_description()
 			})
 	return result
+
+
+func get_sprite() -> Texture2D:
+	if resource:
+		return resource.get_sprite()
+	return null

@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="CardData" load_steps=3 format=3 uid="uid://dr0x4xefdqfv0"]
+
+[ext_resource type="Script" uid="uid://cmra25r1r3ivt" path="res://resources/res_scripts/effect_entry.gd" id="1_bsmbx"]
+[ext_resource type="Script" uid="uid://badcs22cck6n5" path="res://resources/res_scripts/card_data.gd" id="2_w6rt0"]
+
+[resource]
+script = ExtResource("2_w6rt0")
+id = 3
+name_key = "card_atonement_barrier_name"
+description_key = "card_atonement_barrier_desc"
+cost = 2
+metadata/_custom_type_script = "uid://badcs22cck6n5"

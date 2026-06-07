@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="EnemyResource" load_steps=4 format=3 uid="uid://djgbc4s20nldr"]
+
+[ext_resource type="Script" uid="uid://beudtcsu45bk7" path="res://resources/res_scripts/enemy_resource.gd" id="1_2kitk"]
+[ext_resource type="Script" uid="uid://br4ase11y58nd" path="res://resources/res_scripts/passive_resource.gd" id="2_q1s0p"]
+[ext_resource type="Resource" uid="uid://do4j6drxrdsqt" path="res://resources/passives/regrowth.tres" id="3_q1s0p"]
+
+[resource]
+script = ExtResource("1_2kitk")
+size = 0
+name_key = "enemy_mole_mutant_name"
+description_key = "enemy_mole_mutant_desc"
+base_max_health = 25
+starting_passives = Array[ExtResource("2_q1s0p")]([ExtResource("3_q1s0p")])
+metadata/_custom_type_script = "uid://beudtcsu45bk7"

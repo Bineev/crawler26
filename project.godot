@@ -10,7 +10,7 @@ config_version=5
 
 [application]
 
-config/name="monster-lab"
+config/name="comic_crawler"
 run/main_scene="uid://dvfumklriwrf3"
 config/features=PackedStringArray("4.5", "Forward Plus")
 
@@ -26,6 +26,9 @@ StatusInteractionManager="*res://scripts/global/status_interaction_manager.gd"
 EffectExecutor="*res://scripts/global/EffectExecutor.gd"
 BattleDeck="*res://scripts/global/battle_deck.gd"
 BattleManager="*res://scripts/global/battle_manager.gd"
+EnemySelector="*res://scripts/global/enemy_selector.gd"
+FloorManager="*res://scripts/global/floor_manager.gd"
+GameTestManager="*res://scripts/global/game_test_manager.gd"
 
 [display]
 

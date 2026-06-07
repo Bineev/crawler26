@@ -1,0 +1,18 @@
+[gd_scene load_steps=2 format=3 uid="uid://dcst51dams5bp"]
+
+[ext_resource type="Script" uid="uid://rgrbwlag2ceu" path="res://scripts/other/room.gd" id="1_36trf"]
+
+[node name="Room" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+script = ExtResource("1_36trf")
+
+[node name="Background" type="TextureRect" parent="."]
+custom_minimum_size = Vector2(1024, 800)
+layout_mode = 1
+offset_right = 1024.0
+offset_bottom = 800.0
+expand_mode = 2
+stretch_mode = 5
+
+[node name="Content" type="Node2D" parent="."]

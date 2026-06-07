@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="EnemyResource" load_steps=5 format=3 uid="uid://p55uc21lrw82"]
+
+[ext_resource type="Script" uid="uid://beudtcsu45bk7" path="res://resources/res_scripts/enemy_resource.gd" id="1_j71wk"]
+[ext_resource type="Script" uid="uid://br4ase11y58nd" path="res://resources/res_scripts/passive_resource.gd" id="2_t23cl"]
+[ext_resource type="Resource" uid="uid://bfmovyf6o1c8g" path="res://resources/passives/venomous_shield.tres" id="3_3iv35"]
+[ext_resource type="Resource" uid="uid://cjgmceou5cois" path="res://resources/passives/wrath.tres" id="4_ok8oa"]
+
+[resource]
+script = ExtResource("1_j71wk")
+enemy_id = 3
+name_key = "enemy_mole_fungus_name"
+description_key = "enemy_mole_fungus_desc"
+base_max_health = 45
+starting_passives = Array[ExtResource("2_t23cl")]([ExtResource("3_3iv35"), ExtResource("4_ok8oa")])
+metadata/_custom_type_script = "uid://beudtcsu45bk7"

@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="EnemyResource" load_steps=3 format=3 uid="uid://bcw37v403t6vp"]
+
+[ext_resource type="Script" uid="uid://beudtcsu45bk7" path="res://resources/res_scripts/enemy_resource.gd" id="1_7m5h1"]
+[ext_resource type="Script" uid="uid://br4ase11y58nd" path="res://resources/res_scripts/passive_resource.gd" id="2_6vpb6"]
+
+[resource]
+script = ExtResource("1_7m5h1")
+enemy_id = 5
+size = 2
+name_key = "enemy_fungal_miner_name"
+description_key = "enemy_fungal_miner_desc"
+base_max_health = 90
+base_strength = 10
+metadata/_custom_type_script = "uid://beudtcsu45bk7"

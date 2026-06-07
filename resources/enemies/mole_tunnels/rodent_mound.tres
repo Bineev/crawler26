@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="EnemyResource" load_steps=3 format=3 uid="uid://bya3tj3nmxjsl"]
+
+[ext_resource type="Script" uid="uid://beudtcsu45bk7" path="res://resources/res_scripts/enemy_resource.gd" id="1_f27mg"]
+[ext_resource type="Script" uid="uid://br4ase11y58nd" path="res://resources/res_scripts/passive_resource.gd" id="2_0t1tm"]
+
+[resource]
+script = ExtResource("1_f27mg")
+enemy_id = 6
+size = 3
+name_key = "enemy_rodent_mound_name"
+description_key = "enemy_rodent_mound_desc"
+base_max_health = 150
+base_strength = 15
+metadata/_custom_type_script = "uid://beudtcsu45bk7"

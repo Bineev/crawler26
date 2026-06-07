@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="EnemyResource" load_steps=4 format=3 uid="uid://bydotd6n44tan"]
+
+[ext_resource type="Script" uid="uid://beudtcsu45bk7" path="res://resources/res_scripts/enemy_resource.gd" id="1_t8kre"]
+[ext_resource type="Script" uid="uid://br4ase11y58nd" path="res://resources/res_scripts/passive_resource.gd" id="2_ufhci"]
+[ext_resource type="Resource" uid="uid://cy2vuchba7iu7" path="res://resources/passives/freezing_ground.tres" id="3_ufhci"]
+
+[resource]
+script = ExtResource("1_t8kre")
+enemy_id = 4
+size = 2
+name_key = "enemy_many_headed_mole_name"
+description_key = "enemy_many_headed_mole_desc"
+base_max_health = 70
+base_strength = 8
+starting_passives = Array[ExtResource("2_ufhci")]([ExtResource("3_ufhci")])
+metadata/_custom_type_script = "uid://beudtcsu45bk7"
