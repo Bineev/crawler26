@@ -177,3 +177,11 @@ func _exit_tree():
 	# Отписываемся от сигналов
 	SignalManager.enemy_health_changed.disconnect(_on_enemy_health_changed)
 	SignalManager.enemy_status_changed.disconnect(_on_enemy_status_changed)
+
+
+func set_enemy_size():
+	if not enemy_instance:
+		return
+	
+	var rect_size = DataManager.get_enemy_size_pixels(enemy_instance.resource.size)
+	self.size = rect_size

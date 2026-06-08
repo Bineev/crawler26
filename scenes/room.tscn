@@ -15,4 +15,15 @@ offset_bottom = 800.0
 expand_mode = 2
 stretch_mode = 5
 
+[node name="DarkOverlay" type="ColorRect" parent="."]
+custom_minimum_size = Vector2(1024, 800)
+layout_mode = 1
+
+[node name="HorrorOverlay" type="ColorRect" parent="."]
+custom_minimum_size = Vector2(1024, 800)
+layout_mode = 1
+offset_right = 1024.0
+offset_bottom = 800.0
+color = Color(0, 0, 0, 1)
+
 [node name="Content" type="Node2D" parent="."]
