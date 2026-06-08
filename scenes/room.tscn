@@ -1,6 +1,23 @@
-[gd_scene load_steps=2 format=3 uid="uid://dcst51dams5bp"]
+[gd_scene load_steps=6 format=3 uid="uid://dcst51dams5bp"]
 
 [ext_resource type="Script" uid="uid://rgrbwlag2ceu" path="res://scripts/other/room.gd" id="1_36trf"]
+[ext_resource type="Shader" uid="uid://cfcs8l2y88blq" path="res://shaders/mood_shader.gdshader" id="2_85yof"]
+[ext_resource type="Shader" uid="uid://b1dptapvctk7b" path="res://shaders/horror_shader.gdshader" id="3_14vil"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_jxe34"]
+render_priority = 0
+shader = ExtResource("2_85yof")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_jn645"]
+shader = ExtResource("3_14vil")
+shader_parameter/grain_amount = 0.05
+shader_parameter/scanline_intensity = 0.2
+shader_parameter/vignette_intensity = 0.4
+shader_parameter/glitch_amount = 0.03
+shader_parameter/glitch_speed = 5.0
+shader_parameter/pulse_speed = 1.5
+shader_parameter/pulse_intensity = 0.1
+shader_parameter/chromatic_amount = 0.002
 
 [node name="Room" type="Control"]
 layout_mode = 3
@@ -16,10 +33,14 @@ expand_mode = 2
 stretch_mode = 5
 
 [node name="DarkOverlay" type="ColorRect" parent="."]
+material = SubResource("ShaderMaterial_jxe34")
 custom_minimum_size = Vector2(1024, 800)
 layout_mode = 1
+offset_right = 1024.0
+offset_bottom = 800.0
 
 [node name="HorrorOverlay" type="ColorRect" parent="."]
+material = SubResource("ShaderMaterial_jn645")
 custom_minimum_size = Vector2(1024, 800)
 layout_mode = 1
 offset_right = 1024.0

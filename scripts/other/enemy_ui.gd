@@ -5,17 +5,18 @@ class_name EnemyUI
 ## ============================================================
 ## НОДЫ
 ## ============================================================
-
-@onready var enemy_sprite: TextureRect = $VBoxContainer/SpriteContainer/EnemySprite
+@onready var enemy_sprite: TextureRect = $VBoxContainer/LivingContainer/SpriteContainer/EnemySprite
 @onready var intents_container: HBoxContainer = $VBoxContainer/IntentsContainer
 @onready var health_bar: ProgressBar = $VBoxContainer/HealthBar
 @onready var health_label: Label = $VBoxContainer/HealthBar/HealthLabel
 @onready var status_container: HBoxContainer = $VBoxContainer/BottomPanel/StatusContainer
 @onready var passive_container: HBoxContainer = $VBoxContainer/BottomPanel/PassiveContainer
+@onready var living_container: Control = $VBoxContainer/LivingContainer  # новая нода
 
 var enemy_instance: EnemyInstance = null
-
-
+var breath_tween: Tween = null
+var wobble_tween: Tween = null
+var aura_particles: GPUParticles2D = null
 ## ============================================================
 ## ПУБЛИЧНЫЕ МЕТОДЫ
 ## ============================================================
@@ -23,10 +24,136 @@ var enemy_instance: EnemyInstance = null
 func setup(enemy: EnemyInstance):
 	enemy_instance = enemy
 	update_display()
+	living_container.custom_minimum_size = enemy_instance.resource.get_size_pixels()
 	
-	# Подписываемся на сигналы через SignalManager
+	# Поднимаем врага выше дыма
+	living_container.z_index = 10
+	living_container.z_as_relative = false
+	
+	_add_aura_effect()
+	_start_living_animation()
+	_start_random_jitter()
+	
 	SignalManager.enemy_health_changed.connect(_on_enemy_health_changed)
 	SignalManager.enemy_status_changed.connect(_on_enemy_status_changed)
+	
+
+func _add_aura_effect():
+	if not living_container:
+		return
+	
+	var container_size = living_container.custom_minimum_size
+	var enemy_width = container_size.x
+	var enemy_bottom = container_size.y
+	
+	aura_particles = GPUParticles2D.new()
+	aura_particles.name = "AuraParticles"
+	aura_particles.amount = 60
+	aura_particles.lifetime = 5
+	aura_particles.speed_scale = 0.7
+	aura_particles.explosiveness = 0.3
+	aura_particles.one_shot = false
+	aura_particles.emitting = true
+	aura_particles.z_as_relative = false
+	
+	# Увеличиваем область видимости частиц
+	aura_particles.visibility_rect = Rect2(-enemy_width, -100, enemy_width * 2, 200)
+	
+	var particle_texture = preload("res://img/smoke.png")
+	if particle_texture:
+		aura_particles.texture = particle_texture
+	
+	var process_material = ParticleProcessMaterial.new()
+	process_material.direction = Vector3(0, -1, 0)
+	process_material.spread = 60                    # очень широко
+	process_material.gravity = Vector3(0, -3, 0)       # поднимаются выше
+	process_material.initial_velocity_min = 10.0
+	process_material.initial_velocity_max = 30.0
+	process_material.angular_velocity_min = 5.0
+	process_material.angular_velocity_max = 20.0
+	process_material.scale_min = 0.3
+	process_material.scale_max = 0.6            # крупные частицы
+	process_material.color = Color(0, 0, 0, 0.4)
+	#process_material.color = Color(0, 0, 0, 0.4)
+	process_material.hue_variation_max = 0.1  # максимальное изменение оттенка
+	process_material.hue_variation_min = 0.0  # минимальное изменение оттенка
+	
+	aura_particles.process_material = process_material
+	
+	# Позиция: от центра врага, ниже
+	aura_particles.position = Vector2(enemy_width / 2, enemy_bottom - 100)
+	
+	living_container.add_child(aura_particles)
+	
+	# второй слой
+	var aura_particles2 = GPUParticles2D.new()
+	aura_particles2.amount = 20
+	aura_particles2.lifetime = 4.0
+	aura_particles2.speed_scale = 0.5
+	aura_particles2.texture = particle_texture
+
+	var pm2 = ParticleProcessMaterial.new()
+	pm2.direction = Vector3(0, -1, 0)
+	pm2.spread = 150
+	pm2.gravity = Vector3(0, -4, 0)
+	pm2.initial_velocity_min = 5.0
+	pm2.initial_velocity_max = 20.0
+	pm2.scale_min = 0.4
+	pm2.scale_max = 0.9
+	pm2.color = Color(0, 0, 0, 0.25)
+
+	aura_particles2.process_material = pm2
+	aura_particles.position = Vector2(enemy_width / 2, enemy_bottom - 100)
+	living_container.add_child(aura_particles2)
+
+
+func _remove_aura_effect():
+	if aura_particles:
+		aura_particles.queue_free()
+		aura_particles = null
+
+
+func _start_living_animation():
+	if not living_container:
+		return
+	
+	breath_tween = create_tween()
+	breath_tween.set_loops()
+	breath_tween.tween_property(living_container, "scale", Vector2(1.008, 1.008), 5.0).set_ease(Tween.EASE_IN_OUT)
+	breath_tween.tween_property(living_container, "scale", Vector2(0.992, 0.992), 5.0).set_ease(Tween.EASE_IN_OUT)
+	
+	wobble_tween = create_tween()
+	wobble_tween.set_loops()
+	wobble_tween.tween_property(living_container, "position", Vector2(2, 0), 3.5).set_ease(Tween.EASE_IN_OUT).as_relative()
+	wobble_tween.tween_property(living_container, "position", Vector2(-2, 0), 3.5).set_ease(Tween.EASE_IN_OUT).as_relative()
+
+
+func _stop_living_animation():
+	if breath_tween:
+		breath_tween.kill()
+		breath_tween = null
+	if wobble_tween:
+		wobble_tween.kill()
+		wobble_tween = null
+	scale = Vector2.ONE
+	position = Vector2.ZERO
+
+
+func _apply_horror_shader():
+	if not enemy_sprite:
+		return
+	
+	var shader_material = ShaderMaterial.new()
+	var shader = preload("res://shaders/enemy_horror.gdshader")
+	shader_material.shader = shader
+	
+	shader_material.set_shader_parameter("breath_speed", 0)
+	shader_material.set_shader_parameter("breath_amount", 0)
+	shader_material.set_shader_parameter("wobble_speed", 0.001)
+	shader_material.set_shader_parameter("wobble_amount", 0.001)
+	shader_material.set_shader_parameter("jitter_strength", 0)
+	
+	enemy_sprite.material = shader_material
 
 
 func update_display():
@@ -174,7 +301,8 @@ func _on_enemy_status_changed(enemy: EnemyInstance):
 
 
 func _exit_tree():
-	# Отписываемся от сигналов
+	_stop_living_animation()
+	_remove_aura_effect()
 	SignalManager.enemy_health_changed.disconnect(_on_enemy_health_changed)
 	SignalManager.enemy_status_changed.disconnect(_on_enemy_status_changed)
 
@@ -185,3 +313,14 @@ func set_enemy_size():
 	
 	var rect_size = DataManager.get_enemy_size_pixels(enemy_instance.resource.size)
 	self.size = rect_size
+
+
+func _start_random_jitter():
+	var jitter_tween = create_tween()
+	var random_x = randf_range(-3, 3)
+	var random_y = randf_range(-2, 2)
+	jitter_tween.tween_property(living_container, "position", Vector2(random_x, random_y), 0.05)
+	jitter_tween.tween_property(living_container, "position", Vector2.ZERO, 0.1)
+	await get_tree().create_timer(randf_range(4, 10)).timeout
+	if is_inside_tree():
+		_start_random_jitter()

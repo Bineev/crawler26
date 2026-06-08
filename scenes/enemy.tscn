@@ -25,11 +25,16 @@ layout_mode = 2
 theme_override_constants/separation = 10
 alignment = 1
 
-[node name="SpriteContainer" type="CenterContainer" parent="EnemyUI/VBoxContainer"]
+[node name="LivingContainer" type="Control" parent="EnemyUI/VBoxContainer"]
 layout_mode = 2
 
-[node name="EnemySprite" type="TextureRect" parent="EnemyUI/VBoxContainer/SpriteContainer"]
-unique_name_in_owner = true
+[node name="SpriteContainer" type="CenterContainer" parent="EnemyUI/VBoxContainer/LivingContainer"]
+layout_mode = 0
+offset_top = 10.0
+offset_right = 40.0
+offset_bottom = 10.0
+
+[node name="EnemySprite" type="TextureRect" parent="EnemyUI/VBoxContainer/LivingContainer/SpriteContainer"]
 layout_mode = 2
 
 [node name="HealthBar" type="ProgressBar" parent="EnemyUI/VBoxContainer"]
