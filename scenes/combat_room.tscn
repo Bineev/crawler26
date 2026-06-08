@@ -1,5 +1,7 @@
-[gd_scene load_steps=2 format=3 uid="uid://b77d7dy1884q4"]
+[gd_scene load_steps=3 format=3 uid="uid://b77d7dy1884q4"]
 
 [ext_resource type="PackedScene" uid="uid://dcst51dams5bp" path="res://scenes/room.tscn" id="1_xm0ie"]
+[ext_resource type="Script" uid="uid://dc1tva02d5h4p" path="res://scripts/other/combat_room.gd" id="2_7cdi2"]
 
 [node name="CombatRoom" instance=ExtResource("1_xm0ie")]
+script = ExtResource("2_7cdi2")

@@ -13,9 +13,8 @@ var current_room_index: int = 0
 # Ссылка на главную сцену (куда добавлять комнаты)
 var game_world: Node = null
 
-# Загруженные сцены
-var room_scene: PackedScene = preload("res://scenes/room.tscn")
-var combat_room_scene: PackedScene = preload("res://scenes/combat_room.tscn")
+# Ссылка на RoomManager (будет доступен как автолоад)
+# RoomManager уже загружен как синглтон
 
 
 ## ============================================================
@@ -66,11 +65,18 @@ func after_combat_victory():
 ## ПРИВАТНЫЕ МЕТОДЫ
 ## ============================================================
 
+# autoload/game_test_manager.gd
+
 func _on_room_selected(room_node: RoomNode):
 	print("Room selected: ", _get_room_type_string(room_node.room_type, room_node.combat_type))
 	
-	# Создаём соответствующую комнату
-	var room_instance = _create_room_from_node(room_node)
+	# Создаём комнату через RoomManager (параметризация)
+	var room_instance = RoomManager.create_room(
+		room_node,
+		current_floor,
+		current_biome,
+		current_room_index
+	)
 	
 	if not room_instance:
 		print("Failed to create room")
@@ -83,18 +89,13 @@ func _on_room_selected(room_node: RoomNode):
 	# Сохраняем новую комнату
 	current_room_node = room_instance
 	
-	# Добавляем в дерево если ещё не добавлена
+	# Добавляем в дерево
 	if current_room_node and not current_room_node.is_inside_tree() and game_world:
 		game_world.add_child(current_room_node)
-		# Для Control используем anchor/offset вместо position
-		current_room_node.anchor_left = 0.0
-		current_room_node.anchor_top = 0.0
-		current_room_node.anchor_right = 1.0
-		current_room_node.anchor_bottom = 1.0
-		current_room_node.offset_left = 0
-		current_room_node.offset_top = 0
-		current_room_node.offset_right = 0
-		current_room_node.offset_bottom = 0
+		current_room_node.position = Vector2(448, 30)
+		# _ready() сам вызовется и применит отложенные данные
+		
+		current_room_index += 1
 
 
 func _on_floor_completed():
@@ -102,109 +103,6 @@ func _on_floor_completed():
 	current_floor += 1
 	current_room_index = 0
 	FloorManager.start_floor()
-
-
-func _create_room_from_node(room_node: RoomNode) -> Room:
-	match room_node.room_type:
-		DataManager.RoomType.COMBAT:
-			return _create_combat_room(room_node)
-		DataManager.RoomType.EVENT:
-			return _create_event_room(room_node)
-		DataManager.RoomType.OBJECT:
-			return _create_object_room(room_node)
-	
-	return null
-
-
-func _create_combat_room(room_node: RoomNode) -> Room:
-	# Подбираем врагов
-	var enemies = EnemySelector.select_enemies(
-		room_node.combat_type,
-		current_biome,
-		current_floor,
-		current_room_index
-	)
-	
-	print("  Creating combat room with ", enemies.size(), " enemies")
-	for enemy in enemies:
-		print("    - ", DataManager.get_enemy_resource_name(enemy.enemy_id))
-	
-	# Инстанциируем комнату из сцены
-	var room_instance = combat_room_scene.instantiate()
-	
-	# Добавляем в дерево
-	if game_world:
-		game_world.add_child(room_instance)
-		# Растягиваем Control на весь родительский контейнер
-		room_instance.position = Vector2(448, 30)
-	
-	# Настраиваем
-	if room_instance.has_method("setup"):
-		room_instance.setup({
-			"type": DataManager.RoomType.COMBAT,
-			"combat_type": room_node.combat_type,
-			"biome": current_biome,
-			"enemies": enemies,
-		})
-	else:
-		print("ERROR: CombatRoom has no setup method!")
-	
-	current_room_index += 1
-	return room_instance
-
-
-func _create_event_room(room_node: RoomNode) -> Room:
-	print("  Creating event room")
-	
-	var room_instance = room_scene.instantiate()
-	
-	if game_world:
-		game_world.add_child(room_instance)
-		# Растягиваем Control на весь родительский контейнер
-		room_instance.anchor_left = 0.0
-		room_instance.anchor_top = 0.0
-		room_instance.anchor_right = 1.0
-		room_instance.anchor_bottom = 1.0
-		room_instance.offset_left = 0
-		room_instance.offset_top = 0
-		room_instance.offset_right = 0
-		room_instance.offset_bottom = 0
-	
-	if room_instance.has_method("setup"):
-		room_instance.setup({
-			"type": DataManager.RoomType.EVENT,
-			"biome": current_biome,
-		})
-	
-	current_room_index += 1
-	return room_instance
-
-
-func _create_object_room(room_node: RoomNode) -> Room:
-	print("  Creating object room")
-	
-	var room_instance = room_scene.instantiate()
-	
-	if game_world:
-		game_world.add_child(room_instance)
-		# Растягиваем Control на весь родительский контейнер
-		room_instance.anchor_left = 0.0
-		room_instance.anchor_top = 0.0
-		room_instance.anchor_right = 1.0
-		room_instance.anchor_bottom = 1.0
-		room_instance.offset_left = 0
-		room_instance.offset_top = 0
-		room_instance.offset_right = 0
-		room_instance.offset_bottom = 0
-	
-	if room_instance.has_method("setup"):
-		room_instance.setup({
-			"type": DataManager.RoomType.OBJECT,
-			"biome": current_biome,
-		})
-	
-	current_room_index += 1
-	return room_instance
 
 
 func _get_room_type_string(room_type: DataManager.RoomType, combat_type: DataManager.CombatType) -> String:

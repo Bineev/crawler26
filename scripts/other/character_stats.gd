@@ -9,11 +9,12 @@ class_name CharacterStats
 signal health_changed(current: int, max: int)
 signal energy_changed(current: int, max: int)
 signal block_changed(current: int)
-signal atonement_changed(current: int, max: int)  # Для PenitentStats
+signal atonement_changed(current: int, max: int)
 signal status_added(status_id: int, stacks: int, duration: int)
 signal status_removed(status_id: int)
 signal passive_added(passive_id: int)
 signal passive_removed(passive_id: int)
+signal died()
 
 
 ## ============================================================
@@ -106,13 +107,31 @@ func modify_modifier(stat: DataManager.ModifierStat, delta: float, duration: int
 func _emit_flat_signal(stat: DataManager.FlatStat):
 	match stat:
 		DataManager.FlatStat.HEALTH:
-			health_changed.emit(get_flat(DataManager.FlatStat.HEALTH), get_flat(DataManager.FlatStat.MAX_HEALTH))
+			var current = get_flat(DataManager.FlatStat.HEALTH)
+			var max_val = get_flat(DataManager.FlatStat.MAX_HEALTH)
+			health_changed.emit(current, max_val)
+			# Для глобальной шины
+			SignalManager.health_changed.emit(current, max_val)
+			# Если это враг
+			if self is EnemyInstance:
+				SignalManager.enemy_health_changed.emit(self, current, max_val)
+		
 		DataManager.FlatStat.ENERGY:
-			energy_changed.emit(get_flat(DataManager.FlatStat.ENERGY), get_flat(DataManager.FlatStat.MAX_ENERGY))
+			var current = get_flat(DataManager.FlatStat.ENERGY)
+			var max_val = get_flat(DataManager.FlatStat.MAX_ENERGY)
+			energy_changed.emit(current, max_val)
+			SignalManager.energy_changed.emit(current, max_val)
+		
 		DataManager.FlatStat.BLOCK:
-			block_changed.emit(get_flat(DataManager.FlatStat.BLOCK))
+			var current = get_flat(DataManager.FlatStat.BLOCK)
+			block_changed.emit(current)
+			SignalManager.block_changed.emit(current)
+		
 		DataManager.FlatStat.ATONEMENT:
-			atonement_changed.emit(get_flat(DataManager.FlatStat.ATONEMENT), get_flat(DataManager.FlatStat.MAX_ATONEMENT))
+			var current = get_flat(DataManager.FlatStat.ATONEMENT)
+			var max_val = get_flat(DataManager.FlatStat.MAX_ATONEMENT)
+			atonement_changed.emit(current, max_val)
+			SignalManager.atonement_changed.emit(current, max_val)
 
 
 ## ============================================================
@@ -161,6 +180,11 @@ func take_damage(amount: int, ignore_block: bool = false):
 		modify_flat(DataManager.FlatStat.HEALTH, -damage)
 		on_take_damage_gain_resource(damage)
 		_process_passive_triggers(DataManager.PassiveTrigger.ON_TAKE_DAMAGE, damage)
+		
+		# Проверка смерти
+		if get_health() <= 0:
+			died.emit()
+			SignalManager.enemy_died.emit(self)  # Для врагов
 
 
 func heal(amount: int):
@@ -240,7 +264,13 @@ func add_status(status: StatusResource, value: int, duration: int, caster: Chara
 		if strength_status:
 			add_status(strength_status, DataManager.BURN_STRENGTH_STACKS, DataManager.BURN_STRENGTH_DURATION, self, passive_context)
 	
-	signal_emit(status_added, status_id, value, duration)
+	# Локальный сигнал
+	status_added.emit(status_id, value, duration)
+	# Глобальный сигнал
+	SignalManager.status_added.emit(self, status_id, value, duration)
+	# Для врага отдельно
+	if self is EnemyInstance:
+		SignalManager.enemy_status_changed.emit(self)
 
 
 func _get_strength_status_resource() -> StatusResource:
@@ -259,7 +289,14 @@ func remove_status(status_id: DataManager.Status):
 	
 	_remove_status_modifiers(status)
 	StatusInteractionManager.on_status_removed(self, status_id)
-	signal_emit(status_removed, status_id)
+	
+	# Локальный сигнал
+	status_removed.emit(status_id)
+	# Глобальный сигнал
+	SignalManager.status_removed.emit(self, status_id)
+	# Для врага отдельно
+	if self is EnemyInstance:
+		SignalManager.enemy_status_changed.emit(self)
 
 
 func has_status(status_id: DataManager.Status) -> bool:
@@ -340,7 +377,10 @@ func apply_passive(passive: PassiveResource, duration: int = -1):
 		if mod.flat_bonus != 0:
 			modifiers[mod.stat] = modifiers.get(mod.stat, 0) + mod.flat_bonus
 	
-	signal_emit(passive_added, instance.id)
+	# Локальный сигнал
+	passive_added.emit(instance.id)
+	# Глобальный сигнал
+	SignalManager.passive_added.emit(self, instance.id)
 
 
 func remove_passive(passive: PassiveResource):
@@ -351,7 +391,11 @@ func remove_passive(passive: PassiveResource):
 			modifiers[mod.stat] = modifiers.get(mod.stat, 1.0) / mod.multiplier
 			if mod.flat_bonus != 0:
 				modifiers[mod.stat] = modifiers.get(mod.stat, 0) - mod.flat_bonus
-		signal_emit(passive_removed, passive.id)
+		
+		# Локальный сигнал
+		passive_removed.emit(passive.id)
+		# Глобальный сигнал
+		SignalManager.passive_removed.emit(self, passive.id)
 
 
 func _process_passive_triggers(trigger: DataManager.PassiveTrigger, value = null):

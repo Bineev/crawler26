@@ -852,7 +852,7 @@ func get_enemy_resource(enemy: MoleEnemy) -> EnemyResource:
 		printerr("Enemy resource not found for: ", enemy)
 	return resource
 
-func _get_enemy_size_pixels(size: DataManager.EnemySize) -> Vector2:
+func get_enemy_size_pixels(size: DataManager.EnemySize) -> Vector2:
 	match size:
 		DataManager.EnemySize.WEAK:
 			return Vector2(192, 192)

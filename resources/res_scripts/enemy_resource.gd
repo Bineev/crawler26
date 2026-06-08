@@ -93,3 +93,6 @@ func _get_default_description() -> String:
 
 func get_size_pixels() -> Vector2:
 	return DataManager.get_enemy_size_pixels(size)
+
+func get_sprite() -> Texture2D:
+	return DataManager.get_enemy_sprite(enemy_id, biome)

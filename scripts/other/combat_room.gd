@@ -4,22 +4,20 @@ class_name CombatRoom
 
 var combat_type: DataManager.CombatType = DataManager.CombatType.NORMAL
 var enemies: Array[EnemyInstance] = []
+var _pending_enemies: Array[EnemyResource] = []
 
 
 func setup(room_data: Dictionary):
 	combat_type = room_data.get("combat_type", DataManager.CombatType.NORMAL)
-	var enemy_resources = room_data.get("enemies", [])
-	
+	_pending_enemies = room_data.get("enemies", [])
 	super.setup(room_data)
-	
-	# Спавним врагов после того как родительский setup завершился
-	spawn_enemies(enemy_resources)
+
+
+func _init_content(room_data: Dictionary):
+	spawn_enemies(_pending_enemies)
 
 
 func spawn_enemies(enemy_resources: Array[EnemyResource]):
-	if not content:
-		await ready  # ждём пока нода будет готова
-	
 	clear_content()
 	enemies.clear()
 	

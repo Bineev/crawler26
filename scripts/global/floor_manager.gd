@@ -170,7 +170,6 @@ func select_path(path_index: int):
 		print("  Added room: ", _get_room_type_string(room.room_type, room.combat_type))
 	
 	pending_paths = []
-	# Не увеличиваем current_room_index здесь, так как _load_current_room загрузит первую комнату из добавленных
 	_load_current_room()
 
 

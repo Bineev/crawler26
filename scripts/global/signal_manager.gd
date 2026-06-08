@@ -14,16 +14,25 @@ signal block_changed(current: int)
 ## СТАТУСЫ И ПАССИВКИ
 ## ============================================================
 
-signal status_added(status_id: int, stacks: int, duration: int)
-signal status_removed(status_id: int)
-signal passive_added(passive_id: int)
-signal passive_removed(passive_id: int)
+signal status_added(target: Node, status_id: int, stacks: int, duration: int)
+signal status_removed(target: Node, status_id: int)
+signal status_ticked(target: Node, status_id: int, damage: int)
+signal passive_added(target: Node, passive_id: int)
+signal passive_removed(target: Node, passive_id: int)
 
 ## ============================================================
 ## СПЕЦИФИЧЕСКИЕ ДЛЯ ПЕРСОНАЖЕЙ
 ## ============================================================
 
 signal atonement_changed(current: int, max: int)  # PenitentStats
+
+## ============================================================
+## ВРАГИ (EnemyInstance)
+## ============================================================
+
+signal enemy_health_changed(enemy: EnemyInstance, current: int, max: int)
+signal enemy_status_changed(enemy: EnemyInstance)
+signal enemy_died(enemy: EnemyInstance)
 
 ## ============================================================
 ## БОЙ (BattleManager)
@@ -34,7 +43,7 @@ signal battle_victory()
 signal battle_defeat()
 signal player_turn_started()
 signal enemy_turn_started()
-signal turn_started()      # общий сигнал (может быть deprecated)
+signal turn_started()
 signal turn_ended()
 
 ## ============================================================

@@ -1,5 +1,5 @@
 # scripts/enemy_instance.gd
-extends Node
+extends CharacterStats
 class_name EnemyInstance
 
 ## ============================================================
@@ -17,7 +17,6 @@ var stats: CharacterStats = null
 var max_health: int = 0
 var current_health: int = 0
 var base_strength: int = 0
-var active_passives: Array[PassiveResource] = []
 
 
 ## ============================================================
