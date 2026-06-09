@@ -2,10 +2,12 @@
 extends Room
 class_name CombatRoom
 
+var hand_ui : HandUI = null
 var combat_type: DataManager.CombatType = DataManager.CombatType.NORMAL
 var enemies: Array[EnemyInstance] = []
 var _pending_enemies: Array[EnemyResource] = []
-
+var current_floor: int = 1
+var current_biome: DataManager.Biome = DataManager.Biome.MOLE_TUNNELS
 # Загружаем сцену врага один раз
 const ENEMY_SCENE: PackedScene = preload("res://scenes/enemy.tscn")
 
@@ -13,12 +15,16 @@ const ENEMY_SCENE: PackedScene = preload("res://scenes/enemy.tscn")
 func setup(room_data: Dictionary):
 	combat_type = room_data.get("combat_type", DataManager.CombatType.NORMAL)
 	_pending_enemies = room_data.get("enemies", [])
+	current_floor = room_data.get("floor_level", 1)
+	current_biome = room_data.get("biome", DataManager.Biome.MOLE_TUNNELS)
+	hand_ui = room_data.get("hand_ui", null)
 	super.setup(room_data)
 
 
 func _init_content(room_data: Dictionary):
 	spawn_enemies(_pending_enemies)
-
+	# После того как враги созданы, начинаем бой
+	call_deferred("_start_battle")
 
 func spawn_enemies(enemy_resources: Array[EnemyResource]):
 	clear_content()
@@ -107,3 +113,44 @@ func get_enemies() -> Array[EnemyInstance]:
 
 func get_combat_type() -> DataManager.CombatType:
 	return combat_type
+
+
+func _start_battle():
+	# Создаём HandUI
+	if not hand_ui:
+		hand_ui = _create_hand_ui()
+		# Отправляем наверх для добавления в game_world
+		SignalManager.hand_ui_created.emit(hand_ui)
+	
+	var player = BattleManager.get_player()
+	if not player:
+		player = PenitentStats.new()
+		BattleManager.set_player(player)
+	
+	var deck_data = RunManager.get_player_deck()
+	var battle_deck = deck_data.create_battle_copy()
+	battle_deck.hand_ui = hand_ui
+	
+	BattleManager.start_battle(player, enemies, battle_deck, hand_ui, current_floor, current_biome, self)
+
+
+func _create_hand_ui() -> HandUI:
+	var hand_ui_scene = preload("res://scenes/hand_ui.tscn")
+	var hand_ui_instance = hand_ui_scene.instantiate() as HandUI
+	# НЕ добавляем в дерево здесь!
+	return hand_ui_instance
+
+
+func on_battle_victory():
+	print("Battle victory!")
+	# Очищаем руку
+	if hand_ui:
+		hand_ui.queue_free()
+		hand_ui = null
+	# Переход к следующей комнате
+	GameTestManager.after_combat_victory()
+
+
+func on_battle_defeat():
+	print("Battle defeat!")
+	# Показываем экран поражения

@@ -24,11 +24,11 @@ GameManager="*res://scripts/global/game_manager.gd"
 EntityManager="*res://scripts/global/entity_manager.gd"
 StatusInteractionManager="*res://scripts/global/status_interaction_manager.gd"
 EffectExecutor="*res://scripts/global/EffectExecutor.gd"
-BattleDeck="*res://scripts/global/battle_deck.gd"
 BattleManager="*res://scripts/global/battle_manager.gd"
 EnemySelector="*res://scripts/global/enemy_selector.gd"
 FloorManager="*res://scripts/global/floor_manager.gd"
 RoomManager="*res://scripts/global/room_manager.gd"
+RunManager="*res://scripts/global/run_manager.gd"
 GameTestManager="*res://scripts/global/game_test_manager.gd"
 
 [display]

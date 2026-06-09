@@ -3,17 +3,16 @@ extends Node2D
 class_name CardUI
 
 ## ============================================================
-## ССЫЛКИ НА НОДЫ (%)
+## ССЫЛКИ НА НОДЫ
 ## ============================================================
-
-@onready var template: MarginContainer = %CardTemplate
-@onready var cost_label: Label = %CostLabel
-@onready var name_label: Label = %CardName
-@onready var art_image: TextureRect = %ArtImage
-@onready var art_background: ColorRect = %ArtBackground
-@onready var description_label: RichTextLabel = %CardDescription
-@onready var left_icons: VBoxContainer = %LeftIcons
-@onready var right_icons: VBoxContainer = %RightIcons
+var template: MarginContainer = null
+var cost_label: Label = null
+var name_label: Label = null
+var art_image: TextureRect = null
+var art_background: ColorRect = null
+var description_label: RichTextLabel = null
+var left_icons: VBoxContainer = null
+var right_icons: VBoxContainer = null
 
 
 ## ============================================================
@@ -44,7 +43,7 @@ var is_hovered: bool = false
 var original_scale: Vector2 = Vector2.ONE
 var is_in_hand: bool = false
 var is_selectable: bool = true
-var is_being_played: bool = false  # защита от двойного клика
+var is_being_played: bool = false
 
 
 ## ============================================================
@@ -52,8 +51,15 @@ var is_being_played: bool = false  # защита от двойного клик
 ## ============================================================
 
 func _ready():
-	if card_data:
-		display()
+	# Инициализируем ссылки на ноды по структуре сцены
+	template = $CardTemplate
+	cost_label = $CardTemplate/MainLayout/HeaderLayout/CostLabel
+	name_label = $CardTemplate/MainLayout/HeaderLayout/CardName
+	art_image = $CardTemplate/MainLayout/MiddleLayout/ArtContainer/ArtImage
+	art_background = $CardTemplate/MainLayout/MiddleLayout/ArtContainer/ArtBackground
+	description_label = $CardTemplate/MainLayout/DesccriptionContainer/CardDescription
+	left_icons = $CardTemplate/MainLayout/MiddleLayout/LeftIcons
+	right_icons = $CardTemplate/MainLayout/MiddleLayout/RightIcons
 
 
 ## ============================================================
@@ -80,10 +86,12 @@ func display():
 ## ============================================================
 
 func clear_icons():
-	for child in left_icons.get_children():
-		child.queue_free()
-	for child in right_icons.get_children():
-		child.queue_free()
+	if left_icons:
+		for child in left_icons.get_children():
+			child.queue_free()
+	if right_icons:
+		for child in right_icons.get_children():
+			child.queue_free()
 
 
 ## ============================================================
@@ -91,6 +99,9 @@ func clear_icons():
 ## ============================================================
 
 func fill_left_icons():
+	if not left_icons:
+		return
+	
 	var icons: Array[Texture2D] = []
 	var tooltips: Array[String] = []
 	
@@ -129,6 +140,9 @@ func _collect_left_icons_from_effects(effects: Array[EffectEntry], icons: Array[
 ## ============================================================
 
 func fill_right_icons():
+	if not right_icons:
+		return
+	
 	var icons: Array[Texture2D] = []
 	var tooltips: Array[String] = []
 	
@@ -202,7 +216,7 @@ func _unique_icons(icons: Array[Texture2D], tooltips: Array[String]) -> Array[Di
 
 func set_hand_scale():
 	is_in_hand = true
-	original_scale = Vector2(CARD_SCALE_IN_HAND, CARD_SCALE_IN_HAND)
+	original_scale = Vector2(DataManager.CARD_SCALE_IN_HAND, DataManager.CARD_SCALE_IN_HAND)
 	scale = original_scale
 
 

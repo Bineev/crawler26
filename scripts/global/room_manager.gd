@@ -13,10 +13,10 @@ var combat_room_scene: PackedScene = preload("res://scenes/combat_room.tscn")
 ## ПУБЛИЧНЫЕ МЕТОДЫ
 ## ============================================================
 
-func create_room(room_node: RoomNode, floor_level: int, biome: DataManager.Biome, room_index: int = 0) -> Room:
+func create_room(room_node: RoomNode, floor_level: int, biome: DataManager.Biome, room_index: int = 0, hand_ui: HandUI = null) -> Room:
 	match room_node.room_type:
 		DataManager.RoomType.COMBAT:
-			return _create_combat_room(room_node, floor_level, biome, room_index)
+			return _create_combat_room(room_node, floor_level, biome, room_index, hand_ui)
 		DataManager.RoomType.EVENT:
 			return _create_event_room(room_node, biome)
 		DataManager.RoomType.OBJECT:
@@ -29,7 +29,7 @@ func create_room(room_node: RoomNode, floor_level: int, biome: DataManager.Biome
 ## ПРИВАТНЫЕ МЕТОДЫ
 ## ============================================================
 
-func _create_combat_room(room_node: RoomNode, floor_level: int, biome: DataManager.Biome, room_index: int) -> Room:
+func _create_combat_room(room_node: RoomNode, floor_level: int, biome: DataManager.Biome, room_index: int, hand_ui: HandUI) -> Room:
 	# Подбираем врагов
 	var enemies = EnemySelector.select_enemies(
 		room_node.combat_type,
@@ -42,23 +42,19 @@ func _create_combat_room(room_node: RoomNode, floor_level: int, biome: DataManag
 	for enemy in enemies:
 		print("    - ", DataManager.get_enemy_resource_name(enemy.enemy_id))
 	
-	# Получаем случайный фон для биома
 	var background_texture = DataManager.get_random_background(biome)
-	
-	# Инстанциируем комнату
 	var room_instance = combat_room_scene.instantiate()
 	
-	# Параметризуем с передачей фона
 	if room_instance.has_method("setup"):
 		room_instance.setup({
 			"type": DataManager.RoomType.COMBAT,
 			"combat_type": room_node.combat_type,
 			"biome": biome,
+			"floor_level": floor_level,
 			"enemies": enemies,
-			"background": background_texture,  # ← передаём фон
+			"background": background_texture,
+			"hand_ui": hand_ui,  # ← передаём HandUI
 		})
-	else:
-		print("ERROR: CombatRoom has no setup method!")
 	
 	return room_instance
 

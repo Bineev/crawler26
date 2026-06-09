@@ -66,3 +66,6 @@ signal hand_updated(hand: Array)
 ## ============================================================
 
 signal log_message(text: String)
+signal deck_size_changed(size: int)
+signal discard_size_changed(size: int)
+signal hand_ui_created(hand_ui: HandUI)  # рука создана

@@ -9,7 +9,7 @@ var current_room_node: Room = null
 var current_floor: int = 1
 var current_biome: DataManager.Biome = DataManager.Biome.MOLE_TUNNELS
 var current_room_index: int = 0
-
+var hand_ui : HandUI = null
 # Ссылка на главную сцену (куда добавлять комнаты)
 var game_world: Node = null
 
@@ -24,7 +24,7 @@ var game_world: Node = null
 func start_test(world_node: Node):
 	print("=== GAME TEST START ===")
 	game_world = world_node
-	
+	SignalManager.hand_ui_created.connect(_on_hand_ui_created)
 	# Сбрасываем менеджеры
 	FloorManager.reset()
 	
@@ -40,7 +40,12 @@ func start_test(world_node: Node):
 	
 	# Запускаем этаж
 	FloorManager.start_floor()
-
+	
+	
+func _on_hand_ui_created(hand_ui: HandUI):
+	# Добавляем руку в game_world
+	if game_world and hand_ui:
+		game_world.add_child(hand_ui)
 
 func reset():
 	if current_room_node and is_instance_valid(current_room_node):
@@ -68,14 +73,16 @@ func after_combat_victory():
 # autoload/game_test_manager.gd
 
 func _on_room_selected(room_node: RoomNode):
-	print("Room selected: ", _get_room_type_string(room_node.room_type, room_node.combat_type))
+	# Находим HandUI (один раз, можно сохранить в переменную)
+	if not hand_ui:
+		hand_ui = game_world.get_node_or_null("HandUI")
 	
-	# Создаём комнату через RoomManager (параметризация)
 	var room_instance = RoomManager.create_room(
 		room_node,
 		current_floor,
 		current_biome,
-		current_room_index
+		current_room_index,
+		hand_ui  # ← передаём HandUI
 	)
 	
 	if not room_instance:

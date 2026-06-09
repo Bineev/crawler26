@@ -4,7 +4,13 @@ extends Node
 ## ============================================================
 ## 1. ОСНОВНЫЕ ПЕРЕЧИСЛЕНИЯ (ENUMS)
 ## ============================================================
-
+enum BattleState {
+	IDLE,
+	PLAYER_TURN,
+	ENEMY_TURN,
+	VICTORY,
+	DEFEAT
+}
 ## Базовые статы (flats) — числовые характеристики
 enum FlatStat {
 	HEALTH,
@@ -291,6 +297,7 @@ const FLOOR_SEGMENTS_BEFORE_BOSS: int = 3     # сегментов (развил
 
 ## === Основные лимиты ===
 const STARTING_HAND_SIZE: int = 5
+const CARDS_TO_DRAW_PER_TURN: int = 5
 const STARTING_ENERGY: int = 3
 const MAX_ENERGY: int = 3
 
@@ -450,7 +457,6 @@ const LOCATION_SPRITE_SIZE: Vector2 = Vector2(1024, 768)
 ## ============================================================
 
 const MAX_HAND_SIZE: int = 5
-const CARDS_TO_DRAW_PER_TURN: int = 5
 ## ============================================================
 ## НАСТРОЙКИ ПОДБОРА ВРАГОВ
 ## ============================================================
@@ -877,3 +883,63 @@ func get_enemy_size_pixels(size: DataManager.EnemySize) -> Vector2:
 		DataManager.EnemySize.BOSS:
 			return Vector2(460, 460)
 	return Vector2(256, 256)
+
+
+## СТАРТОВАЯ КОЛОДА
+## ============================================================
+
+# DataManager.gd
+
+## ============================================================
+## КАРТЫ
+## ============================================================
+
+var _cards: Dictionary = {}  # CardId -> CardData
+var _cards_loaded: bool = false
+
+func load_all_cards():
+	if _cards_loaded:
+		return
+	
+	# Загружаем все карты по enum
+	_register_card(CardId.ATONEMENT_STRIKE, "res://resources/cards/penitent/atonement_strike.tres")
+	_register_card(CardId.SINFUL_STRIKE, "res://resources/cards/penitent/sinful_strike.tres")
+	_register_card(CardId.PENITENT_REVELATION, "res://resources/cards/penitent/penitent_revelation.tres")
+	_register_card(CardId.ATONEMENT_BARRIER, "res://resources/cards/penitent/atonement_barrier.tres")
+	_register_card(CardId.BLOOD_SACRIFICE, "res://resources/cards/penitent/blood_sacrifice.tres")
+	_register_card(CardId.PRICE_OF_DESPAIR, "res://resources/cards/penitent/price_of_despair.tres")
+	_register_card(CardId.SCOURING_FLAME, "res://resources/cards/penitent/scouring_flame.tres")
+	_register_card(CardId.SIN_OF_VANITY, "res://resources/cards/penitent/sin_of_vanity.tres")
+	_register_card(CardId.THIRST_FOR_PUNISHMENT, "res://resources/cards/penitent/thirst_for_punishment.tres")
+	_register_card(CardId.SHIELD_OF_PENANCE, "res://resources/cards/penitent/shield_of_penance.tres")
+	_register_card(CardId.VOID_STRIKE, "res://resources/cards/penitent/void_strike.tres")
+	_register_card(CardId.CRY_OF_DESPAIR, "res://resources/cards/penitent/cry_of_despair.tres")
+	
+	_cards_loaded = true
+
+func _register_card(card_id: CardId, path: String):
+	if ResourceLoader.exists(path):
+		_cards[card_id] = load(path)
+	else:
+		printerr("Card not found: ", path)
+
+func get_card(card_id: CardId) -> CardData:
+	if not _cards_loaded:
+		load_all_cards()
+	return _cards.get(card_id)
+
+
+func get_starting_deck() -> Array[CardData]:
+	var deck: Array[CardData] = []
+	
+	deck.append(get_card(CardId.ATONEMENT_STRIKE))
+	deck.append(get_card(CardId.ATONEMENT_STRIKE))
+	deck.append(get_card(CardId.ATONEMENT_STRIKE))
+	deck.append(get_card(CardId.SINFUL_STRIKE))
+	deck.append(get_card(CardId.SINFUL_STRIKE))
+	deck.append(get_card(CardId.SINFUL_STRIKE))
+	deck.append(get_card(CardId.PENITENT_REVELATION))
+	deck.append(get_card(CardId.ATONEMENT_BARRIER))
+	deck.append(get_card(CardId.ATONEMENT_BARRIER))
+	
+	return deck
