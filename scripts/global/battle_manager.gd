@@ -184,6 +184,7 @@ func check_victory():
 func check_defeat():
 	if player and player.get_health() <= 0:
 		defeat()
+		SignalManager.log_message.emit(tr("msg_defeat"))
 
 
 ## ============================================================

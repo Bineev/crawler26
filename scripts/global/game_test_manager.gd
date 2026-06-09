@@ -99,7 +99,7 @@ func _on_room_selected(room_node: RoomNode):
 	# Добавляем в дерево
 	if current_room_node and not current_room_node.is_inside_tree() and game_world:
 		game_world.add_child(current_room_node)
-		current_room_node.position = Vector2(448, 30)
+		current_room_node.position = DataManager.ROOM_POSITION
 		# _ready() сам вызовется и применит отложенные данные
 		
 		current_room_index += 1

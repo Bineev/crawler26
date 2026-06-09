@@ -1,0 +1,136 @@
+keys,ru
+card_atonement_strike_name,Удар расплаты
+card_atonement_strike_desc,"Наносит 8 урона.\nКонвертирует весь блок в Искупление."
+
+card_sinful_strike_name,Греховный выпад
+card_sinful_strike_desc,"Наносит 10 урона.\nНакладывает Стыд на 2 хода."
+
+card_penitent_revelation_name,Покаянное откровение
+card_penitent_revelation_desc,"Сожгите карту.\nДоберите карты в зависимости от Искупления: 10+ → 1, 20+ → 2, 30+ → 3."
+
+card_atonement_barrier_name,Искупительный барьер
+card_atonement_barrier_desc,"Получите 5 урона.\nПолучите блок в зависимости от Искупления: 10+ → 10, 20+ → 16, 30+ → 22."
+
+card_blood_sacrifice_name,Кровавая жертва
+card_blood_sacrifice_desc,"Получите 5 урона.\nПолучите 30 Искупления.\nИзлишек превращается в блок."
+
+card_price_of_despair_name,Цена отчаяния
+card_price_of_despair_desc,"Выберите цель.\nУдваивает негативные статусы на цели.\nЛечит от Искупления: 10+ → 6, 20+ → 11, 30+ → 15."
+
+card_scouring_flame_name,Очищающее пламя
+card_scouring_flame_desc,"За каждый негативный статус: 3 урона, снять статус, +5 Искупления."
+
+card_sin_of_vanity_name,Грех тщеславия
+card_sin_of_vanity_desc,"Наносит 4 урона.\n+2 за каждый негативный статус на вас и положительный на враге."
+
+card_thirst_for_punishment_name,Жажда кары
+card_thirst_for_punishment_desc,"Получите 5 урона.\nПолучите энергию от Искупления: 10+ → 1, 20+ → 2, 30+ → 3."
+
+card_shield_of_penance_name,Щит покаяния
+card_shield_of_penance_desc,"Даёт 5 блока.\n+5 блока если у вас 2+ негативных статуса."
+
+card_void_strike_name,Удар пустоты
+card_void_strike_desc,"Наносит 6 урона.\n+4 урона если Искупление = 0."
+
+card_cry_of_despair_name,Крик отчаяния
+card_cry_of_despair_desc,"Наносит 5 урона.\nЛечит от Искупления: 10+ → 5, 20+ → 10, 30+ → 15.\nСжигает всё Искупление."
+
+card_blind_fury_name,Слепая ярость
+card_blind_fury_desc,"Наносит 3 удара по 4 урона.\nЕсли есть кровотечение — все удары в одну цель."
+
+card_smell_of_blood_name,Запах крови
+card_smell_of_blood_desc,"Возьмите 1 карту за врага с кровотечением.\nИначе возьмите 2 карты и получите 3 урона."
+
+card_molerat_hide_name,Шкура кротокрыса
+card_molerat_hide_desc,"Даёт 10 блока.\nАтакующие получают кровотечение."
+
+card_tunnel_ambush_name,Туннельная засада
+card_tunnel_ambush_desc,"Следующая атака наносит двойной урон.\nПропустите следующий ход."
+
+card_bloodletting_name,Кровопускание
+card_bloodletting_desc,"Снимает всё кровотечение.\nНаносит урон = снятые стаки × 2."
+
+status_poison_name,Яд
+status_poison_desc,"Каждый ход получает %d урона за стек. Игнорирует броню."
+
+status_bleed_name,Кровотечение
+status_bleed_desc,"Каждые %d хода получает %d урона за стек."
+
+status_burn_name,Горение
+status_burn_desc,"Каждый ход получает %d урона за стек. При %d стаках взрывается."
+
+status_cold_name,Холод
+status_cold_desc,"Снижает исходящий урон на %.0f%% за стек (макс 25%%)."
+
+status_weakness_name,Слабость
+status_weakness_desc,"Атаки наносят на 25%% меньше урона."
+
+status_vulnerability_name,Уязвимость
+status_vulnerability_desc,"Получает на 50%% больше урона от всех источников."
+
+status_strength_name,Сила
+status_strength_desc,"Увеличивает урон на %d за стек."
+
+status_regen_name,Регенерация
+status_regen_desc,"Лечит %d HP в конце хода за каждый стек."
+
+status_shield_name,Щит
+status_shield_desc,"Поглощает входящий урон. Сбрасывается в конце хода."
+
+status_thorns_name,Шипы
+status_thorns_desc,"При получении урона наносит ответный урон."
+
+status_despair_name,Отчаяние
+status_despair_desc,"Снижает исходящий урон на 25%%."
+
+passive_regrowth_name,Оживление
+passive_regrowth_desc,"Каждый ход лечит на растущую величину."
+
+passive_venomous_shield_name,Ядовитый щит
+passive_venomous_shield_desc,"При получении урона накладывает Яд на атакующего."
+
+passive_wrath_name,Злость
+passive_wrath_desc,"В конце каждого хода даёт +1 Силы."
+
+passive_freezing_ground_name,Стылая земля
+passive_freezing_ground_desc,"При получении атаки накладывает Лёд на атакующего."
+
+passive_denial_name,Отрицание
+passive_denial_desc,"Блокирует негативные статусы."
+
+passive_shame_name,Стыд
+passive_shame_desc,"Увеличивает входящий урон на 25%% и удваивает получаемое Искупление."
+
+enemy_mole_mutant_name,Слепыш-мутант
+enemy_mole_mutant_desc,"Жалкое слепое создание. Медленно регенерирует."
+
+enemy_strong_mole_name,Крот-силач
+enemy_strong_mole_desc,"Коренастый крот с мощными когтями. Чередует атаку и защиту."
+
+enemy_rabid_rat_name,Бешеная крыса
+enemy_rabid_rat_desc,"Обезумевшая крыса, чьи укусы вызывают кровотечение."
+
+enemy_mole_fungus_name,Крот-гриб
+enemy_mole_fungus_desc,"Ужас, поражённый грибком. Становится сильнее с каждым ходом."
+
+enemy_many_headed_mole_name,Многоголовый слепыш
+enemy_many_headed_mole_desc,"Трёхголовый монстр. Его ледяное прикосновение замораживает землю."
+
+enemy_fungal_miner_name,Шахтёр-гриб
+enemy_fungal_miner_desc,"Шахтёр, поглощённый грибницей. Роет ходы и отравляет."
+
+enemy_rodent_mound_name,Гора грызунов
+enemy_rodent_mound_desc,"Огромная масса копошащихся крыс. Рой пожирает всё на своём пути."
+
+ui_attack,Атака
+ui_defend,Защита
+ui_heal,Лечение
+ui_buff,Бафф
+ui_debuff,Дебафф
+ui_utility,Утилити
+ui_resource,Ресурс
+
+msg_not_enough_energy,Недостаточно энергии!
+msg_target_selection,Выберите цель
+msg_victory,Победа!
+msg_defeat,Поражение...

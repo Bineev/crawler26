@@ -1,10 +1,9 @@
 [gd_resource type="LabelSettings" load_steps=2 format=3 uid="uid://cho2cb5x0hrmf"]
 
-[ext_resource type="FontFile" uid="uid://dqwy07f4watts" path="res://fonts/KellySlab-Regular.ttf" id="1_xrqhq"]
+[ext_resource type="FontFile" uid="uid://cfcw32u84nc63" path="res://fonts/RobotoCondensed-VariableFont_wght.ttf" id="1_xrqhq"]
 
 [resource]
 font = ExtResource("1_xrqhq")
 font_size = 24
 font_color = Color(0.34901962, 0.14901961, 0.14901961, 1)
-shadow_color = Color(0, 0, 0, 1)
 shadow_offset = Vector2(1, 0)

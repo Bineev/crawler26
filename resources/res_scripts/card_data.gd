@@ -191,3 +191,7 @@ func duplicate_for_instance() -> CardData:
 
 func get_illustration() -> Texture2D:
 	return DataManager.get_card_illustration(id)
+
+
+func get_art_background_color(use_light: bool = false) -> Color:
+	return DataManager.get_card_art_background_color(origin, character_class, biome, use_light)

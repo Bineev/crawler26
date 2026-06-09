@@ -1,0 +1,8 @@
+[gd_resource type="LabelSettings" load_steps=2 format=3 uid="uid://eu2gkwf45dgn"]
+
+[ext_resource type="FontFile" uid="uid://cfcw32u84nc63" path="res://fonts/RobotoCondensed-VariableFont_wght.ttf" id="1_u40vf"]
+
+[resource]
+font = ExtResource("1_u40vf")
+font_size = 32
+font_color = Color(0, 0, 0, 1)

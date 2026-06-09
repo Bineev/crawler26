@@ -229,7 +229,8 @@ func _create_intent_panel(effect: EffectEntry) -> HBoxContainer:
 				value_label.text = effect.passive.get_localized_name()
 		_:
 			icon.texture = DataManager.get_intent_icon(DataManager.IntentType.UNKNOWN)
-			value_label.text = "?"
+			if effect.passive:
+				value_label.text = effect.passive.get_localized_name()
 	
 	panel.add_child(icon)
 	panel.add_child(value_label)
@@ -277,7 +278,7 @@ func _create_icon(texture: Texture2D, size: int, tooltip: String) -> TextureRect
 	icon.custom_minimum_size = Vector2(size, size)
 	icon.expand_mode = TextureRect.EXPAND_FIT_WIDTH_PROPORTIONAL
 	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-	icon.tooltip_text = tooltip
+	icon.tooltip_text = tr(tooltip)  # ← если tooltip — это ключ
 	return icon
 
 

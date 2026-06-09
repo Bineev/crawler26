@@ -408,7 +408,8 @@ const CRY_OF_DESPAIR_HEAL_TIER_3: int = 15
 ## ============================================================
 ## 3. РАЗМЕРЫ КАРТ
 ## ============================================================
-
+#const CARD_HAND_Y_OFFSET: int = -80     # отступ от нижнего края
+const CARD_HAND_Y_OFFSET: int = -100     # отступ от нижнего края
 const CARD_BASE_WIDTH: int = 234
 const CARD_BASE_HEIGHT: int = 330
 const CARD_ART_SIZE: int = 164
@@ -416,12 +417,13 @@ const CARD_ICON_SIZE: int = 32
 const CARD_ICON_SOURCE_SIZE: int = 64
 
 const CARD_SCALE_NORMAL: float = 1.0
-const CARD_SCALE_IN_HAND: float = 0.9
-const CARD_SCALE_HOVER: float = 1.05
+const CARD_SCALE_IN_HAND: float = 1
+const CARD_SCALE_HOVER: float = 1.2
+const CARD_HOVER_RAISE: int = 150  # высота подъёма при наведении
 
 const CARD_HAND_WIDTH: int = int(CARD_BASE_WIDTH * CARD_SCALE_IN_HAND)
 const CARD_HAND_HEIGHT: int = int(CARD_BASE_HEIGHT * CARD_SCALE_IN_HAND)
-const CARD_SPACING: int = 0
+const CARD_SPACING_IN_HAND: int = -60
 
 
 ## ============================================================
@@ -502,7 +504,7 @@ const ROOM_WIDTH: int = 1024
 const ROOM_HEIGHT: int = 800
 const ROOM_CENTER_X: int = ROOM_WIDTH / 2  # 512
 const ROOM_CENTER_Y: int = ROOM_HEIGHT / 2  # 400
-
+const ROOM_POSITION: Vector2 = Vector2(448, -80)
 ## ============================================================
 ## РАЗМЕРЫ ВРАГОВ
 ## ============================================================
@@ -1014,47 +1016,96 @@ func get_card_illustration(card_id: CardId) -> Texture2D:
 ## ЦВЕТА КАРТ (КОНСТАНТЫ в HEX)
 ## ============================================================
 
+# === ТЁМНЫЕ ЦВЕТА (оригинальные) ===
 # Цвета для фона иллюстрации (ArtBackground) - карты персонажа
-const COLOR_PENITENT_ART_BG: Color = Color("592626")    # тёмно-бордовый
-const COLOR_WARRIOR_ART_BG: Color = Color("33334D")     # стальной
-const COLOR_MYSTIC_ART_BG: Color = Color("331A40")      # фиолетовый
-const COLOR_ROGUE_ART_BG: Color = Color("263326")       # тёмно-зелёный
+const COLOR_PENITENT_ART_BG_DARK: Color = Color("592626")    # тёмно-бордовый
+const COLOR_WARRIOR_ART_BG_DARK: Color = Color("33334D")      # тёмно-синий
+const COLOR_MYSTIC_ART_BG_DARK: Color = Color("331A40")       # тёмно-фиолетовый
+const COLOR_ROGUE_ART_BG_DARK: Color = Color("263326")        # тёмно-зелёный
 
 # Цвета для фона иллюстрации (ArtBackground) - карты биома
-const COLOR_MOLE_TUNNELS_ART_BG: Color = Color("261A0D")    # тёмно-коричневый
-const COLOR_FLESH_CAVES_ART_BG: Color = Color("400D0D")     # тёмно-красный
-const COLOR_BONE_LABYRINTH_ART_BG: Color = Color("332E26")  # бледно-костный
+const COLOR_MOLE_TUNNELS_ART_BG_DARK: Color = Color("261A0D")    # тёмно-коричневый
+const COLOR_FLESH_CAVES_ART_BG_DARK: Color = Color("400D0D")     # тёмно-красный
+const COLOR_BONE_LABYRINTH_ART_BG_DARK: Color = Color("332E26")  # тёмно-серый
 
+# === СВЕТЛЫЕ ЦВЕТА (альтернативные) ===
+const COLOR_PENITENT_ART_BG_LIGHT: Color = Color("C47A7A")     # светло-бордовый
+const COLOR_WARRIOR_ART_BG_LIGHT: Color = Color("8A8ABF")      # светло-синий
+const COLOR_MYSTIC_ART_BG_LIGHT: Color = Color("8A5ABF")       # светло-фиолетовый
+const COLOR_ROGUE_ART_BG_LIGHT: Color = Color("6ABF6A")        # светло-зелёный
+
+const COLOR_MOLE_TUNNELS_ART_BG_LIGHT: Color = Color("BFA86A")     # светло-коричневый
+const COLOR_FLESH_CAVES_ART_BG_LIGHT: Color = Color("BF6A6A")      # светло-красный
+const COLOR_BONE_LABYRINTH_ART_BG_LIGHT: Color = Color("BFB8A6")   # светло-серый
 
 ## ============================================================
-## ЦВЕТА КАРТ (МЕТОДЫ)
+## МЕТОДЫ ПОЛУЧЕНИЯ ЦВЕТОВ
 ## ============================================================
 
-func get_card_art_background_color(origin: CardOrigin, character_class: CharacterClass, biome: Biome) -> Color:
+# Использовать тёмные цвета (по умолчанию)
+func get_card_art_background_color(origin: CardOrigin, character_class: CharacterClass, biome: Biome, use_light: bool = false) -> Color:
+	if use_light:
+		return _get_card_art_background_color_light(origin, character_class, biome)
+	else:
+		return _get_card_art_background_color_dark(origin, character_class, biome)
+
+func _get_card_art_background_color_dark(origin: CardOrigin, character_class: CharacterClass, biome: Biome) -> Color:
 	match origin:
 		CardOrigin.CHARACTER:
 			match character_class:
 				CharacterClass.PENITENT:
-					return COLOR_PENITENT_ART_BG
+					return COLOR_PENITENT_ART_BG_DARK
 				CharacterClass.WARRIOR:
-					return COLOR_WARRIOR_ART_BG
+					return COLOR_WARRIOR_ART_BG_DARK
 				CharacterClass.MYSTIC:
-					return COLOR_MYSTIC_ART_BG
+					return COLOR_MYSTIC_ART_BG_DARK
 				CharacterClass.ROGUE:
-					return COLOR_ROGUE_ART_BG
+					return COLOR_ROGUE_ART_BG_DARK
 				_:
 					return Color.BLACK
 		
 		CardOrigin.BIOME:
 			match biome:
 				Biome.MOLE_TUNNELS:
-					return COLOR_MOLE_TUNNELS_ART_BG
+					return COLOR_MOLE_TUNNELS_ART_BG_DARK
 				Biome.FLESH_CAVES:
-					return COLOR_FLESH_CAVES_ART_BG
+					return COLOR_FLESH_CAVES_ART_BG_DARK
 				Biome.BONE_LABYRINTH:
-					return COLOR_BONE_LABYRINTH_ART_BG
+					return COLOR_BONE_LABYRINTH_ART_BG_DARK
 				_:
 					return Color.BLACK
 		
 		_:
 			return Color.BLACK
+
+func _get_card_art_background_color_light(origin: CardOrigin, character_class: CharacterClass, biome: Biome) -> Color:
+	match origin:
+		CardOrigin.CHARACTER:
+			match character_class:
+				CharacterClass.PENITENT:
+					return COLOR_PENITENT_ART_BG_LIGHT
+				CharacterClass.WARRIOR:
+					return COLOR_WARRIOR_ART_BG_LIGHT
+				CharacterClass.MYSTIC:
+					return COLOR_MYSTIC_ART_BG_LIGHT
+				CharacterClass.ROGUE:
+					return COLOR_ROGUE_ART_BG_LIGHT
+				_:
+					return Color.BLACK
+		
+		CardOrigin.BIOME:
+			match biome:
+				Biome.MOLE_TUNNELS:
+					return COLOR_MOLE_TUNNELS_ART_BG_LIGHT
+				Biome.FLESH_CAVES:
+					return COLOR_FLESH_CAVES_ART_BG_LIGHT
+				Biome.BONE_LABYRINTH:
+					return COLOR_BONE_LABYRINTH_ART_BG_LIGHT
+				_:
+					return Color.BLACK
+		
+		_:
+			return Color.BLACK
+
+func t(key: String) -> String:
+	return tr(key)

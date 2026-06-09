@@ -29,6 +29,7 @@ custom_minimum_size = Vector2(1024, 800)
 layout_mode = 1
 offset_right = 1024.0
 offset_bottom = 800.0
+mouse_filter = 2
 expand_mode = 2
 stretch_mode = 5
 
@@ -38,6 +39,9 @@ custom_minimum_size = Vector2(1024, 800)
 layout_mode = 1
 offset_right = 1024.0
 offset_bottom = 800.0
+mouse_filter = 2
+
+[node name="Content" type="Node2D" parent="."]
 
 [node name="HorrorOverlay" type="ColorRect" parent="."]
 material = SubResource("ShaderMaterial_jn645")
@@ -45,6 +49,5 @@ custom_minimum_size = Vector2(1024, 800)
 layout_mode = 1
 offset_right = 1024.0
 offset_bottom = 800.0
+mouse_filter = 2
 color = Color(0, 0, 0, 1)
-
-[node name="Content" type="Node2D" parent="."]

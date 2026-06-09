@@ -1,0 +1,136 @@
+keys,en
+card_atonement_strike_name,Atonement Strike
+card_atonement_strike_desc,"Deals 8 damage.\nConverts all Block into Atonement."
+
+card_sinful_strike_name,Sinful Strike
+card_sinful_strike_desc,"Deals 10 damage.\nApplies Shame for 2 turns."
+
+card_penitent_revelation_name,Penitent Revelation
+card_penitent_revelation_desc,"Sacrifice a card.\nDraw cards based on Atonement: 10+ → 1, 20+ → 2, 30+ → 3."
+
+card_atonement_barrier_name,Atonement Barrier
+card_atonement_barrier_desc,"Take 5 damage.\nGain Block based on Atonement: 10+ → 10, 20+ → 16, 30+ → 22."
+
+card_blood_sacrifice_name,Blood Sacrifice
+card_blood_sacrifice_desc,"Take 5 damage.\nGain 30 Atonement.\nExcess converts to Block."
+
+card_price_of_despair_name,Price of Despair
+card_price_of_despair_desc,"Choose a target.\nDouble negative statuses on target.\nHeal based on Atonement: 10+ → 6, 20+ → 11, 30+ → 15."
+
+card_scouring_flame_name,Scouring Flame
+card_scouring_flame_desc,"For each negative status: take 3 damage, remove status, gain 5 Atonement."
+
+card_sin_of_vanity_name,Sin of Vanity
+card_sin_of_vanity_desc,"Deal 4 damage.\n+2 per negative status on you and positive status on enemy."
+
+card_thirst_for_punishment_name,Thirst for Punishment
+card_thirst_for_punishment_desc,"Take 5 damage.\nGain energy based on Atonement: 10+ → 1, 20+ → 2, 30+ → 3."
+
+card_shield_of_penance_name,Shield of Penance
+card_shield_of_penance_desc,"Gain 5 Block.\n+5 Block if you have 2+ negative statuses."
+
+card_void_strike_name,Void Strike
+card_void_strike_desc,"Deal 6 damage.\n+4 damage if Atonement = 0."
+
+card_cry_of_despair_name,Cry of Despair
+card_cry_of_despair_desc,"Deal 5 damage.\nHeal based on Atonement: 10+ → 5, 20+ → 10, 30+ → 15.\nConsume all Atonement."
+
+card_blind_fury_name,Blind Fury
+card_blind_fury_desc,"Deal 3 hits of 4 damage.\nIf Bleeding exists, all hits target the same enemy."
+
+card_smell_of_blood_name,Smell of Blood
+card_smell_of_blood_desc,"Draw 1 card per enemy with Bleeding.\nOtherwise draw 2 cards and take 3 damage."
+
+card_molerat_hide_name,Molerat Hide
+card_molerat_hide_desc,"Gain 10 Block.\nAttackers receive Bleeding."
+
+card_tunnel_ambush_name,Tunnel Ambush
+card_tunnel_ambush_desc,"Next attack deals double damage.\nSkip your next turn."
+
+card_bloodletting_name,Bloodletting
+card_bloodletting_desc,"Remove all Bleeding.\nDeal damage equal to stacks × 2."
+
+status_poison_name,Poison
+status_poison_desc,"Deals %d damage per stack each turn. Ignores Block."
+
+status_bleed_name,Bleed
+status_bleed_desc,"Deals %d damage per stack every %d turns."
+
+status_burn_name,Burn
+status_burn_desc,"Deals %d damage per stack each turn. Explodes at %d stacks."
+
+status_cold_name,Cold
+status_cold_desc,"Reduces outgoing damage by %.0f%% per stack (max 25%%)."
+
+status_weakness_name,Weakness
+status_weakness_desc,"Attacks deal 25%% less damage."
+
+status_vulnerability_name,Vulnerability
+status_vulnerability_desc,"Takes 50%% more damage from all sources."
+
+status_strength_name,Strength
+status_strength_desc,"Increases damage by %d per stack."
+
+status_regen_name,Regeneration
+status_regen_desc,"Heals %d HP per stack at end of turn."
+
+status_shield_name,Shield
+status_shield_desc,"Absorbs incoming damage. Resets at end of turn."
+
+status_thorns_name,Thorns
+status_thorns_desc,"Deals thorns damage when hit."
+
+status_despair_name,Despair
+status_despair_desc,"Reduces outgoing damage by 25%%."
+
+passive_regrowth_name,Regrowth
+passive_regrowth_desc,"Heals increasing amount each turn."
+
+passive_venomous_shield_name,Venomous Shield
+passive_venomous_shield_desc,"Applies Poison to attacker when hit."
+
+passive_wrath_name,Wrath
+passive_wrath_desc,"Grants +1 Strength at end of each turn."
+
+passive_freezing_ground_name,Freezing Ground
+passive_freezing_ground_desc,"Applies Cold to attacker when hit."
+
+passive_denial_name,Denial
+passive_denial_desc,"Blocks negative statuses."
+
+passive_shame_name,Shame
+passive_shame_desc,"Increases incoming damage by 25% and doubles Atonement gained."
+
+enemy_mole_mutant_name,Mole Mutant
+enemy_mole_mutant_desc,"A pathetic blind creature. It regenerates slowly."
+
+enemy_strong_mole_name,Strong Mole
+enemy_strong_mole_desc,"A stout mole with powerful claws. Alternates attack and defense."
+
+enemy_rabid_rat_name,Rabid Rat
+enemy_rabid_rat_desc,"A frenzied rat that spreads bleeding wounds."
+
+enemy_mole_fungus_name,Mole Fungus
+enemy_mole_fungus_desc,"A mushroom-infested horror. Grows stronger each turn."
+
+enemy_many_headed_mole_name,Many-Headed Mole
+enemy_many_headed_mole_desc,"A three-headed abomination. Its icy touch freezes the ground."
+
+enemy_fungal_miner_name,Fungal Miner
+enemy_fungal_miner_desc,"A miner consumed by fungus. It digs and poisons."
+
+enemy_rodent_mound_name,Rodent Mound
+enemy_rodent_mound_desc,"A massive pile of writhing rodents. The swarm consumes all."
+
+ui_attack,Attack
+ui_defend,Defend
+ui_heal,Heal
+ui_buff,Buff
+ui_debuff,Debuff
+ui_utility,Utility
+ui_resource,Resource
+
+msg_not_enough_energy,Not enough energy!
+msg_target_selection,Select target
+msg_victory,Victory!
+msg_defeat,Defeat...

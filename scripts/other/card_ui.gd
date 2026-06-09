@@ -13,7 +13,7 @@ var art_background: ColorRect = null
 var description_label: RichTextLabel = null
 var left_icons: VBoxContainer = null
 var right_icons: VBoxContainer = null
-
+var card_control: Control = null
 
 ## ============================================================
 ## ДАННЫЕ КАРТЫ
@@ -44,7 +44,8 @@ var original_scale: Vector2 = Vector2.ONE
 var is_in_hand: bool = false
 var is_selectable: bool = true
 var is_being_played: bool = false
-
+var original_position: Vector2 = Vector2.ZERO
+var original_z_index: int = 0
 
 ## ============================================================
 ## ИНИЦИАЛИЗАЦИЯ
@@ -53,15 +54,21 @@ var is_being_played: bool = false
 func _ready():
 	# Инициализируем ссылки на ноды по структуре сцены
 	template = $CardTemplate
-	cost_label = $CardTemplate/MarginContainer/MainLayout/HeaderLayout/CostLabel
+	cost_label = $CardTemplate/CardBackground/CostLabel
 	name_label = $CardTemplate/MarginContainer/MainLayout/HeaderLayout/CardName
 	art_image = $CardTemplate/MarginContainer/MainLayout/MiddleLayout/ArtContainer/ArtImage
 	art_background = $CardTemplate/MarginContainer/MainLayout/MiddleLayout/ArtContainer/ArtBackground
 	description_label = $CardTemplate/MarginContainer/MainLayout/DesccriptionContainer/CardDescription
 	left_icons = $CardTemplate/MarginContainer/MainLayout/MiddleLayout/LeftIcons
 	right_icons = $CardTemplate/MarginContainer/MainLayout/MiddleLayout/RightIcons
-
-
+	card_control = $CardTemplate
+	original_position = position
+	original_z_index = z_index
+	card_control.mouse_entered.connect(_on_mouse_entered)
+	card_control.mouse_exited.connect(_on_mouse_exited)
+	card_control.gui_input.connect(_on_gui_input)
+	left_icons.custom_minimum_size = Vector2(32, 0)
+	right_icons.custom_minimum_size = Vector2(32, 0)
 ## ============================================================
 ## ОСНОВНОЙ МЕТОД ЗАПОЛНЕНИЯ КАРТЫ
 ## ============================================================
@@ -71,19 +78,18 @@ func display():
 		return
 	
 	cost_label.text = str(card_data.cost)
-	name_label.text = card_data.get_localized_name()
+	
+	# Разбиваем название на части для переноса
+	var full_name = card_data.get_localized_name()
+	name_label.text = _smart_wrap_card_name(full_name)
 	
 	# Иллюстрация
 	var illustration = card_data.get_illustration()
 	if illustration and art_image:
 		art_image.texture = illustration
 	
-	# Описание
-	var description_text = card_data.get_localized_description()
-	description_label.text = description_text
-	description_label.fit_content = true
-	description_label.autowrap_mode = TextServer.AUTOWRAP_WORD
-	
+	description_label.text = card_data.get_localized_description()
+	print(description_label.text)
 	# Фон карты
 	var card_bg = $CardTemplate/CardBackground as TextureRect
 	if card_bg:
@@ -91,12 +97,43 @@ func display():
 		if bg_texture:
 			card_bg.texture = bg_texture
 	
-	art_background.color = card_data.get_base_color()
+	art_background.color = card_data.get_art_background_color(true)
 	
 	clear_icons()
 	fill_left_icons()
 	fill_right_icons()
 
+
+func _smart_wrap_card_name(name: String) -> String:
+	var words = name.split(" ")
+	
+	# Если одно слово
+	if words.size() <= 1:
+		return name
+	
+	# Список предлогов
+	var prepositions = ["of", "the", "and", "to", "for", "with", "by", "in", "on", "at", "from", "into", "through", "during", "without", "against", "among", "along", "between", "about", "like", "via", "per"]
+	
+	# Если два слова
+	if words.size() == 2:
+		# Если есть предлог — не переносим
+		if words[0].to_lower() in prepositions or words[1].to_lower() in prepositions:
+			return name
+		# Иначе — переносим
+		return words[0] + "\n" + words[1]
+	
+	# Если три слова и больше — делим на две строки
+	# Ищем предлог для красивого переноса
+	var split_index = words.size() / 2
+	for i in range(words.size()):
+		if words[i].to_lower() in prepositions:
+			split_index = i
+			break
+	
+	var first_line = " ".join(words.slice(0, split_index))
+	var second_line = " ".join(words.slice(split_index, words.size()))
+	
+	return first_line + "\n" + second_line
 
 ## ============================================================
 ## ОЧИСТКА ИКОНОК
@@ -170,19 +207,19 @@ func fill_right_icons():
 		
 		match card_type:
 			DataManager.CardType.ATTACK:
-				_add_right_icon(icon, "Атака", icons, tooltips)
+				_add_right_icon(icon, tr("ui_attack"), icons, tooltips)
 			DataManager.CardType.DEFEND:
-				_add_right_icon(icon, "Защита", icons, tooltips)
+				_add_right_icon(icon, tr("ui_defend"), icons, tooltips)
 			DataManager.CardType.HEAL:
-				_add_right_icon(icon, "Лечение", icons, tooltips)
+				_add_right_icon(icon, tr("ui_heal"), icons, tooltips)
 			DataManager.CardType.RESOURCE:
-				_add_right_icon(icon, "Ресурс (Искупление)", icons, tooltips)
+				_add_right_icon(icon, tr("ui_resource"), icons, tooltips)
 			DataManager.CardType.BUFF_SELF:
-				_add_right_icon(icon, "Бафф на себя", icons, tooltips)
+				_add_right_icon(icon, tr("ui_buff"), icons, tooltips)
 			DataManager.CardType.DEBUFF:
-				_add_right_icon(icon, "Дебафф на врага", icons, tooltips)
+				_add_right_icon(icon, tr("ui_debuff"), icons, tooltips)
 			DataManager.CardType.UTILITY:
-				_add_right_icon(icon, "Утилити", icons, tooltips)
+				_add_right_icon(icon, tr("ui_utility"), icons, tooltips)
 	
 	var unique_icons = _unique_icons(icons, tooltips)
 	
@@ -231,11 +268,6 @@ func _unique_icons(icons: Array[Texture2D], tooltips: Array[String]) -> Array[Di
 ## МАСШТАБИРОВАНИЕ
 ## ============================================================
 
-func set_hand_scale():
-	is_in_hand = true
-	original_scale = Vector2(DataManager.CARD_SCALE_IN_HAND, DataManager.CARD_SCALE_IN_HAND)
-	scale = original_scale
-
 
 func set_normal_scale():
 	is_in_hand = false
@@ -246,19 +278,6 @@ func set_normal_scale():
 ## ============================================================
 ## АНИМАЦИИ И ВЗАИМОДЕЙСТВИЕ
 ## ============================================================
-
-func _on_mouse_entered():
-	if not is_hovered:
-		is_hovered = true
-		var tween = create_tween()
-		tween.tween_property(self, "scale", Vector2(CARD_SCALE_HOVER, CARD_SCALE_HOVER), 0.1)
-
-
-func _on_mouse_exited():
-	if is_hovered:
-		is_hovered = false
-		var tween = create_tween()
-		tween.tween_property(self, "scale", original_scale, 0.1)
 
 
 func _on_gui_input(event: InputEvent):
@@ -284,7 +303,7 @@ func on_card_clicked():
 		return
 	
 	if player_stats.get_flat(DataManager.FlatStat.ENERGY) < card_data.cost:
-		SignalManager.log_message.emit("Недостаточно энергии!")
+		SignalManager.log_message.emit(tr("msg_not_enough_energy"))
 		return
 	
 	play_card()
@@ -353,3 +372,38 @@ func set_selectable(selectable: bool):
 
 func get_card_data() -> CardData:
 	return card_data
+
+
+func _on_mouse_entered():
+	print('hui')
+	if not is_hovered:
+		is_hovered = true
+		var tween = create_tween()
+		tween.set_parallel(true)
+		# Увеличиваем масштаб
+		tween.tween_property(self, "scale", Vector2(CARD_SCALE_HOVER, CARD_SCALE_HOVER), 0.1)
+		# Поднимаем вверх
+		tween.tween_property(self, "position", position + Vector2(0, -DataManager.CARD_HOVER_RAISE), 0.1)
+		# Поднимаем Z-index, чтобы карта была поверх других
+		z_index = 10
+
+
+func _on_mouse_exited():
+	if is_hovered:
+		is_hovered = false
+		var tween = create_tween()
+		tween.set_parallel(true)
+		# Возвращаем масштаб
+		tween.tween_property(self, "scale", original_scale, 0.1)
+		# Возвращаем позицию
+		tween.tween_property(self, "position", original_position, 0.1)
+		# Возвращаем Z-index
+		tween.tween_callback(func(): z_index = original_z_index)
+
+
+func set_hand_scale():
+	is_in_hand = true
+	original_scale = Vector2(DataManager.CARD_SCALE_IN_HAND, DataManager.CARD_SCALE_IN_HAND)
+	original_position = position
+	original_z_index = z_index
+	scale = original_scale
