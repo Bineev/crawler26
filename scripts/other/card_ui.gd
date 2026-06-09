@@ -53,13 +53,13 @@ var is_being_played: bool = false
 func _ready():
 	# Инициализируем ссылки на ноды по структуре сцены
 	template = $CardTemplate
-	cost_label = $CardTemplate/MainLayout/HeaderLayout/CostLabel
-	name_label = $CardTemplate/MainLayout/HeaderLayout/CardName
-	art_image = $CardTemplate/MainLayout/MiddleLayout/ArtContainer/ArtImage
-	art_background = $CardTemplate/MainLayout/MiddleLayout/ArtContainer/ArtBackground
-	description_label = $CardTemplate/MainLayout/DesccriptionContainer/CardDescription
-	left_icons = $CardTemplate/MainLayout/MiddleLayout/LeftIcons
-	right_icons = $CardTemplate/MainLayout/MiddleLayout/RightIcons
+	cost_label = $CardTemplate/MarginContainer/MainLayout/HeaderLayout/CostLabel
+	name_label = $CardTemplate/MarginContainer/MainLayout/HeaderLayout/CardName
+	art_image = $CardTemplate/MarginContainer/MainLayout/MiddleLayout/ArtContainer/ArtImage
+	art_background = $CardTemplate/MarginContainer/MainLayout/MiddleLayout/ArtContainer/ArtBackground
+	description_label = $CardTemplate/MarginContainer/MainLayout/DesccriptionContainer/CardDescription
+	left_icons = $CardTemplate/MarginContainer/MainLayout/MiddleLayout/LeftIcons
+	right_icons = $CardTemplate/MarginContainer/MainLayout/MiddleLayout/RightIcons
 
 
 ## ============================================================
@@ -72,8 +72,25 @@ func display():
 	
 	cost_label.text = str(card_data.cost)
 	name_label.text = card_data.get_localized_name()
-	art_image.texture = card_data.texture
-	description_label.text = card_data.get_localized_description()
+	
+	# Иллюстрация
+	var illustration = card_data.get_illustration()
+	if illustration and art_image:
+		art_image.texture = illustration
+	
+	# Описание
+	var description_text = card_data.get_localized_description()
+	description_label.text = description_text
+	description_label.fit_content = true
+	description_label.autowrap_mode = TextServer.AUTOWRAP_WORD
+	
+	# Фон карты
+	var card_bg = $CardTemplate/CardBackground as TextureRect
+	if card_bg:
+		var bg_texture = card_data.get_card_background()
+		if bg_texture:
+			card_bg.texture = bg_texture
+	
 	art_background.color = card_data.get_base_color()
 	
 	clear_icons()

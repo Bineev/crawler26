@@ -40,6 +40,11 @@ enum ModifierStat {
 	DAMAGE_FLAT_BONUS,         # СИЛА (+X к урону)
 }
 
+enum CardOrigin {
+	CHARACTER,  # карта персонажа
+	BIOME,      # карта биома
+}
+
 enum GrowType {
 	NONE,       # не растёт
 	ADD,        # +value_grow_value каждый раз
@@ -407,16 +412,16 @@ const CRY_OF_DESPAIR_HEAL_TIER_3: int = 15
 const CARD_BASE_WIDTH: int = 234
 const CARD_BASE_HEIGHT: int = 330
 const CARD_ART_SIZE: int = 164
-const CARD_ICON_SIZE: int = 24
+const CARD_ICON_SIZE: int = 32
 const CARD_ICON_SOURCE_SIZE: int = 64
 
 const CARD_SCALE_NORMAL: float = 1.0
-const CARD_SCALE_IN_HAND: float = 0.7
+const CARD_SCALE_IN_HAND: float = 0.9
 const CARD_SCALE_HOVER: float = 1.05
 
 const CARD_HAND_WIDTH: int = int(CARD_BASE_WIDTH * CARD_SCALE_IN_HAND)
 const CARD_HAND_HEIGHT: int = int(CARD_BASE_HEIGHT * CARD_SCALE_IN_HAND)
-const CARD_SPACING: int = 20
+const CARD_SPACING: int = 0
 
 
 ## ============================================================
@@ -943,3 +948,113 @@ func get_starting_deck() -> Array[CardData]:
 	deck.append(get_card(CardId.ATONEMENT_BARRIER))
 	
 	return deck
+	
+## ============================================================
+## ФОНЫ КАРТ
+## ============================================================
+
+var _card_backgrounds: Dictionary = {}
+
+func load_card_backgrounds():
+	# Фоны биомов
+	#_card_backgrounds["biome_" + str(Biome.MOLE_TUNNELS)] = preload("res://img/cards/backgrounds/mole_tunnels_card_bg.png")
+	
+	# Фоны классов персонажей
+	_card_backgrounds["class_" + str(CharacterClass.PENITENT)] = preload("res://img/cards/backgrounds/penitent_card_bg.png")
+
+
+func get_card_background_for_class(class_type: CharacterClass) -> Texture2D:
+	if _card_backgrounds.is_empty():
+		load_card_backgrounds()
+	return _card_backgrounds.get("class_" + str(class_type), null)
+
+
+func get_card_background_for_biome(biome: Biome) -> Texture2D:
+	if _card_backgrounds.is_empty():
+		load_card_backgrounds()
+	return _card_backgrounds.get("biome_" + str(biome), null)
+
+
+## ============================================================
+## ИЛЛЮСТРАЦИИ КАРТ
+## ============================================================
+
+var _card_illustrations: Dictionary = {}  # CardId -> Texture2D
+
+func load_card_illustrations():
+	# Карты Сломленного (Penitent)
+	_card_illustrations[CardId.ATONEMENT_STRIKE] = preload("res://img/cards/penitent/atonement_strike.png")
+	_card_illustrations[CardId.SINFUL_STRIKE] = preload("res://img/cards/penitent/sinful_strike.png")
+	_card_illustrations[CardId.PENITENT_REVELATION] = preload("res://img/cards/penitent/penitent_revelation.png")
+	_card_illustrations[CardId.ATONEMENT_BARRIER] = preload("res://img/cards/penitent/atonement_barrier.png")
+	_card_illustrations[CardId.BLOOD_SACRIFICE] = preload("res://img/cards/penitent/blood_sacrifice.png")
+	_card_illustrations[CardId.PRICE_OF_DESPAIR] = preload("res://img/cards/penitent/price_of_despair.png")
+	_card_illustrations[CardId.SCOURING_FLAME] = preload("res://img/cards/penitent/scouring_flame.png")
+	_card_illustrations[CardId.SIN_OF_VANITY] = preload("res://img/cards/penitent/sin_of_vanity.png")
+	_card_illustrations[CardId.THIRST_FOR_PUNISHMENT] = preload("res://img/cards/penitent/thirst_for_punishment.png")
+	_card_illustrations[CardId.SHIELD_OF_PENANCE] = preload("res://img/cards/penitent/shield_of_penance.png")
+	_card_illustrations[CardId.VOID_STRIKE] = preload("res://img/cards/penitent/void_strike.png")
+	_card_illustrations[CardId.CRY_OF_DESPAIR] = preload("res://img/cards/penitent/cry_of_despair.png")
+	
+	## Карты биома Кротовые норы
+	#_card_illustrations[CardId.BLIND_FURY] = preload("res://img/cards/mole_tunnels/blind_fury.png")
+	#_card_illustrations[CardId.SMELL_OF_BLOOD] = preload("res://img/cards/mole_tunnels/smell_of_blood.png")
+	#_card_illustrations[CardId.MOLERAT_HIDE] = preload("res://img/cards/mole_tunnels/molerat_hide.png")
+	#_card_illustrations[CardId.TUNNEL_AMBUSH] = preload("res://img/cards/mole_tunnels/tunnel_ambush.png")
+	#_card_illustrations[CardId.BLOODLETTING] = preload("res://img/cards/mole_tunnels/bloodletting.png")
+
+
+func get_card_illustration(card_id: CardId) -> Texture2D:
+	if _card_illustrations.is_empty():
+		load_card_illustrations()
+	return _card_illustrations.get(card_id, null)
+
+
+## ============================================================
+## ЦВЕТА КАРТ (КОНСТАНТЫ в HEX)
+## ============================================================
+
+# Цвета для фона иллюстрации (ArtBackground) - карты персонажа
+const COLOR_PENITENT_ART_BG: Color = Color("592626")    # тёмно-бордовый
+const COLOR_WARRIOR_ART_BG: Color = Color("33334D")     # стальной
+const COLOR_MYSTIC_ART_BG: Color = Color("331A40")      # фиолетовый
+const COLOR_ROGUE_ART_BG: Color = Color("263326")       # тёмно-зелёный
+
+# Цвета для фона иллюстрации (ArtBackground) - карты биома
+const COLOR_MOLE_TUNNELS_ART_BG: Color = Color("261A0D")    # тёмно-коричневый
+const COLOR_FLESH_CAVES_ART_BG: Color = Color("400D0D")     # тёмно-красный
+const COLOR_BONE_LABYRINTH_ART_BG: Color = Color("332E26")  # бледно-костный
+
+
+## ============================================================
+## ЦВЕТА КАРТ (МЕТОДЫ)
+## ============================================================
+
+func get_card_art_background_color(origin: CardOrigin, character_class: CharacterClass, biome: Biome) -> Color:
+	match origin:
+		CardOrigin.CHARACTER:
+			match character_class:
+				CharacterClass.PENITENT:
+					return COLOR_PENITENT_ART_BG
+				CharacterClass.WARRIOR:
+					return COLOR_WARRIOR_ART_BG
+				CharacterClass.MYSTIC:
+					return COLOR_MYSTIC_ART_BG
+				CharacterClass.ROGUE:
+					return COLOR_ROGUE_ART_BG
+				_:
+					return Color.BLACK
+		
+		CardOrigin.BIOME:
+			match biome:
+				Biome.MOLE_TUNNELS:
+					return COLOR_MOLE_TUNNELS_ART_BG
+				Biome.FLESH_CAVES:
+					return COLOR_FLESH_CAVES_ART_BG
+				Biome.BONE_LABYRINTH:
+					return COLOR_BONE_LABYRINTH_ART_BG
+				_:
+					return Color.BLACK
+		
+		_:
+			return Color.BLACK

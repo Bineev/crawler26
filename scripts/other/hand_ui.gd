@@ -5,8 +5,6 @@ class_name HandUI
 var cards_container: Node2D = null
 var is_manual_layout: bool = true
 
-const CARD_SPACING: int = 160
-
 
 func _ready():
 	cards_container = $CardsContainer
@@ -61,13 +59,13 @@ func layout_cards():
 	var card_height = DataManager.CARD_BASE_HEIGHT * DataManager.CARD_SCALE_IN_HAND
 	var screen_size = get_viewport().get_visible_rect().size
 	
-	var total_width = card_width * card_count + CARD_SPACING * (card_count - 1)
+	var total_width = card_width * card_count + DataManager.CARD_SPACING * (card_count - 1)
 	var start_x = (screen_size.x - total_width) / 2
 	var y_pos = screen_size.y - card_height - 50
 	
 	for i in range(card_count):
 		var card = cards_container.get_child(i)
-		var x_pos = start_x + i * (card_width + CARD_SPACING)
+		var x_pos = start_x + i * (card_width + DataManager.CARD_SPACING)
 		card.position = Vector2(x_pos, y_pos)
 		
 		var angle = (i - (card_count - 1) / 2.0) * 0.08

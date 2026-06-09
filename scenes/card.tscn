@@ -1,53 +1,72 @@
-[gd_scene load_steps=2 format=3 uid="uid://coec2fnqd70g0"]
+[gd_scene load_steps=6 format=3 uid="uid://coec2fnqd70g0"]
 
 [ext_resource type="Script" uid="uid://b7y61xslq656g" path="res://scripts/other/card_ui.gd" id="1_d81rb"]
+[ext_resource type="FontFile" uid="uid://dqwy07f4watts" path="res://fonts/KellySlab-Regular.ttf" id="2_6u4wf"]
+[ext_resource type="LabelSettings" uid="uid://cho2cb5x0hrmf" path="res://styles/label_red_24.tres" id="3_ktuci"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_kg30u"]
+font = ExtResource("2_6u4wf")
+font_size = 32
+font_color = Color(0, 0, 0, 1)
+shadow_size = 0
+shadow_color = Color(0, 0, 0, 1)
+
+[sub_resource type="Theme" id="Theme_ktuci"]
 
 [node name="Card" type="Node2D"]
+z_index = 100
 script = ExtResource("1_d81rb")
 
 [node name="CardTemplate" type="MarginContainer" parent="."]
 custom_minimum_size = Vector2(234, 330)
-offset_right = 40.0
-offset_bottom = 40.0
-theme_override_constants/margin_left = 5
-theme_override_constants/margin_top = 5
-theme_override_constants/margin_right = 5
-theme_override_constants/margin_bottom = 5
+offset_right = 234.0
+offset_bottom = 330.0
 
 [node name="CardBackground" type="TextureRect" parent="CardTemplate"]
 layout_mode = 2
 
-[node name="MainLayout" type="VBoxContainer" parent="CardTemplate"]
+[node name="MarginContainer" type="MarginContainer" parent="CardTemplate"]
 layout_mode = 2
-alignment = 1
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 20
 
-[node name="HeaderLayout" type="HBoxContainer" parent="CardTemplate/MainLayout"]
+[node name="MainLayout" type="VBoxContainer" parent="CardTemplate/MarginContainer"]
 layout_mode = 2
-alignment = 1
 
-[node name="CostLabel" type="Label" parent="CardTemplate/MainLayout/HeaderLayout"]
+[node name="HeaderLayout" type="VBoxContainer" parent="CardTemplate/MarginContainer/MainLayout"]
+layout_mode = 2
+
+[node name="CostLabel" type="Label" parent="CardTemplate/MarginContainer/MainLayout/HeaderLayout"]
 custom_minimum_size = Vector2(28, 28)
 layout_mode = 2
-horizontal_alignment = 1
+text = "2424"
+label_settings = SubResource("LabelSettings_kg30u")
 vertical_alignment = 1
 
-[node name="CardName" type="Label" parent="CardTemplate/MainLayout/HeaderLayout"]
+[node name="CardName" type="Label" parent="CardTemplate/MarginContainer/MainLayout/HeaderLayout"]
 layout_mode = 2
+label_settings = ExtResource("3_ktuci")
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 2
 
-[node name="MiddleLayout" type="HBoxContainer" parent="CardTemplate/MainLayout"]
+[node name="MiddleLayout" type="HBoxContainer" parent="CardTemplate/MarginContainer/MainLayout"]
 layout_mode = 2
 alignment = 1
 
-[node name="LeftIcons" type="VBoxContainer" parent="CardTemplate/MainLayout/MiddleLayout"]
+[node name="LeftIcons" type="VBoxContainer" parent="CardTemplate/MarginContainer/MainLayout/MiddleLayout"]
 layout_mode = 2
 theme_override_constants/separation = 4
 alignment = 1
 
-[node name="ArtContainer" type="Control" parent="CardTemplate/MainLayout/MiddleLayout"]
-custom_minimum_size = Vector2(164, 164)
+[node name="ArtContainer" type="Control" parent="CardTemplate/MarginContainer/MainLayout/MiddleLayout"]
+custom_minimum_size = Vector2(128, 128)
 layout_mode = 2
+theme = SubResource("Theme_ktuci")
 
-[node name="ArtBackground" type="ColorRect" parent="CardTemplate/MainLayout/MiddleLayout/ArtContainer"]
+[node name="ArtBackground" type="ColorRect" parent="CardTemplate/MarginContainer/MainLayout/MiddleLayout/ArtContainer"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -55,7 +74,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="ArtImage" type="TextureRect" parent="CardTemplate/MainLayout/MiddleLayout/ArtContainer"]
+[node name="ArtImage" type="TextureRect" parent="CardTemplate/MarginContainer/MainLayout/MiddleLayout/ArtContainer"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -65,13 +84,14 @@ grow_vertical = 2
 expand_mode = 3
 stretch_mode = 5
 
-[node name="RightIcons" type="VBoxContainer" parent="CardTemplate/MainLayout/MiddleLayout"]
+[node name="RightIcons" type="VBoxContainer" parent="CardTemplate/MarginContainer/MainLayout/MiddleLayout"]
 layout_mode = 2
 theme_override_constants/separation = 4
 alignment = 1
 
-[node name="DesccriptionContainer" type="MarginContainer" parent="CardTemplate/MainLayout"]
+[node name="DesccriptionContainer" type="MarginContainer" parent="CardTemplate/MarginContainer/MainLayout"]
 layout_mode = 2
 
-[node name="CardDescription" type="RichTextLabel" parent="CardTemplate/MainLayout/DesccriptionContainer"]
+[node name="CardDescription" type="RichTextLabel" parent="CardTemplate/MarginContainer/MainLayout/DesccriptionContainer"]
+custom_minimum_size = Vector2(200, 0)
 layout_mode = 2
