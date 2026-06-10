@@ -420,7 +420,7 @@ const CARD_SCALE_NORMAL: float = 1.0
 const CARD_SCALE_IN_HAND: float = 1
 const CARD_SCALE_HOVER: float = 1.2
 const CARD_HOVER_RAISE: int = 150  # высота подъёма при наведении
-
+const CARD_HOVER_CENTER_FORCE: float = 0.02 # сила притяжения к центру (0-1)
 const CARD_HAND_WIDTH: int = int(CARD_BASE_WIDTH * CARD_SCALE_IN_HAND)
 const CARD_HAND_HEIGHT: int = int(CARD_BASE_HEIGHT * CARD_SCALE_IN_HAND)
 const CARD_SPACING_IN_HAND: int = -60

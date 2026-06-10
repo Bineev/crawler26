@@ -22,10 +22,18 @@ var current_room_node: Node = null  # ссылка на комнату для у
 var battle_deck: BattleDeck = null
 var hand_ui: HandUI = null
 
-
 ## ============================================================
 ## ИНИЦИАЛИЗАЦИЯ БОЯ
 ## ============================================================
+
+func _get_target_at_position(pos: Vector2) -> Node:
+	# Проверяем всех врагов на коллизию
+	for enemy in enemies:
+		var enemy_ui = enemy.get_node("EnemyUI")
+		if enemy_ui and enemy_ui.get_rect().has_point(enemy_ui.to_local(pos)):
+			return enemy
+	return null
+
 
 func start_battle(player_stats: CharacterStats, enemy_instances: Array, battle_deck: BattleDeck, hand_ui_node: HandUI, floor_level: int = 1, biome_index: int = 1, room_node: Node = null):
 	print("бой стартует")
@@ -64,18 +72,14 @@ func start_player_turn():
 	
 	current_state = DataManager.BattleState.PLAYER_TURN
 	
-	# Восстанавливаем энергию
 	if player and player.has_method("restore_energy"):
 		player.restore_energy()
 	
-	# Добираем карты
 	if battle_deck:
 		battle_deck.start_turn()
 	
 	SignalManager.player_turn_started.emit()
 	SignalManager.turn_started.emit()
-
-
 
 ## ============================================================
 ## ХОД ВРАГА

@@ -112,3 +112,7 @@ theme_override_font_sizes/normal_font_size = 18
 fit_content = true
 scroll_active = false
 horizontal_alignment = 1
+
+[node name="ClickArea" type="Area2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="ClickArea"]

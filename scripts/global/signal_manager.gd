@@ -69,3 +69,7 @@ signal log_message(text: String)
 signal deck_size_changed(size: int)
 signal discard_size_changed(size: int)
 signal hand_ui_created(hand_ui: HandUI)  # рука создана
+
+signal target_selection_requested(card_ui: CardUI)
+signal target_selected(target: Node)
+signal target_selection_cancelled()

@@ -279,6 +279,7 @@ func _create_icon(texture: Texture2D, size: int, tooltip: String) -> TextureRect
 	icon.expand_mode = TextureRect.EXPAND_FIT_WIDTH_PROPORTIONAL
 	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	icon.tooltip_text = tr(tooltip)  # ← если tooltip — это ключ
+	icon.mouse_filter = Control.MOUSE_FILTER_PASS
 	return icon
 
 

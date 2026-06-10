@@ -14,6 +14,7 @@ var max_atonement: int = DataManager.PENITENT_MAX_ATONEMENT
 ## ============================================================
 
 func _init():
+	super._init()  # ← вызываем родительский _init
 	# Устанавливаем максимальное Искупление
 	set_flat(DataManager.FlatStat.MAX_ATONEMENT, max_atonement)
 	set_flat(DataManager.FlatStat.ATONEMENT, 0)

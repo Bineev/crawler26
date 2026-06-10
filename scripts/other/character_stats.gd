@@ -21,7 +21,7 @@ signal died()
 ## БАЗОВЫЕ СТАТЫ (FLATS)
 ## ============================================================
 
-var flats: Dictionary = {
+var flats: Dictionary[DataManager.FlatStat, int] = {
 	DataManager.FlatStat.HEALTH: 0,
 	DataManager.FlatStat.MAX_HEALTH: 0,
 	DataManager.FlatStat.ENERGY: 0,
@@ -74,6 +74,19 @@ var immunity: Dictionary = {}  # status_id -> remaining_duration
 ## ============================================================
 ## МЕТОДЫ ДОСТУПА К СТАТАМ
 ## ============================================================
+func _init():
+	_init_flat_stats()
+
+
+func _init_flat_stats():
+	flats[DataManager.FlatStat.HEALTH] = DataManager.PENITENT_STARTING_HEALTH
+	flats[DataManager.FlatStat.MAX_HEALTH] = DataManager.PENITENT_STARTING_HEALTH
+	flats[DataManager.FlatStat.ENERGY] = DataManager.STARTING_ENERGY
+	flats[DataManager.FlatStat.MAX_ENERGY] = DataManager.MAX_ENERGY
+	flats[DataManager.FlatStat.BLOCK] = 0
+	flats[DataManager.FlatStat.ATONEMENT] = 0
+	flats[DataManager.FlatStat.MAX_ATONEMENT] = DataManager.PENITENT_MAX_ATONEMENT
+
 
 func get_flat(stat: DataManager.FlatStat) -> int:
 	return flats.get(stat, 0)
@@ -496,3 +509,18 @@ func signal_emit(sig: Signal, arg1 = null, arg2 = null, arg3 = null):
 
 func get_strength_bonus() -> int:
 	return get_status_stacks(DataManager.Status.STRENGTH)
+
+
+func set_energy(value: int):
+	modify_flat(DataManager.FlatStat.ENERGY, value - get_flat(DataManager.FlatStat.ENERGY))
+
+
+func get_max_energy() -> int:
+	return get_flat(DataManager.FlatStat.MAX_ENERGY)
+
+
+func restore_energy():
+	set_energy(get_max_energy())
+
+func get_energy() -> int:
+	return get_flat(DataManager.FlatStat.ENERGY)

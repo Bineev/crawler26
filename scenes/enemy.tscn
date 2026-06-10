@@ -27,6 +27,7 @@ alignment = 1
 
 [node name="LivingContainer" type="Control" parent="EnemyUI/VBoxContainer"]
 layout_mode = 2
+mouse_filter = 1
 
 [node name="SpriteContainer" type="CenterContainer" parent="EnemyUI/VBoxContainer/LivingContainer"]
 layout_mode = 0
@@ -39,6 +40,7 @@ layout_mode = 2
 
 [node name="HealthBar" type="ProgressBar" parent="EnemyUI/VBoxContainer"]
 layout_mode = 2
+mouse_filter = 1
 
 [node name="HealthLabel" type="Label" parent="EnemyUI/VBoxContainer/HealthBar"]
 layout_mode = 0

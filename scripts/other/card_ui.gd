@@ -2,6 +2,9 @@
 extends Node2D
 class_name CardUI
 
+enum CardState { IDLE, HOVERED, SELECTED, AIMING, PLAYED }
+var state: CardState = CardState.IDLE
+
 ## ============================================================
 ## ССЫЛКИ НА НОДЫ
 ## ============================================================
@@ -14,45 +17,38 @@ var description_label: RichTextLabel = null
 var left_icons: VBoxContainer = null
 var right_icons: VBoxContainer = null
 var card_control: Control = null
+var click_area: Area2D = null
+var collision_shape: CollisionShape2D = null
 
 ## ============================================================
 ## ДАННЫЕ КАРТЫ
 ## ============================================================
-
 @export var card_data: CardData
 
-
 ## ============================================================
-## КОНСТАНТЫ (из DataManager)
+## КОНСТАНТЫ
 ## ============================================================
-
 const ICON_SIZE: int = DataManager.CARD_ICON_SIZE
-const ART_SIZE: int = DataManager.CARD_ART_SIZE
 const CARD_BASE_WIDTH: int = DataManager.CARD_BASE_WIDTH
 const CARD_BASE_HEIGHT: int = DataManager.CARD_BASE_HEIGHT
-const CARD_SCALE_NORMAL: float = DataManager.CARD_SCALE_NORMAL
 const CARD_SCALE_HOVER: float = DataManager.CARD_SCALE_HOVER
 const CARD_SCALE_IN_HAND: float = DataManager.CARD_SCALE_IN_HAND
-
 
 ## ============================================================
 ## СОСТОЯНИЕ
 ## ============================================================
-
-var is_hovered: bool = false
 var original_scale: Vector2 = Vector2.ONE
-var is_in_hand: bool = false
-var is_selectable: bool = true
-var is_being_played: bool = false
 var original_position: Vector2 = Vector2.ZERO
 var original_z_index: int = 0
+var original_parent: Node = null
+var hand_ui_ref: HandUI = null
+var current_tween: Tween = null
 
 ## ============================================================
 ## ИНИЦИАЛИЗАЦИЯ
 ## ============================================================
-
 func _ready():
-	# Инициализируем ссылки на ноды по структуре сцены
+	# Инициализируем ссылки на ноды
 	template = $CardTemplate
 	cost_label = $CardTemplate/CardBackground/CostLabel
 	name_label = $CardTemplate/MarginContainer/MainLayout/HeaderLayout/CardName
@@ -62,35 +58,38 @@ func _ready():
 	left_icons = $CardTemplate/MarginContainer/MainLayout/MiddleLayout/LeftIcons
 	right_icons = $CardTemplate/MarginContainer/MainLayout/MiddleLayout/RightIcons
 	card_control = $CardTemplate
+	click_area = $ClickArea
+	collision_shape = $ClickArea/CollisionShape2D
+	
 	original_position = position
 	original_z_index = z_index
+	
 	card_control.mouse_entered.connect(_on_mouse_entered)
 	card_control.mouse_exited.connect(_on_mouse_exited)
-	card_control.gui_input.connect(_on_gui_input)
+	
 	left_icons.custom_minimum_size = Vector2(32, 0)
 	right_icons.custom_minimum_size = Vector2(32, 0)
+	
+	_setup_click_area()
+
+
+
 ## ============================================================
 ## ОСНОВНОЙ МЕТОД ЗАПОЛНЕНИЯ КАРТЫ
 ## ============================================================
-
 func display():
 	if not card_data:
 		return
 	
 	cost_label.text = str(card_data.cost)
+	name_label.text = _smart_wrap_card_name(card_data.get_localized_name())
 	
-	# Разбиваем название на части для переноса
-	var full_name = card_data.get_localized_name()
-	name_label.text = _smart_wrap_card_name(full_name)
-	
-	# Иллюстрация
 	var illustration = card_data.get_illustration()
 	if illustration and art_image:
 		art_image.texture = illustration
 	
 	description_label.text = card_data.get_localized_description()
-	print(description_label.text)
-	# Фон карты
+	
 	var card_bg = $CardTemplate/CardBackground as TextureRect
 	if card_bg:
 		var bg_texture = card_data.get_card_background()
@@ -106,39 +105,28 @@ func display():
 
 func _smart_wrap_card_name(name: String) -> String:
 	var words = name.split(" ")
-	
-	# Если одно слово
 	if words.size() <= 1:
 		return name
 	
-	# Список предлогов
 	var prepositions = ["of", "the", "and", "to", "for", "with", "by", "in", "on", "at", "from", "into", "through", "during", "without", "against", "among", "along", "between", "about", "like", "via", "per"]
 	
-	# Если два слова
 	if words.size() == 2:
-		# Если есть предлог — не переносим
 		if words[0].to_lower() in prepositions or words[1].to_lower() in prepositions:
 			return name
-		# Иначе — переносим
 		return words[0] + "\n" + words[1]
 	
-	# Если три слова и больше — делим на две строки
-	# Ищем предлог для красивого переноса
 	var split_index = words.size() / 2
 	for i in range(words.size()):
 		if words[i].to_lower() in prepositions:
 			split_index = i
 			break
 	
-	var first_line = " ".join(words.slice(0, split_index))
-	var second_line = " ".join(words.slice(split_index, words.size()))
-	
-	return first_line + "\n" + second_line
+	return " ".join(words.slice(0, split_index)) + "\n" + " ".join(words.slice(split_index, words.size()))
+
 
 ## ============================================================
-## ОЧИСТКА ИКОНОК
+## ИКОНКИ
 ## ============================================================
-
 func clear_icons():
 	if left_icons:
 		for child in left_icons.get_children():
@@ -148,23 +136,16 @@ func clear_icons():
 			child.queue_free()
 
 
-## ============================================================
-## ЛЕВАЯ КОЛОНКА (статусы и пассивки)
-## ============================================================
-
 func fill_left_icons():
 	if not left_icons:
 		return
 	
 	var icons: Array[Texture2D] = []
 	var tooltips: Array[String] = []
-	
 	_collect_left_icons_from_effects(card_data.effects, icons, tooltips)
 	
-	var unique_icons = _unique_icons(icons, tooltips)
-	
-	for i in range(unique_icons.size()):
-		add_icon(left_icons, unique_icons[i]["texture"], unique_icons[i]["tooltip"])
+	for icon_data in _unique_icons(icons, tooltips):
+		add_icon(left_icons, icon_data["texture"], icon_data["tooltip"])
 
 
 func _collect_left_icons_from_effects(effects: Array[EffectEntry], icons: Array[Texture2D], tooltips: Array[String]):
@@ -188,10 +169,6 @@ func _collect_left_icons_from_effects(effects: Array[EffectEntry], icons: Array[
 				if effect.false_effect:
 					_collect_left_icons_from_effects([effect.false_effect], icons, tooltips)
 
-
-## ============================================================
-## ПРАВАЯ КОЛОНКА (типы действий)
-## ============================================================
 
 func fill_right_icons():
 	if not right_icons:
@@ -221,10 +198,8 @@ func fill_right_icons():
 			DataManager.CardType.UTILITY:
 				_add_right_icon(icon, tr("ui_utility"), icons, tooltips)
 	
-	var unique_icons = _unique_icons(icons, tooltips)
-	
-	for i in range(unique_icons.size()):
-		add_icon(right_icons, unique_icons[i]["texture"], unique_icons[i]["tooltip"])
+	for icon_data in _unique_icons(icons, tooltips):
+		add_icon(right_icons, icon_data["texture"], icon_data["tooltip"])
 
 
 func _add_right_icon(icon: Texture2D, tooltip: String, icons: Array[Texture2D], tooltips: Array[String]):
@@ -233,10 +208,6 @@ func _add_right_icon(icon: Texture2D, tooltip: String, icons: Array[Texture2D], 
 		tooltips.append(tooltip)
 
 
-## ============================================================
-## ДОБАВЛЕНИЕ ИКОНКИ
-## ============================================================
-
 func add_icon(container: VBoxContainer, texture: Texture2D, tooltip: String):
 	var icon = TextureRect.new()
 	icon.texture = texture
@@ -244,12 +215,9 @@ func add_icon(container: VBoxContainer, texture: Texture2D, tooltip: String):
 	icon.expand_mode = TextureRect.EXPAND_FIT_WIDTH_PROPORTIONAL
 	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	icon.tooltip_text = tooltip
+	icon.mouse_filter = Control.MOUSE_FILTER_PASS
 	container.add_child(icon)
 
-
-## ============================================================
-## ВСПОМОГАТЕЛЬНЫЕ МЕТОДЫ
-## ============================================================
 
 func _unique_icons(icons: Array[Texture2D], tooltips: Array[String]) -> Array[Dictionary]:
 	var unique: Array[Dictionary] = []
@@ -265,37 +233,17 @@ func _unique_icons(icons: Array[Texture2D], tooltips: Array[String]) -> Array[Di
 
 
 ## ============================================================
-## МАСШТАБИРОВАНИЕ
+## ВЗАИМОДЕЙСТВИЕ
 ## ============================================================
-
-
-func set_normal_scale():
-	is_in_hand = false
-	original_scale = Vector2(CARD_SCALE_NORMAL, CARD_SCALE_NORMAL)
-	scale = original_scale
-
-
-## ============================================================
-## АНИМАЦИИ И ВЗАИМОДЕЙСТВИЕ
-## ============================================================
-
-
-func _on_gui_input(event: InputEvent):
-	if not is_selectable:
-		return
-	if is_being_played:
-		return
-	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
-		on_card_clicked()
-
-
 func on_card_clicked():
-	if not is_selectable:
-		return
-	if is_being_played:
+	print("on_card_clicked called, current state: ", state)  # Отладка
+	
+	if state != CardState.HOVERED:
+		print("Not in HOVERED state, ignoring")
 		return
 	
 	if not BattleManager.is_player_turn():
+		SignalManager.log_message.emit(tr("msg_not_player_turn"))
 		return
 	
 	var player_stats = BattleManager.get_player()
@@ -306,29 +254,26 @@ func on_card_clicked():
 		SignalManager.log_message.emit(tr("msg_not_enough_energy"))
 		return
 	
-	play_card()
+	state = CardState.SELECTED
 
 
 func play_card(target = null):
-	if is_being_played:
+	if state != CardState.AIMING:
 		return
 	
-	is_being_played = true
+	state = CardState.PLAYED
 	
 	var player_stats = BattleManager.get_player()
 	if not player_stats:
-		is_being_played = false
+		state = CardState.IDLE
 		return
 	
-	# Списываем энергию
 	player_stats.modify_flat(DataManager.FlatStat.ENERGY, -card_data.cost)
 	
-	# Выполняем эффекты карты
 	for effect in card_data.effects:
 		var targets = _get_targets_for_effect(effect, target)
 		EffectExecutor.execute(effect, player_stats, targets, {"card": card_data})
 	
-	# Отправляем карту в сброс или удаляем
 	var battle_deck = BattleManager.get_battle_deck()
 	if battle_deck:
 		battle_deck.play_card(self, card_data, target)
@@ -337,7 +282,15 @@ func play_card(target = null):
 	
 	SignalManager.card_played.emit(card_data)
 	
-	is_being_played = false
+	if hand_ui_ref:
+		hand_ui_ref.set_all_cards_input_enabled(true)
+
+
+func _needs_target() -> bool:
+	for effect in card_data.effects:
+		if effect.target in [DataManager.EffectTarget.ENEMY, DataManager.EffectTarget.ANY]:
+			return true
+	return false
 
 
 func _get_targets_for_effect(effect: EffectEntry, selected_target) -> Array:
@@ -348,62 +301,192 @@ func _get_targets_for_effect(effect: EffectEntry, selected_target) -> Array:
 			if selected_target:
 				return [selected_target]
 			var enemies = BattleManager.get_enemies()
-			if enemies.size() > 0:
-				return [enemies[0]]
-			return []
+			return [enemies[0]] if enemies.size() > 0 else []
 		DataManager.EffectTarget.ALL_ENEMIES:
 			return BattleManager.get_enemies()
 		DataManager.EffectTarget.ALL_ALLIES:
 			return [BattleManager.get_player()]
 		DataManager.EffectTarget.ANY:
-			if selected_target:
-				return [selected_target]
-			return []
+			return [selected_target] if selected_target else []
 	return []
 
 
+func cancel_selection():
+	if state == CardState.SELECTED or state == CardState.AIMING:
+		if current_tween:
+			current_tween.kill()
+			current_tween = null
+		
+		_return_to_original()
+		state = CardState.IDLE
+		
+		if hand_ui_ref:
+			hand_ui_ref.set_all_cards_input_enabled(true)
+			hand_ui_ref.clear_hovered_card(self)
+		
+		SignalManager.target_selection_cancelled.emit()
+
+
+func confirm_target(target):
+	if state == CardState.AIMING:
+		play_card(target)
+
+
 ## ============================================================
-## ДОПОЛНИТЕЛЬНЫЕ МЕТОДЫ
+## АНИМАЦИИ
 ## ============================================================
-
-func set_selectable(selectable: bool):
-	is_selectable = selectable
-
-
-func get_card_data() -> CardData:
-	return card_data
-
-
 func _on_mouse_entered():
-	print('hui')
-	if not is_hovered:
-		is_hovered = true
+	if state == CardState.IDLE:
+		state = CardState.HOVERED
+		print('go hovered')
+		
+		if current_tween:
+			current_tween.kill()
+			current_tween = null
+		
 		var tween = create_tween()
 		tween.set_parallel(true)
-		# Увеличиваем масштаб
 		tween.tween_property(self, "scale", Vector2(CARD_SCALE_HOVER, CARD_SCALE_HOVER), 0.1)
-		# Поднимаем вверх
-		tween.tween_property(self, "position", position + Vector2(0, -DataManager.CARD_HOVER_RAISE), 0.1)
-		# Поднимаем Z-index, чтобы карта была поверх других
+		
+		var screen_center_x = get_viewport().get_visible_rect().size.x / 2
+		var card_center_x = global_position.x + (get_card_size().x / 2)
+		var offset_to_center = (screen_center_x - card_center_x) * DataManager.CARD_HOVER_CENTER_FORCE
+		tween.tween_property(self, "position", original_position + Vector2(offset_to_center, -DataManager.CARD_HOVER_RAISE), 0.1)
+		
 		z_index = 10
+		current_tween = tween
+		
+		if hand_ui_ref:
+			hand_ui_ref.try_set_hovered_card(self)
 
 
 func _on_mouse_exited():
-	if is_hovered:
-		is_hovered = false
+	if state == CardState.HOVERED:
+		state = CardState.IDLE
+		print('go idle')
+		
+		if current_tween:
+			current_tween.kill()
+			current_tween = null
+		
 		var tween = create_tween()
 		tween.set_parallel(true)
-		# Возвращаем масштаб
 		tween.tween_property(self, "scale", original_scale, 0.1)
-		# Возвращаем позицию
 		tween.tween_property(self, "position", original_position, 0.1)
-		# Возвращаем Z-index
 		tween.tween_callback(func(): z_index = original_z_index)
+		current_tween = tween
+		
+		if hand_ui_ref:
+			hand_ui_ref.clear_hovered_card(self)
 
 
+func _move_to_center():
+	if current_tween:
+		current_tween.kill()
+		current_tween = null
+	
+	var viewport = get_viewport()
+	var screen_center_x = viewport.get_visible_rect().size.x / 2
+	var card_size = get_card_size()
+	
+	# Целевая позиция: центр по X, Y остаётся текущий (от наведения)
+	var target_global_x = screen_center_x - card_size.x / 2
+	var target_local_x = get_parent().to_local(Vector2(target_global_x, 0)).x
+	
+	# Сохраняем текущую Y позицию (от наведения)
+	var target_pos = Vector2(target_local_x, position.y)
+	
+	# Сохраняем текущий масштаб
+	var current_scale = scale
+	original_scale = current_scale
+	
+	var tween = create_tween()
+	tween.set_parallel(true)
+	tween.tween_property(self, "position", target_pos, 0.2)
+	tween.tween_callback(func(): z_index = 100)
+	current_tween = tween
+
+
+func _return_to_original():
+	if current_tween:
+		current_tween.kill()
+		current_tween = null
+	
+	# Возвращаемся к исходной позиции (до наведения)
+	var target_pos = original_position
+	
+	var tween = create_tween()
+	tween.set_parallel(true)
+	tween.tween_property(self, "position", target_pos, 0.2)
+	tween.tween_property(self, "scale", original_scale, 0.2)
+	tween.tween_callback(func(): 
+		z_index = original_z_index
+		state = CardState.IDLE
+	)
+	current_tween = tween
+
+
+func _process(delta):
+	if state == CardState.SELECTED:
+		var mouse_pos = get_viewport().get_mouse_position()
+		var card_rect = Rect2(global_position - get_card_size() / 2, get_card_size())
+		
+		# Если мышь выше верхнего края карты или на определённом расстоянии
+		var threshold = 100  # пикселей от верхнего края
+		if mouse_pos.y < card_rect.position.y + threshold:
+			print("Mouse above card, moving to center")
+			state = CardState.AIMING
+			_move_to_center()
+			SignalManager.target_selection_requested.emit(self)
+	
+	# ПКМ для отмены
+	if Input.is_mouse_button_pressed(MOUSE_BUTTON_RIGHT):
+		if state == CardState.SELECTED or state == CardState.AIMING:
+			cancel_selection()
+
+
+## ============================================================
+## НАСТРОЙКИ
+## ============================================================
 func set_hand_scale():
-	is_in_hand = true
-	original_scale = Vector2(DataManager.CARD_SCALE_IN_HAND, DataManager.CARD_SCALE_IN_HAND)
-	original_position = position
-	original_z_index = z_index
+	original_scale = Vector2(CARD_SCALE_IN_HAND, CARD_SCALE_IN_HAND)
 	scale = original_scale
+	
+	if collision_shape:
+		var scaled_size = Vector2(CARD_BASE_WIDTH, CARD_BASE_HEIGHT) * CARD_SCALE_IN_HAND
+		var rect_shape = collision_shape.shape as RectangleShape2D
+		if rect_shape:
+			rect_shape.size = scaled_size
+			collision_shape.position = scaled_size / 2
+
+
+func _setup_click_area():
+	if not click_area or not collision_shape:
+		return
+	
+	# Отключаем старый сигнал, если он уже подключён
+	if click_area.input_event.is_connected(_on_click_area_input):
+		click_area.input_event.disconnect(_on_click_area_input)
+	
+	var rect_shape = RectangleShape2D.new()
+	var card_size = Vector2(CARD_BASE_WIDTH, CARD_BASE_HEIGHT)
+	rect_shape.size = card_size
+	collision_shape.shape = rect_shape
+	collision_shape.position = card_size / 2
+	
+	click_area.input_event.connect(_on_click_area_input)
+
+
+func get_card_size() -> Vector2:
+	return Vector2(CARD_BASE_WIDTH, CARD_BASE_HEIGHT) * scale
+
+
+func set_hand_ui(hand_ui: HandUI):
+	hand_ui_ref = hand_ui
+
+
+func _on_click_area_input(viewport, event, shape_idx):
+	print("_on_click_area_input called, event: ", event)  # Отладка
+	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
+		print("Left click detected")
+		on_card_clicked()
