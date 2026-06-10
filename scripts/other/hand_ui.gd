@@ -10,6 +10,9 @@ var current_card: CardUI = null
 var target_arrow: Line2D = null
 var current_hovered_card: CardUI = null
 
+var arrow_head: Sprite2D
+
+
 func _ready():
 	cards_container = $CardsContainer
 	if not cards_container:
@@ -113,26 +116,55 @@ func _on_target_selection_requested(card_ui: CardUI):
 	is_selecting_target = true
 	
 	target_arrow = Line2D.new()
-	target_arrow.width = 4
-	target_arrow.default_color = Color(0.9, 0.3, 0.2, 0.8)
+	target_arrow.width = 24 # Увеличили базовую ширину, так как сужение будет уменьшать её
+	target_arrow.default_color = DataManager.COLOR_FLESH_CAVES_ART_BG_DARK
 	target_arrow.antialiased = true
+	
+	# Настройка плавного сужения линии (от толстого начала к тонкому концу)
+	var curve = Curve.new()
+	curve.add_point(Vector2(0.0, 1.0)) # Начало у карты: 100% ширины
+	curve.add_point(Vector2(1.0, 0.2)) # Конец у мыши: 20% ширины
+	target_arrow.width_curve = curve
+	
 	add_child(target_arrow)
 
 
-func _process(delta):
+func _process(_delta):
 	if not is_selecting_target or not target_arrow or not current_card:
 		return
 	
-	var card_pos = current_card.get_global_position()
-	var mouse_pos = get_viewport().get_mouse_position()
+	# Центр карты
+	var card_size = current_card.get_card_size()
+	var card_center = current_card.global_position + card_size / 2
+	
+	var mouse_pos = get_global_mouse_position()
 	
 	target_arrow.clear_points()
-	target_arrow.add_point(card_pos)
 	
-	var mid_point = (card_pos + mouse_pos) / 2
-	mid_point.y -= 50
-	target_arrow.add_point(mid_point)
-	target_arrow.add_point(mouse_pos)
+	# Расчет контрольной точки для плавного изгиба (дуги)
+	var mid_point = (card_center + mouse_pos) / 2
+	mid_point.y -= 200  # Смещение вверх создает красивый прогиб дуги
+	
+	# Строим идеально ровную и сглаженную кривую из 30 сегментов
+	var steps = 30
+	for i in range(steps + 1):
+		var t = float(i) / steps
+		# Математическое сглаживание Безье между точками старта, изгиба и мыши
+		var point = card_center.bezier_interpolate(mid_point, mid_point, mouse_pos, t)
+		target_arrow.add_point(point)
+	
+	# Управляем наконечником стрелки
+	_update_arrow_head(mouse_pos, target_arrow.get_point_position(steps - 1))
+
+
+
+func _update_arrow_head(head_pos: Vector2, last_point_pos: Vector2):
+	if not arrow_head:
+		return
+	arrow_head.global_position = head_pos
+	# Разворачиваем наконечник по направлению движения
+	arrow_head.rotation = (head_pos - last_point_pos).angle() + PI/2
+
 
 
 func _get_target_at_position(pos: Vector2) -> Node:

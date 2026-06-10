@@ -19,6 +19,8 @@ var right_icons: VBoxContainer = null
 var card_control: Control = null
 var click_area: Area2D = null
 var collision_shape: CollisionShape2D = null
+var effect_overlay: ColorRect = null
+var effect_overlay2: ColorRect = null
 
 ## ============================================================
 ## ДАННЫЕ КАРТЫ
@@ -33,7 +35,7 @@ const CARD_BASE_WIDTH: int = DataManager.CARD_BASE_WIDTH
 const CARD_BASE_HEIGHT: int = DataManager.CARD_BASE_HEIGHT
 const CARD_SCALE_HOVER: float = DataManager.CARD_SCALE_HOVER
 const CARD_SCALE_IN_HAND: float = DataManager.CARD_SCALE_IN_HAND
-
+var shader_time: float = 0.0
 ## ============================================================
 ## СОСТОЯНИЕ
 ## ============================================================
@@ -60,6 +62,8 @@ func _ready():
 	card_control = $CardTemplate
 	click_area = $ClickArea
 	collision_shape = $ClickArea/CollisionShape2D
+	effect_overlay = $CardTemplate/ShaderRect
+	effect_overlay2 = $CardTemplate/ShaderRect2
 	
 	original_position = position
 	original_z_index = z_index
@@ -69,9 +73,16 @@ func _ready():
 	
 	left_icons.custom_minimum_size = Vector2(32, 0)
 	right_icons.custom_minimum_size = Vector2(32, 0)
-	
-	_setup_click_area()
 
+	set_glow(false)
+	effect_overlay.show()
+		# Делаем материал уникальным для этой конкретной карты
+	if effect_overlay.material:
+		effect_overlay.material = effect_overlay.material.duplicate()
+	if effect_overlay2.material:
+		effect_overlay2.material = effect_overlay2.material.duplicate()
+
+	_setup_click_area()
 
 
 ## ============================================================
@@ -217,6 +228,21 @@ func add_icon(container: VBoxContainer, texture: Texture2D, tooltip: String):
 	icon.tooltip_text = tooltip
 	icon.mouse_filter = Control.MOUSE_FILTER_PASS
 	container.add_child(icon)
+	
+	
+func set_glow(enabled: bool):
+	var mat = effect_overlay.material as ShaderMaterial
+	if not mat: 
+		return
+	
+	if enabled:
+		# Выставляем рабочие значения параметров
+		mat.set_shader_parameter("glow_softness", 0.15)
+		mat.set_shader_parameter("flash_speed", 2.0)
+	else:
+		# Полностью сбрасываем в ноль, убирая эффекты
+		mat.set_shader_parameter("glow_softness", 0.0)
+		mat.set_shader_parameter("flash_speed", 0.0)
 
 
 func _unique_icons(icons: Array[Texture2D], tooltips: Array[String]) -> Array[Dictionary]:
@@ -255,6 +281,7 @@ func on_card_clicked():
 		return
 	
 	state = CardState.SELECTED
+	set_glow(true)
 
 
 func play_card(target = null):
@@ -325,6 +352,7 @@ func cancel_selection():
 			hand_ui_ref.clear_hovered_card(self)
 		
 		SignalManager.target_selection_cancelled.emit()
+		set_glow(false)
 
 
 func confirm_target(target):
@@ -427,16 +455,42 @@ func _return_to_original():
 
 
 func _process(delta):
+	# Получаем позицию мыши относительно центра самой карты
+	var mouse_pos2 = get_local_mouse_position()
+	var card_size2 = get_card_size()
+	
+	# Переводим координаты в диапазон от -0.5 до 0.5
+	var relative_mouse = Vector2(
+		(mouse_pos2.x / card_size2.x) - 0.5,
+		(mouse_pos2.y / card_size2.y) - 0.5
+	).clamp(Vector2(-1.0, -1.0), Vector2(1.0, 1.0))
+	
+	# 1. СЛЕГКА УМЕНЬШИЛИ НАКЛОН (Снизили множитель с 0.12 до 0.05)
+	var target_rotation = relative_mouse.x * 0.05 
+	rotation = lerp(rotation, target_rotation, 8.0 * delta)
+	
+	# 2. МЯГКАЯ ИМИТАЦИЯ 3D (Снизили деформацию краев с 0.04 до 0.015)
+	var target_scale_x = 1.0 - abs(relative_mouse.y) * 0.015
+	var target_scale_y = 1.0 - abs(relative_mouse.x) * 0.015
+	scale.x = lerp(scale.x, target_scale_x, 8.0 * delta)
+	scale.y = lerp(scale.y, target_scale_y, 8.0 * delta)
+	
+	# 3. Передаем наклон в шейдер
+	var mat = effect_overlay2.material as ShaderMaterial
+	if mat:
+		mat.set_shader_parameter("mouse_offset", relative_mouse)
+		
 	if state == CardState.SELECTED:
 		var mouse_pos = get_viewport().get_mouse_position()
 		var card_rect = Rect2(global_position - get_card_size() / 2, get_card_size())
 		
 		# Если мышь выше верхнего края карты или на определённом расстоянии
-		var threshold = 100  # пикселей от верхнего края
+		var threshold = 200  # пикселей от верхнего края
 		if mouse_pos.y < card_rect.position.y + threshold:
 			print("Mouse above card, moving to center")
 			state = CardState.AIMING
-			_move_to_center()
+			#TODO Вернуть, если будет нужно
+			#_move_to_center()
 			SignalManager.target_selection_requested.emit(self)
 	
 	# ПКМ для отмены

@@ -45,7 +45,10 @@ func start_test(world_node: Node):
 func _on_hand_ui_created(hand_ui: HandUI):
 	# Добавляем руку в game_world
 	if game_world and hand_ui:
-		game_world.add_child(hand_ui)
+		var canvas_layer = CanvasLayer.new()
+		canvas_layer.layer = 10  # высокий слой
+		game_world.add_child(canvas_layer)
+		canvas_layer.add_child(hand_ui)
 
 func reset():
 	if current_room_node and is_instance_valid(current_room_node):

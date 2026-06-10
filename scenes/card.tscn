@@ -1,11 +1,41 @@
-[gd_scene load_steps=6 format=3 uid="uid://coec2fnqd70g0"]
+[gd_scene load_steps=12 format=3 uid="uid://coec2fnqd70g0"]
 
 [ext_resource type="Script" uid="uid://b7y61xslq656g" path="res://scripts/other/card_ui.gd" id="1_d81rb"]
 [ext_resource type="LabelSettings" uid="uid://eu2gkwf45dgn" path="res://styles/label_black_32.tres" id="2_kg30u"]
 [ext_resource type="LabelSettings" uid="uid://cho2cb5x0hrmf" path="res://styles/label_red_24.tres" id="3_ktuci"]
 [ext_resource type="FontFile" uid="uid://cfcw32u84nc63" path="res://fonts/RobotoCondensed-VariableFont_wght.ttf" id="4_kg30u"]
+[ext_resource type="Shader" uid="uid://xlaxko82yrc2" path="res://shaders/card_shader.gdshader" id="5_sy11y"]
+[ext_resource type="Shader" uid="uid://cltqs0v1xgjjb" path="res://shaders/card2_shader.gdshader" id="6_6ligt"]
+[ext_resource type="Shader" uid="uid://1kutc6pr0rfa" path="res://shaders/card3_shader.gdshader" id="7_8w5pg"]
 
 [sub_resource type="Theme" id="Theme_ktuci"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_sy11y"]
+shader = ExtResource("5_sy11y")
+shader_parameter/glow_color = Color(1, 0.69803923, 0.2, 0)
+shader_parameter/glow_thickness = 0.0
+shader_parameter/glow_softness = 0.13200000627
+shader_parameter/flash_color = Color(1, 1, 1, 0.25882354)
+shader_parameter/flash_speed = 2.0
+shader_parameter/flash_width = 0.15
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_8w5pg"]
+shader = ExtResource("6_6ligt")
+shader_parameter/dirt_color = Color(0.18, 0.12, 0.08, 0.6)
+shader_parameter/grain_intensity = 0.19200000912
+shader_parameter/dirt_amount = 0.74800003553
+shader_parameter/scratch_amount = 0.0990000047025
+shader_parameter/vignette_color = Color(0.019607844, 0.011764706, 0.011764706, 1)
+shader_parameter/darkness_power = 1.3630000647425
+shader_parameter/card_roundness = 0.0570000027075
+shader_parameter/mouse_offset = Vector2(0, 0)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_nvopj"]
+shader = ExtResource("7_8w5pg")
+shader_parameter/vignette_color = Color(0.02, 0.01, 0.01, 1)
+shader_parameter/darkness_power = 1.6
+shader_parameter/light_radius = 0.4790000227525
+shader_parameter/flicker_speed = 2.000000095
 
 [node name="Card" type="Node2D"]
 z_index = 100
@@ -112,6 +142,27 @@ theme_override_font_sizes/normal_font_size = 18
 fit_content = true
 scroll_active = false
 horizontal_alignment = 1
+
+[node name="ShaderRect" type="ColorRect" parent="CardTemplate"]
+visible = false
+material = SubResource("ShaderMaterial_sy11y")
+layout_mode = 2
+mouse_filter = 2
+color = Color(1, 1, 1, 0)
+
+[node name="ShaderRect2" type="ColorRect" parent="CardTemplate"]
+clip_children = 2
+material = SubResource("ShaderMaterial_8w5pg")
+layout_mode = 2
+mouse_filter = 2
+color = Color(0, 0, 0, 1)
+
+[node name="ShaderRect3" type="ColorRect" parent="CardTemplate"]
+visible = false
+material = SubResource("ShaderMaterial_nvopj")
+layout_mode = 2
+mouse_filter = 2
+color = Color(0, 0, 0, 1)
 
 [node name="ClickArea" type="Area2D" parent="."]
 
