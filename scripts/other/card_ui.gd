@@ -53,10 +53,10 @@ func _ready():
 	# Инициализируем ссылки на ноды
 	template = $CardTemplate
 	cost_label = $CardTemplate/CardBackground/CostLabel
-	name_label = $CardTemplate/MarginContainer/MainLayout/HeaderLayout/CardName
+	name_label = $CardTemplate/MarginContainer/MainLayout/HeaderLayout/Control/CardName
 	art_image = $CardTemplate/MarginContainer/MainLayout/MiddleLayout/ArtContainer/ArtImage
 	art_background = $CardTemplate/MarginContainer/MainLayout/MiddleLayout/ArtContainer/ArtBackground
-	description_label = $CardTemplate/MarginContainer/MainLayout/DesccriptionContainer/CardDescription
+	description_label = $CardTemplate/MarginContainer/MainLayout/DesccriptionContainer/Control/CardDescription
 	left_icons = $CardTemplate/MarginContainer/MainLayout/MiddleLayout/LeftIcons
 	right_icons = $CardTemplate/MarginContainer/MainLayout/MiddleLayout/RightIcons
 	card_control = $CardTemplate

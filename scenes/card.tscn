@@ -66,7 +66,6 @@ offset_left = 20.0
 offset_top = 20.0
 offset_right = 220.0
 offset_bottom = 59.0
-scale = Vector2(0.5, 0.5)
 text = "2424"
 label_settings = ExtResource("2_kg30u")
 vertical_alignment = 1
@@ -83,16 +82,20 @@ theme_override_constants/margin_bottom = 20
 layout_mode = 2
 mouse_filter = 2
 
-[node name="HeaderLayout" type="Control" parent="CardTemplate/MarginContainer/MainLayout"]
+[node name="HeaderLayout" type="CenterContainer" parent="CardTemplate/MarginContainer/MainLayout"]
 layout_mode = 2
-size_flags_vertical = 3
 mouse_filter = 2
 
-[node name="CardName" type="Label" parent="CardTemplate/MarginContainer/MainLayout/HeaderLayout"]
+[node name="Control" type="Control" parent="CardTemplate/MarginContainer/MainLayout/HeaderLayout"]
+custom_minimum_size = Vector2(200, 60)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="CardName" type="Label" parent="CardTemplate/MarginContainer/MainLayout/HeaderLayout/Control"]
 custom_minimum_size = Vector2(400, 0)
 layout_mode = 1
-offset_right = 400.0
-offset_bottom = 57.0
+offset_right = 200.0
+offset_bottom = 59.0
 scale = Vector2(0.5, 0.5)
 theme_override_constants/line_spacing = 0
 label_settings = ExtResource("3_ktuci")
@@ -156,13 +159,17 @@ mouse_filter = 2
 theme_override_constants/separation = 4
 alignment = 1
 
-[node name="DesccriptionContainer" type="Control" parent="CardTemplate/MarginContainer/MainLayout"]
+[node name="DesccriptionContainer" type="CenterContainer" parent="CardTemplate/MarginContainer/MainLayout"]
 layout_mode = 2
-size_flags_vertical = 3
 mouse_filter = 2
 
-[node name="CardDescription" type="RichTextLabel" parent="CardTemplate/MarginContainer/MainLayout/DesccriptionContainer"]
-custom_minimum_size = Vector2(400, 0)
+[node name="Control" type="Control" parent="CardTemplate/MarginContainer/MainLayout/DesccriptionContainer"]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="CardDescription" type="RichTextLabel" parent="CardTemplate/MarginContainer/MainLayout/DesccriptionContainer/Control"]
+custom_minimum_size = Vector2(200, 0)
 layout_mode = 1
 offset_right = 400.0
 scale = Vector2(0.5, 0.5)
