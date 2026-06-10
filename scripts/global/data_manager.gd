@@ -419,7 +419,7 @@ const CARD_ICON_SOURCE_SIZE: int = 64
 const CARD_SCALE_NORMAL: float = 1.0
 const CARD_SCALE_IN_HAND: float = 1
 const CARD_SCALE_HOVER: float = 1.2
-const CARD_HOVER_RAISE: int = 150  # высота подъёма при наведении
+const CARD_HOVER_RAISE: int = 180  # высота подъёма при наведении
 const CARD_HOVER_CENTER_FORCE: float = 0.02 # сила притяжения к центру (0-1)
 const CARD_HAND_WIDTH: int = int(CARD_BASE_WIDTH * CARD_SCALE_IN_HAND)
 const CARD_HAND_HEIGHT: int = int(CARD_BASE_HEIGHT * CARD_SCALE_IN_HAND)
@@ -511,6 +511,10 @@ const ROOM_POSITION: Vector2 = Vector2(448, -80)
 
 const ENEMY_SPACING: int = 40
 const ENEMY_Y_OFFSET_FROM_BOTTOM: int = 150  # отступ от нижней границы
+
+
+const sound_delay: int = 50  # задержка между одинаковыми звуками в мс
+const max_sounds: int = 8    # максимальное количество одновременных звуков
 ## ============================================================
 ## 6. ВСПОМОГАТЕЛЬНЫЕ МЕТОДЫ
 ## ============================================================
@@ -1029,7 +1033,8 @@ const COLOR_FLESH_CAVES_ART_BG_DARK: Color = Color("400D0D")     # тёмно-к
 const COLOR_BONE_LABYRINTH_ART_BG_DARK: Color = Color("332E26")  # тёмно-серый
 
 # === СВЕТЛЫЕ ЦВЕТА (альтернативные) ===
-const COLOR_PENITENT_ART_BG_LIGHT: Color = Color("C47A7A")     # светло-бордовый
+const COLOR_PENITENT_ART_BG_LIGHT2: Color = Color("C47A7A")     # светло-бордовый
+const COLOR_PENITENT_ART_BG_LIGHT: Color = Color("faeceb")     # светло-бордовый
 const COLOR_WARRIOR_ART_BG_LIGHT: Color = Color("8A8ABF")      # светло-синий
 const COLOR_MYSTIC_ART_BG_LIGHT: Color = Color("8A5ABF")       # светло-фиолетовый
 const COLOR_ROGUE_ART_BG_LIGHT: Color = Color("6ABF6A")        # светло-зелёный

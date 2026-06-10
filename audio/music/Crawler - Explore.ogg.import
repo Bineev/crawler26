@@ -1,0 +1,19 @@
+[remap]
+
+importer="oggvorbisstr"
+type="AudioStreamOggVorbis"
+uid="uid://baalu7fsse5cx"
+path="res://.godot/imported/Crawler - Explore.ogg-9c7d4bf5ac4177e794ce18e0e91cb2fc.oggvorbisstr"
+
+[deps]
+
+source_file="res://audio/music/Crawler - Explore.ogg"
+dest_files=["res://.godot/imported/Crawler - Explore.ogg-9c7d4bf5ac4177e794ce18e0e91cb2fc.oggvorbisstr"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

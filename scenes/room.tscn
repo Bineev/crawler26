@@ -1,8 +1,9 @@
-[gd_scene load_steps=6 format=3 uid="uid://dcst51dams5bp"]
+[gd_scene load_steps=8 format=3 uid="uid://dcst51dams5bp"]
 
 [ext_resource type="Script" uid="uid://rgrbwlag2ceu" path="res://scripts/other/room.gd" id="1_36trf"]
 [ext_resource type="Shader" uid="uid://cfcs8l2y88blq" path="res://shaders/mood_shader.gdshader" id="2_85yof"]
 [ext_resource type="Shader" uid="uid://b1dptapvctk7b" path="res://shaders/horror_shader.gdshader" id="3_14vil"]
+[ext_resource type="Shader" uid="uid://1kutc6pr0rfa" path="res://shaders/card3_shader.gdshader" id="4_14vil"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_jxe34"]
 render_priority = 0
@@ -18,6 +19,13 @@ shader_parameter/glitch_speed = 5.0
 shader_parameter/pulse_speed = 1.5
 shader_parameter/pulse_intensity = 0.1
 shader_parameter/chromatic_amount = 0.002
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_qvc4m"]
+shader = ExtResource("4_14vil")
+shader_parameter/vignette_color = Color(0.019607844, 0.011764706, 0.011764706, 0.7058824)
+shader_parameter/darkness_power = 3.0
+shader_parameter/light_radius = 0.3350000159125
+shader_parameter/flicker_speed = 2.000000095
 
 [node name="Room" type="Control"]
 layout_mode = 3
@@ -50,4 +58,12 @@ layout_mode = 1
 offset_right = 1024.0
 offset_bottom = 800.0
 mouse_filter = 2
+color = Color(0, 0, 0, 1)
+
+[node name="ShaderLayer" type="ColorRect" parent="."]
+material = SubResource("ShaderMaterial_qvc4m")
+custom_minimum_size = Vector2(1024, 800)
+layout_mode = 1
+offset_right = 40.0
+offset_bottom = 40.0
 color = Color(0, 0, 0, 1)

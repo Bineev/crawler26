@@ -99,6 +99,17 @@ func display():
 	if illustration and art_image:
 		art_image.texture = illustration
 	
+	# Уменьшаем ArtImage на 20%
+	if art_image:
+		var scale_factor = 0.8
+		art_image.scale = Vector2(scale_factor, scale_factor)
+		# Центрируем
+		art_image.position = Vector2(
+			art_image.size.x * (1 - scale_factor) / 2,
+			art_image.size.y * (1 - scale_factor) / 2
+		)
+	
+	
 	description_label.text = card_data.get_localized_description()
 	
 	var card_bg = $CardTemplate/CardBackground as TextureRect
@@ -455,30 +466,48 @@ func _return_to_original():
 
 
 func _process(delta):
-	# Получаем позицию мыши относительно центра самой карты
-	var mouse_pos2 = get_local_mouse_position()
-	var card_size2 = get_card_size()
-	
-	# Переводим координаты в диапазон от -0.5 до 0.5
-	var relative_mouse = Vector2(
-		(mouse_pos2.x / card_size2.x) - 0.5,
-		(mouse_pos2.y / card_size2.y) - 0.5
-	).clamp(Vector2(-1.0, -1.0), Vector2(1.0, 1.0))
-	
-	# 1. СЛЕГКА УМЕНЬШИЛИ НАКЛОН (Снизили множитель с 0.12 до 0.05)
-	var target_rotation = relative_mouse.x * 0.05 
-	rotation = lerp(rotation, target_rotation, 8.0 * delta)
-	
-	# 2. МЯГКАЯ ИМИТАЦИЯ 3D (Снизили деформацию краев с 0.04 до 0.015)
-	var target_scale_x = 1.0 - abs(relative_mouse.y) * 0.015
-	var target_scale_y = 1.0 - abs(relative_mouse.x) * 0.015
-	scale.x = lerp(scale.x, target_scale_x, 8.0 * delta)
-	scale.y = lerp(scale.y, target_scale_y, 8.0 * delta)
-	
-	# 3. Передаем наклон в шейдер
-	var mat = effect_overlay2.material as ShaderMaterial
-	if mat:
-		mat.set_shader_parameter("mouse_offset", relative_mouse)
+	if state == CardState.IDLE:
+		# Получаем позицию мыши относительно центра самой карты
+		var mouse_pos2 = get_local_mouse_position()
+		var card_size2 = get_card_size()
+		
+		# Переводим координаты в диапазон от -0.5 до 0.5
+		var relative_mouse = Vector2(
+			(mouse_pos2.x / card_size2.x) - 0.5,
+			(mouse_pos2.y / card_size2.y) - 0.5
+		).clamp(Vector2(-1.0, -1.0), Vector2(1.0, 1.0))
+		
+		# 1. СЛЕГКА УМЕНЬШИЛИ НАКЛОН (Снизили множитель с 0.12 до 0.05)
+		var target_rotation = relative_mouse.x * 0.05 
+		rotation = lerp(rotation, target_rotation, 8.0 * delta)
+		
+		# 2. МЯГКАЯ ИМИТАЦИЯ 3D (Снизили деформацию краев с 0.04 до 0.015)
+		var target_scale_x = 1.0 - abs(relative_mouse.y) * 0.015
+		var target_scale_y = 1.0 - abs(relative_mouse.x) * 0.015
+		scale.x = lerp(scale.x, target_scale_x, 8.0 * delta)
+		scale.y = lerp(scale.y, target_scale_y, 8.0 * delta)
+		
+		# 3. Передаем наклон в шейдер
+		var mat = effect_overlay2.material as ShaderMaterial
+		if mat:
+			mat.set_shader_parameter("mouse_offset", relative_mouse)
+	else:
+		# --- ВОЗВРАЩАЕМ В НЕПОДВИЖНОЕ СОСТОЯНИЕ И ВЫПРЯМЛЯЕМ КАРТУ ---
+		# Плавно возвращаем поворот в ноль
+		rotation = lerp(rotation, 0.0, 12.0 * delta)
+		
+		# Плавно возвращаем масштаб в стандартный 1.0 по обеим осям
+		scale.x = lerp(scale.x, DataManager.CARD_SCALE_HOVER, 12.0 * delta)
+		scale.y = lerp(scale.y, DataManager.CARD_SCALE_HOVER, 12.0 * delta)
+		
+		# Плавно возвращаем параллакс грязи в шейдере в центр
+		var mat = effect_overlay2.material as ShaderMaterial
+		if mat:
+			var current_offset = mat.get_shader_parameter("mouse_offset")
+			if current_offset:
+				# Используем lerp для Vector2, чтобы грязь мягко «встала на место»
+				var target_offset = current_offset.lerp(Vector2.ZERO, 12.0 * delta)
+				mat.set_shader_parameter("mouse_offset", target_offset)
 		
 	if state == CardState.SELECTED:
 		var mouse_pos = get_viewport().get_mouse_position()

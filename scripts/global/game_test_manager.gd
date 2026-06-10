@@ -106,6 +106,8 @@ func _on_room_selected(room_node: RoomNode):
 		# _ready() сам вызовется и применит отложенные данные
 		
 		current_room_index += 1
+		
+	SoundManager.start_gameplay_playlist()
 
 
 func _on_floor_completed():

@@ -14,7 +14,7 @@ dest_files=["res://.godot/imported/RobotoCondensed-VariableFont_wght.ttf-e014447
 
 Rendering=null
 antialiasing=1
-generate_mipmaps=true
+generate_mipmaps=false
 disable_embedded_bitmaps=true
 multichannel_signed_distance_field=false
 msdf_pixel_range=8

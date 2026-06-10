@@ -1,0 +1,19 @@
+[remap]
+
+importer="oggvorbisstr"
+type="AudioStreamOggVorbis"
+uid="uid://bhej78fmf5u2k"
+path="res://.godot/imported/Crawler - Death is near.ogg-7450b21115fc40cb583657aad52a05e2.oggvorbisstr"
+
+[deps]
+
+source_file="res://audio/music/Crawler - Death is near.ogg"
+dest_files=["res://.godot/imported/Crawler - Death is near.ogg-7450b21115fc40cb583657aad52a05e2.oggvorbisstr"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4
