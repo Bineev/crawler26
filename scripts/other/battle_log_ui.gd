@@ -60,7 +60,9 @@ func _add_log_entry(text: String):
 	entry.autowrap_mode = TextServer.AUTOWRAP_WORD
 	entry.add_theme_font_override("font", DataManager.FONT_MAIN)
 	entry.add_theme_font_size_override("font_size", 18)
-	
+	# Уменьшаем отступы
+	entry.add_theme_constant_override("margin_top", 0)
+	entry.add_theme_constant_override("margin_bottom", 0)
 	# Фиксируем ширину, чтобы не дёргалось
 	entry.size_flags_horizontal = Control.SIZE_EXPAND
 	entry.custom_minimum_size.x = size.x - 30
@@ -90,7 +92,7 @@ func _get_color_by_text(text: String) -> Color:
 	elif "наложен" in lower or "status" in lower:
 		return DataManager.COLOR_MYSTIC_ART_BG_DARK
 	else:
-		return DataManager.COLOR_PENITENT_CARD_BG
+		return DataManager.COLOR_BONE_LABYRINTH_ART_BG_DARK
 
 
 func clear_log():

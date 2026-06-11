@@ -40,6 +40,7 @@ func draw_card() -> bool:
 	
 	var card_data = draw_pile.pop_front()
 	hand.append(card_data)
+	SignalManager.log_message.emit("Добрана карта: %s" % card_data.get_localized_name())
 	
 	SignalManager.card_drawn.emit(card_data)
 	

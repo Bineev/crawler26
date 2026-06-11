@@ -59,10 +59,13 @@ func add_card(card_data: CardData, card_scene: PackedScene):
 
 
 func remove_card(card_ui: CardUI):
-	card_ui.queue_free()
-	if is_manual_layout:
-		layout_cards()
-
+	# Удаляем карту из контейнера
+	if cards_container and card_ui.get_parent() == cards_container:
+		cards_container.remove_child(card_ui)
+		card_ui.queue_free()
+		
+		if is_manual_layout:
+			layout_cards()
 
 func layout_cards():
 	var card_count = cards_container.get_child_count()

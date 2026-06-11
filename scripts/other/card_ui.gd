@@ -306,6 +306,8 @@ func play_card(target = null):
 		state = CardState.IDLE
 		return
 	
+	var old_energy = player_stats.get_energy()
+	
 	player_stats.modify_flat(DataManager.FlatStat.ENERGY, -card_data.cost)
 	
 	for effect in card_data.effects:
@@ -315,15 +317,22 @@ func play_card(target = null):
 	var battle_deck = BattleManager.get_battle_deck()
 	if battle_deck:
 		battle_deck.play_card(self, card_data, target)
-	else:
-		queue_free()
 	
 	SignalManager.card_played.emit(card_data)
+	SignalManager.log_message.emit("Разыграна карта: %s" % card_data.get_localized_name())
+	var new_energy = player_stats.get_energy()
+	var max_energy = player_stats.get_max_energy()
+	SignalManager.log_message.emit("Потрачено энергии: %d | Энергия: %d/%d" % [card_data.cost, new_energy, max_energy])
+	
+	# Анимация улёта (если есть цель — враг)
+	if target and target is EnemyInstance:
+		# Анимируем к позиции врага (корневая нода Enemy)
+		animate_to_target(target)
+	else:
+		animate_to_center()
 	
 	if hand_ui_ref:
 		hand_ui_ref.set_all_cards_input_enabled(true)
-		
-	SignalManager.log_message.emit("Разыграна карта: %s" % card_data.get_localized_name())
 
 
 func _needs_target() -> bool:
@@ -577,3 +586,41 @@ func _on_click_area_input(viewport, event, shape_idx):
 
 func set_highlight(enabled: bool):
 	modulate = Color(1, 0.5, 0.2) if enabled else Color.WHITE
+
+
+func animate_to_target(target_node: Node2D):
+	if current_tween:
+		current_tween.kill()
+	
+	# Получаем позицию цели (корневая нода врага)
+	var target_global_pos = target_node.global_position
+	var target_local_pos = get_parent().to_local(target_global_pos)
+	
+	current_tween = create_tween()
+	current_tween.set_parallel(true)
+	current_tween.tween_property(self, "position", target_local_pos, 0.25).set_ease(Tween.EASE_IN)
+	current_tween.tween_property(self, "scale", Vector2(0.2, 0.2), 0.25)
+	current_tween.tween_property(self, "modulate", Color.TRANSPARENT, 0.2)
+	current_tween.finished.connect(_on_animation_finished)
+
+
+func _on_animation_finished():
+	if hand_ui_ref:
+		hand_ui_ref.remove_card(self)
+	else:
+		queue_free()
+
+
+func animate_to_center():
+	if current_tween:
+		current_tween.kill()
+	
+	var screen_center = get_viewport().get_visible_rect().size / 2
+	var target_local_pos = get_parent().to_local(screen_center)
+	
+	current_tween = create_tween()
+	current_tween.set_parallel(true)
+	current_tween.tween_property(self, "position", target_local_pos, 0.25).set_ease(Tween.EASE_IN)
+	current_tween.tween_property(self, "scale", Vector2(0.2, 0.2), 0.25)
+	current_tween.tween_property(self, "modulate", Color.TRANSPARENT, 0.2)
+	current_tween.finished.connect(_on_animation_finished)

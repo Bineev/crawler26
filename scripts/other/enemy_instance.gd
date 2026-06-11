@@ -173,7 +173,7 @@ func select_next_intent() -> IntentEntry:
 func execute_intent(target: CharacterStats):
 	if not current_intent:
 		return
-	
+	SignalManager.log_message.emit("%s атакует!" % get_display_name())
 	for effect in current_intent.effects:
 		EffectExecutor.execute(effect, stats, [target])
 
@@ -258,3 +258,9 @@ func get_sprite() -> Texture2D:
 	if resource:
 		return resource.get_sprite()
 	return null
+
+
+func get_display_name() -> String:
+	if resource:
+		return resource.get_localized_name()
+	return "Враг"

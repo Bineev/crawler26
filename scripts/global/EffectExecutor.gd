@@ -118,6 +118,8 @@ func _execute_block(effect: EffectEntry, source, targets: Array) -> void:
 	for target in targets:
 		if target.has_method("add_block"):
 			target.add_block(block)
+			var target_name = target.get_display_name() if target.has_method("get_display_name") else "Цель"
+			SignalManager.log_message.emit("%s получил %d блока" % [target_name, block])
 
 
 func _execute_heal(effect: EffectEntry, source, targets: Array) -> void:
@@ -130,6 +132,8 @@ func _execute_heal(effect: EffectEntry, source, targets: Array) -> void:
 	for target in targets:
 		if target.has_method("heal"):
 			target.heal(heal)
+			var target_name = target.get_display_name() if target.has_method("get_display_name") else "Цель"
+			SignalManager.log_message.emit("%s восстановил %d HP" % [target_name, heal])
 
 
 func _execute_scaled_value(effect: EffectEntry, source, targets: Array) -> void:
