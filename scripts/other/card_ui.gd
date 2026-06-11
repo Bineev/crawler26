@@ -569,7 +569,9 @@ func set_hand_ui(hand_ui: HandUI):
 
 
 func _on_click_area_input(viewport, event, shape_idx):
-	print("_on_click_area_input called, event: ", event)  # Отладка
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
-		print("Left click detected")
 		on_card_clicked()
+
+
+func set_highlight(enabled: bool):
+	modulate = Color(1, 0.5, 0.2) if enabled else Color.WHITE

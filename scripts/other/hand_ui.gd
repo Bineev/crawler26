@@ -22,6 +22,7 @@ func _ready():
 	SignalManager.target_selection_requested.connect(_on_target_selection_requested)
 	SignalManager.target_selected.connect(_on_target_selected)
 	SignalManager.target_selection_cancelled.connect(_on_target_selection_cancelled)
+	SignalManager.enemy_clicked.connect(_on_enemy_clicked)
 
 
 func clear_hand():
@@ -98,15 +99,8 @@ func _unhandled_input(event):
 	if not is_selecting_target:
 		return
 	
-	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
-		var target = _get_target_at_position(get_viewport().get_mouse_position())
-		if target:
-			SignalManager.target_selected.emit(target)
-		else:
-			SignalManager.target_selection_cancelled.emit()
-		accept_event()
-	
-	elif event is InputEventKey and event.key == KEY_ESCAPE and event.pressed:
+	# Только ESCAPE для отмены
+	if event is InputEventKey and event.pressed and event.keycode == KEY_ESCAPE:
 		SignalManager.target_selection_cancelled.emit()
 		accept_event()
 
@@ -167,16 +161,6 @@ func _update_arrow_head(head_pos: Vector2, last_point_pos: Vector2):
 
 
 
-func _get_target_at_position(pos: Vector2) -> Node:
-	for enemy in BattleManager.get_enemies():
-		if not enemy.is_alive():
-			continue
-		var enemy_ui = enemy.get_node("EnemyUI")
-		if enemy_ui and enemy_ui.get_rect().has_point(enemy_ui.to_local(pos)):
-			return enemy
-	return null
-
-
 func _on_target_selected(target: Node):
 	is_selecting_target = false
 	if target_arrow:
@@ -234,3 +218,8 @@ func _set_all_cards_mouse_filter(filter: int):
 		var card = child as CardUI
 		if card and card.card_control:
 			card.card_control.mouse_filter = filter
+
+
+func _on_enemy_clicked(enemy: EnemyInstance):
+	if is_selecting_target:
+		SignalManager.target_selected.emit(enemy)

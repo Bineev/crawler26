@@ -8,7 +8,7 @@ class_name EnemyInstance
 
 var resource: EnemyResource = null
 var stats: CharacterStats = null
-
+var enemy_ui: EnemyUI = null  # ссылка на UI
 
 ## ============================================================
 ## ХАРАКТЕРИСТИКИ
@@ -46,7 +46,6 @@ func init(floor_level: int = 1, biome_index: int = 1):
 		var passive_copy = passive.duplicate_for_instance()
 		passive_copy.init_instance()
 		stats.apply_passive(passive_copy)
-		active_passives.append(passive_copy)
 
 
 func _calculate_scale(floor_level: int, biome_index: int) -> float:

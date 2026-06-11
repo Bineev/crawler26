@@ -73,3 +73,5 @@ signal hand_ui_created(hand_ui: HandUI)  # рука создана
 signal target_selection_requested(card_ui: CardUI)
 signal target_selected(target: Node)
 signal target_selection_cancelled()
+
+signal enemy_clicked(enemy: EnemyInstance)

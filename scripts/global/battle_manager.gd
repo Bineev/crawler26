@@ -131,7 +131,7 @@ func start_enemy_turn():
 
 func execute_enemy_action(enemy, intent: IntentEntry):
 	for effect in intent.effects:
-		EffectExecutor.execute(effect, enemy.stats if enemy.has_method("get_stats") else enemy, [player])
+		EffectExecutor.execute(effect, enemy.stats, [player])
 
 
 ## ============================================================
@@ -212,7 +212,7 @@ func get_player() -> CharacterStats:
 
 
 func get_enemies() -> Array:
-	return enemies
+	return enemies  # теперь это массив EnemyInstance (Node2D)
 
 
 func get_battle_deck() -> BattleDeck:

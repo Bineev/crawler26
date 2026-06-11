@@ -13,7 +13,7 @@
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_1yd6c"]
 shader = ExtResource("5_sy11y")
 shader_parameter/glow_color = Color(0.34901962, 0.14901961, 0.14901961, 1)
-shader_parameter/glow_thickness = 0.027000001282499998
+shader_parameter/glow_thickness = 0.02700000128249999
 shader_parameter/glow_softness = 0.0
 shader_parameter/flash_color = Color(1, 1, 1, 0.5)
 shader_parameter/flash_speed = 0.0

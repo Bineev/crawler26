@@ -30,38 +30,33 @@ func spawn_enemies(enemy_resources: Array[EnemyResource]):
 	clear_content()
 	enemies.clear()
 	
-	# Создаём всех врагов
 	for res in enemy_resources:
-		# Инстанциируем сцену врага
-		var enemy_instance_node = ENEMY_SCENE.instantiate()
-		var enemy_ui = enemy_instance_node as Control
+		# Инстанциируем сцену врага (корневая нода теперь EnemyInstance)
+		var enemy_instance = ENEMY_SCENE.instantiate() as EnemyInstance
 		
-		# Получаем компоненты
-		var enemy_instance = enemy_instance_node.get_node("EnemyInstance") as EnemyInstance
-		var enemy_ui_component = enemy_instance_node.get_node("EnemyUI") as EnemyUI
+		# Получаем EnemyUI (дочерняя нода)
+		var enemy_ui = enemy_instance.get_node("EnemyUI") as EnemyUI
 		
-		# Настраиваем размер врага (до добавления в дерево)
+		# Настраиваем размер врага
 		var size = DataManager.get_enemy_size_pixels(res.size)
 		if enemy_ui:
 			enemy_ui.size = size
 		
 		# Добавляем в контент
-		content.add_child(enemy_instance_node)
+		content.add_child(enemy_instance)
 		
 		# Настраиваем врага
-		if enemy_instance:
-			enemy_instance.resource = res
-			enemy_instance.init(1, 1)
-			enemy_instance.load_intents()
+		enemy_instance.resource = res
+		enemy_instance.init(current_floor, current_biome)  # нужно передать floor_level и biome
+		enemy_instance.load_intents()
 		
 		# Настраиваем UI
-		if enemy_ui_component and enemy_instance:
-			enemy_ui_component.setup(enemy_instance)
+		if enemy_ui:
+			enemy_ui.setup(enemy_instance)
 		
-		# Сохраняем для последующего позиционирования
+		# Сохраняем для позиционирования
 		enemies.append(enemy_instance)
 	
-	# Позиционируем врагов
 	layout_enemies()
 
 

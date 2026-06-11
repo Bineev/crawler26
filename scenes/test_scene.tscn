@@ -9,6 +9,7 @@ script = ExtResource("1_g7g4h")
 custom_minimum_size = Vector2(1920, 1080)
 offset_right = 1920.0
 offset_bottom = 1080.0
+mouse_filter = 2
 color = Color(0, 0, 0, 1)
 
 [node name="GameWorld" type="Node2D" parent="."]

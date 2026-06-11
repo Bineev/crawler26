@@ -30,6 +30,7 @@ shader_parameter/flicker_speed = 2.000000095
 [node name="Room" type="Control"]
 layout_mode = 3
 anchors_preset = 0
+mouse_filter = 2
 script = ExtResource("1_36trf")
 
 [node name="Background" type="TextureRect" parent="."]
@@ -66,4 +67,5 @@ custom_minimum_size = Vector2(1024, 800)
 layout_mode = 1
 offset_right = 40.0
 offset_bottom = 40.0
+mouse_filter = 2
 color = Color(0, 0, 0, 1)

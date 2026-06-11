@@ -12,6 +12,8 @@ class_name EnemyUI
 @onready var status_container: HBoxContainer = $VBoxContainer/BottomPanel/StatusContainer
 @onready var passive_container: HBoxContainer = $VBoxContainer/BottomPanel/PassiveContainer
 @onready var living_container: Control = $VBoxContainer/LivingContainer  # новая нода
+@onready var click_area: Area2D = $ClickArea
+@onready var collision_shape: CollisionShape2D = $ClickArea/CollisionShape2D
 
 var enemy_instance: EnemyInstance = null
 var breath_tween: Tween = null
@@ -24,6 +26,7 @@ var aura_particles: GPUParticles2D = null
 func setup(enemy: EnemyInstance):
 	enemy_instance = enemy
 	update_display()
+	_setup_click_area()
 	living_container.custom_minimum_size = enemy_instance.resource.get_size_pixels()
 	
 	# Поднимаем врага выше дыма
@@ -185,29 +188,34 @@ func update_intents():
 	if not intents_container:
 		return
 	
+	# Очищаем старые намерения
 	for child in intents_container.get_children():
 		child.queue_free()
 	
 	if not enemy_instance or not enemy_instance.current_intent:
 		return
 	
+	# Создаём иконку и лейбл для каждого эффекта
 	for effect in enemy_instance.current_intent.effects:
-		var intent_panel = _create_intent_panel(effect)
-		if intent_panel:
-			intents_container.add_child(intent_panel)
+		var intent_item = _create_intent_item(effect)
+		if intent_item:
+			intents_container.add_child(intent_item)
 
 
-func _create_intent_panel(effect: EffectEntry) -> HBoxContainer:
-	var panel = HBoxContainer.new()
-	panel.add_constant_override("separation", 5)
+func _create_intent_item(effect: EffectEntry) -> Control:
+	# Создаём контейнер для иконки и текста
+	var container = HBoxContainer.new()
+	container.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	
 	var icon = TextureRect.new()
 	icon.custom_minimum_size = Vector2(32, 32)
 	icon.expand_mode = TextureRect.EXPAND_FIT_WIDTH_PROPORTIONAL
 	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	
 	var value_label = Label.new()
 	value_label.add_theme_font_size_override("font_size", 16)
+	value_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	
 	match effect.category:
 		DataManager.EffectCategory.DAMAGE:
@@ -229,13 +237,12 @@ func _create_intent_panel(effect: EffectEntry) -> HBoxContainer:
 				value_label.text = effect.passive.get_localized_name()
 		_:
 			icon.texture = DataManager.get_intent_icon(DataManager.IntentType.UNKNOWN)
-			if effect.passive:
-				value_label.text = effect.passive.get_localized_name()
+			value_label.text = "?"
 	
-	panel.add_child(icon)
-	panel.add_child(value_label)
+	container.add_child(icon)
+	container.add_child(value_label)
 	
-	return panel
+	return container
 
 
 func update_statuses():
@@ -326,3 +333,33 @@ func _start_random_jitter():
 	await get_tree().create_timer(randf_range(4, 10)).timeout
 	if is_inside_tree():
 		_start_random_jitter()
+
+
+func _setup_click_area():
+	if not click_area or not collision_shape:
+		print("ERROR: ClickArea or CollisionShape not found!")
+		return
+	
+	# Получаем размер врага
+	var enemy_size = DataManager.get_enemy_size_pixels(enemy_instance.resource.size)
+	
+	# Создаём прямоугольную форму
+	var rect_shape = RectangleShape2D.new()
+	rect_shape.size = enemy_size
+	
+	collision_shape.shape = rect_shape
+	collision_shape.position = enemy_size / 2  # центрируем
+	
+	# Подключаем сигнал клика
+	if not click_area.input_event.is_connected(_on_click_area_input):
+		click_area.input_event.connect(_on_click_area_input)
+	
+	# Настройка области клика
+	click_area.input_pickable = true
+	click_area.z_index = 10
+
+
+func _on_click_area_input(viewport, event, shape_idx):
+	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
+		print("Enemy clicked: ", enemy_instance.resource.enemy_id)
+		SignalManager.enemy_clicked.emit(enemy_instance)
