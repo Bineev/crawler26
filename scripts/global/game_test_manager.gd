@@ -12,7 +12,7 @@ var current_room_index: int = 0
 var hand_ui : HandUI = null
 # Ссылка на главную сцену (куда добавлять комнаты)
 var game_world: Node = null
-
+var battle_log: BattleLogUI = null
 # Ссылка на RoomManager (будет доступен как автолоад)
 # RoomManager уже загружен как синглтон
 
@@ -76,6 +76,9 @@ func after_combat_victory():
 # autoload/game_test_manager.gd
 
 func _on_room_selected(room_node: RoomNode):
+	# Обновляем стиль лога при смене биома
+	if battle_log and current_biome:
+		battle_log.set_biome_style(current_biome)
 	# Находим HandUI (один раз, можно сохранить в переменную)
 	if not hand_ui:
 		hand_ui = game_world.get_node_or_null("HandUI")
@@ -107,6 +110,8 @@ func _on_room_selected(room_node: RoomNode):
 		
 		current_room_index += 1
 		
+	_create_battle_log()
+	
 	SoundManager.start_gameplay_playlist()
 
 
@@ -134,3 +139,15 @@ func _get_room_type_string(room_type: DataManager.RoomType, combat_type: DataMan
 		DataManager.RoomType.OBJECT:
 			return "OBJECT"
 	return "UNKNOWN"
+
+
+func _create_battle_log():
+	var log_scene = preload("res://scenes/battle_log.tscn")
+	battle_log = log_scene.instantiate() as BattleLogUI
+	battle_log.position = Vector2(1520, 80)  # правый верхний угол
+	battle_log.size = Vector2(350, 500)
+	
+	# Устанавливаем стиль под биом
+	battle_log.set_biome_style(current_biome)
+	
+	game_world.add_child(battle_log)

@@ -322,6 +322,8 @@ func play_card(target = null):
 	
 	if hand_ui_ref:
 		hand_ui_ref.set_all_cards_input_enabled(true)
+		
+	SignalManager.log_message.emit("Разыграна карта: %s" % card_data.get_localized_name())
 
 
 func _needs_target() -> bool:

@@ -80,12 +80,14 @@ func start_player_turn():
 	
 	SignalManager.player_turn_started.emit()
 	SignalManager.turn_started.emit()
+	SignalManager.log_message.emit("--- Ход игрока ---")
 
 ## ============================================================
 ## ХОД ВРАГА
 ## ============================================================
 
 func start_enemy_turn():
+	SignalManager.log_message.emit("--- Ход врага ---")
 	current_state = DataManager.BattleState.ENEMY_TURN
 	SignalManager.enemy_turn_started.emit()
 	SignalManager.turn_started.emit()
@@ -178,6 +180,7 @@ func check_victory():
 	var all_dead = true
 	for enemy in enemies:
 		if enemy.is_alive():
+			SignalManager.log_message.emit("%s повержен!" % enemy.name)
 			all_dead = false
 			break
 	

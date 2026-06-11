@@ -542,7 +542,12 @@ func get_status_name(status: Status) -> String:
 		Status.SHIELD: return "Shield"
 		_: return "Unknown"
 
+##
+## FONT
+##
 
+const FONT_HEADERS : Font = preload("res://fonts/KellySlab-Regular.ttf")
+const FONT_MAIN : Font = preload("res://fonts/RobotoCondensed-VariableFont_wght.ttf")
 ## ============================================================
 ## 7. ИКОНКИ
 ## ============================================================
@@ -1043,6 +1048,23 @@ const COLOR_MOLE_TUNNELS_ART_BG_LIGHT: Color = Color("BFA86A")     # светл�
 const COLOR_FLESH_CAVES_ART_BG_LIGHT: Color = Color("BF6A6A")      # светло-красный
 const COLOR_BONE_LABYRINTH_ART_BG_LIGHT: Color = Color("BFB8A6")   # светло-серый
 
+const COLOR_DAMAGE_LOG: Color = Color(1, 0.3, 0.2)
+const COLOR_HEAL_LOG: Color = Color(0.4, 0.8, 0.3)
+
+## ============================================================
+## ЦВЕТА ПОДЛОЖКИ КАРТ (CARDBACKGROUND)
+## ============================================================
+
+# Цвета подложки карт персонажа
+const COLOR_PENITENT_CARD_BG: Color = Color("f2ccb3")   # бежевый
+const COLOR_WARRIOR_CARD_BG: Color = Color("c4c4e6")    # светло-синий
+const COLOR_MYSTIC_CARD_BG: Color = Color("ccb3e6")     # светло-фиолетовый
+const COLOR_ROGUE_CARD_BG: Color = Color("b3e6b3")      # светло-зелёный
+
+# Цвета подложки карт биома
+const COLOR_MOLE_TUNNELS_CARD_BG: Color = Color("e6d6b3")    # бежево-коричневый
+const COLOR_FLESH_CAVES_CARD_BG: Color = Color("e6c4c4")     # светло-красный
+const COLOR_BONE_LABYRINTH_CARD_BG: Color = Color("e6e0d6")  # светло-серый
 ## ============================================================
 ## МЕТОДЫ ПОЛУЧЕНИЯ ЦВЕТОВ
 ## ============================================================

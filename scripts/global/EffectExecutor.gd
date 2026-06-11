@@ -104,6 +104,7 @@ func _execute_damage(effect: EffectEntry, source, targets: Array) -> void:
 			var final_damage = damage
 			if target.has_method("get_modifier"):
 				final_damage *= target.get_modifier(DataManager.ModifierStat.DAMAGE_TAKEN_PERCENT)
+			#SignalManager.log_message.emit("Нанесено %d урона %s" % [final_damage, target.name])
 			target.take_damage(floor(final_damage))
 
 
@@ -151,6 +152,7 @@ func _execute_scaled_value(effect: EffectEntry, source, targets: Array) -> void:
 		DataManager.ScaledType.GAIN_ENERGY:
 			source.gain_energy(value)
 		DataManager.ScaledType.DRAW_CARD:
+			#BUG
 			source.draw_cards(value)
 
 

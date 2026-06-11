@@ -190,6 +190,7 @@ func take_damage(amount: int, ignore_block: bool = false):
 			damage -= block_amount
 	
 	if damage > 0:
+		SignalManager.log_message.emit("%s получил %d урона" % [name, damage])
 		modify_flat(DataManager.FlatStat.HEALTH, -damage)
 		on_take_damage_gain_resource(damage)
 		_process_passive_triggers(DataManager.PassiveTrigger.ON_TAKE_DAMAGE, damage)
@@ -284,6 +285,7 @@ func add_status(status: StatusResource, value: int, duration: int, caster: Chara
 	# Для врага отдельно
 	if self is EnemyInstance:
 		SignalManager.enemy_status_changed.emit(self)
+	SignalManager.log_message.emit("Наложен %s: %d стаков на %d ходов" % [status.get_localized_name(), value, duration])
 
 
 func _get_strength_status_resource() -> StatusResource:
@@ -386,6 +388,7 @@ func apply_passive(passive: PassiveResource, duration: int = -1):
 	active_passives.append(instance)
 	
 	for mod in instance.modifiers:
+		#BUG
 		modifiers[mod.stat] = modifiers.get(mod.stat, 1.0) * mod.multiplier
 		if mod.flat_bonus != 0:
 			modifiers[mod.stat] = modifiers.get(mod.stat, 0) + mod.flat_bonus
