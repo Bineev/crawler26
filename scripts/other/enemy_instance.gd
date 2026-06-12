@@ -9,7 +9,7 @@ class_name EnemyInstance
 var resource: EnemyResource = null
 var stats: CharacterStats = null
 var enemy_ui: EnemyUI = null  # ссылка на UI
-
+var click_area: Area2D = null
 ## ============================================================
 ## ХАРАКТЕРИСТИКИ
 ## ============================================================
@@ -18,7 +18,7 @@ var max_health: int = 0
 var current_health: int = 0
 var base_strength: int = 0
 
-
+var is_aiming_mode: bool = false
 ## ============================================================
 ## НАМЕРЕНИЯ
 ## ============================================================
@@ -33,6 +33,10 @@ var current_intent: IntentEntry = null
 ## ИНИЦИАЛИЗАЦИЯ
 ## ============================================================
 
+func _ready():
+	SignalManager.selecting_target_changed.connect(_on_selecting_target_changed)
+	
+	
 func init(floor_level: int = 1, biome_index: int = 1):
 	stats = CharacterStats.new()
 	
@@ -46,6 +50,14 @@ func init(floor_level: int = 1, biome_index: int = 1):
 		var passive_copy = passive.duplicate_for_instance()
 		passive_copy.init_instance()
 		stats.apply_passive(passive_copy)
+
+	# Находим компоненты
+	enemy_ui = $EnemyUI
+	click_area = $EnemyUI/ClickArea
+	
+	if click_area:
+		click_area.mouse_entered.connect(_on_mouse_entered)
+		click_area.mouse_exited.connect(_on_mouse_exited)
 
 
 func _calculate_scale(floor_level: int, biome_index: int) -> float:
@@ -264,3 +276,25 @@ func get_display_name() -> String:
 	if resource:
 		return resource.get_localized_name()
 	return "Враг"
+
+
+func _on_selecting_target_changed(is_selecting: bool):
+	is_aiming_mode = is_selecting
+	# Принудительно снимаем подсветку, если режим выбора цели закончился
+	if not is_selecting:
+		SignalManager.enemy_highlight_requested.emit(self, false)
+
+
+func _on_mouse_entered():
+	if is_aiming_mode:
+		SignalManager.enemy_highlight_requested.emit(self, true)
+
+func _on_mouse_exited():
+	SignalManager.enemy_highlight_requested.emit(self, false)
+
+
+func die():
+	if enemy_ui:
+		enemy_ui.die()
+	else:
+		queue_free()

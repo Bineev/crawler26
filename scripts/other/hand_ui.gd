@@ -4,6 +4,7 @@ class_name HandUI
 
 var cards_container: Node2D = null
 var is_manual_layout: bool = true
+var is_aiming_mode: bool = false
 
 var is_selecting_target: bool = false
 var current_card: CardUI = null
@@ -109,6 +110,7 @@ func _unhandled_input(event):
 
 
 func _on_target_selection_requested(card_ui: CardUI):
+	is_aiming_mode = true
 	current_card = card_ui
 	is_selecting_target = true
 	
@@ -116,7 +118,7 @@ func _on_target_selection_requested(card_ui: CardUI):
 	target_arrow.width = 24 # Увеличили базовую ширину, так как сужение будет уменьшать её
 	target_arrow.default_color = DataManager.COLOR_FLESH_CAVES_ART_BG_DARK
 	target_arrow.antialiased = true
-	
+	SignalManager.selecting_target_changed.emit(true)
 	# Настройка плавного сужения линии (от толстого начала к тонкому концу)
 	var curve = Curve.new()
 	curve.add_point(Vector2(0.0, 1.0)) # Начало у карты: 100% ширины
@@ -165,7 +167,9 @@ func _update_arrow_head(head_pos: Vector2, last_point_pos: Vector2):
 
 
 func _on_target_selected(target: Node):
+	is_aiming_mode = false
 	is_selecting_target = false
+	SignalManager.selecting_target_changed.emit(false)
 	if target_arrow:
 		target_arrow.queue_free()
 		target_arrow = null
@@ -176,6 +180,8 @@ func _on_target_selected(target: Node):
 
 
 func _on_target_selection_cancelled():
+	is_aiming_mode = false
+	SignalManager.selecting_target_changed.emit(false)
 	is_selecting_target = false
 	if target_arrow:
 		target_arrow.queue_free()
@@ -226,3 +232,9 @@ func _set_all_cards_mouse_filter(filter: int):
 func _on_enemy_clicked(enemy: EnemyInstance):
 	if is_selecting_target:
 		SignalManager.target_selected.emit(enemy)
+
+
+func _on_selecting_target_changed(is_selecting: bool):
+	is_aiming_mode = is_selecting
+	if not is_selecting:
+		SignalManager.enemy_highlight_requested.emit(self, false)

@@ -75,3 +75,12 @@ signal target_selected(target: Node)
 signal target_selection_cancelled()
 
 signal enemy_clicked(enemy: EnemyInstance)
+
+signal get_hit(target: Node)
+
+signal enemy_highlight_requested(enemy: EnemyInstance, enabled: bool)
+# Выбор цели (HandUI)
+signal selecting_target_changed(is_selecting: bool)
+
+signal damage_dealt(target: Node, amount: int)
+signal heal_received(target: Node, amount: int)

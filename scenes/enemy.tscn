@@ -1,7 +1,18 @@
-[gd_scene load_steps=3 format=3 uid="uid://rfsuaeky3l17"]
+[gd_scene load_steps=5 format=3 uid="uid://rfsuaeky3l17"]
 
 [ext_resource type="Script" uid="uid://cujnkju5sswv0" path="res://scripts/other/enemy_instance.gd" id="1_7p1mj"]
 [ext_resource type="Script" uid="uid://hpnp0qu0c4eu" path="res://scripts/other/enemy_ui.gd" id="2_md0e3"]
+[ext_resource type="Shader" uid="uid://docxqw4n3pjei" path="res://shaders/get_hit_shader.gdshader" id="3_4ra3w"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_5uy6h"]
+shader = ExtResource("3_4ra3w")
+shader_parameter/hit_progress = 0.0
+shader_parameter/glitch_chance = 0.3
+shader_parameter/glitch_strength = 0.05
+shader_parameter/stretch_chance = 0.2
+shader_parameter/stretch_strength = 0.04
+shader_parameter/warp_chance = 0.3
+shader_parameter/warp_strength = 0.02
 
 [node name="Enemy" type="Node2D"]
 script = ExtResource("1_7p1mj")
@@ -35,6 +46,7 @@ offset_right = 40.0
 offset_bottom = 10.0
 
 [node name="EnemySprite" type="TextureRect" parent="EnemyUI/VBoxContainer/LivingContainer/SpriteContainer"]
+material = SubResource("ShaderMaterial_5uy6h")
 layout_mode = 2
 
 [node name="HealthBar" type="ProgressBar" parent="EnemyUI/VBoxContainer"]

@@ -19,6 +19,10 @@ var enemy_instance: EnemyInstance = null
 var breath_tween: Tween = null
 var wobble_tween: Tween = null
 var aura_particles: GPUParticles2D = null
+
+var highlight_material: ShaderMaterial = null
+var is_highlighted: bool = false
+
 ## ============================================================
 ## ПУБЛИЧНЫЕ МЕТОДЫ
 ## ============================================================
@@ -36,7 +40,13 @@ func setup(enemy: EnemyInstance):
 	_add_aura_effect()
 	_start_living_animation()
 	_start_random_jitter()
-	
+
+	# Подключаем сигнал получения урона
+	# Подписываемся на сигнал подсветки
+	SignalManager.damage_dealt.connect(_on_damage_dealt)
+	SignalManager.heal_received.connect(_on_heal_received)
+	SignalManager.enemy_highlight_requested.connect(_on_highlight_requested)
+	SignalManager.get_hit.connect(_on_get_hit)
 	SignalManager.enemy_health_changed.connect(_on_enemy_health_changed)
 	SignalManager.enemy_status_changed.connect(_on_enemy_status_changed)
 	
@@ -312,6 +322,10 @@ func _on_enemy_status_changed(enemy: EnemyInstance):
 func _exit_tree():
 	_stop_living_animation()
 	_remove_aura_effect()
+	SignalManager.damage_dealt.disconnect(_on_damage_dealt)
+	SignalManager.heal_received.disconnect(_on_heal_received)
+	SignalManager.enemy_highlight_requested.disconnect(_on_highlight_requested)
+	SignalManager.get_hit.disconnect(_on_get_hit)
 	SignalManager.enemy_health_changed.disconnect(_on_enemy_health_changed)
 	SignalManager.enemy_status_changed.disconnect(_on_enemy_status_changed)
 
@@ -363,3 +377,146 @@ func _on_click_area_input(viewport, event, shape_idx):
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
 		print("Enemy clicked: ", enemy_instance.resource.enemy_id)
 		SignalManager.enemy_clicked.emit(enemy_instance)
+
+
+func _on_get_hit(target: Node):
+	# Проверяем, что удар пришёлся по этому врагу
+	if target != enemy_instance:
+		return
+	
+	# Применяем эффект удара
+	_hit_effect()
+
+
+func _hit_effect():
+	if not enemy_sprite:
+		return
+	
+	# 1. Шейдерный эффект (как было)
+	var material = enemy_sprite.material
+	if not material:
+		var shader = preload("res://shaders/get_hit_shader.gdshader")
+		var shader_material = ShaderMaterial.new()
+		shader_material.shader = shader
+		enemy_sprite.material = shader_material
+		material = shader_material
+	
+	material.set_shader_parameter("hit_progress", 1.0)
+	
+	var tween = create_tween()
+	tween.tween_property(material, "shader_parameter/hit_progress", 0.0, 0.3).set_trans(Tween.TRANS_QUART).set_ease(Tween.EASE_OUT)
+	
+	# 2. Дёрганье (смещение) всей ноды Enemy
+	var original_position = position
+	
+	# Создаём отдельный твин для дёрганья
+	var shake_tween = create_tween()
+	shake_tween.set_parallel(true)
+	
+	# Смещаем вправо-влево несколько раз
+	shake_tween.tween_property(self, "position", original_position + Vector2(8, 0), 0.05)
+	shake_tween.tween_property(self, "position", original_position - Vector2(6, 0), 0.05).set_delay(0.05)
+	shake_tween.tween_property(self, "position", original_position + Vector2(4, 0), 0.05).set_delay(0.1)
+	shake_tween.tween_property(self, "position", original_position - Vector2(2, 0), 0.05).set_delay(0.15)
+	shake_tween.tween_property(self, "position", original_position, 0.05).set_delay(0.2)
+	
+	# 3. Небольшое сжатие
+	var original_scale = scale
+	var scale_tween = create_tween()
+	scale_tween.set_parallel(true)
+	scale_tween.tween_property(self, "scale", Vector2(0.9, 1.1), 0.05)
+	scale_tween.tween_property(self, "scale", Vector2(1.05, 0.95), 0.05).set_delay(0.05)
+	scale_tween.tween_property(self, "scale", original_scale, 0.1).set_delay(0.1)
+
+
+func _on_highlight_requested(enemy: EnemyInstance, enabled: bool):
+	if enemy != enemy_instance:
+		return
+	
+	if enabled == is_highlighted:
+		return
+	
+	is_highlighted = enabled
+	_apply_highlight(enabled)
+
+
+func _apply_highlight(enabled: bool):
+	if not enemy_sprite:
+		return
+	
+	if enabled:
+		# Загружаем шейдер
+		if not highlight_material:
+			var shader = preload("res://shaders/highlight_enemy.gdshader")
+			highlight_material = ShaderMaterial.new()
+			highlight_material.shader = shader
+		
+		# Сохраняем оригинальный материал, если нужно
+		if not enemy_sprite.material or enemy_sprite.material == highlight_material:
+			pass
+		
+		highlight_material.set_shader_parameter("hover_intensity", 1.0)
+		enemy_sprite.material = highlight_material
+	else:
+		# Убираем шейдер
+		if enemy_sprite.material == highlight_material:
+			enemy_sprite.material = null
+		highlight_material = null
+
+
+func show_floating_text(text: String, color: Color):
+	var floating_text = preload("res://scenes/floating_text.tscn").instantiate() as FloatingText
+	floating_text.setup(text, color)  # ← сначала настраиваем
+	add_child(floating_text)          # ← потом добавляем
+	
+	await get_tree().process_frame
+	# Стартуем выше — от верхней части спрайта, а не от центра
+	var sprite_top = enemy_sprite.global_position + Vector2(enemy_sprite.size.x / 2, -enemy_sprite.size.y / 4)
+	floating_text.global_position = sprite_top
+
+
+func _on_damage_dealt(target: Node, amount: int):
+	if target != enemy_instance:
+		return
+	var color = DataManager.COLOR_DAMAGE_LOG  # тёмно-красный
+	show_floating_text(str(amount), color)
+
+
+func _on_heal_received(target: Node, amount: int):
+	if target != enemy_instance:
+		return
+	var color = DataManager.COLOR_ROGUE_ART_BG_LIGHT  # светло-зелёный
+	show_floating_text("+" + str(amount), color)
+
+func die():
+	if not enemy_sprite:
+		return
+	
+	# Получаем или создаём материал с шейдером смерти
+	var shader = preload("res://shaders/death_dissolve.gdshader")
+	var death_material = ShaderMaterial.new()
+	death_material.shader = shader
+	
+	# Сохраняем оригинальный материал
+	var original_material = enemy_sprite.material
+	
+	enemy_sprite.material = death_material
+	
+	# Анимируем death_progress от 0 до 1
+	var tween = create_tween()
+	tween.tween_method(_set_death_progress, 0.0, 1.0, 1.0)
+	tween.finished.connect(_on_death_animation_finished.bind(death_material, original_material))
+
+
+func _set_death_progress(value: float):
+	if enemy_sprite and enemy_sprite.material:
+		enemy_sprite.material.set_shader_parameter("death_progress", value)
+
+
+func _on_death_animation_finished(death_material: ShaderMaterial, original_material: ShaderMaterial):
+	# Восстанавливаем материал
+	if enemy_sprite:
+		enemy_sprite.material = original_material
+	
+	# Удаляем врага
+	enemy_instance.queue_free()

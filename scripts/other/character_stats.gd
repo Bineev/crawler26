@@ -191,7 +191,8 @@ func take_damage(amount: int, ignore_block: bool = false):
 	
 	if damage > 0:
 		SignalManager.log_message.emit("%s получил %d урона" % [get_display_name(), damage])
-		modify_flat(DataManager.FlatStat.HEALTH, -damage)
+		SignalManager.damage_dealt.emit(self, damage)
+		SignalManager.get_hit.emit(self)
 		modify_flat(DataManager.FlatStat.HEALTH, -damage)
 		on_take_damage_gain_resource(damage)
 		_process_passive_triggers(DataManager.PassiveTrigger.ON_TAKE_DAMAGE, damage)
@@ -207,6 +208,8 @@ func heal(amount: int):
 	var new_health = get_health() + final_heal
 	set_flat(DataManager.FlatStat.HEALTH, min(new_health, get_max_health()))
 	SignalManager.log_message.emit("%s восстановил %d здоровья" % [get_display_name(), final_heal])
+	SignalManager.heal_received.emit(self, final_heal)
+
 
 ## Для переопределения в наследниках
 func on_take_damage_gain_resource(amount: int):

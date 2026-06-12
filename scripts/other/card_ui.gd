@@ -301,6 +301,8 @@ func play_card(target = null):
 	
 	state = CardState.PLAYED
 	
+	SignalManager.selecting_target_changed.emit(false)  # ← здесь
+	
 	var player_stats = BattleManager.get_player()
 	if not player_stats:
 		state = CardState.IDLE
