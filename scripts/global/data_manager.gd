@@ -505,6 +505,7 @@ const ROOM_HEIGHT: int = 800
 const ROOM_CENTER_X: int = ROOM_WIDTH / 2  # 512
 const ROOM_CENTER_Y: int = ROOM_HEIGHT / 2  # 400
 const ROOM_POSITION: Vector2 = Vector2(448, -80)
+const END_BUTTON_POSITION: Vector2 = Vector2(1600, 860)
 ## ============================================================
 ## РАЗМЕРЫ ВРАГОВ
 ## ============================================================

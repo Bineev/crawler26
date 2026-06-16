@@ -28,7 +28,9 @@ func _ready():
 
 func clear_hand():
 	if cards_container:
+		# Используем remove_child вместо queue_free
 		for child in cards_container.get_children():
+			cards_container.remove_child(child)
 			child.queue_free()
 	
 	# Сбрасываем состояние выбора цели

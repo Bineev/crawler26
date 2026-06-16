@@ -88,6 +88,22 @@ func discard_hand():
 		hand_ui.clear_hand()
 	
 	SignalManager.discard_size_changed.emit(discard_pile.size())
+	print("Hand discarded, discard pile size: ", discard_pile.size())
+
+
+func draw_new_hand():
+	# Очищаем UI
+	if hand_ui:
+		hand_ui.clear_hand()
+	
+	# Очищаем массив
+	hand.clear()
+	
+	# Добираем карты
+	for i in range(max_hand_size):
+		draw_card()
+	
+	print("New hand drawn, hand size: ", hand.size())
 
 
 func play_card(card_ui: CardUI, card_data: CardData, target = null):

@@ -230,7 +230,7 @@ func _create_end_turn_button():
 	var canvas_layer = hand_ui.get_parent()
 	if canvas_layer:
 		canvas_layer.add_child(end_turn_button)
-		end_turn_button.position = Vector2(1720, 860)
+		end_turn_button.position = DataManager.END_BUTTON_POSITION
 
 
 func _on_battle_started():

@@ -46,11 +46,11 @@ func start_battle(player_stats: CharacterStats, enemy_instances: Array, battle_d
 	SignalManager.battle_victory.connect(_on_battle_victory)
 	SignalManager.battle_defeat.connect(_on_battle_defeat)
 	
-	player = player_stats
-	enemies = enemy_instances
-	hand_ui = hand_ui_node
-	current_room_node = room_node
-	battle_deck = battle_deck
+	self.player = player_stats
+	self.enemies = enemy_instances
+	self.hand_ui = hand_ui_node
+	self.current_room_node = room_node
+	self.battle_deck = battle_deck
 	
 	# Инициализация врагов
 	for enemy in enemies:
@@ -100,7 +100,6 @@ func start_player_turn():
 ## ============================================================
 
 func start_enemy_turn():
-	SignalManager.log_message.emit("--- Ход врага ---")
 	current_state = DataManager.BattleState.ENEMY_TURN
 	SignalManager.enemy_turn_started.emit()
 	SignalManager.turn_started.emit()
@@ -109,37 +108,34 @@ func start_enemy_turn():
 		if not enemy.is_alive():
 			continue
 		
-		# Враг выбирает намерение
-		var intent = null
-		if enemy.has_method("select_next_intent"):
-			intent = enemy.select_next_intent()
-		
+		# Используем уже выбранное намерение (current_intent)
+		var intent = enemy.current_intent
 		if intent:
-			SignalManager.enemy_intent_changed.emit(enemy, intent)
 			execute_enemy_action(enemy, intent)
+		else:
+			# Если по какой-то причине намерения нет — пропускаем
+			print("WARNING: Enemy has no current_intent")
+			continue
 		
-		# Проверка на смерть игрока после каждого врага
 		if player and player.get_health() <= 0:
 			defeat()
 			return
 	
-	# Обработка конца хода для всех существ
 	process_end_of_turn()
-	
 	SignalManager.turn_ended.emit()
-
+	
+	check_defeat()
 	
 	if current_state == DataManager.BattleState.VICTORY or current_state == DataManager.BattleState.DEFEAT:
 		return
 	
-	# Все враги сходили — ход игрока
 	start_player_turn()
 
 
-func execute_enemy_action(enemy, intent: IntentEntry):
+func execute_enemy_action(enemy: EnemyInstance, intent: IntentEntry):
 	for effect in intent.effects:
-		EffectExecutor.execute(effect, enemy.stats, [player])
-
+		# Используем самого врага, а не enemy.stats
+		EffectExecutor.execute(effect, enemy, [player])
 
 ## ============================================================
 ## КОНЕЦ ХОДА
@@ -309,7 +305,7 @@ func _on_player_died(player: CharacterStats):
 func reset_battle():
 	current_state = DataManager.BattleState.IDLE
 	enemies = []
-	battle_deck = null
+	#battle_deck = null
 	hand_ui = null
 	current_room_node = null
 	print("BattleManager reset")
