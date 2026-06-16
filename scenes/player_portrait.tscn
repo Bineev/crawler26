@@ -1,8 +1,26 @@
-[gd_scene load_steps=5 format=3 uid="uid://clmyxdwovjiwv"]
+[gd_scene load_steps=9 format=3 uid="uid://clmyxdwovjiwv"]
 
 [ext_resource type="Script" uid="uid://cqgirclrqlv2m" path="res://scripts/other/player_portrait.gd" id="1_xpecc"]
+[ext_resource type="Shader" uid="uid://nyqt5rf23ph0" path="res://shaders/comic_shader.gdshader" id="2_icepd"]
 [ext_resource type="Texture2D" uid="uid://ckbmiay4apyet" path="res://img/portraits/penitent_portrait.png" id="2_yotol"]
 [ext_resource type="Shader" uid="uid://1kutc6pr0rfa" path="res://shaders/card3_shader.gdshader" id="3_ge412"]
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_icepd"]
+noise_type = 2
+seed = 2
+frequency = 0.232
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_icepd"]
+noise = SubResource("FastNoiseLite_icepd")
+seamless = true
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_eunvh"]
+shader = ExtResource("2_icepd")
+shader_parameter/grunge_noise_tex = SubResource("NoiseTexture2D_icepd")
+shader_parameter/grunge_intensity = 0.35
+shader_parameter/jitter_speed = 5.0000002375
+shader_parameter/jitter_amount = 0.003
+shader_parameter/paper_tint = Color(0.9, 0.85, 0.8, 1)
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_icepd"]
 shader = ExtResource("3_ge412")
@@ -28,6 +46,7 @@ theme_override_constants/separation = 5
 alignment = 1
 
 [node name="TextureRect" type="TextureRect" parent="VBoxContainer"]
+material = SubResource("ShaderMaterial_eunvh")
 custom_minimum_size = Vector2(360, 360)
 layout_mode = 2
 texture = ExtResource("2_yotol")
