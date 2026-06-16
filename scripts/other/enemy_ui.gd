@@ -212,10 +212,24 @@ func update_intents():
 		if intent_item:
 			intents_container.add_child(intent_item)
 
+# Добавление шейдера на TextureRect
+func apply_shader_to_icon(icon: TextureRect, shader_path: String):
+	var shader = load(shader_path)
+	if not shader:
+		print("Shader not found: ", shader_path)
+		return
+	
+	var shader_material = ShaderMaterial.new()
+	shader_material.shader = shader
+	
+	shader_material.set_shader_parameter("hover_intensity", 1.0)
+	shader_material.set_shader_parameter("pulse_speed", 0)
+	icon.material = shader_material
+
 
 func _create_intent_item(effect: EffectEntry) -> Control:
 	var container = HBoxContainer.new()
-	container.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	container.mouse_filter = Control.MOUSE_FILTER_PASS
 	
 	var icon = TextureRect.new()
 	icon.custom_minimum_size = Vector2(32, 32)
@@ -223,32 +237,45 @@ func _create_intent_item(effect: EffectEntry) -> Control:
 	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	
+	# добавить шейдер на обводку
+	apply_shader_to_icon(icon, "res://shaders/highlight_enemy.gdshader")
+	
 	var value_label = Label.new()
 	value_label.add_theme_font_size_override("font_size", 16)
 	value_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	
-	# Определяем иконку и текст для каждого эффекта
+	# Формируем текст и иконку
+	var tooltip_text = ""
+	
 	match effect.category:
 		DataManager.EffectCategory.DAMAGE:
 			icon.texture = DataManager.get_intent_icon(DataManager.IntentType.ATTACK)
 			value_label.text = str(effect.base_value)
+			tooltip_text = "Враг собирается атаковать"
 		DataManager.EffectCategory.BLOCK:
 			icon.texture = DataManager.get_intent_icon(DataManager.IntentType.DEFEND)
 			value_label.text = str(effect.base_value)
+			tooltip_text = "Враг собирается защищаться"
 		DataManager.EffectCategory.HEAL:
 			icon.texture = DataManager.get_intent_icon(DataManager.IntentType.HEAL)
 			value_label.text = str(effect.base_value)
+			tooltip_text = "Враг собирается лечиться"
 		DataManager.EffectCategory.APPLY_STATUS:
 			icon.texture = DataManager.get_intent_icon(DataManager.IntentType.DEBUFF)
 			if effect.status:
 				value_label.text = "%d %s" % [effect.value, effect.status.get_localized_name()]
+			tooltip_text = "Враг собирается наложить дебафф"
 		DataManager.EffectCategory.APPLY_PASSIVE:
 			icon.texture = DataManager.get_intent_icon(DataManager.IntentType.BUFF)
 			if effect.passive:
 				value_label.text = effect.passive.get_localized_name()
+			tooltip_text = "Враг собирается усилить себя"
 		_:
 			icon.texture = DataManager.get_intent_icon(DataManager.IntentType.UNKNOWN)
 			value_label.text = "?"
+			tooltip_text = "Неизвестное намерение"
+	
+	container.tooltip_text = tooltip_text
 	
 	container.add_child(icon)
 	container.add_child(value_label)
@@ -271,6 +298,7 @@ func update_statuses():
 		if status_data.get("duration", 0) > 0:
 			tooltip += " (осталось: %d)" % status_data["duration"]
 		var icon = _create_icon(status_data["icon"], 32, tooltip)
+		apply_shader_to_icon(icon, "res://shaders/highlight_enemy.gdshader")
 		status_container.add_child(icon)
 
 
@@ -287,6 +315,7 @@ func update_passives():
 	for passive_data in enemy_instance.get_active_passives_for_ui():
 		var tooltip = "%s\n%s" % [passive_data["name"], passive_data["description"]]
 		var icon = _create_icon(passive_data["icon"], 32, tooltip)
+		apply_shader_to_icon(icon, "res://shaders/highlight_enemy.gdshader")
 		passive_container.add_child(icon)
 
 
