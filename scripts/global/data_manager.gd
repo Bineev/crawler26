@@ -1136,3 +1136,22 @@ func _get_card_art_background_color_light(origin: CardOrigin, character_class: C
 
 func t(key: String) -> String:
 	return tr(key)
+
+
+func get_room_icon(room_type: DataManager.RoomType, combat_type: DataManager.CombatType = DataManager.CombatType.NORMAL) -> Texture2D:
+	match room_type:
+		DataManager.RoomType.COMBAT:
+			match combat_type:
+				DataManager.CombatType.NORMAL:
+					return preload("res://img/icons/card_types/attack.png")
+				DataManager.CombatType.ELITE:
+					return preload("res://img/icons/statuses/strength.png")
+				DataManager.CombatType.BOSS:
+					return preload("res://img/icons/passives/shame.png")
+				_:
+					return preload("res://img/icons/card_types/attack.png")
+		DataManager.RoomType.EVENT:
+			return preload("res://img/icons/intents/summon.png")
+		DataManager.RoomType.OBJECT:
+			return preload("res://img/icons/card_types/utility.png")
+	return preload("res://img/icons/intents/unknown.png")

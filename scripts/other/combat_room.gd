@@ -12,6 +12,11 @@ var current_biome: DataManager.Biome = DataManager.Biome.MOLE_TUNNELS
 const ENEMY_SCENE: PackedScene = preload("res://scenes/enemy.tscn")
 
 
+func _ready():
+	super._ready()
+	SignalManager.battle_victory.connect(_on_battle_victory)
+
+
 func setup(room_data: Dictionary):
 	combat_type = room_data.get("combat_type", DataManager.CombatType.NORMAL)
 	_pending_enemies = room_data.get("enemies", [])
@@ -47,7 +52,7 @@ func spawn_enemies(enemy_resources: Array[EnemyResource]):
 		
 		# Настраиваем врага
 		enemy_instance.resource = res
-		enemy_instance.init(current_floor, current_biome)  # нужно передать floor_level и biome
+		enemy_instance.init(current_floor)  # нужно передать floor_level и biome
 		enemy_instance.load_intents()
 		
 		# Настраиваем UI
@@ -136,16 +141,28 @@ func _create_hand_ui() -> HandUI:
 	return hand_ui_instance
 
 
-func on_battle_victory():
-	print("Battle victory!")
-	# Очищаем руку
-	if hand_ui:
-		hand_ui.queue_free()
-		hand_ui = null
-	# Переход к следующей комнате
-	GameTestManager.after_combat_victory()
+func _on_battle_victory():
+	# Ждём 1.5 секунды, чтобы анимация смерти успела проиграться
+	await get_tree().create_timer(1.5).timeout
+	# Очищаем UI (рука и лог) через GameTestManager
+	GameTestManager.clear_ui()
+	
+	# Проверяем развилку
+	var available_paths = FloorManager.get_available_paths()
+	if available_paths.is_empty():
+		SignalManager.next_room.emit()
+	else:
+		SignalManager.show_paths.emit(available_paths)
+		
+	# Удаляем комнату
+	queue_free()
 
 
-func on_battle_defeat():
-	print("Battle defeat!")
-	# Показываем экран поражения
+func _on_battle_defeat():
+	# Удаляем комнату
+	queue_free()
+	
+	# Очищаем UI
+	GameTestManager.clear_ui()
+	
+	SignalManager.battle_defeat.emit()

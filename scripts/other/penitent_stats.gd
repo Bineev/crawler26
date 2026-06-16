@@ -20,6 +20,15 @@ func _init():
 	set_flat(DataManager.FlatStat.ATONEMENT, 0)
 
 
+func _init_flat_stats():
+	flats[DataManager.FlatStat.HEALTH] = DataManager.PENITENT_STARTING_HEALTH
+	flats[DataManager.FlatStat.MAX_HEALTH] = DataManager.PENITENT_STARTING_HEALTH
+	flats[DataManager.FlatStat.ENERGY] = DataManager.STARTING_ENERGY
+	flats[DataManager.FlatStat.MAX_ENERGY] = DataManager.MAX_ENERGY
+	flats[DataManager.FlatStat.BLOCK] = 0
+	flats[DataManager.FlatStat.ATONEMENT] = 0
+	flats[DataManager.FlatStat.MAX_ATONEMENT] = DataManager.PENITENT_MAX_ATONEMENT
+
 ## ============================================================
 ## МЕТОДЫ ДОСТУПА К ИСКУПЛЕНИЮ
 ## ============================================================

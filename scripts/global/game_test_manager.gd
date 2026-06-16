@@ -21,10 +21,16 @@ var battle_log: BattleLogUI = null
 ## ПУБЛИЧНЫЕ МЕТОДЫ
 ## ============================================================
 
+
+
 func start_test(world_node: Node):
 	print("=== GAME TEST START ===")
 	game_world = world_node
+	_reset_game_state()
 	SignalManager.hand_ui_created.connect(_on_hand_ui_created)
+	SignalManager.next_room.connect(_on_next_room)
+	SignalManager.show_paths.connect(_on_show_paths)
+	SignalManager.choice_panel_selected.connect(_on_choice_panel_selected)
 	# Сбрасываем менеджеры
 	FloorManager.reset()
 	
@@ -42,13 +48,22 @@ func start_test(world_node: Node):
 	FloorManager.start_floor()
 	
 	
-func _on_hand_ui_created(hand_ui: HandUI):
-	# Добавляем руку в game_world
-	if game_world and hand_ui:
-		var canvas_layer = CanvasLayer.new()
-		canvas_layer.layer = 10  # высокий слой
-		game_world.add_child(canvas_layer)
-		canvas_layer.add_child(hand_ui)
+func _on_hand_ui_created(created_hand_ui: HandUI):
+	if not game_world:
+		return
+	
+	# Если есть старая рука — удаляем
+	if hand_ui:
+		clear_ui()
+	
+	var canvas_layer = CanvasLayer.new()
+	canvas_layer.layer = 10
+	game_world.add_child(canvas_layer)
+	canvas_layer.add_child(created_hand_ui)
+	
+	# Сохраняем ссылку
+	hand_ui = created_hand_ui
+	print("hand_ui saved: ", hand_ui)
 
 func reset():
 	if current_room_node and is_instance_valid(current_room_node):
@@ -76,10 +91,14 @@ func after_combat_victory():
 # autoload/game_test_manager.gd
 
 func _on_room_selected(room_node: RoomNode):
+	# Сбрасываем состояния
+	_reset_game_state()
+	
 	# Обновляем стиль лога при смене биома
 	if battle_log and current_biome:
 		battle_log.set_biome_style(current_biome)
-	# Находим HandUI (один раз, можно сохранить в переменную)
+	
+	# Находим HandUI (если ещё нет)
 	if not hand_ui:
 		hand_ui = game_world.get_node_or_null("HandUI")
 	
@@ -88,7 +107,7 @@ func _on_room_selected(room_node: RoomNode):
 		current_floor,
 		current_biome,
 		current_room_index,
-		hand_ui  # ← передаём HandUI
+		hand_ui
 	)
 	
 	if not room_instance:
@@ -106,10 +125,9 @@ func _on_room_selected(room_node: RoomNode):
 	if current_room_node and not current_room_node.is_inside_tree() and game_world:
 		game_world.add_child(current_room_node)
 		current_room_node.position = DataManager.ROOM_POSITION
-		# _ready() сам вызовется и применит отложенные данные
-		
-		current_room_index += 1
-		
+	
+	current_room_index += 1
+	
 	_create_battle_log()
 	
 	SoundManager.start_gameplay_playlist()
@@ -151,3 +169,41 @@ func _create_battle_log():
 	battle_log.set_biome_style(current_biome)
 	
 	game_world.add_child(battle_log)
+
+
+func _on_next_room():
+	FloorManager.next_room()
+
+
+func _on_show_paths(paths: Array):
+	var choice_panel = preload("res://scenes/choice_panel.tscn").instantiate() as ChoicePanel
+	choice_panel.setup(paths)
+	game_world.add_child(choice_panel)
+	choice_panel.position = DataManager.ROOM_POSITION + Vector2(0, 300)
+
+
+func _on_choice_panel_selected(path_index: int):
+	FloorManager.select_path(path_index)
+
+
+func _reset_game_state():
+	BattleManager.reset_battle()
+	current_room_node = null
+
+
+func clear_ui():
+	# Удаляем руку и её CanvasLayer
+	if hand_ui:
+		var canvas_layer = hand_ui.get_parent()
+		if canvas_layer is CanvasLayer:
+			canvas_layer.queue_free()
+		else:
+			hand_ui.queue_free()
+		hand_ui = null
+	
+	# Удаляем лог
+	if battle_log:
+		battle_log.queue_free()
+		battle_log = null
+	
+	print("UI cleared")

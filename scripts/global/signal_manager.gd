@@ -33,6 +33,7 @@ signal atonement_changed(current: int, max: int)  # PenitentStats
 signal enemy_health_changed(enemy: EnemyInstance, current: int, max: int)
 signal enemy_status_changed(enemy: EnemyInstance)
 signal enemy_died(enemy: EnemyInstance)
+signal player_died(player: CharacterStats)
 
 ## ============================================================
 ## БОЙ (BattleManager)
@@ -84,3 +85,8 @@ signal selecting_target_changed(is_selecting: bool)
 
 signal damage_dealt(target: Node, amount: int)
 signal heal_received(target: Node, amount: int)
+
+signal next_room()
+signal show_paths(paths: Array)
+
+signal choice_panel_selected(path_index: int)

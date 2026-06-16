@@ -1,4 +1,3 @@
-# scripts/enemy_instance.gd
 extends CharacterStats
 class_name EnemyInstance
 
@@ -7,23 +6,21 @@ class_name EnemyInstance
 ## ============================================================
 
 var resource: EnemyResource = null
-var stats: CharacterStats = null
-var enemy_ui: EnemyUI = null  # ссылка на UI
+var enemy_ui: EnemyUI = null
 var click_area: Area2D = null
+
 ## ============================================================
 ## ХАРАКТЕРИСТИКИ
 ## ============================================================
 
-var max_health: int = 0
-var current_health: int = 0
 var base_strength: int = 0
-
 var is_aiming_mode: bool = false
+
 ## ============================================================
 ## НАМЕРЕНИЯ
 ## ============================================================
 
-var intent_cycle: Array = []  # Array[Dictionary]
+var intent_cycle: Array = []
 var cycle_type: DataManager.IntentCycleType = DataManager.IntentCycleType.SEQUENTIAL
 var current_cycle_index: int = 0
 var current_intent: IntentEntry = null
@@ -35,21 +32,22 @@ var current_intent: IntentEntry = null
 
 func _ready():
 	SignalManager.selecting_target_changed.connect(_on_selecting_target_changed)
-	
-	
-func init(floor_level: int = 1, biome_index: int = 1):
-	stats = CharacterStats.new()
-	
-	var scale_multiplier = _calculate_scale(floor_level, biome_index)
+	SignalManager.enemy_died.connect(_on_self_died)
+
+
+func init(floor_level: int = 1):
+	var scale_multiplier = _calculate_scale(floor_level)
 	var scaled_max_health = int(resource.base_max_health * scale_multiplier)
-	stats.set_flat(DataManager.FlatStat.MAX_HEALTH, scaled_max_health)
-	stats.set_flat(DataManager.FlatStat.HEALTH, scaled_max_health)
+	
+	# Используем self, а не stats
+	set_flat(DataManager.FlatStat.MAX_HEALTH, scaled_max_health)
+	set_flat(DataManager.FlatStat.HEALTH, scaled_max_health)
 	base_strength = int(resource.base_strength * scale_multiplier)
 	
 	for passive in resource.starting_passives:
 		var passive_copy = passive.duplicate_for_instance()
 		passive_copy.init_instance()
-		stats.apply_passive(passive_copy)
+		apply_passive(passive_copy)  # ← вызываем на self
 
 	# Находим компоненты
 	enemy_ui = $EnemyUI
@@ -60,9 +58,8 @@ func init(floor_level: int = 1, biome_index: int = 1):
 		click_area.mouse_exited.connect(_on_mouse_exited)
 
 
-func _calculate_scale(floor_level: int, biome_index: int) -> float:
+func _calculate_scale(floor_level: int) -> float:
 	var scale = 1.0
-	scale += (biome_index - 1) * 0.3
 	scale += (floor_level - 1) * 0.1
 	return scale
 
@@ -112,7 +109,6 @@ func _create_intent_from_data(data: Dictionary) -> IntentEntry:
 		
 		intent.effects.append(effect)
 	
-	# Определяем тип намерения по эффектам
 	intent.intent_type = _determine_intent_type(intent.effects)
 	return intent
 
@@ -187,7 +183,7 @@ func execute_intent(target: CharacterStats):
 		return
 	SignalManager.log_message.emit("%s атакует!" % get_display_name())
 	for effect in current_intent.effects:
-		EffectExecutor.execute(effect, stats, [target])
+		EffectExecutor.execute(effect, self, [target])  # ← self вместо stats
 
 
 ## ============================================================
@@ -195,7 +191,7 @@ func execute_intent(target: CharacterStats):
 ## ============================================================
 
 func process_end_of_turn():
-	stats.process_end_of_turn()
+	super.process_end_of_turn()  # ← вызываем родительский
 
 
 ## ============================================================
@@ -203,35 +199,7 @@ func process_end_of_turn():
 ## ============================================================
 
 func is_alive() -> bool:
-	return stats.get_health() > 0
-
-
-## ============================================================
-## UI МЕТОДЫ
-## ============================================================
-
-func get_health() -> int:
-	return stats.get_health()
-
-
-func get_max_health() -> int:
-	return stats.get_max_health()
-
-
-func get_block() -> int:
-	return stats.get_block()
-
-
-func get_current_intent_icon() -> Texture2D:
-	if not current_intent:
-		return DataManager.get_intent_icon(DataManager.IntentType.UNKNOWN)
-	return DataManager.get_intent_icon(current_intent.intent_type)
-
-
-func get_current_intent_description() -> String:
-	if current_intent:
-		return current_intent.get_localized_description()
-	return ""
+	return get_health() > 0  # ← используем self
 
 
 ## ============================================================
@@ -240,8 +208,8 @@ func get_current_intent_description() -> String:
 
 func get_active_statuses_for_ui() -> Array[Dictionary]:
 	var result: Array[Dictionary] = []
-	for status_id in stats.active_statuses.keys():
-		var status_data = stats.active_statuses[status_id]
+	for status_id in active_statuses.keys():  # ← self.active_statuses
+		var status_data = active_statuses[status_id]
 		var icon = DataManager.get_status_icon(status_id)
 		if icon:
 			result.append({
@@ -255,7 +223,7 @@ func get_active_statuses_for_ui() -> Array[Dictionary]:
 
 func get_active_passives_for_ui() -> Array[Dictionary]:
 	var result: Array[Dictionary] = []
-	for passive in active_passives:
+	for passive in active_passives:  # ← self.active_passives
 		var icon = DataManager.get_passive_icon(passive.id)
 		if icon:
 			result.append({
@@ -280,7 +248,6 @@ func get_display_name() -> String:
 
 func _on_selecting_target_changed(is_selecting: bool):
 	is_aiming_mode = is_selecting
-	# Принудительно снимаем подсветку, если режим выбора цели закончился
 	if not is_selecting:
 		SignalManager.enemy_highlight_requested.emit(self, false)
 
@@ -289,8 +256,14 @@ func _on_mouse_entered():
 	if is_aiming_mode:
 		SignalManager.enemy_highlight_requested.emit(self, true)
 
+
 func _on_mouse_exited():
 	SignalManager.enemy_highlight_requested.emit(self, false)
+
+
+func _on_self_died(enemy: CharacterStats):
+	if enemy == self:
+		die()
 
 
 func die():

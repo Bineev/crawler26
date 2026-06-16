@@ -27,6 +27,11 @@ var hand_ui: HandUI = null
 ## ИНИЦИАЛИЗАЦИЯ БОЯ
 ## ============================================================
 
+func _ready():
+	SignalManager.enemy_died.connect(_on_enemy_died)
+	SignalManager.player_died.connect(_on_player_died)
+
+
 func _get_target_at_position(pos: Vector2) -> Node:
 	# Проверяем всех врагов на коллизию
 	for enemy in enemies:
@@ -50,7 +55,7 @@ func start_battle(player_stats: CharacterStats, enemy_instances: Array, battle_d
 	# Инициализация врагов
 	for enemy in enemies:
 		if enemy.has_method("init"):
-			enemy.init(floor_level, biome_index)
+			enemy.init(floor_level)
 		if enemy.has_method("load_intents"):
 			enemy.load_intents()
 	
@@ -110,20 +115,12 @@ func start_enemy_turn():
 		if player and player.get_health() <= 0:
 			defeat()
 			return
-		
-		# Проверка победы после каждого врага
-		check_victory()
-		if current_state == DataManager.BattleState.VICTORY:
-			return
 	
 	# Обработка конца хода для всех существ
 	process_end_of_turn()
 	
 	SignalManager.turn_ended.emit()
-	
-	# Проверка победы/поражения после тиков
-	check_defeat()
-	check_victory()
+
 	
 	if current_state == DataManager.BattleState.VICTORY or current_state == DataManager.BattleState.DEFEAT:
 		return
@@ -284,3 +281,28 @@ func end_player_turn():
 	
 	SignalManager.turn_ended.emit()
 	start_enemy_turn()
+
+
+func _on_enemy_died(enemy: CharacterStats):
+	# Проверяем, все ли враги мертвы
+	var all_dead = true
+	for e in enemies:
+		if e.is_alive():
+			all_dead = false
+			break
+
+	if all_dead:
+		victory()
+
+
+func _on_player_died(player: CharacterStats):
+	defeat()
+
+
+func reset_battle():
+	current_state = DataManager.BattleState.IDLE
+	enemies = []
+	battle_deck = null
+	hand_ui = null
+	current_room_node = null
+	print("BattleManager reset")

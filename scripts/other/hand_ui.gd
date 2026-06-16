@@ -30,6 +30,13 @@ func clear_hand():
 	if cards_container:
 		for child in cards_container.get_children():
 			child.queue_free()
+	
+	# Сбрасываем состояние выбора цели
+	is_selecting_target = false
+	current_card = null
+	if target_arrow:
+		target_arrow.queue_free()
+		target_arrow = null
 
 
 func update_hand(hand_cards: Array[CardData], card_scene: PackedScene):
