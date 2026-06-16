@@ -24,6 +24,7 @@ func _ready() -> void:
 
 func setup(stats: CharacterStats):
 	player_stats = stats
+	_setup_bars()
 	
 	SignalManager.health_changed.connect(_on_health_changed)
 	SignalManager.atonement_changed.connect(_on_atonement_changed)
@@ -32,7 +33,7 @@ func setup(stats: CharacterStats):
 	
 	_update_health()
 	_update_atonement()
-	_update_statuses()
+	#_update_statuses()
 
 
 func _update_health():
@@ -105,3 +106,69 @@ func _exit_tree():
 	SignalManager.atonement_changed.disconnect(_on_atonement_changed)
 	SignalManager.status_added.disconnect(_on_status_changed)
 	SignalManager.status_removed.disconnect(_on_status_changed)
+
+
+func _setup_bars():
+	# ===== ЗДОРОВЬЕ =====
+	# Фон
+	var health_bg = StyleBoxFlat.new()
+	health_bg.bg_color = Color(0.15, 0.05, 0.05, 0.8)
+	health_bg.border_width_bottom = 2
+	health_bg.border_width_top = 2
+	health_bg.border_width_left = 2
+	health_bg.border_width_right = 2
+	health_bg.border_color = Color(0.3, 0.1, 0.1)
+	health_bar.add_theme_stylebox_override("background", health_bg)
+	
+	# Заливка (красный)
+	var health_fill = StyleBoxFlat.new()
+	health_fill.bg_color = DataManager.COLOR_FLESH_CAVES_ART_BG_DARK
+	health_fill.border_width_bottom = 1
+	health_fill.border_width_top = 1
+	health_fill.border_width_left = 1
+	health_fill.border_width_right = 1
+	health_fill.border_color = Color(0.5, 0.15, 0.15)
+	health_bar.add_theme_stylebox_override("fill", health_fill)
+	
+	# Текст
+	health_label.add_theme_color_override("font_color", Color.WHITE)
+	health_label.add_theme_font_override("font", DataManager.FONT_MAIN)
+	health_label.add_theme_font_size_override("font_size", 14)
+	health_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	health_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	
+	# ===== ИСКУПЛЕНИЕ =====
+	# Фон
+	var atonement_bg = StyleBoxFlat.new()
+	atonement_bg.bg_color = Color(0.1, 0.08, 0.05, 0.8)
+	atonement_bg.border_width_bottom = 2
+	atonement_bg.border_width_top = 2
+	atonement_bg.border_width_left = 2
+	atonement_bg.border_width_right = 2
+	atonement_bg.border_color = Color(0.2, 0.15, 0.1)
+	atonement_bar.add_theme_stylebox_override("background", atonement_bg)
+	
+	# Заливка (бежевый)
+	var atonement_fill = StyleBoxFlat.new()
+	atonement_fill.bg_color = DataManager.COLOR_PENITENT_ART_BG_LIGHT
+	atonement_fill.border_width_bottom = 1
+	atonement_fill.border_width_top = 1
+	atonement_fill.border_width_left = 1
+	atonement_fill.border_width_right = 1
+	atonement_fill.border_color = Color(0.4, 0.3, 0.2)
+	atonement_bar.add_theme_stylebox_override("fill", atonement_fill)
+	
+	# Текст
+	atonement_label.add_theme_color_override("font_color", Color.WHITE)
+	atonement_label.add_theme_font_override("font", DataManager.FONT_MAIN)
+	atonement_label.add_theme_font_size_override("font_size", 14)
+	atonement_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	atonement_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	
+	# Высота баров
+	health_bar.custom_minimum_size = Vector2(0, 40)
+	atonement_bar.custom_minimum_size = Vector2(0, 40)
+	
+	# Обновляем значения
+	_update_health()
+	_update_atonement()

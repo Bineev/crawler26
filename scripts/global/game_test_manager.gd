@@ -16,6 +16,7 @@ var game_world: Node = null
 var battle_log: BattleLogUI = null
 var end_turn_button : EndTurnButton = null
 var player_portrait: PlayerPortrait = null
+var player : PenitentStats = null
 # Ссылка на RoomManager (будет доступен как автолоад)
 # RoomManager уже загружен как синглтон
 var is_ending_turn: bool = false
@@ -32,6 +33,11 @@ func start_test(world_node: Node):
 	_reset_game_state()
 	# Загружаем данные намерений для биома
 	DataManager.load_biome_enemies(current_biome)
+	
+	# 2. Создаём игрока
+	player = PenitentStats.new()
+	BattleManager.set_player(player)
+	print("Player created in start_test: ", player)
 	
 	SignalManager.hand_ui_created.connect(_on_hand_ui_created)
 	SignalManager.next_room.connect(_on_next_room)
