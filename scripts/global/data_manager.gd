@@ -725,20 +725,25 @@ func load_biome_enemies(biome: Biome):
 		#     _current_enemies_data = preload("res://data/biomes/bone_labyrinth_enemies.gd").new()
 
 func get_enemy_intents(enemy_id: int) -> Dictionary:
-	if _current_enemies_data and _current_enemies_data.has_constant("INTENTS"):
-		var intents_dict = _current_enemies_data.get_constant("INTENTS")
-		return intents_dict.get(enemy_id, {})
-	return {}
+	if not _current_enemies_data:
+		return {}
+	
+	# Получаем константу INTENTS из ресурса
+	var intents_dict = _current_enemies_data.get("INTENTS")
+	if intents_dict == null:
+		return {}
+	
+	return intents_dict.get(enemy_id, {})
+
 
 func get_enemy_intents_list(enemy_id: int) -> Array:
 	var data = get_enemy_intents(enemy_id)
 	return data.get("intents", [])
 
+
 func get_enemy_cycle_type(enemy_id: int) -> int:
 	var data = get_enemy_intents(enemy_id)
-	return data.get("cycle_type", IntentCycleType.SEQUENTIAL)
-
-
+	return data.get("cycle_type", DataManager.IntentCycleType.SEQUENTIAL)
 ## ============================================================
 ## 12. ИНИЦИАЛИЗАЦИЯ
 ## ============================================================

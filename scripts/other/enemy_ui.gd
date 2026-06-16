@@ -49,6 +49,7 @@ func setup(enemy: EnemyInstance):
 	SignalManager.get_hit.connect(_on_get_hit)
 	SignalManager.enemy_health_changed.connect(_on_enemy_health_changed)
 	SignalManager.enemy_status_changed.connect(_on_enemy_status_changed)
+	SignalManager.enemy_intent_changed.connect(_on_enemy_intent_changed)
 	
 
 func _add_aura_effect():
@@ -213,7 +214,6 @@ func update_intents():
 
 
 func _create_intent_item(effect: EffectEntry) -> Control:
-	# Создаём контейнер для иконки и текста
 	var container = HBoxContainer.new()
 	container.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	
@@ -227,6 +227,7 @@ func _create_intent_item(effect: EffectEntry) -> Control:
 	value_label.add_theme_font_size_override("font_size", 16)
 	value_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	
+	# Определяем иконку и текст для каждого эффекта
 	match effect.category:
 		DataManager.EffectCategory.DAMAGE:
 			icon.texture = DataManager.get_intent_icon(DataManager.IntentType.ATTACK)
@@ -520,3 +521,17 @@ func _on_death_animation_finished(death_material: ShaderMaterial, original_mater
 	
 	# Удаляем врага
 	enemy_instance.queue_free()
+
+
+func _on_enemy_intent_changed(enemy: EnemyInstance, intent: IntentEntry):
+	print("_on_enemy_intent_changed: enemy=", enemy.get_display_name())
+	if enemy != enemy_instance:
+		return
+	
+	# Сохраняем намерение в enemy_instance
+	enemy_instance.current_intent = intent
+	update_intents()
+
+
+func _get_intent_text(intent: IntentEntry) -> String:
+	return intent.get_localized_description()

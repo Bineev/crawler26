@@ -77,9 +77,10 @@ func load_intents():
 		intent_cycle.append(intent_data)
 	
 	cycle_type = DataManager.get_enemy_cycle_type(enemy_id)
+	print("intents loaded")
 
 
-func _create_intent_from_data(data: Dictionary) -> IntentEntry:
+func _create_intent_from_data(data: Array) -> IntentEntry:
 	var intent = IntentEntry.new()
 	intent.effects = []
 	
@@ -109,41 +110,40 @@ func _create_intent_from_data(data: Dictionary) -> IntentEntry:
 		
 		intent.effects.append(effect)
 	
-	intent.intent_type = _determine_intent_type(intent.effects)
+	intent.intent_types = _determine_intent_types(intent.effects)
 	return intent
 
 
-func _determine_intent_type(effects: Array[EffectEntry]) -> DataManager.IntentType:
-	var has_damage = false
-	var has_block = false
-	var has_heal = false
-	var has_debuff = false
+func _determine_intent_types(effects) -> Array[DataManager.IntentType]:
+	var types: Array[DataManager.IntentType] = []
 	
 	for effect in effects:
 		match effect.category:
 			DataManager.EffectCategory.DAMAGE:
-				has_damage = true
+				if DataManager.IntentType.ATTACK not in types:
+					types.append(DataManager.IntentType.ATTACK)
 			DataManager.EffectCategory.HEAL:
-				has_heal = true
+				if DataManager.IntentType.HEAL not in types:
+					types.append(DataManager.IntentType.HEAL)
 			DataManager.EffectCategory.BLOCK:
-				has_block = true
+				if DataManager.IntentType.DEFEND not in types:
+					types.append(DataManager.IntentType.DEFEND)
 			DataManager.EffectCategory.APPLY_STATUS:
 				if effect.target == DataManager.EffectTarget.ENEMY:
-					has_debuff = true
+					if DataManager.IntentType.DEBUFF not in types:
+						types.append(DataManager.IntentType.DEBUFF)
 			DataManager.EffectCategory.APPLY_PASSIVE:
 				if effect.target == DataManager.EffectTarget.ENEMY:
-					has_debuff = true
+					if DataManager.IntentType.DEBUFF not in types:
+						types.append(DataManager.IntentType.DEBUFF)
+				elif effect.target == DataManager.EffectTarget.SELF:
+					if DataManager.IntentType.BUFF not in types:
+						types.append(DataManager.IntentType.BUFF)
 	
-	if has_damage:
-		return DataManager.IntentType.ATTACK
-	if has_block:
-		return DataManager.IntentType.DEFEND
-	if has_heal:
-		return DataManager.IntentType.HEAL
-	if has_debuff:
-		return DataManager.IntentType.DEBUFF
+	if types.is_empty():
+		types.append(DataManager.IntentType.UNKNOWN)
 	
-	return DataManager.IntentType.UNKNOWN
+	return types
 
 
 func select_next_intent() -> IntentEntry:
@@ -174,6 +174,7 @@ func select_next_intent() -> IntentEntry:
 	
 	if selected_data != null:
 		current_intent = _create_intent_from_data(selected_data)
+		print("Intent created with ", current_intent.effects.size(), " effects")
 	
 	return current_intent
 

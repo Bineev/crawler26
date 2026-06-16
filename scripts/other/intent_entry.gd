@@ -1,39 +1,49 @@
-# scripts/enemies/intent_entry.gd
+# resources/effects/intent_entry.gd
+extends Resource
 class_name IntentEntry
 
-## Тип намерения (DataManager.IntentType)
-var intent_type: DataManager.IntentType
-
-## Эффекты намерения (массив EffectEntry)
-var effects: Array = []
-
-## Ключ локализации для описания (опционально)
-var description_key: String = ""
+var effects = []
+var intent_types: Array[DataManager.IntentType] = []
 
 
-## Возвращает локализованное описание
 func get_localized_description() -> String:
-	if not description_key.is_empty():
-		return tr(description_key)
-	return _generate_default_description()
+	if intent_types.is_empty():
+		return "???"
+	
+	var descriptions: Array[String] = []
+	for intent_type in intent_types:
+		descriptions.append(_get_description_for_type(intent_type))
+	
+	return ", ".join(descriptions)
 
 
-## Генерирует описание по умолчанию на основе типа намерения
-func _generate_default_description() -> String:
+func _get_description_for_type(intent_type: DataManager.IntentType) -> String:
 	match intent_type:
 		DataManager.IntentType.ATTACK:
-			return "Наносит урон"
+			return "Атака"
 		DataManager.IntentType.DEFEND:
-			return "Защищается"
+			return "Защита"
 		DataManager.IntentType.BUFF:
-			return "Усиливается"
+			return "Усиление"
 		DataManager.IntentType.DEBUFF:
-			return "Ослабляет игрока"
+			return "Ослабление"
 		DataManager.IntentType.HEAL:
-			return "Лечится"
+			return "Лечение"
 		DataManager.IntentType.SUMMON:
-			return "Призывает союзников"
+			return "Призыв"
 		DataManager.IntentType.UNKNOWN:
-			return "??? (неизвестно)"
+			return "???"
 		_:
-			return "Действует"
+			return "Действие"
+
+
+func get_icon() -> Texture2D:
+	if intent_types.is_empty():
+		return DataManager.get_intent_icon(DataManager.IntentType.UNKNOWN)
+	
+	# Показываем иконку первого типа, если их несколько
+	return DataManager.get_intent_icon(intent_types[0])
+
+
+func get_intent_types() -> Array[DataManager.IntentType]:
+	return intent_types

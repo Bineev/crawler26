@@ -78,6 +78,13 @@ func start_player_turn():
 	
 	current_state = DataManager.BattleState.PLAYER_TURN
 	
+	# Сначала выбираем намерения для всех врагов
+	for enemy in enemies:
+		if enemy.is_alive():
+			var intent = enemy.select_next_intent()
+			if intent:
+				SignalManager.enemy_intent_changed.emit(enemy, intent)
+	
 	if player and player.has_method("restore_energy"):
 		player.restore_energy()
 	

@@ -13,6 +13,7 @@ var hand_ui : HandUI = null
 # Ссылка на главную сцену (куда добавлять комнаты)
 var game_world: Node = null
 var battle_log: BattleLogUI = null
+var end_turn_button : EndTurnButton = null
 # Ссылка на RoomManager (будет доступен как автолоад)
 # RoomManager уже загружен как синглтон
 
@@ -27,10 +28,19 @@ func start_test(world_node: Node):
 	print("=== GAME TEST START ===")
 	game_world = world_node
 	_reset_game_state()
+	# Загружаем данные намерений для биома
+	DataManager.load_biome_enemies(current_biome)
+	
 	SignalManager.hand_ui_created.connect(_on_hand_ui_created)
 	SignalManager.next_room.connect(_on_next_room)
 	SignalManager.show_paths.connect(_on_show_paths)
 	SignalManager.choice_panel_selected.connect(_on_choice_panel_selected)
+	# Подписываемся на сигналы
+	SignalManager.battle_started.connect(_on_battle_started)
+	SignalManager.player_turn_started.connect(_on_player_turn_started)
+	SignalManager.enemy_turn_started.connect(_on_enemy_turn_started)
+	SignalManager.battle_victory.connect(_on_battle_ended)
+	SignalManager.battle_defeat.connect(_on_battle_ended)
 	# Сбрасываем менеджеры
 	FloorManager.reset()
 	
@@ -64,6 +74,9 @@ func _on_hand_ui_created(created_hand_ui: HandUI):
 	# Сохраняем ссылку
 	hand_ui = created_hand_ui
 	print("hand_ui saved: ", hand_ui)
+		# Создаём кнопку "Конец хода"
+	_create_end_turn_button()
+
 
 func reset():
 	if current_room_node and is_instance_valid(current_room_node):
@@ -207,3 +220,34 @@ func clear_ui():
 		battle_log = null
 	
 	print("UI cleared")
+
+
+func _create_end_turn_button():
+	var button_scene = preload("res://scenes/end_turn_button.tscn")
+	end_turn_button = button_scene.instantiate()
+	
+	# Добавляем в CanvasLayer вместе с рукой
+	var canvas_layer = hand_ui.get_parent()
+	if canvas_layer:
+		canvas_layer.add_child(end_turn_button)
+		end_turn_button.position = Vector2(1720, 860)
+
+
+func _on_battle_started():
+	if end_turn_button:
+		end_turn_button.visible = true
+
+
+func _on_player_turn_started():
+	if end_turn_button:
+		end_turn_button.visible = true
+
+
+func _on_enemy_turn_started():
+	if end_turn_button:
+		end_turn_button.visible = false
+
+
+func _on_battle_ended():
+	if end_turn_button:
+		end_turn_button.visible = false
