@@ -535,3 +535,48 @@ func _on_enemy_intent_changed(enemy: EnemyInstance, intent: IntentEntry):
 
 func _get_intent_text(intent: IntentEntry) -> String:
 	return intent.get_localized_description()
+
+
+func play_attack_animation():
+	if not enemy_instance:
+		return
+	
+	var original_position = position
+	var attack_offset = Vector2(0, -30)  # приближение к игроку
+	
+	var tween = create_tween()
+	tween.set_parallel(true)
+	
+	# Приближаемся к игроку
+	tween.tween_property(self, "position", original_position + attack_offset, 0.1).set_ease(Tween.EASE_OUT)
+	tween.tween_property(self, "scale", Vector2(1.6, 1.6), 0.1).set_ease(Tween.EASE_OUT)
+	
+	# Возвращаемся
+	tween.tween_property(self, "position", original_position, 0.1).set_delay(0.1).set_ease(Tween.EASE_IN)
+	tween.tween_property(self, "scale", Vector2(1.0, 1.0), 0.1).set_delay(0.1).set_ease(Tween.EASE_IN)
+	
+	# Пауза после анимации
+	await get_tree().create_timer(0.3).timeout
+	
+
+func play_debuff_animation():
+	if not enemy_instance:
+		return
+	
+	var original_position = position
+	var tween = create_tween()
+	tween.set_parallel(true)
+	
+	# Небольшая пульсация
+	tween.tween_property(self, "scale", Vector2(1.05, 1.05), 0.2).set_ease(Tween.EASE_OUT)
+	tween.tween_property(self, "scale", Vector2(1.0, 1.0), 0.2).set_delay(0.2).set_ease(Tween.EASE_IN)
+	
+	# Лёгкое смещение в сторону
+	tween.tween_property(self, "position", original_position + Vector2(10, 0), 0.15).set_ease(Tween.EASE_OUT)
+	tween.tween_property(self, "position", original_position, 0.15).set_delay(0.15).set_ease(Tween.EASE_IN)
+	
+	await get_tree().create_timer(0.4).timeout
+
+
+func play_delay(duration: float = 0.3):
+	await get_tree().create_timer(duration).timeout

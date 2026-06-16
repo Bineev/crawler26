@@ -272,3 +272,32 @@ func die():
 		enemy_ui.die()
 	else:
 		queue_free()
+
+
+func execute_intent_with_animation(target: CharacterStats):
+	if not current_intent:
+		return
+	
+	var has_damage = false
+	var has_debuff = false
+	
+	for effect in current_intent.effects:
+		if effect.category == DataManager.EffectCategory.DAMAGE:
+			has_damage = true
+		elif effect.category == DataManager.EffectCategory.APPLY_STATUS or effect.category == DataManager.EffectCategory.APPLY_PASSIVE:
+			if effect.target == DataManager.EffectTarget.ENEMY:
+				has_debuff = true
+	
+	# Проигрываем анимацию
+	if enemy_ui:
+		if has_damage:
+			await enemy_ui.play_attack_animation()
+		elif has_debuff:
+			await enemy_ui.play_debuff_animation()
+		else:
+			await get_tree().create_timer(0.3).timeout
+	
+	# Выполняем эффекты
+	SignalManager.log_message.emit("%s атакует!" % get_display_name())
+	for effect in current_intent.effects:
+		EffectExecutor.execute(effect, self, [target])

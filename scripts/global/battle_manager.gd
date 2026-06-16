@@ -108,14 +108,9 @@ func start_enemy_turn():
 		if not enemy.is_alive():
 			continue
 		
-		# Используем уже выбранное намерение (current_intent)
 		var intent = enemy.current_intent
 		if intent:
-			execute_enemy_action(enemy, intent)
-		else:
-			# Если по какой-то причине намерения нет — пропускаем
-			print("WARNING: Enemy has no current_intent")
-			continue
+			await execute_enemy_action(enemy, intent)
 		
 		if player and player.get_health() <= 0:
 			defeat()
@@ -133,9 +128,12 @@ func start_enemy_turn():
 
 
 func execute_enemy_action(enemy: EnemyInstance, intent: IntentEntry):
-	for effect in intent.effects:
-		# Используем самого врага, а не enemy.stats
-		EffectExecutor.execute(effect, enemy, [player])
+	if enemy.has_method("execute_intent_with_animation"):
+		await enemy.execute_intent_with_animation(player)
+	else:
+		# Fallback
+		for effect in intent.effects:
+			EffectExecutor.execute(effect, enemy, [player])
 
 ## ============================================================
 ## КОНЕЦ ХОДА

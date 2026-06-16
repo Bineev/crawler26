@@ -596,7 +596,7 @@ func animate_to_target(target_node: Node2D):
 	
 	# Получаем позицию цели (корневая нода врага)
 	var target_global_pos = target_node.global_position
-	var target_local_pos = get_parent().to_local(target_global_pos)
+	var target_local_pos = to_local(target_global_pos)
 	
 	current_tween = create_tween()
 	current_tween.set_parallel(true)

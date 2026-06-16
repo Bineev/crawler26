@@ -154,6 +154,8 @@ func take_damage(amount: int, ignore_block: bool = false):
 		SignalManager.log_message.emit("%s получил %d урона" % [get_display_name(), damage])
 		SignalManager.damage_dealt.emit(self, damage)
 		SignalManager.get_hit.emit(self)
+		if self is PenitentStats:
+			SignalManager.player_took_damage.emit(damage)
 		modify_flat(DataManager.FlatStat.HEALTH, -damage)
 		on_take_damage_gain_resource(damage)
 		_process_passive_triggers(DataManager.PassiveTrigger.ON_TAKE_DAMAGE, damage)

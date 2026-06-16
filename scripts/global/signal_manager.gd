@@ -90,3 +90,5 @@ signal next_room()
 signal show_paths(paths: Array)
 
 signal choice_panel_selected(path_index: int)
+
+signal player_took_damage(damage: int)

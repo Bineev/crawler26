@@ -10,13 +10,14 @@ var current_floor: int = 1
 var current_biome: DataManager.Biome = DataManager.Biome.MOLE_TUNNELS
 var current_room_index: int = 0
 var hand_ui : HandUI = null
+var blood_screen: BloodScreen = null
 # Ссылка на главную сцену (куда добавлять комнаты)
 var game_world: Node = null
 var battle_log: BattleLogUI = null
 var end_turn_button : EndTurnButton = null
 # Ссылка на RoomManager (будет доступен как автолоад)
 # RoomManager уже загружен как синглтон
-
+var is_ending_turn: bool = false
 
 ## ============================================================
 ## ПУБЛИЧНЫЕ МЕТОДЫ
@@ -41,8 +42,11 @@ func start_test(world_node: Node):
 	SignalManager.enemy_turn_started.connect(_on_enemy_turn_started)
 	SignalManager.battle_victory.connect(_on_battle_ended)
 	SignalManager.battle_defeat.connect(_on_battle_ended)
+	SignalManager.player_took_damage.connect(_on_player_took_damage)
 	# Сбрасываем менеджеры
 	FloorManager.reset()
+	
+	_create_blood_screen()
 	
 	# Отключаем старые сигналы перед подключением
 	if FloorManager.room_selected.is_connected(_on_room_selected):
@@ -241,13 +245,33 @@ func _on_battle_started():
 func _on_player_turn_started():
 	if end_turn_button:
 		end_turn_button.visible = true
+		end_turn_button.is_ending_turn = false
 
 
 func _on_enemy_turn_started():
 	if end_turn_button:
 		end_turn_button.visible = false
+		end_turn_button.is_ending_turn = true
 
 
 func _on_battle_ended():
 	if end_turn_button:
 		end_turn_button.visible = false
+		end_turn_button.is_ending_turn = false
+
+
+func _create_blood_screen():
+	var screen_scene = preload("res://scenes/blood_screen.tscn")
+	blood_screen = screen_scene.instantiate() as BloodScreen
+	
+	# Добавляем в корень или CanvasLayer
+	var canvas_layer = CanvasLayer.new()
+	canvas_layer.layer = 100  # поверх всего
+	game_world.add_child(canvas_layer)
+	canvas_layer.add_child(blood_screen)
+
+
+func _on_player_took_damage(damage: int):
+	if blood_screen:
+		var intensity = clamp(damage / 20.0, 0.1, 0.6)
+		blood_screen.flash(intensity)
