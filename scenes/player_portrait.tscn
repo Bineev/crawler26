@@ -1,0 +1,63 @@
+[gd_scene load_steps=5 format=3 uid="uid://clmyxdwovjiwv"]
+
+[ext_resource type="Script" uid="uid://cqgirclrqlv2m" path="res://scripts/other/player_portrait.gd" id="1_xpecc"]
+[ext_resource type="Texture2D" uid="uid://ckbmiay4apyet" path="res://img/portraits/penitent_portrait.png" id="2_yotol"]
+[ext_resource type="Shader" uid="uid://1kutc6pr0rfa" path="res://shaders/card3_shader.gdshader" id="3_ge412"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_icepd"]
+shader = ExtResource("3_ge412")
+shader_parameter/vignette_color = Color(0.01, 0.01, 0.01, 1)
+shader_parameter/darkness_power = 0.57600002736
+shader_parameter/light_radius = 0.45
+shader_parameter/flicker_speed = 3.930000186675
+
+[node name="PlayerPortrait" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_xpecc")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+theme_override_constants/separation = 5
+alignment = 1
+
+[node name="TextureRect" type="TextureRect" parent="VBoxContainer"]
+custom_minimum_size = Vector2(360, 360)
+layout_mode = 2
+texture = ExtResource("2_yotol")
+expand_mode = 3
+stretch_mode = 5
+
+[node name="StatusContainer" type="HBoxContainer" parent="VBoxContainer"]
+custom_minimum_size = Vector2(0, 40)
+layout_mode = 2
+
+[node name="HealthBar" type="ProgressBar" parent="VBoxContainer"]
+layout_mode = 2
+
+[node name="HealthLabel" type="Label" parent="VBoxContainer/HealthBar"]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 23.0
+
+[node name="AtonementBar" type="ProgressBar" parent="VBoxContainer"]
+layout_mode = 2
+
+[node name="AtonementLabel" type="Label" parent="VBoxContainer/AtonementBar"]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 23.0
+
+[node name="ColorRect" type="ColorRect" parent="."]
+material = SubResource("ShaderMaterial_icepd")
+custom_minimum_size = Vector2(360, 360)
+layout_mode = 0
+offset_right = 366.0
+offset_bottom = 360.0
+color = Color(0, 0, 0, 1)

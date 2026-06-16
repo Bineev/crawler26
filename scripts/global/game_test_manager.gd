@@ -15,6 +15,7 @@ var blood_screen: BloodScreen = null
 var game_world: Node = null
 var battle_log: BattleLogUI = null
 var end_turn_button : EndTurnButton = null
+var player_portrait: PlayerPortrait = null
 # Ссылка на RoomManager (будет доступен как автолоад)
 # RoomManager уже загружен как синглтон
 var is_ending_turn: bool = false
@@ -47,7 +48,7 @@ func start_test(world_node: Node):
 	FloorManager.reset()
 	
 	_create_blood_screen()
-	
+	_create_player_portrait()
 	# Отключаем старые сигналы перед подключением
 	if FloorManager.room_selected.is_connected(_on_room_selected):
 		FloorManager.room_selected.disconnect(_on_room_selected)
@@ -275,3 +276,11 @@ func _on_player_took_damage(damage: int):
 	if blood_screen:
 		var intensity = clamp(damage / 20.0, 0.1, 0.6)
 		blood_screen.flash(intensity)
+
+
+func _create_player_portrait():
+	var portrait_scene = preload("res://scenes/player_portrait.tscn")
+	player_portrait = portrait_scene.instantiate() as PlayerPortrait
+	player_portrait.position = Vector2(50, 80)
+	game_world.add_child(player_portrait)
+	player_portrait.setup(BattleManager.get_player())
