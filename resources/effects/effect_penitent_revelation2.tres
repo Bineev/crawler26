@@ -7,5 +7,7 @@ script = ExtResource("1_svach")
 category = 3
 target = 0
 scaled_values = Array[int]([0, 1, 2, 3])
+scaled_thresholds = Array[int]([0, 10, 20, 30])
 scaled_type = 4
+scaled_spend_resource = true
 metadata/_custom_type_script = "uid://cmra25r1r3ivt"

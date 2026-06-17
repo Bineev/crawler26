@@ -6,7 +6,7 @@
 [ext_resource type="FontFile" uid="uid://cfcw32u84nc63" path="res://fonts/RobotoCondensed-VariableFont_wght.ttf" id="4_kg30u"]
 [ext_resource type="Shader" uid="uid://xlaxko82yrc2" path="res://shaders/card_shader.gdshader" id="5_sy11y"]
 [ext_resource type="Shader" uid="uid://cltqs0v1xgjjb" path="res://shaders/card2_shader.gdshader" id="6_6ligt"]
-[ext_resource type="Shader" uid="uid://1kutc6pr0rfa" path="res://shaders/card3_shader.gdshader" id="7_8w5pg"]
+[ext_resource type="Shader" uid="uid://nnhafgmukg3v" path="res://shaders/card_burn.gdshader" id="7_8w5pg"]
 
 [sub_resource type="Theme" id="Theme_ktuci"]
 
@@ -41,10 +41,10 @@ shader_parameter/mouse_offset = Vector2(0, 0)
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_nvopj"]
 shader = ExtResource("7_8w5pg")
-shader_parameter/vignette_color = Color(0.02, 0.01, 0.01, 1)
-shader_parameter/darkness_power = 1.6
-shader_parameter/light_radius = 0.4790000227525
-shader_parameter/flicker_speed = 2.000000095
+shader_parameter/death_progress = 0.0
+shader_parameter/burn_color = Color(1, 0.3, 0.1, 1)
+shader_parameter/burn_size = 0.08
+shader_parameter/background_color = Color(0, 0, 0, 1)
 
 [node name="Card" type="Node2D"]
 z_index = 100
@@ -159,16 +159,16 @@ mouse_filter = 2
 theme_override_constants/separation = 4
 alignment = 1
 
-[node name="DesccriptionContainer" type="CenterContainer" parent="CardTemplate/MarginContainer/MainLayout"]
+[node name="DescriptionContainer" type="CenterContainer" parent="CardTemplate/MarginContainer/MainLayout"]
 layout_mode = 2
 mouse_filter = 2
 
-[node name="Control" type="Control" parent="CardTemplate/MarginContainer/MainLayout/DesccriptionContainer"]
+[node name="Control" type="Control" parent="CardTemplate/MarginContainer/MainLayout/DescriptionContainer"]
 custom_minimum_size = Vector2(200, 0)
 layout_mode = 2
 mouse_filter = 2
 
-[node name="CardDescription" type="RichTextLabel" parent="CardTemplate/MarginContainer/MainLayout/DesccriptionContainer/Control"]
+[node name="CardDescription" type="RichTextLabel" parent="CardTemplate/MarginContainer/MainLayout/DescriptionContainer/Control"]
 custom_minimum_size = Vector2(200, 0)
 layout_mode = 1
 offset_right = 400.0
@@ -201,7 +201,6 @@ visible = false
 material = SubResource("ShaderMaterial_nvopj")
 layout_mode = 2
 mouse_filter = 2
-color = Color(0, 0, 0, 1)
 
 [node name="ClickArea" type="Area2D" parent="."]
 

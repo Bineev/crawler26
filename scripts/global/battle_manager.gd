@@ -344,3 +344,7 @@ func _clear_all_passives(target: CharacterStats):
 	var passives = target.active_passives.duplicate()
 	for passive in passives:
 		target.remove_passive(passive)
+
+
+func get_hand_ui() -> HandUI:
+	return hand_ui

@@ -29,8 +29,8 @@ func draw_initial_hand():
 		draw_card()
 
 
-func draw_card() -> bool:
-	if hand.size() >= max_hand_size:
+func draw_card(ignore_hand_limit: bool = false) -> bool:
+	if not ignore_hand_limit and hand.size() >= max_hand_size:
 		return false
 	
 	if draw_pile.is_empty():
@@ -121,3 +121,32 @@ func play_card(card_ui: CardUI, card_data: CardData, target = null):
 	
 	if hand_ui:
 		hand_ui.remove_card(card_ui)
+
+
+func sacrifice_card(card_ui: CardUI, card_data: CardData):
+	var index = hand.find(card_data)
+	if index != -1:
+		hand.remove_at(index)
+		
+		if card_ui:
+			card_ui.state = DataManager.CardState.BURNED  # помечаем как сожжённую
+			await card_ui.play_burn_animation()
+		else:
+			queue_free()
+		
+		SignalManager.card_discarded.emit(card_data)
+	
+
+
+func draw_cards(amount: int, ignore_hand_limit: bool = false):
+	var drawn = 0
+	for i in range(amount):
+		if draw_card(ignore_hand_limit):
+			drawn += 1
+		else:
+			break
+	print("Drawn ", drawn, " cards")
+
+
+func get_hand() -> Array[CardData]:
+	return hand

@@ -247,3 +247,12 @@ func _on_selecting_target_changed(is_selecting: bool):
 	is_aiming_mode = is_selecting
 	if not is_selecting:
 		SignalManager.enemy_highlight_requested.emit(self, false)
+
+
+func get_card_uis() -> Array[CardUI]:
+	var result: Array[CardUI] = []
+	if cards_container:
+		for child in cards_container.get_children():
+			if child is CardUI:
+				result.append(child)
+	return result

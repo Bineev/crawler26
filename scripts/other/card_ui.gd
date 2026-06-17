@@ -2,8 +2,8 @@
 extends Node2D
 class_name CardUI
 
-enum CardState { IDLE, HOVERED, SELECTED, AIMING, PLAYED }
-var state: CardState = CardState.IDLE
+#enum CardState { IDLE, HOVERED, SELECTED, AIMING, PLAYED, BURNED }
+var state: DataManager.CardState = DataManager.CardState.IDLE
 
 ## ============================================================
 ## ССЫЛКИ НА НОДЫ
@@ -21,6 +21,7 @@ var click_area: Area2D = null
 var collision_shape: CollisionShape2D = null
 var effect_overlay: ColorRect = null
 var effect_overlay2: ColorRect = null
+var effect_overlay3: ColorRect = null
 
 ## ============================================================
 ## ДАННЫЕ КАРТЫ
@@ -56,7 +57,7 @@ func _ready():
 	name_label = $CardTemplate/MarginContainer/MainLayout/HeaderLayout/Control/CardName
 	art_image = $CardTemplate/MarginContainer/MainLayout/MiddleLayout/ArtContainer/ArtImage
 	art_background = $CardTemplate/MarginContainer/MainLayout/MiddleLayout/ArtContainer/ArtBackground
-	description_label = $CardTemplate/MarginContainer/MainLayout/DesccriptionContainer/Control/CardDescription
+	description_label = $CardTemplate/MarginContainer/MainLayout/DescriptionContainer/Control/CardDescription
 	left_icons = $CardTemplate/MarginContainer/MainLayout/MiddleLayout/LeftIcons
 	right_icons = $CardTemplate/MarginContainer/MainLayout/MiddleLayout/RightIcons
 	card_control = $CardTemplate
@@ -64,6 +65,7 @@ func _ready():
 	collision_shape = $ClickArea/CollisionShape2D
 	effect_overlay = $CardTemplate/ShaderRect
 	effect_overlay2 = $CardTemplate/ShaderRect2
+	effect_overlay3 = $CardTemplate/ShaderRect3
 	
 	original_position = position
 	original_z_index = z_index
@@ -275,7 +277,7 @@ func _unique_icons(icons: Array[Texture2D], tooltips: Array[String]) -> Array[Di
 func on_card_clicked():
 	print("on_card_clicked called, current state: ", state)  # Отладка
 	
-	if state != CardState.HOVERED:
+	if state != DataManager.CardState.HOVERED:
 		print("Not in HOVERED state, ignoring")
 		return
 	
@@ -291,47 +293,46 @@ func on_card_clicked():
 		SignalManager.log_message.emit(tr("msg_not_enough_energy"))
 		return
 	
-	state = CardState.SELECTED
+	state = DataManager.CardState.SELECTED
 	set_glow(true)
 
 
 func play_card(target = null):
-	if state != CardState.AIMING:
+	if state != DataManager.CardState.AIMING:
 		return
 	
-	state = CardState.PLAYED
-	
-	SignalManager.selecting_target_changed.emit(false)  # ← здесь
+	state = DataManager.CardState.PLAYED
 	
 	var player_stats = BattleManager.get_player()
 	if not player_stats:
-		state = CardState.IDLE
+		state = DataManager.CardState.IDLE
 		return
 	
-	var old_energy = player_stats.get_energy()
-	
+	# Списываем энергию
 	player_stats.modify_flat(DataManager.FlatStat.ENERGY, -card_data.cost)
 	
+	# Сначала анимация улёта
+	if target and target is EnemyInstance:
+		await animate_to_target(target)  # ← await
+	else:
+		await animate_to_center()        # ← await
+	
+	# Выполняем эффекты карты (после анимации)
 	for effect in card_data.effects:
 		var targets = _get_targets_for_effect(effect, target)
-		EffectExecutor.execute(effect, player_stats, targets, {"card": card_data})
+		if effect.category == DataManager.EffectCategory.SACRIFICE_CARD:
+			# Не передаём текущую карту для сожжения
+			EffectExecutor.execute(effect, player_stats, targets, {"card_data": null, "card": null})
+		else:
+			EffectExecutor.execute(effect, player_stats, targets, {"card": self, "card_data": card_data})
 	
-	var battle_deck = BattleManager.get_battle_deck()
-	if battle_deck:
-		battle_deck.play_card(self, card_data, target)
+	# Если карта сожжена — она уже удалится через burn анимацию
+	if state != DataManager.CardState.BURNED:
+		var battle_deck = BattleManager.get_battle_deck()
+		if battle_deck:
+			battle_deck.play_card(self, card_data, target)
 	
 	SignalManager.card_played.emit(card_data)
-	SignalManager.log_message.emit("Разыграна карта: %s" % card_data.get_localized_name())
-	var new_energy = player_stats.get_energy()
-	var max_energy = player_stats.get_max_energy()
-	SignalManager.log_message.emit("Потрачено энергии: %d | Энергия: %d/%d" % [card_data.cost, new_energy, max_energy])
-	
-	# Анимация улёта (если есть цель — враг)
-	if target and target is EnemyInstance:
-		# Анимируем к позиции врага (корневая нода Enemy)
-		animate_to_target(target)
-	else:
-		animate_to_center()
 	
 	if hand_ui_ref:
 		hand_ui_ref.set_all_cards_input_enabled(true)
@@ -363,13 +364,13 @@ func _get_targets_for_effect(effect: EffectEntry, selected_target) -> Array:
 
 
 func cancel_selection():
-	if state == CardState.SELECTED or state == CardState.AIMING:
+	if state == DataManager.CardState.SELECTED or state == DataManager.CardState.AIMING:
 		if current_tween:
 			current_tween.kill()
 			current_tween = null
 		
 		_return_to_original()
-		state = CardState.IDLE
+		state = DataManager.CardState.IDLE
 		
 		if hand_ui_ref:
 			hand_ui_ref.set_all_cards_input_enabled(true)
@@ -380,7 +381,7 @@ func cancel_selection():
 
 
 func confirm_target(target):
-	if state == CardState.AIMING:
+	if state == DataManager.CardState.AIMING:
 		play_card(target)
 
 
@@ -388,8 +389,8 @@ func confirm_target(target):
 ## АНИМАЦИИ
 ## ============================================================
 func _on_mouse_entered():
-	if state == CardState.IDLE:
-		state = CardState.HOVERED
+	if state == DataManager.CardState.IDLE:
+		state = DataManager.CardState.HOVERED
 		print('go hovered')
 		
 		if current_tween:
@@ -413,8 +414,8 @@ func _on_mouse_entered():
 
 
 func _on_mouse_exited():
-	if state == CardState.HOVERED:
-		state = CardState.IDLE
+	if state == DataManager.CardState.HOVERED:
+		state = DataManager.CardState.IDLE
 		print('go idle')
 		
 		if current_tween:
@@ -473,13 +474,13 @@ func _return_to_original():
 	tween.tween_property(self, "scale", original_scale, 0.2)
 	tween.tween_callback(func(): 
 		z_index = original_z_index
-		state = CardState.IDLE
+		state = DataManager.CardState.IDLE
 	)
 	current_tween = tween
 
 
 func _process(delta):
-	if state == CardState.IDLE:
+	if state == DataManager.CardState.IDLE:
 		# Получаем позицию мыши относительно центра самой карты
 		var mouse_pos2 = get_local_mouse_position()
 		var card_size2 = get_card_size()
@@ -522,7 +523,7 @@ func _process(delta):
 				var target_offset = current_offset.lerp(Vector2.ZERO, 12.0 * delta)
 				mat.set_shader_parameter("mouse_offset", target_offset)
 		
-	if state == CardState.SELECTED:
+	if state == DataManager.CardState.SELECTED:
 		var mouse_pos = get_viewport().get_mouse_position()
 		var card_rect = Rect2(global_position - get_card_size() / 2, get_card_size())
 		
@@ -530,14 +531,14 @@ func _process(delta):
 		var threshold = 200  # пикселей от верхнего края
 		if mouse_pos.y < card_rect.position.y + threshold:
 			print("Mouse above card, moving to center")
-			state = CardState.AIMING
+			state = DataManager.CardState.AIMING
 			#TODO Вернуть, если будет нужно
 			#_move_to_center()
 			SignalManager.target_selection_requested.emit(self)
 	
 	# ПКМ для отмены
 	if Input.is_mouse_button_pressed(MOUSE_BUTTON_RIGHT):
-		if state == CardState.SELECTED or state == CardState.AIMING:
+		if state == DataManager.CardState.SELECTED or state == DataManager.CardState.AIMING:
 			cancel_selection()
 
 
@@ -590,22 +591,6 @@ func set_highlight(enabled: bool):
 	modulate = Color(1, 0.5, 0.2) if enabled else Color.WHITE
 
 
-func animate_to_target(target_node: Node2D):
-	if current_tween:
-		current_tween.kill()
-	
-	# Получаем позицию цели (корневая нода врага)
-	var target_global_pos = target_node.global_position
-	var target_local_pos = to_local(target_global_pos)
-	
-	current_tween = create_tween()
-	current_tween.set_parallel(true)
-	current_tween.tween_property(self, "position", target_local_pos, 0.25).set_ease(Tween.EASE_IN)
-	current_tween.tween_property(self, "scale", Vector2(0.2, 0.2), 0.25)
-	current_tween.tween_property(self, "modulate", Color.TRANSPARENT, 0.2)
-	current_tween.finished.connect(_on_animation_finished)
-
-
 func _on_animation_finished():
 	if hand_ui_ref:
 		hand_ui_ref.remove_card(self)
@@ -613,16 +598,91 @@ func _on_animation_finished():
 		queue_free()
 
 
-func animate_to_center():
+func play_burn_animation():
+	if not effect_overlay3:
+		return
+	
+	var burn_material = effect_overlay3.material as ShaderMaterial
+	if not burn_material:
+		return
+		
+	# Гарантируем, что пока карта едет, шейдер еще не горит
+	burn_material.set_shader_parameter("death_progress", 0.0)
+	
+	# Высчитываем целевую глобальную позицию (замените вектор на нужный вам)
+	var target_global_position = Vector2(100, 800)
+	
+	var tween = create_tween()
+	
+	# Настраиваем плавность для движения (плавный старт и торможение)
+	tween.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN_OUT)
+	
+	# ШАГ 1: Карта отъезжает (например, за 1.5 секунды)
+	tween.tween_property(
+		self,
+		"global_position", 
+		target_global_position, 
+		1
+	)
+	
+	effect_overlay3.show()
+	
+	# ШАГ 2: Включается шейдер горения (займет 2.0 секунды)
+	# Этот шаг начнется автоматически, как только завершится ШАГ 1
+	tween.tween_property(
+		burn_material, 
+		"shader_parameter/death_progress", 
+		1.0, 
+		1
+	)
+	
+	# Сигнал сработает в самом конце, когда шейдер полностью догорит
+	tween.finished.connect(_on_burn_animation_finished)
+
+
+
+func _on_burn_animation_finished():
+	# Удаляем карту из родителя и перестраиваем руку
+	var hand_ui = hand_ui_ref
+	if hand_ui:
+		if get_parent():
+			get_parent().remove_child(self)
+		hand_ui.layout_cards()
+	
+	queue_free()
+
+
+func animate_to_target(target_node: Node2D):
 	if current_tween:
 		current_tween.kill()
+		current_tween = null
 	
-	var screen_center = get_viewport().get_visible_rect().size / 2
-	var target_local_pos = get_parent().to_local(screen_center)
+	var target_global_pos = target_node.global_position
+	var target_local_pos = get_parent().to_local(target_global_pos)
 	
 	current_tween = create_tween()
 	current_tween.set_parallel(true)
 	current_tween.tween_property(self, "position", target_local_pos, 0.25).set_ease(Tween.EASE_IN)
 	current_tween.tween_property(self, "scale", Vector2(0.2, 0.2), 0.25)
 	current_tween.tween_property(self, "modulate", Color.TRANSPARENT, 0.2)
-	current_tween.finished.connect(_on_animation_finished)
+	
+	await current_tween.finished
+	queue_free()
+
+
+func animate_to_center():
+	if current_tween:
+		current_tween.kill()
+		current_tween = null
+	
+	var screen_center = get_viewport().get_visible_rect().size / 2
+	var target_local_pos = get_parent().to_local(screen_center)
+	
+	current_tween = create_tween()
+	current_tween.set_parallel(true)
+	current_tween.tween_property(self, "position", target_local_pos, 0.3).set_ease(Tween.EASE_IN)
+	current_tween.tween_property(self, "scale", Vector2(0.2, 0.2), 0.3)
+	current_tween.tween_property(self, "modulate", Color.TRANSPARENT, 0.25)
+	
+	await current_tween.finished
+	queue_free()

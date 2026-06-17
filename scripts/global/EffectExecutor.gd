@@ -239,9 +239,12 @@ func _execute_scaled_value(effect: EffectEntry, source, targets: Array) -> void:
 				SignalManager.log_message.emit("Получено %d энергии (scaled)" % value)
 		
 		DataManager.ScaledType.DRAW_CARD:
-			if source.has_method("draw_cards"):
-				source.draw_cards(value)
+			var battle_deck = BattleManager.get_battle_deck()
+			if battle_deck:
+				battle_deck.draw_cards(value, true)  # ignore_hand_limit = true
 				SignalManager.log_message.emit("Добрано %d карт (scaled)" % value)
+			else:
+				printerr("BattleDeck not found for DRAW_CARD")
 		
 		DataManager.ScaledType.APPLY_STATUS:
 			for target in targets:
@@ -294,18 +297,14 @@ func _execute_modify_modifier(effect: EffectEntry, source, targets: Array) -> vo
 
 
 func _execute_draw_card(effect: EffectEntry, source) -> void:
-	if source and source.has_method("draw_cards"):
-		source.draw_cards(effect.amount)
+	var battle_deck = BattleManager.get_battle_deck()
+	if battle_deck:
+		battle_deck.draw_cards(effect.amount, false)
 
 
 func _execute_gain_energy(effect: EffectEntry, source) -> void:
 	if source and source.has_method("gain_energy"):
 		source.gain_energy(effect.amount)
-
-
-func _execute_sacrifice_card(effect: EffectEntry, source, card_info: Dictionary) -> void:
-	if source.has_method("sacrifice_card") and card_info.has("card"):
-		source.sacrifice_card(card_info["card"])
 
 
 func _execute_convert(effect: EffectEntry, source, targets: Array) -> void:
@@ -471,3 +470,46 @@ func _execute_convert_status(effect: EffectEntry, source, targets: Array) -> voi
 			
 			_:
 				printerr("Unknown convert_to_stat: ", effect.convert_to_stat)
+
+
+func _execute_sacrifice_card(effect: EffectEntry, source, card_info: Dictionary) -> void:
+	var card_ui_to_sacrifice = null
+	var card_data_to_sacrifice = null
+	
+	# Если в card_info передана конкретная карта — сжигаем её
+	if card_info.has("card_data") and card_info.has("card"):
+		card_data_to_sacrifice = card_info.get("card_data")
+		card_ui_to_sacrifice = card_info.get("card")
+	
+	# Если не передана — выбираем случайную карту из руки
+	if not card_data_to_sacrifice:
+		var battle_deck = BattleManager.get_battle_deck()
+		if not battle_deck:
+			return
+		
+		var hand = battle_deck.get_hand()
+		if hand.is_empty():
+			SignalManager.log_message.emit("Нет карт для сожжения!")
+			return
+		
+		# Выбираем случайную карту (кроме текущей)
+		var random_index = randi() % hand.size()
+		var random_card = hand[random_index]
+		
+		# Находим CardUI для этой карты
+		var hand_ui = BattleManager.get_hand_ui()
+		if hand_ui:
+			var card_uis = hand_ui.get_card_uis()
+			for ui in card_uis:
+				if ui.card_data == random_card:
+					card_ui_to_sacrifice = ui
+					break
+		
+		card_data_to_sacrifice = random_card
+	
+	if not card_data_to_sacrifice:
+		return
+	
+	var battle_deck = BattleManager.get_battle_deck()
+	if battle_deck:
+		await battle_deck.sacrifice_card(card_ui_to_sacrifice, card_data_to_sacrifice)

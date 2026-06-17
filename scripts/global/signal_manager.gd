@@ -95,3 +95,5 @@ signal player_took_damage(damage: int)
 
 signal player_damage_dealt(damage: int)
 signal player_heal_received(heal: int)
+
+signal card_burned(card_data: CardData)
