@@ -4,7 +4,8 @@
 
 [resource]
 script = ExtResource("1_w0dtv")
-category = 11
+category = 12
 target = 0
 to_stat = 7
+convert_from_status = 8
 metadata/_custom_type_script = "uid://cmra25r1r3ivt"

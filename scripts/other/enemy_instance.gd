@@ -47,7 +47,8 @@ func init(floor_level: int = 1):
 	for passive in resource.starting_passives:
 		var passive_copy = passive.duplicate_for_instance()
 		passive_copy.init_instance()
-		apply_passive(passive_copy)  # ← вызываем на self
+		# starting_charges уже установлены в ресурсе
+		apply_passive(passive_copy)
 
 	# Находим компоненты
 	enemy_ui = $EnemyUI

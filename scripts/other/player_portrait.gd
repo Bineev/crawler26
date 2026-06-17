@@ -31,19 +31,21 @@ func _ready() -> void:
 
 func setup(stats: CharacterStats):
 	player_stats = stats
+	
 	_setup_bars()
 	
 	SignalManager.health_changed.connect(_on_health_changed)
 	SignalManager.atonement_changed.connect(_on_atonement_changed)
-	SignalManager.status_added.connect(_on_status_changed)
-	SignalManager.status_removed.connect(_on_status_changed)
-		# Подписка на урон/лечение
+	SignalManager.status_added.connect(_on_icons_changed)
+	SignalManager.status_removed.connect(_on_icons_changed)
+	SignalManager.passive_added.connect(_on_icons_changed)
+	SignalManager.passive_removed.connect(_on_icons_changed)
 	SignalManager.player_damage_dealt.connect(_on_player_damage_dealt)
 	SignalManager.player_heal_received.connect(_on_player_heal_received)
 	
 	_update_health()
 	_update_atonement()
-	_update_statuses()
+	_update_icons()
 
 
 func _update_health():
@@ -246,3 +248,44 @@ func _init_floating_positions():
 		var x = portrait_pos.x + portrait_size.x * (1 - right_margin) - portrait_size.x * 0.05
 		var y = portrait_pos.y + portrait_size.y * (top_margin + t * (bottom_margin - top_margin))
 		floating_text_positions.append(Vector2(x, y))
+
+func _update_icons():
+	if not status_container:
+		return
+	
+	# Очищаем контейнер
+	for child in status_container.get_children():
+		child.queue_free()
+	
+	if not player_stats:
+		return
+	
+	# Добавляем статусы
+	for status_id in player_stats.active_statuses.keys():
+		var status_data = player_stats.active_statuses[status_id]
+		var icon = DataManager.get_status_icon(status_id)
+		if icon:
+			var icon_rect = _create_icon(icon, "%s: %d" % [DataManager.get_status_name(status_id), status_data.stacks])
+			status_container.add_child(icon_rect)
+	
+	# Добавляем пассивки
+	for passive in player_stats.active_passives:
+		var icon = DataManager.get_passive_icon(passive.id)
+		if icon:
+			var icon_rect = _create_icon(icon, passive.get_localized_name())
+			status_container.add_child(icon_rect)
+
+
+func _create_icon(texture: Texture2D, tooltip: String) -> TextureRect:
+	var icon_rect = TextureRect.new()
+	icon_rect.texture = texture
+	icon_rect.custom_minimum_size = Vector2(24, 24)
+	icon_rect.expand_mode = TextureRect.EXPAND_FIT_WIDTH_PROPORTIONAL
+	icon_rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	icon_rect.tooltip_text = tooltip
+	return icon_rect
+
+
+func _on_icons_changed(target: Node, arg1 = null, arg2 = null, arg3 = null):
+	if target == player_stats:
+		_update_icons()

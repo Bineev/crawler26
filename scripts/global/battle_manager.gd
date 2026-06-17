@@ -311,8 +311,36 @@ func _on_player_died(player: CharacterStats):
 
 func reset_battle():
 	current_state = DataManager.BattleState.IDLE
+	# Очищаем статусы и пассивки у игрока
+	if player:
+		_clear_all_statuses(player)
+		_clear_all_passives(player)
+	
+	# Очищаем статусы и пассивки у врагов
+	for enemy in enemies:
+		if enemy:
+			_clear_all_statuses(enemy)
+			_clear_all_passives(enemy)
 	enemies = []
 	#battle_deck = null
 	hand_ui = null
 	current_room_node = null
 	print("BattleManager reset")
+
+
+func _clear_all_statuses(target: CharacterStats):
+	if not target:
+		return
+	
+	var statuses = target.active_statuses.keys()
+	for status_id in statuses:
+		target.remove_status(status_id)
+
+
+func _clear_all_passives(target: CharacterStats):
+	if not target:
+		return
+	
+	var passives = target.active_passives.duplicate()
+	for passive in passives:
+		target.remove_passive(passive)

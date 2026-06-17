@@ -17,7 +17,7 @@ enum FlatStat {
 	MAX_HEALTH,
 	ENERGY,
 	MAX_ENERGY,
-	BLOCK,
+	#BLOCK,
 	HAND_SIZE,
 	DRAW_PER_TURN,
 	ATONEMENT,
@@ -86,6 +86,7 @@ enum EffectCategory {
 	GAIN_ENERGY,
 	SACRIFICE_CARD,
 	CONVERT,
+	CONVERT_STATUS,  # ← новый тип
 	CONVERT_EXCESS_TO_BLOCK,
 	CONDITIONAL,
 	CUSTOM,
@@ -98,6 +99,28 @@ enum ScaledType {
 	HEAL,
 	GAIN_ENERGY,
 	DRAW_CARD,
+	APPLY_STATUS,  # ← добавить
+}
+
+enum ScaledResource {
+	ATONEMENT,
+	HEALTH,
+	MAX_HEALTH,
+	ENERGY,
+	BLOCK,
+	ENEMY_STATUSES,
+	PLAYER_STATUSES,
+	BURN_STACKS,
+	POISON_STACKS,
+	BLEED_STACKS,
+}
+
+enum ScaledCompare {
+	GREATER_EQUAL,   # значение >= порога
+	LESSER_EQUAL,    # значение <= порога
+	GREATER,         # значение > порога
+	LESSER,          # значение < порога
+	EQUAL,           # значение == порога
 }
 
 ## Тип цикла намерений
@@ -309,7 +332,7 @@ const MAX_ENERGY: int = 3
 ## === Сломленный (Penitent) ===
 const PENITENT_STARTING_HEALTH: int = 80
 const PENITENT_MAX_ATONEMENT: int = 30
-const PENITENT_ATONEMENT_GAIN_PER_DAMAGE: int = 1
+const PENITENT_ATONEMENT_GAIN_PER_DAMAGE: int = 0.2
 
 ## === Статусы ===
 

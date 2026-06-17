@@ -1,7 +1,9 @@
-[gd_resource type="Resource" script_class="CardData" load_steps=3 format=3 uid="uid://dr0x4xefdqfv0"]
+[gd_resource type="Resource" script_class="CardData" load_steps=5 format=3 uid="uid://dr0x4xefdqfv0"]
 
 [ext_resource type="Script" uid="uid://cmra25r1r3ivt" path="res://resources/res_scripts/effect_entry.gd" id="1_bsmbx"]
+[ext_resource type="Resource" uid="uid://bssiob51e7rtj" path="res://resources/effects/effect_atonement_barrier.tres" id="2_rc748"]
 [ext_resource type="Script" uid="uid://badcs22cck6n5" path="res://resources/res_scripts/card_data.gd" id="2_w6rt0"]
+[ext_resource type="Resource" uid="uid://b17tljpgfw4dt" path="res://resources/effects/effect_atonement_barrier2.tres" id="3_4kxsk"]
 
 [resource]
 script = ExtResource("2_w6rt0")
@@ -9,4 +11,5 @@ id = 3
 name_key = "card_atonement_barrier_name"
 description_key = "card_atonement_barrier_desc"
 cost = 2
+effects = Array[ExtResource("1_bsmbx")]([ExtResource("2_rc748"), ExtResource("3_4kxsk")])
 metadata/_custom_type_script = "uid://badcs22cck6n5"

@@ -11,7 +11,7 @@ var flats: Dictionary[DataManager.FlatStat, int] = {
 	DataManager.FlatStat.MAX_HEALTH: 0,
 	DataManager.FlatStat.ENERGY: 0,
 	DataManager.FlatStat.MAX_ENERGY: 0,
-	DataManager.FlatStat.BLOCK: 0,
+	#DataManager.FlatStat.BLOCK: 0,
 	DataManager.FlatStat.HAND_SIZE: 5,
 	DataManager.FlatStat.DRAW_PER_TURN: 5,
 	DataManager.FlatStat.ATONEMENT: 0,
@@ -105,9 +105,9 @@ func _emit_flat_signal(stat: DataManager.FlatStat):
 			var max_val = get_flat(DataManager.FlatStat.MAX_ENERGY)
 			SignalManager.energy_changed.emit(current, max_val)
 		
-		DataManager.FlatStat.BLOCK:
-			var current = get_flat(DataManager.FlatStat.BLOCK)
-			SignalManager.block_changed.emit(current)
+		#DataManager.FlatStat.BLOCK:
+			#var current = get_flat(DataManager.FlatStat.BLOCK)
+			#SignalManager.block_changed.emit(current)
 		
 		DataManager.FlatStat.ATONEMENT:
 			var current = get_flat(DataManager.FlatStat.ATONEMENT)
@@ -125,11 +125,14 @@ func get_max_health() -> int:
 	return get_flat(DataManager.FlatStat.MAX_HEALTH)
 
 func get_block() -> int:
-	return get_flat(DataManager.FlatStat.BLOCK)
+	return get_status_stacks(DataManager.Status.SHIELD)
+
 
 func add_block(amount: int):
 	var final_block = floor(amount * get_modifier(DataManager.ModifierStat.BLOCK_GAINED_PERCENT))
-	modify_flat(DataManager.FlatStat.BLOCK, final_block)
+	if final_block > 0:
+		var shield_status = DataManager.get_status_resource(DataManager.Status.SHIELD)
+		add_status(shield_status, final_block, 1, self)  # на 1 ход
 
 func take_damage(amount: int, ignore_block: bool = false):
 	var damage = amount
@@ -141,14 +144,14 @@ func take_damage(amount: int, ignore_block: bool = false):
 	
 	damage = floor(damage)
 	
-	if not ignore_block and get_block() > 0:
-		var block_amount = get_block()
-		if block_amount >= damage:
-			modify_flat(DataManager.FlatStat.BLOCK, -damage)
+	if not ignore_block and has_status(DataManager.Status.SHIELD):
+		var shield_stacks = get_status_stacks(DataManager.Status.SHIELD)
+		if shield_stacks >= damage:
+			reduce_status_stacks(DataManager.Status.SHIELD, damage)
 			damage = 0
 		else:
-			modify_flat(DataManager.FlatStat.BLOCK, -block_amount)
-			damage -= block_amount
+			reduce_status_stacks(DataManager.Status.SHIELD, shield_stacks)
+			damage -= shield_stacks
 	if self is PenitentStats:
 		SignalManager.player_damage_dealt.emit(damage)
 	if damage > 0:
@@ -278,28 +281,56 @@ func apply_passive(passive: PassiveResource, duration: int = -1):
 	var instance = passive.duplicate_for_instance()
 	instance.init_instance()
 	
-	if instance.charge_type == DataManager.PassiveChargeType.TURN_BASED and duration > 0:
-		instance.current_charges = duration
+	# Для TURN_BASED используем duration или starting_charges
+	if instance.charge_type == DataManager.PassiveChargeType.TURN_BASED:
+		if duration > 0:
+			instance.current_charges = duration
+		else:
+			instance.current_charges = instance.starting_charges
+	else:
+		instance.current_charges = instance.starting_charges
+	
+	# Проверяем, есть ли уже такая пассивка
+	for existing in active_passives:
+		if existing.id == instance.id:
+			# Для PERMANENT не стакаем
+			if instance.charge_type == DataManager.PassiveChargeType.PERMANENT:
+				return
+			# Для всех остальных просто складываем заряды
+			existing.current_charges += instance.current_charges
+			return
 	
 	active_passives.append(instance)
 	
+	# Применяем модификаторы
 	for mod in instance.modifiers:
-		modifiers[mod.stat] = modifiers.get(mod.stat, 1.0) * mod.multiplier
-		if mod.flat_bonus != 0:
-			modifiers[mod.stat] = modifiers.get(mod.stat, 0) + mod.flat_bonus
+		match mod.change_type:
+			DataManager.ModifierChangeType.MULTIPLIER:
+				modifiers[mod.stat] = modifiers.get(mod.stat, 1.0) * mod.value
+			DataManager.ModifierChangeType.PERCENT:
+				modifiers[mod.stat] = modifiers.get(mod.stat, 1.0) + mod.value
+			DataManager.ModifierChangeType.FLAT_BONUS:
+				modifiers[mod.stat] = modifiers.get(mod.stat, 0.0) + mod.value
 	
 	SignalManager.passive_added.emit(self, instance.id)
+
 
 func remove_passive(passive: PassiveResource):
 	var idx = active_passives.find(passive)
 	if idx != -1:
 		active_passives.remove_at(idx)
+		
 		for mod in passive.modifiers:
-			modifiers[mod.stat] = modifiers.get(mod.stat, 1.0) / mod.multiplier
-			if mod.flat_bonus != 0:
-				modifiers[mod.stat] = modifiers.get(mod.stat, 0) - mod.flat_bonus
+			match mod.change_type:
+				DataManager.ModifierChangeType.MULTIPLIER:
+					modifiers[mod.stat] = modifiers.get(mod.stat, 1.0) / mod.value
+				DataManager.ModifierChangeType.PERCENT:
+					modifiers[mod.stat] = modifiers.get(mod.stat, 1.0) - mod.value
+				DataManager.ModifierChangeType.FLAT_BONUS:
+					modifiers[mod.stat] = modifiers.get(mod.stat, 0.0) - mod.value
 		
 		SignalManager.passive_removed.emit(self, passive.id)
+
 
 func _process_passive_triggers(trigger: DataManager.PassiveTrigger, value = null):
 	for passive in active_passives:

@@ -27,9 +27,11 @@ class_name EffectEntry
 ## ============================================================
 
 @export var scaled_values: Array[int] = [0, 0, 0, 0]
+@export var scaled_thresholds: Array[int] = [0, 0, 0, 0]  # границы
 @export var scaled_type: DataManager.ScaledType = DataManager.ScaledType.BLOCK
-
-
+@export var scaled_resource: DataManager.ScaledResource = DataManager.ScaledResource.ATONEMENT
+@export var scaled_compare: DataManager.ScaledCompare = DataManager.ScaledCompare.GREATER_EQUAL
+@export var scaled_spend_resource: bool = false  # ← новое поле
 ## ============================================================
 ## ДЛЯ APPLY_STATUS
 ## ============================================================
@@ -75,10 +77,14 @@ class_name EffectEntry
 ## ДЛЯ CONVERT
 ## ============================================================
 
-@export var from_stat: DataManager.FlatStat = DataManager.FlatStat.BLOCK
+@export var from_stat: DataManager.FlatStat = DataManager.FlatStat.ATONEMENT
 @export var to_stat: DataManager.FlatStat = DataManager.FlatStat.HEALTH
 @export var conversion_ratio: float = 1.0
 
+## ДЛЯ CONVERT_STATUS
+@export var convert_from_status: DataManager.Status = DataManager.Status.POISON
+@export var convert_to_stat: DataManager.FlatStat = DataManager.FlatStat.ATONEMENT
+@export var convert_conversion_ratio: float = 1.0
 
 ## ============================================================
 ## ДЛЯ CONDITIONAL
@@ -162,13 +168,6 @@ func duplicate_for_instance() -> EffectEntry:
 	return copy
 
 
-func get_scaled_value(tier: int) -> int:
-	if scaled_values.is_empty():
-		return 0
-	var index = clamp(tier, 0, scaled_values.size() - 1)
-	return scaled_values[index]
-
-
 func apply_growth():
 	if grow_type == DataManager.GrowType.NONE:
 		return
@@ -233,3 +232,30 @@ func is_custom() -> bool:
 ## Проверка, является ли эффект масштабируемым (scaled_value)
 func is_scaled() -> bool:
 	return category == DataManager.EffectCategory.SCALED_VALUE
+
+
+func get_scaled_value(resource_value: int) -> int:
+	if scaled_values.is_empty():
+		return 0
+	
+	var tier = 0
+	for i in range(scaled_thresholds.size()):
+		var threshold = scaled_thresholds[i]
+		match scaled_compare:
+			DataManager.ScaledCompare.GREATER_EQUAL:
+				if resource_value >= threshold:
+					tier = i
+			DataManager.ScaledCompare.LESSER_EQUAL:
+				if resource_value <= threshold:
+					tier = i
+			DataManager.ScaledCompare.GREATER:
+				if resource_value > threshold:
+					tier = i
+			DataManager.ScaledCompare.LESSER:
+				if resource_value < threshold:
+					tier = i
+			DataManager.ScaledCompare.EQUAL:
+				if resource_value == threshold:
+					tier = i
+	
+	return scaled_values[tier] if tier < scaled_values.size() else scaled_values[0]
