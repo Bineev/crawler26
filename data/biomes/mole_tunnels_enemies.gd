@@ -18,7 +18,6 @@ const INTENTS = {
 			# Ход 2
 			[
 				{ "category": DataManager.EffectCategory.DAMAGE, "target": DataManager.EffectTarget.ENEMY, "base_value": 5 },
-				{ "category": DataManager.EffectCategory.APPLY_PASSIVE, "target": DataManager.EffectTarget.SELF, "passive": DataManager.Passive.REGROWTH, "passive_duration": 3 }
 			],
 		]
 	},

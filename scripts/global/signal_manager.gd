@@ -92,3 +92,6 @@ signal show_paths(paths: Array)
 signal choice_panel_selected(path_index: int)
 
 signal player_took_damage(damage: int)
+
+signal player_damage_dealt(damage: int)
+signal player_heal_received(heal: int)

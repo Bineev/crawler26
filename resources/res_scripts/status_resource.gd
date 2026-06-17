@@ -80,16 +80,16 @@ func _generate_default_description() -> String:
 func get_tick_value(stacks: int, caster: CharacterStats = null) -> int:
 	match id:
 		DataManager.Status.BLEED:
-			return stacks * DataManager.BLEED_BASE_DAMAGE_PER_STACK
+			return stacks * RunManager.bleed_damage_per_stack
 		DataManager.Status.POISON:
-			return stacks * DataManager.POISON_BASE_DAMAGE_PER_STACK
+			return stacks * RunManager.poison_damage_per_stack
 		DataManager.Status.BURN:
-			var base_val = stacks * DataManager.BURN_BASE_DAMAGE_PER_STACK
+			var base_val = stacks * RunManager.burn_damage_per_stack
 			if caster and caster.has_method("get_strength_bonus"):
 				return base_val + caster.get_strength_bonus()
 			return base_val
 		DataManager.Status.REGEN:
-			return stacks * DataManager.REGEN_HEAL_PER_STACK
+			return stacks * RunManager.regen_heal_per_stack
 		_:
 			return 0
 

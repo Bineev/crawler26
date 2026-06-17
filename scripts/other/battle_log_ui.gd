@@ -51,6 +51,9 @@ func set_biome_style(biome: DataManager.Biome):
 
 
 func _add_log_entry(text: String):
+	if text.is_empty():
+		return
+	
 	if not log_container:
 		return
 	
@@ -59,23 +62,20 @@ func _add_log_entry(text: String):
 	entry.add_theme_color_override("font_color", _get_color_by_text(text))
 	entry.autowrap_mode = TextServer.AUTOWRAP_WORD
 	entry.add_theme_font_override("font", DataManager.FONT_MAIN)
-	entry.add_theme_font_size_override("font_size", 18)
-	# Уменьшаем отступы
-	entry.add_theme_constant_override("margin_top", 0)
-	entry.add_theme_constant_override("margin_bottom", 0)
-	# Фиксируем ширину, чтобы не дёргалось
-	entry.size_flags_horizontal = Control.SIZE_EXPAND
-	entry.custom_minimum_size.x = size.x - 30
+	entry.add_theme_font_size_override("font_size", 14)
 	
 	log_container.add_child(entry)
+	entry.custom_minimum_size.x = size.x - 30
 	
 	while log_container.get_child_count() > max_log_entries:
 		var oldest = log_container.get_child(0)
+		log_container.remove_child(oldest)
 		oldest.queue_free()
 	
+	# Проблема может быть здесь — await на process_frame
 	if scroll_container:
-		await get_tree().process_frame
-		scroll_container.scroll_vertical = scroll_container.get_v_scroll_bar().max_value
+		# Убрать await, использовать call_deferred
+		scroll_to_bottom()
 
 
 func _get_color_by_text(text: String) -> Color:
@@ -99,3 +99,10 @@ func clear_log():
 	if log_container:
 		for child in log_container.get_children():
 			child.queue_free()
+
+
+func scroll_to_bottom():
+	# Ждем, пока контейнер пересчитает размеры элементов
+	await scroll_container.sort_children
+	# Скроллим на максимально возможную величину
+	scroll_container.scroll_vertical = scroll_container.get_v_scroll_bar().max_value

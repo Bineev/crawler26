@@ -149,13 +149,15 @@ func take_damage(amount: int, ignore_block: bool = false):
 		else:
 			modify_flat(DataManager.FlatStat.BLOCK, -block_amount)
 			damage -= block_amount
-	
+	if self is PenitentStats:
+		SignalManager.player_damage_dealt.emit(damage)
 	if damage > 0:
 		SignalManager.log_message.emit("%s получил %d урона" % [get_display_name(), damage])
 		SignalManager.damage_dealt.emit(self, damage)
 		SignalManager.get_hit.emit(self)
 		if self is PenitentStats:
 			SignalManager.player_took_damage.emit(damage)
+			#SignalManager.player_damage_dealt.emit(damage)
 		modify_flat(DataManager.FlatStat.HEALTH, -damage)
 		on_take_damage_gain_resource(damage)
 		_process_passive_triggers(DataManager.PassiveTrigger.ON_TAKE_DAMAGE, damage)
@@ -171,6 +173,8 @@ func heal(amount: int):
 	set_flat(DataManager.FlatStat.HEALTH, min(new_health, get_max_health()))
 	SignalManager.log_message.emit("%s восстановил %d здоровья" % [get_display_name(), final_heal])
 	SignalManager.heal_received.emit(self, final_heal)
+	if self is PenitentStats:
+		SignalManager.player_heal_received.emit(final_heal)
 
 func on_take_damage_gain_resource(amount: int):
 	pass
@@ -308,27 +312,19 @@ func _process_passive_triggers(trigger: DataManager.PassiveTrigger, value = null
 ## ============================================================
 
 func process_end_of_turn():
+	# Убираем тик статусов (он теперь в process_start_of_turn)
+	# Оставляем только уменьшение длительности и удаление истекших статусов
 	var statuses_to_remove = []
 	
 	for status_id in active_statuses.keys():
 		var data = active_statuses[status_id]
 		var status = data["resource"]
 		
-		if status.is_ticking:
-			data.duration -= 1
-			
-			if status.tick_effect:
-				var tick_effect = status.tick_effect.duplicate_for_instance()
-				var caster = data.get("caster", null)
-				tick_effect.value = status.get_tick_value(data.stacks, caster)
-				EffectExecutor.execute(tick_effect, self, [self])
-			
-			if status.id == DataManager.Status.BURN and data.stacks >= DataManager.BURN_THRESHOLD_STACKS:
-				_trigger_burn_explosion(data.stacks)
-				statuses_to_remove.append(status_id)
-			
-			if data.duration <= 0:
-				statuses_to_remove.append(status_id)
+		# Уменьшаем длительность
+		data.duration -= 1
+		
+		if data.duration <= 0:
+			statuses_to_remove.append(status_id)
 	
 	for status_id in statuses_to_remove:
 		remove_status(status_id)
@@ -407,3 +403,50 @@ func _on_death():
 		SignalManager.enemy_died.emit(self)
 	elif self is PenitentStats:
 		SignalManager.player_died.emit(self)
+
+
+func get_applied_statuses() -> Array:
+	return active_statuses.keys()
+
+
+func process_start_of_turn():
+	var statuses_to_remove = []
+	
+	for status_id in active_statuses.keys():
+		var data = active_statuses[status_id]
+		var status = data["resource"]
+		
+		if status.is_ticking:
+			data.turn_counter = data.get("turn_counter", 0) + 1
+			
+			if data.turn_counter >= status.tick_interval:
+				if status.tick_effect:
+					var tick_effect = status.tick_effect.duplicate_for_instance()
+					var caster = data.get("caster", null)
+					
+					# Вычисляем значение тика
+					var tick_value = status.get_tick_value(data.stacks, caster)
+					
+					# В зависимости от категории эффекта
+					match tick_effect.category:
+						DataManager.EffectCategory.DAMAGE:
+							tick_effect.base_value = tick_value
+						DataManager.EffectCategory.HEAL:
+							tick_effect.base_value = tick_value
+						DataManager.EffectCategory.BLOCK:
+							tick_effect.base_value = tick_value
+						DataManager.EffectCategory.APPLY_STATUS:
+							tick_effect.value = tick_value
+						_:
+							tick_effect.base_value = tick_value
+					
+					EffectExecutor.execute(tick_effect, self, [self])
+				
+				data.turn_counter = 0
+			
+			if status.id == DataManager.Status.BURN and data.stacks >= DataManager.BURN_THRESHOLD_STACKS:
+				_trigger_burn_explosion(data.stacks)
+				statuses_to_remove.append(status_id)
+	
+	for status_id in statuses_to_remove:
+		remove_status(status_id)

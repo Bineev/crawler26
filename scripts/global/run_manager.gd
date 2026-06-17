@@ -3,6 +3,10 @@ extends Node
 
 var player_deck_data: DeckData = null
 
+var poison_damage_per_stack: int = DataManager.POISON_BASE_DAMAGE_PER_STACK
+var bleed_damage_per_stack: int = DataManager.BLEED_BASE_DAMAGE_PER_STACK
+var burn_damage_per_stack: int = DataManager.BURN_BASE_DAMAGE_PER_STACK
+var regen_heal_per_stack: int = DataManager.REGEN_HEAL_PER_STACK
 
 func _ready():
 	initialize_run()
@@ -33,3 +37,22 @@ func remove_card(card: CardData):
 func reset_deck():
 	player_deck_data = null
 	initialize_run()
+
+
+func modify_poison_damage(modifier: int):
+	poison_damage_per_stack += modifier
+
+
+func modify_bleed_damage(modifier: int):
+	bleed_damage_per_stack += modifier
+
+
+func modify_burn_damage(modifier: int):
+	burn_damage_per_stack += modifier
+
+
+func reset_status_values():
+	poison_damage_per_stack = DataManager.POISON_BASE_DAMAGE_PER_STACK
+	bleed_damage_per_stack = DataManager.BLEED_BASE_DAMAGE_PER_STACK
+	burn_damage_per_stack = DataManager.BURN_BASE_DAMAGE_PER_STACK
+	regen_heal_per_stack = DataManager.REGEN_HEAL_PER_STACK

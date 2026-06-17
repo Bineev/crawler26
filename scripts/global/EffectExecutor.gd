@@ -88,23 +88,22 @@ func _execute_damage(effect: EffectEntry, source, targets: Array) -> void:
 	var damage = effect.base_value
 	
 	if effect.stat_multiplier != null and effect.stat_divisor > 0:
-		if source.has_method("get_stat"):
+		if source and source.has_method("get_stat"):
 			var stat_value = source.get_stat(effect.stat_multiplier)
 			damage += stat_value / effect.stat_divisor
 	
-	if source.has_method("get_strength_bonus"):
+	if source and source.has_method("get_strength_bonus"):
 		damage += source.get_strength_bonus()
 	
-	if source.has_method("get_modifier"):
+	if source and source.has_method("get_modifier"):
 		damage += source.get_modifier(DataManager.ModifierStat.DAMAGE_FLAT_BONUS)
 		damage *= source.get_modifier(DataManager.ModifierStat.DAMAGE_DEALT_PERCENT)
 	
 	for target in targets:
-		if target.has_method("take_damage"):
+		if target and target.has_method("take_damage"):
 			var final_damage = damage
 			if target.has_method("get_modifier"):
 				final_damage *= target.get_modifier(DataManager.ModifierStat.DAMAGE_TAKEN_PERCENT)
-			#SignalManager.log_message.emit("Нанесено %d урона %s" % [final_damage, target.name])
 			target.take_damage(floor(final_damage))
 
 
@@ -157,7 +156,8 @@ func _execute_scaled_value(effect: EffectEntry, source, targets: Array) -> void:
 			source.gain_energy(value)
 		DataManager.ScaledType.DRAW_CARD:
 			#BUG
-			source.draw_cards(value)
+			if source.has_method("draw_cards"):
+				source.draw_cards(value)
 
 
 func _execute_apply_status(effect: EffectEntry, source, targets: Array, passive_context: PassiveResource = null) -> void:
@@ -165,11 +165,12 @@ func _execute_apply_status(effect: EffectEntry, source, targets: Array, passive_
 	var duration = effect.get_current_duration()
 	
 	if effect.stat_multiplier != null and effect.stat_divisor > 0:
-		if source.has_method("get_stat"):
-			duration += source.get_stat(effect.stat_multiplier) / effect.stat_divisor
+		if source and source.has_method("get_flat"):
+			var stat_value = source.get_flat(effect.stat_multiplier)
+			duration += stat_value / effect.stat_divisor
 	
 	for target in targets:
-		if target.has_method("add_status"):
+		if target and target.has_method("add_status"):
 			target.add_status(effect.status, value, max(1, duration), source, passive_context)
 
 
@@ -186,8 +187,8 @@ func _execute_modify_stat(effect: EffectEntry, source, targets: Array) -> void:
 	var delta = effect.delta
 	
 	for target in targets:
-		if target.has_method("modify_stat"):
-			target.modify_stat(effect.target_stat, delta)
+		if target and target.has_method("modify_flat"):
+			target.modify_flat(effect.target_stat, delta)
 
 
 func _execute_modify_modifier(effect: EffectEntry, source, targets: Array) -> void:
@@ -199,12 +200,12 @@ func _execute_modify_modifier(effect: EffectEntry, source, targets: Array) -> vo
 
 
 func _execute_draw_card(effect: EffectEntry, source) -> void:
-	if source.has_method("draw_cards"):
+	if source and source.has_method("draw_cards"):
 		source.draw_cards(effect.amount)
 
 
 func _execute_gain_energy(effect: EffectEntry, source) -> void:
-	if source.has_method("gain_energy"):
+	if source and source.has_method("gain_energy"):
 		source.gain_energy(effect.amount)
 
 
@@ -215,11 +216,11 @@ func _execute_sacrifice_card(effect: EffectEntry, source, card_info: Dictionary)
 
 func _execute_convert(effect: EffectEntry, source, targets: Array) -> void:
 	for target in targets:
-		if target.has_method("get_stat") and target.has_method("modify_stat"):
-			var value = target.get_stat(effect.from_stat)
+		if target and target.has_method("get_flat") and target.has_method("modify_flat"):
+			var value = target.get_flat(effect.from_stat)
 			var converted = floor(value * effect.conversion_ratio)
-			target.modify_stat(effect.from_stat, -value)
-			target.modify_stat(effect.to_stat, converted)
+			target.modify_flat(effect.from_stat, -value)
+			target.modify_flat(effect.to_stat, converted)
 
 
 func _execute_convert_excess_to_block(effect: EffectEntry, source, targets: Array) -> void:

@@ -54,13 +54,11 @@ func start_battle(player_stats: CharacterStats, enemy_instances: Array, battle_d
 	
 	# Инициализация врагов
 	for enemy in enemies:
-		if enemy.has_method("init"):
-			enemy.init(floor_level)
 		if enemy.has_method("load_intents"):
 			enemy.load_intents()
 	
 	# Раздаём карты (внутри вызывается add_card для каждой карты)
-	battle_deck.draw_initial_hand()
+	#battle_deck.draw_initial_hand()
 	
 	# НЕ вызываем update_hand повторно! Карты уже отрисованы в draw_initial_hand
 	
@@ -77,7 +75,10 @@ func start_player_turn():
 		return
 	
 	current_state = DataManager.BattleState.PLAYER_TURN
-	
+
+	if player:
+		player.process_start_of_turn()
+
 	# Сначала выбираем намерения для всех врагов
 	for enemy in enemies:
 		if enemy.is_alive():
@@ -90,7 +91,7 @@ func start_player_turn():
 	
 	if battle_deck:
 		battle_deck.start_turn()
-	
+	#BUG
 	SignalManager.player_turn_started.emit()
 	SignalManager.turn_started.emit()
 	SignalManager.log_message.emit("--- Ход игрока ---")
@@ -100,10 +101,18 @@ func start_player_turn():
 ## ============================================================
 
 func start_enemy_turn():
+	print("=== ENEMY TURN START ===")
+	print("Enemies count: ", enemies.size())
 	current_state = DataManager.BattleState.ENEMY_TURN
+	#BUG
 	SignalManager.enemy_turn_started.emit()
 	SignalManager.turn_started.emit()
-	
+
+	# Тик статусов каждого врага в начале хода
+	for enemy in enemies:
+		if enemy.is_alive():
+			enemy.process_start_of_turn()
+
 	for enemy in enemies:
 		if not enemy.is_alive():
 			continue

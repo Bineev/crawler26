@@ -12,6 +12,11 @@ var atonement_label: Label = null
 
 var player_stats: CharacterStats = null
 
+var floating_text_positions: Array[Vector2] = []
+var current_position_index: int = 0
+var floating_counter: int = 0
+var left_index: int = 0
+var right_index: int = 0
 
 func _ready() -> void:
 	vbox = $VBoxContainer
@@ -21,6 +26,8 @@ func _ready() -> void:
 	health_label = $VBoxContainer/HealthBar/HealthLabel
 	atonement_bar = $VBoxContainer/AtonementBar
 	atonement_label = $VBoxContainer/AtonementBar/AtonementLabel
+	# Инициализируем позиции для всплывающих цифр
+	_init_floating_positions()
 
 func setup(stats: CharacterStats):
 	player_stats = stats
@@ -30,10 +37,13 @@ func setup(stats: CharacterStats):
 	SignalManager.atonement_changed.connect(_on_atonement_changed)
 	SignalManager.status_added.connect(_on_status_changed)
 	SignalManager.status_removed.connect(_on_status_changed)
+		# Подписка на урон/лечение
+	SignalManager.player_damage_dealt.connect(_on_player_damage_dealt)
+	SignalManager.player_heal_received.connect(_on_player_heal_received)
 	
 	_update_health()
 	_update_atonement()
-	#_update_statuses()
+	_update_statuses()
 
 
 func _update_health():
@@ -101,13 +111,6 @@ func _on_status_changed(target: Node, status_id: int, stacks: int, duration: int
 		_update_statuses()
 
 
-func _exit_tree():
-	SignalManager.health_changed.disconnect(_on_health_changed)
-	SignalManager.atonement_changed.disconnect(_on_atonement_changed)
-	SignalManager.status_added.disconnect(_on_status_changed)
-	SignalManager.status_removed.disconnect(_on_status_changed)
-
-
 func _setup_bars():
 	# ===== ЗДОРОВЬЕ =====
 	# Фон
@@ -172,3 +175,74 @@ func _setup_bars():
 	# Обновляем значения
 	_update_health()
 	_update_atonement()
+
+
+func _on_player_damage_dealt(damage: int):
+	show_floating_text(str(damage), DataManager.COLOR_FLESH_CAVES_ART_BG_DARK)
+
+
+func _on_player_heal_received(heal: int):
+	show_floating_text("+" + str(heal), DataManager.COLOR_ROGUE_ART_BG_LIGHT)
+
+
+func show_floating_text(text: String, color: Color):
+	if floating_text_positions.is_empty():
+		_init_floating_positions()
+	
+	if floating_text_positions.is_empty():
+		return
+	
+	var pos: Vector2
+	
+	if floating_counter % 2 == 0:
+		# Чётные → левая сторона
+		pos = floating_text_positions[left_index]
+		left_index = (left_index + 1) % 5
+	else:
+		# Нечётные → правая сторона
+		pos = floating_text_positions[5 + right_index]
+		right_index = (right_index + 1) % 5
+	
+	floating_counter += 1
+	
+	var floating_text = preload("res://scenes/floating_text.tscn").instantiate() as FloatingText
+	add_child(floating_text)
+	floating_text.global_position = pos
+	floating_text.setup(text, color)
+
+
+func _exit_tree():
+	SignalManager.health_changed.disconnect(_on_health_changed)
+	SignalManager.atonement_changed.disconnect(_on_atonement_changed)
+	SignalManager.status_added.disconnect(_on_status_changed)
+	SignalManager.status_removed.disconnect(_on_status_changed)
+	SignalManager.player_damage_dealt.disconnect(_on_player_damage_dealt)
+	SignalManager.player_heal_received.disconnect(_on_player_heal_received)
+
+
+func _init_floating_positions():
+	if not portrait_texture:
+		return
+	
+	var portrait_pos = portrait_texture.global_position
+	var portrait_size = portrait_texture.size
+	
+	# Коэффициенты для позиций
+	var left_margin = 0.05   # от левого края
+	var right_margin = 0.05  # от правого края
+	var top_margin = 0.25    # от верхнего края (ниже глаз)
+	var bottom_margin = 0.75 # до нижнего края
+	
+	# Левые позиции
+	for i in range(5):
+		var t = float(i) / 4.0
+		var x = portrait_pos.x + portrait_size.x * left_margin + portrait_size.x * 0.05
+		var y = portrait_pos.y + portrait_size.y * (top_margin + t * (bottom_margin - top_margin))
+		floating_text_positions.append(Vector2(x, y))
+	
+	# Правые позиции
+	for i in range(5):
+		var t = float(i) / 4.0
+		var x = portrait_pos.x + portrait_size.x * (1 - right_margin) - portrait_size.x * 0.05
+		var y = portrait_pos.y + portrait_size.y * (top_margin + t * (bottom_margin - top_margin))
+		floating_text_positions.append(Vector2(x, y))
