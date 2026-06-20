@@ -23,7 +23,8 @@ static func select_enemies(combat_type: DataManager.CombatType, biome: DataManag
 
 
 static func _calculate_difficulty_factor(progress_on_floor: int) -> float:
-	return clamp(progress_on_floor / DataManager.DIFFICULTY_MAX_PROGRESS, 0.0, 1.0)
+	print(progress_on_floor / float(DataManager.DIFFICULTY_MAX_PROGRESS))
+	return clamp(progress_on_floor / float(DataManager.DIFFICULTY_MAX_PROGRESS), 0.0, 1.0)
 
 
 static func _select_normal_enemies(biome: DataManager.Biome, floor_level: int, difficulty: float) -> Array[EnemyResource]:
@@ -38,26 +39,94 @@ static func _select_normal_enemies(biome: DataManager.Biome, floor_level: int, d
 			DataManager.MoleEnemy.STRONG_MOLE,
 			DataManager.MoleEnemy.MOLE_FUNGUS,
 		]
+		var elite_enemies = [
+			DataManager.MoleEnemy.MANY_HEADED_MOLE,
+			DataManager.MoleEnemy.FUNGAL_MINER,
+		]
 		
-		if difficulty < DataManager.NORMAL_DIFFICULTY_EARLY:
-			var count = DataManager.NORMAL_ENEMY_COUNT_EARLY
-			for i in range(count):
-				var enemy_id = weak_enemies[randi() % weak_enemies.size()]
-				enemies.append(DataManager.get_enemy_resource(enemy_id))
+		# Количество врагов: от 1 до 3 в зависимости от difficulty
+		var count = 1
+		if difficulty >= 0.15:
+			count = 2
+		if difficulty >= 0.40:
+			count = 3
 		
-		elif difficulty < DataManager.NORMAL_DIFFICULTY_MID:
-			enemies.append(DataManager.get_enemy_resource(weak_enemies[0]))
-			enemies.append(DataManager.get_enemy_resource(normal_enemies[0]))
+		# Выбор состава в зависимости от difficulty
+		var composition = []
 		
-		elif difficulty < DataManager.NORMAL_DIFFICULTY_LATE:
-			for i in range(DataManager.NORMAL_ENEMY_COUNT_MID):
-				var normal_id = normal_enemies[randi() % normal_enemies.size()]
-				enemies.append(DataManager.get_enemy_resource(normal_id))
+		if count == 1:
+			# 1 враг
+			if difficulty <= 0.1:
+				composition = [weak_enemies[randi() % weak_enemies.size()]]
+			elif difficulty <= 0.2:
+				composition = [normal_enemies[randi() % normal_enemies.size()]]
+			else:
+				if randf() < 0.5:
+					composition = [normal_enemies[randi() % normal_enemies.size()]]
+				else:
+					composition = [elite_enemies[randi() % elite_enemies.size()]]
 		
-		else:
-			enemies.append(DataManager.get_enemy_resource(normal_enemies[0]))
-			enemies.append(DataManager.get_enemy_resource(normal_enemies[1]))
-			enemies.append(DataManager.get_enemy_resource(weak_enemies[0]))
+		elif count == 2:
+			# 2 врага
+			if difficulty <= 0.25:
+				# 2 слабых
+				composition = [
+					weak_enemies[randi() % weak_enemies.size()],
+					weak_enemies[randi() % weak_enemies.size()]
+				]
+			elif difficulty <= 0.35:
+				# 1 слабый + 1 обычный
+				composition = [
+					weak_enemies[randi() % weak_enemies.size()],
+					normal_enemies[randi() % normal_enemies.size()]
+				]
+			elif difficulty <= 0.50:
+				# 2 обычных
+				composition = [
+					normal_enemies[randi() % normal_enemies.size()],
+					normal_enemies[randi() % normal_enemies.size()]
+				]
+			else:
+				# 1 обычный + 1 элитный
+				composition = [
+					normal_enemies[randi() % normal_enemies.size()],
+					elite_enemies[randi() % elite_enemies.size()]
+				]
+		
+		elif count == 3:
+			# 3 врага
+			if difficulty <= 0.50:
+				# 2 слабых + 1 обычный
+				composition = [
+					weak_enemies[randi() % weak_enemies.size()],
+					weak_enemies[randi() % weak_enemies.size()],
+					normal_enemies[randi() % normal_enemies.size()]
+				]
+			elif difficulty <= 0.65:
+				# 1 слабый + 2 обычных
+				composition = [
+					weak_enemies[randi() % weak_enemies.size()],
+					normal_enemies[randi() % normal_enemies.size()],
+					normal_enemies[randi() % normal_enemies.size()]
+				]
+			elif difficulty <= 0.80:
+				# 3 обычных
+				composition = [
+					normal_enemies[randi() % normal_enemies.size()],
+					normal_enemies[randi() % normal_enemies.size()],
+					normal_enemies[randi() % normal_enemies.size()]
+				]
+			else:
+				# 1 элитный + 2 обычных
+				composition = [
+					elite_enemies[randi() % elite_enemies.size()],
+					normal_enemies[randi() % normal_enemies.size()],
+					normal_enemies[randi() % normal_enemies.size()]
+				]
+		
+		# Преобразуем состав в ресурсы врагов
+		for enemy_type in composition:
+			enemies.append(DataManager.get_enemy_resource(enemy_type))
 	
 	return enemies
 

@@ -145,7 +145,7 @@ func add_block(amount: int):
 		var shield_status = DataManager.get_status_resource(DataManager.Status.SHIELD)
 		add_status(shield_status, final_block, 1, self)  # на 1 ход
 
-func take_damage(amount: int, ignore_block: bool = false):
+func take_damage(amount: int, ignore_block: bool = false, attacker: CharacterStats = null):
 	var damage = amount
 	
 	if has_status(DataManager.Status.COLD):
@@ -174,7 +174,7 @@ func take_damage(amount: int, ignore_block: bool = false):
 			#SignalManager.player_damage_dealt.emit(damage)
 		modify_flat(DataManager.FlatStat.HEALTH, -damage)
 		on_take_damage_gain_resource(damage)
-		_process_passive_triggers(DataManager.PassiveTrigger.ON_TAKE_DAMAGE, damage)
+		_process_passive_triggers(DataManager.PassiveTrigger.ON_TAKE_DAMAGE, attacker)  # ← передаём атакующего, а не урон
 		
 	# Проверка смерти ВСЕГДА, даже если damage == 0
 	if get_health() <= 0:
@@ -358,11 +358,23 @@ func remove_passive(passive: PassiveResource):
 		print("Passive removed: ", passive.get_localized_name())  # ← отладка
 
 
-func _process_passive_triggers(trigger: DataManager.PassiveTrigger, value = null):
+func _process_passive_triggers(trigger: DataManager.PassiveTrigger, attacker = null):
 	for passive in active_passives:
 		if passive.trigger == trigger and passive.is_active():
 			for effect in passive.effects:
-				EffectExecutor.execute(effect, self, [self], {}, passive)
+				var targets = []
+				match effect.target:
+					DataManager.EffectTarget.SELF:
+						targets = [self]
+					DataManager.EffectTarget.ANY:
+						if attacker:
+							targets = [attacker]
+						else:
+							targets = [self]
+					_:
+						targets = [self]
+				
+				EffectExecutor.execute(effect, self, targets, {}, passive)
 
 ## ============================================================
 ## КОНЕЦ ХОДА

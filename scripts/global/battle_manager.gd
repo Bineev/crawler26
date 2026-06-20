@@ -102,9 +102,13 @@ func start_player_turn():
 
 func start_enemy_turn():
 	print("=== ENEMY TURN START ===")
-	print("Enemies count: ", enemies.size())
+	
+	# Удаляем мёртвых врагов
+	enemies = enemies.filter(func(e): return e != null and e.is_alive())
+	
+	print("Enemies alive: ", enemies.size())
+	
 	current_state = DataManager.BattleState.ENEMY_TURN
-	#BUG
 	SignalManager.enemy_turn_started.emit()
 	SignalManager.turn_started.emit()
 
@@ -119,7 +123,10 @@ func start_enemy_turn():
 		
 		var intent = enemy.current_intent
 		if intent:
-			await execute_enemy_action(enemy, intent)
+			await enemy.execute_intent_with_animation(player)  # ← ждём анимацию
+		
+		# Пауза между действиями врагов
+		await get_tree().create_timer(0.5).timeout
 		
 		if player and player.get_health() <= 0:
 			defeat()
@@ -137,12 +144,11 @@ func start_enemy_turn():
 
 
 func execute_enemy_action(enemy: EnemyInstance, intent: IntentEntry):
-	if enemy.has_method("execute_intent_with_animation"):
-		await enemy.execute_intent_with_animation(player)
-	else:
-		# Fallback
-		for effect in intent.effects:
-			EffectExecutor.execute(effect, enemy, [player])
+	print("execute_enemy_action: ", enemy.get_display_name())
+	
+	for effect in intent.effects:
+		EffectExecutor.execute(effect, enemy, [player])
+		await get_tree().create_timer(0.2).timeout
 
 ## ============================================================
 ## КОНЕЦ ХОДА
@@ -294,13 +300,16 @@ func end_player_turn():
 
 
 func _on_enemy_died(enemy: CharacterStats):
-	# Проверяем, все ли враги мертвы
+	print("Enemy died: ", enemy.get_display_name())
+	enemies.erase(enemy)
+	
+	# Проверяем, остались ли живые враги
 	var all_dead = true
 	for e in enemies:
 		if e.is_alive():
 			all_dead = false
 			break
-
+	
 	if all_dead:
 		victory()
 
@@ -348,3 +357,9 @@ func _clear_all_passives(target: CharacterStats):
 
 func get_hand_ui() -> HandUI:
 	return hand_ui
+
+
+func _execute_enemy_action(enemy: EnemyInstance, intent: IntentEntry):
+	for effect in intent.effects:
+		# При атаке врага source = enemy, target = player
+		EffectExecutor.execute(effect, enemy, [player])

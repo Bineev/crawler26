@@ -44,21 +44,18 @@ layout_mode = 2
 theme_override_constants/separation = 10
 alignment = 1
 
-[node name="LivingContainer" type="Control" parent="EnemyUI/VBoxContainer"]
+[node name="SpriteContainer" type="CenterContainer" parent="EnemyUI/VBoxContainer"]
 layout_mode = 2
-mouse_filter = 1
 
-[node name="SpriteContainer" type="CenterContainer" parent="EnemyUI/VBoxContainer/LivingContainer"]
-layout_mode = 0
-offset_top = 10.0
-offset_right = 40.0
-offset_bottom = 10.0
-
-[node name="EnemySpriteCopy" type="TextureRect" parent="EnemyUI/VBoxContainer/LivingContainer/SpriteContainer"]
+[node name="EnemySpriteCopy" type="TextureRect" parent="EnemyUI/VBoxContainer/SpriteContainer"]
 material = SubResource("ShaderMaterial_c4w8v")
 layout_mode = 2
 
-[node name="EnemySprite" type="TextureRect" parent="EnemyUI/VBoxContainer/LivingContainer/SpriteContainer"]
+[node name="LivingContainer" type="Control" parent="EnemyUI/VBoxContainer/SpriteContainer"]
+layout_mode = 2
+mouse_filter = 1
+
+[node name="EnemySprite" type="TextureRect" parent="EnemyUI/VBoxContainer/SpriteContainer"]
 material = SubResource("ShaderMaterial_5uy6h")
 layout_mode = 2
 

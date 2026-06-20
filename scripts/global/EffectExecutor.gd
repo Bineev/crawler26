@@ -107,7 +107,8 @@ func _execute_damage(effect: EffectEntry, source, targets: Array) -> void:
 			var final_damage = damage
 			if target.has_method("get_modifier"):
 				final_damage *= target.get_modifier(DataManager.ModifierStat.DAMAGE_TAKEN_PERCENT)
-			target.take_damage(floor(final_damage))
+			# Передаём source как атакующего
+			target.take_damage(floor(final_damage), false, source)
 
 
 func _execute_block(effect: EffectEntry, source, targets: Array) -> void:

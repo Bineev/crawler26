@@ -5,16 +5,16 @@ class_name EnemyUI
 ## ============================================================
 ## НОДЫ
 ## ============================================================
-@onready var enemy_sprite: TextureRect = $VBoxContainer/LivingContainer/SpriteContainer/EnemySprite
+@onready var enemy_sprite: TextureRect = $VBoxContainer/SpriteContainer/EnemySprite
 @onready var intents_container: HBoxContainer = $VBoxContainer/IntentsContainer
 @onready var health_bar: ProgressBar = $VBoxContainer/HealthBar
 @onready var health_label: Label = $VBoxContainer/HealthBar/HealthLabel
 @onready var status_container: HBoxContainer = $VBoxContainer/BottomPanel/StatusContainer
 @onready var passive_container: HBoxContainer = $VBoxContainer/BottomPanel/PassiveContainer
-@onready var living_container: Control = $VBoxContainer/LivingContainer  # новая нода
+@onready var living_container: Control = $VBoxContainer/SpriteContainer/LivingContainer
 @onready var click_area: Area2D = $ClickArea
 @onready var collision_shape: CollisionShape2D = $ClickArea/CollisionShape2D
-@onready var enemy_sprite_copy: TextureRect = $VBoxContainer/LivingContainer/SpriteContainer/EnemySpriteCopy
+@onready var enemy_sprite_copy: TextureRect = $VBoxContainer/SpriteContainer/EnemySpriteCopy
 
 var enemy_instance: EnemyInstance = null
 var breath_tween: Tween = null
@@ -134,15 +134,15 @@ func _start_living_animation():
 	if not living_container:
 		return
 	
-	breath_tween = create_tween()
-	breath_tween.set_loops()
-	breath_tween.tween_property(living_container, "scale", Vector2(1.008, 1.008), 5.0).set_ease(Tween.EASE_IN_OUT)
-	breath_tween.tween_property(living_container, "scale", Vector2(0.992, 0.992), 5.0).set_ease(Tween.EASE_IN_OUT)
+	#breath_tween = create_tween()
+	#breath_tween.set_loops()
+	#breath_tween.tween_property(living_container, "scale", Vector2(1.008, 1.008), 5.0).set_ease(Tween.EASE_IN_OUT)
+	#breath_tween.tween_property(living_container, "scale", Vector2(0.992, 0.992), 5.0).set_ease(Tween.EASE_IN_OUT)
 	
-	wobble_tween = create_tween()
-	wobble_tween.set_loops()
-	wobble_tween.tween_property(living_container, "position", Vector2(2, 0), 3.5).set_ease(Tween.EASE_IN_OUT).as_relative()
-	wobble_tween.tween_property(living_container, "position", Vector2(-2, 0), 3.5).set_ease(Tween.EASE_IN_OUT).as_relative()
+	#wobble_tween = create_tween()
+	#wobble_tween.set_loops()
+	#wobble_tween.tween_property(living_container, "position", Vector2(2, 0), 3.5).set_ease(Tween.EASE_IN_OUT).as_relative()
+	#wobble_tween.tween_property(living_container, "position", Vector2(-2, 0), 3.5).set_ease(Tween.EASE_IN_OUT).as_relative()
 
 
 func _stop_living_animation():
@@ -441,6 +441,8 @@ func _hit_effect():
 	var tween = create_tween()
 	tween.tween_property(material, "shader_parameter/hit_progress", 0.0, 0.3).set_trans(Tween.TRANS_QUART).set_ease(Tween.EASE_OUT)
 	
+		# Ждём завершения анимации
+	await tween.finished
 	# 2. Дёрганье (смещение) всей ноды Enemy
 	var original_position = position
 	

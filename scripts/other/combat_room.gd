@@ -14,7 +14,7 @@ const ENEMY_SCENE: PackedScene = preload("res://scenes/enemy.tscn")
 
 func _ready():
 	super._ready()
-	SignalManager.battle_victory.connect(_on_battle_victory)
+	#SignalManager.battle_victory.connect(on_battle_victory)
 
 
 func setup(room_data: Dictionary):
@@ -94,15 +94,13 @@ func layout_enemies():
 	
 	# Размещаем каждого врага
 	for i in range(count):
-		var enemy_node = enemies[i].get_parent()
-		if not enemy_node:
-			continue
+		var enemy = enemies[i]  # ← сам враг (EnemyInstance)
 		
 		var size = enemy_sizes[i]
 		var x_pos = start_x
 		var y_pos = y_base - size.y
 		
-		enemy_node.position = Vector2(x_pos, y_pos)
+		enemy.position = Vector2(x_pos, y_pos)  # ← позиционируем врага напрямую
 		
 		start_x += size.x + spacing
 
@@ -141,20 +139,13 @@ func _create_hand_ui() -> HandUI:
 	return hand_ui_instance
 
 
-func _on_battle_victory():
-	# Ждём 1.5 секунды, чтобы анимация смерти успела проиграться
+func on_battle_victory():
 	await get_tree().create_timer(1.5).timeout
-	# Очищаем UI (рука и лог) через GameTestManager
 	GameTestManager.clear_ui()
 	
-	# Проверяем развилку
-	var available_paths = FloorManager.get_available_paths()
-	if available_paths.is_empty():
-		SignalManager.next_room.emit()
-	else:
-		SignalManager.show_paths.emit(available_paths)
-		
-	# Удаляем комнату
+	# Просто говорим FloorManager, что комната пройдена
+	FloorManager.process_next()
+	
 	queue_free()
 
 

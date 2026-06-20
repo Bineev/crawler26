@@ -18,7 +18,9 @@ var current_path_index: int = 0
 
 # Временное хранение путей на развилке
 var pending_paths: Array[Array] = []
-
+var all_paths: Array = []  # [ [[path1_rooms], [path2_rooms]], [[path1_rooms], [path2_rooms]], ... ]
+var current_path_progress: int = 0  # сколько комнат пройдено в текущем пути
+var current_segment_index: int = 0  # текущий сегмент (развилка)
 # Флаг, нужно ли генерировать босса
 var boss_generated: bool = false
 
@@ -36,6 +38,7 @@ func start_floor():
 
 func reset():
 	all_rooms.clear()
+	all_paths.clear()
 	current_room_index = 0
 	current_path_index = 0
 	pending_paths.clear()
@@ -44,6 +47,7 @@ func reset():
 
 
 func next_room():
+	print('next room: ' + str(current_room_index + 1))
 	if current_room_index + 1 < all_rooms.size():
 		current_room_index += 1
 		_load_current_room()
@@ -99,7 +103,7 @@ func _add_branching_paths():
 			var visibility = "VISIBLE" if is_revealed else "HIDDEN"
 			print("      Room ", room_idx, ": ", _get_room_type_string(room.room_type, room.combat_type), " (", visibility, ")")
 	
-	pending_paths = paths
+	all_paths.append(paths)  # ← добавляем, а не перезаписываем
 
 
 func _generate_random_room(is_revealed: bool) -> RoomNode:
@@ -154,39 +158,39 @@ func _get_room_type_string(room_type: DataManager.RoomType, combat_type: DataMan
 ## ============================================================
 
 func select_path(path_index: int):
-	if pending_paths.is_empty():
-		print("No paths available to select!")
+	print("=== select_path ===")
+	print("path_index: ", path_index)
+	print("current_segment_index: ", current_segment_index)
+	
+	if current_segment_index >= all_paths.size():
+		print("No more segments!")
 		return
 	
-	if path_index < 0 or path_index >= pending_paths.size():
-		print("Invalid path index: ", path_index)
+	var current_paths = all_paths[current_segment_index]
+	if current_paths.is_empty():
 		return
 	
-	print("Path selected: ", path_index + 1)
-	current_path_index = path_index
-	
-	for room in pending_paths[path_index]:
+	# Добавляем комнаты выбранного пути в all_rooms
+	for room in current_paths[path_index]:
 		all_rooms.append(room)
 		print("  Added room: ", _get_room_type_string(room.room_type, room.combat_type))
 	
-	pending_paths = []
+	# Переходим к следующему сегменту для следующей развилки
+	current_segment_index += 1
+	
+	# Загружаем первую комнату пути
 	_load_current_room()
 
 
 func _load_current_room():
-	# Проверяем, нужно ли генерировать босса
-	if current_room_index >= all_rooms.size() and not boss_generated:
-		_start_boss_fight()
+	if current_path_progress >= all_rooms.size():
+		# Если нет комнат — вызываем process_next
+		process_next()
 		return
 	
-	if current_room_index >= all_rooms.size():
-		print("All rooms completed!")
-		floor_completed.emit()
-		return
-	
-	var room = all_rooms[current_room_index]
+	var room = all_rooms[current_path_progress]
 	room.is_visited = true
-	print("=== LOADING ROOM ", current_room_index, ": ", _get_room_type_string(room.room_type, room.combat_type), " ===")
+	print("=== LOADING ROOM ", current_path_progress, ": ", _get_room_type_string(room.room_type, room.combat_type), " ===")
 	room_selected.emit(room)
 
 
@@ -208,8 +212,10 @@ func _start_boss_fight():
 ## ПОЛУЧЕНИЕ ДАННЫХ
 ## ============================================================
 
-func get_available_paths() -> Array[Array]:
-	return pending_paths
+func get_available_paths() -> Array:
+	if current_segment_index < all_paths.size():
+		return all_paths[current_segment_index]
+	return []
 
 
 func get_current_room() -> RoomNode:
@@ -247,3 +253,35 @@ func is_boss_room(room_index: int) -> bool:
 		return false
 	var room = all_rooms[room_index]
 	return room.room_type == DataManager.RoomType.COMBAT and room.combat_type == DataManager.CombatType.BOSS
+
+
+func process_next():
+	print("=== process_next ===")
+	print("current_path_progress: ", current_path_progress)
+	print("all_rooms size: ", all_rooms.size())
+	print("current_segment_index: ", current_segment_index)
+	print("all_paths size: ", all_paths.size())
+	
+	# 1. Увеличиваем прогресс пути
+	current_path_progress += 1
+	
+	# 2. Проверяем, есть ли комнаты в all_rooms
+	if current_path_progress < all_rooms.size():
+		# Есть следующая комната — загружаем
+		current_room_index = current_path_progress
+		_load_current_room()
+		return
+	
+	# 3. Комнаты в пути закончились — переходим к следующему сегменту
+	# current_segment_index уже указывает на следующий сегмент,
+	# потому что мы увеличили его при выборе пути
+	current_path_progress = all_rooms.size()  # сохраняем как есть
+	
+	# 4. Проверяем, есть ли следующий сегмент
+	if current_segment_index < all_paths.size():
+		# Есть развилка — показываем выбор
+		var available_paths = all_paths[current_segment_index]
+		SignalManager.show_paths.emit(available_paths)
+	else:
+		# Нет больше сегментов — босс
+		_start_boss_fight()
