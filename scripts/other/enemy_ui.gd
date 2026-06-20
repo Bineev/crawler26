@@ -255,7 +255,11 @@ func _create_intent_item(effect: EffectEntry) -> Control:
 	match effect.category:
 		DataManager.EffectCategory.DAMAGE:
 			icon.texture = DataManager.get_intent_icon(DataManager.IntentType.ATTACK)
-			value_label.text = str(effect.base_value)
+			# Вычисляем финальный урон с учётом силы
+			var base_damage = effect.base_value
+			var strength_bonus = enemy_instance.get_strength_bonus() if enemy_instance else 0
+			var final_damage = base_damage + strength_bonus
+			value_label.text = str(final_damage)
 			tooltip_text = "Враг собирается атаковать"
 		DataManager.EffectCategory.BLOCK:
 			icon.texture = DataManager.get_intent_icon(DataManager.IntentType.DEFEND)

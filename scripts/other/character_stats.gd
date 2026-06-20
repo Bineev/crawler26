@@ -389,6 +389,10 @@ func process_end_of_turn():
 		var data = active_statuses[status_id]
 		var status = data["resource"]
 		
+		# SHIELD не уменьшается в конце хода (снимается в начале)
+		if status.id == DataManager.Status.SHIELD:
+			continue
+		
 		# Уменьшаем длительность
 		data.duration -= 1
 		
@@ -479,6 +483,9 @@ func get_applied_statuses() -> Array:
 
 
 func process_start_of_turn():
+	# Снимаем SHIELD в начале хода
+	if has_status(DataManager.Status.SHIELD):
+		remove_status(DataManager.Status.SHIELD)
 	var statuses_to_remove = []
 	
 	for status_id in active_statuses.keys():
@@ -519,3 +526,12 @@ func process_start_of_turn():
 	
 	for status_id in statuses_to_remove:
 		remove_status(status_id)
+
+
+func trigger_poison_immediately():
+	if has_status(DataManager.Status.POISON):
+		var stacks = get_status_stacks(DataManager.Status.POISON)
+		var damage = stacks * DataManager.POISON_BASE_DAMAGE_PER_STACK
+		take_damage(damage, true)
+		remove_status(DataManager.Status.POISON)
+		SignalManager.log_message.emit("Яд сработал мгновенно! %d урона" % damage)

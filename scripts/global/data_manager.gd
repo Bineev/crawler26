@@ -332,7 +332,7 @@ enum RoomReveal {
 ## ============================================================
 
 const FLOOR_ROOMS_PER_PATH: int = 3           # комнат в одном пути
-const FLOOR_VISIBLE_ROOMS: int = 1            # видимых комнат в пути
+const FLOOR_VISIBLE_ROOMS: int = 3            # видимых комнат в пути
 const FLOOR_PATHS_COUNT: int = 2              # количество путей на развилке
 const FLOOR_SEGMENTS_BEFORE_BOSS: int = 3     # сегментов (развилок) до босса
 ## ============================================================
@@ -348,7 +348,7 @@ const MAX_ENERGY: int = 3
 ## === Сломленный (Penitent) ===
 const PENITENT_STARTING_HEALTH: int = 80
 const PENITENT_MAX_ATONEMENT: int = 30
-const PENITENT_ATONEMENT_GAIN_PER_ATTACK: int = 3
+const PENITENT_ATONEMENT_GAIN_PER_ATTACK: int = 5
 
 ## === Статусы ===
 

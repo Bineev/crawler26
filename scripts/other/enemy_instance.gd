@@ -298,7 +298,27 @@ func execute_intent_with_animation(target: CharacterStats):
 		else:
 			await get_tree().create_timer(0.3).timeout
 	
-	# Выполняем эффекты
+	# Выполняем эффекты с правильными целями
 	SignalManager.log_message.emit("%s атакует!" % get_display_name())
 	for effect in current_intent.effects:
-		EffectExecutor.execute(effect, self, [target])
+		var targets = _get_targets_for_effect(effect, target)
+		EffectExecutor.execute(effect, self, targets)
+
+
+func _get_targets_for_effect(effect: EffectEntry, target: CharacterStats) -> Array:
+	match effect.target:
+		DataManager.EffectTarget.SELF:
+			return [self]
+		DataManager.EffectTarget.ENEMY:
+			return [target] if target else []
+		DataManager.EffectTarget.ALL_ENEMIES:
+			# Если есть несколько врагов, возвращаем всех (кроме себя)
+			var all_targets = BattleManager.get_enemies()
+			return all_targets
+		DataManager.EffectTarget.ALL_ALLIES:
+			# Союзники врага — это он сам
+			return [self]
+		DataManager.EffectTarget.ANY:
+			return [target] if target else []
+		_:
+			return [target] if target else []

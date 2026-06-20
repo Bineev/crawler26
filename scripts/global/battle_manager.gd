@@ -141,15 +141,6 @@ func start_enemy_turn():
 		return
 	
 	start_player_turn()
-
-
-func execute_enemy_action(enemy: EnemyInstance, intent: IntentEntry):
-	print("execute_enemy_action: ", enemy.get_display_name())
-	
-	for effect in intent.effects:
-		EffectExecutor.execute(effect, enemy, [player])
-		await get_tree().create_timer(0.2).timeout
-
 ## ============================================================
 ## КОНЕЦ ХОДА
 ## ============================================================
@@ -357,9 +348,3 @@ func _clear_all_passives(target: CharacterStats):
 
 func get_hand_ui() -> HandUI:
 	return hand_ui
-
-
-func _execute_enemy_action(enemy: EnemyInstance, intent: IntentEntry):
-	for effect in intent.effects:
-		# При атаке врага source = enemy, target = player
-		EffectExecutor.execute(effect, enemy, [player])
