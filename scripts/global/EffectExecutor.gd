@@ -473,43 +473,52 @@ func _execute_convert_status(effect: EffectEntry, source, targets: Array) -> voi
 
 
 func _execute_sacrifice_card(effect: EffectEntry, source, card_info: Dictionary) -> void:
-	var card_ui_to_sacrifice = null
-	var card_data_to_sacrifice = null
-	
-	# Если в card_info передана конкретная карта — сжигаем её
-	if card_info.has("card_data") and card_info.has("card"):
-		card_data_to_sacrifice = card_info.get("card_data")
-		card_ui_to_sacrifice = card_info.get("card")
-	
-	# Если не передана — выбираем случайную карту из руки
-	if not card_data_to_sacrifice:
-		var battle_deck = BattleManager.get_battle_deck()
-		if not battle_deck:
-			return
-		
-		var hand = battle_deck.get_hand()
-		if hand.is_empty():
-			SignalManager.log_message.emit("Нет карт для сожжения!")
-			return
-		
-		# Выбираем случайную карту (кроме текущей)
-		var random_index = randi() % hand.size()
-		var random_card = hand[random_index]
-		
-		# Находим CardUI для этой карты
-		var hand_ui = BattleManager.get_hand_ui()
-		if hand_ui:
-			var card_uis = hand_ui.get_card_uis()
-			for ui in card_uis:
-				if ui.card_data == random_card:
-					card_ui_to_sacrifice = ui
-					break
-		
-		card_data_to_sacrifice = random_card
-	
-	if not card_data_to_sacrifice:
-		return
+	var current_card_data = card_info.get("card_data")
+	var current_card_ui = card_info.get("card")
+	var amount_to_sacrifice = effect.amount  # сколько карт нужно сжечь
 	
 	var battle_deck = BattleManager.get_battle_deck()
-	if battle_deck:
-		await battle_deck.sacrifice_card(card_ui_to_sacrifice, card_data_to_sacrifice)
+	if not battle_deck:
+		return
+	
+	var hand = battle_deck.get_hand()
+	
+	# Проверяем, что в руке достаточно карт:
+	# нужно: текущая карта + amount_to_sacrifice других карт
+	if hand.size() <= amount_to_sacrifice:
+		SignalManager.log_message.emit("Нужно сжечь %d карт, но в руке недостаточно!" % amount_to_sacrifice)
+		return
+	
+	# Собираем карты для сожжения (исключаем текущую)
+	var available_cards = []
+	for card in hand:
+		if card != current_card_data:
+			available_cards.append(card)
+	
+	if available_cards.size() < amount_to_sacrifice:
+		SignalManager.log_message.emit("Недостаточно других карт для сожжения! Нужно: %d, доступно: %d" % [amount_to_sacrifice, available_cards.size()])
+		return
+	
+	# Сжигаем amount_to_sacrifice случайных карт
+	var cards_to_sacrifice = []
+	for i in range(amount_to_sacrifice):
+		var random_index = randi() % available_cards.size()
+		var random_card = available_cards[random_index]
+		cards_to_sacrifice.append(random_card)
+		available_cards.remove_at(random_index)
+	
+	# Находим CardUI для каждой карты
+	var card_uis_to_sacrifice = []
+	var hand_ui = BattleManager.get_hand_ui()
+	if hand_ui:
+		var card_uis = hand_ui.get_card_uis()
+		for card_data in cards_to_sacrifice:
+			for ui in card_uis:
+				if ui.card_data == card_data:
+					card_uis_to_sacrifice.append(ui)
+					break
+	
+	# Сжигаем все выбранные карты
+	for i in range(cards_to_sacrifice.size()):
+		var card_ui = card_uis_to_sacrifice[i] if i < card_uis_to_sacrifice.size() else null
+		await battle_deck.sacrifice_card(card_ui, cards_to_sacrifice[i])

@@ -73,9 +73,20 @@ func set_flat(stat: DataManager.FlatStat, value: int):
 
 func modify_flat(stat: DataManager.FlatStat, delta: int):
 	var new_value = flats.get(stat, 0) + delta
-	if stat == DataManager.FlatStat.HEALTH:
-		var max_health = get_flat(DataManager.FlatStat.MAX_HEALTH)
-		new_value = clamp(new_value, 0, max_health)
+	
+	match stat:
+		DataManager.FlatStat.HEALTH:
+			var max_health = get_flat(DataManager.FlatStat.MAX_HEALTH)
+			new_value = clamp(new_value, 0, max_health)
+		
+		DataManager.FlatStat.ATONEMENT:
+			var max_atonement = get_flat(DataManager.FlatStat.MAX_ATONEMENT)
+			new_value = clamp(new_value, 0, max_atonement)
+		
+		DataManager.FlatStat.ENERGY:
+			var max_energy = get_flat(DataManager.FlatStat.MAX_ENERGY)
+			new_value = clamp(new_value, 0, max_energy)
+	
 	flats[stat] = new_value
 	_emit_flat_signal(stat)
 
@@ -172,12 +183,26 @@ func take_damage(amount: int, ignore_block: bool = false):
 
 func heal(amount: int):
 	var final_heal = floor(amount * get_modifier(DataManager.ModifierStat.HEALING_RECEIVED_PERCENT))
-	var new_health = get_health() + final_heal
-	set_flat(DataManager.FlatStat.HEALTH, min(new_health, get_max_health()))
-	SignalManager.log_message.emit("%s восстановил %d здоровья" % [get_display_name(), final_heal])
-	SignalManager.heal_received.emit(self, final_heal)
-	if self is PenitentStats:
-		SignalManager.player_heal_received.emit(final_heal)
+	if final_heal <= 0:
+		return
+	
+	var current_health = get_health()
+	var max_health = get_max_health()
+	
+	# Если здоровье уже полное — не лечим и не показываем цифры
+	if current_health >= max_health:
+		return
+	
+	var new_health = min(current_health + final_heal, max_health)
+	var actual_heal = new_health - current_health
+	
+	if actual_heal <= 0:
+		return
+	
+	set_flat(DataManager.FlatStat.HEALTH, new_health)
+	SignalManager.log_message.emit("%s восстановил %d здоровья" % [get_display_name(), actual_heal])
+	SignalManager.heal_received.emit(self, actual_heal)
+
 
 func on_take_damage_gain_resource(amount: int):
 	pass
@@ -330,6 +355,7 @@ func remove_passive(passive: PassiveResource):
 					modifiers[mod.stat] = modifiers.get(mod.stat, 0.0) - mod.value
 		
 		SignalManager.passive_removed.emit(self, passive.id)
+		print("Passive removed: ", passive.get_localized_name())  # ← отладка
 
 
 func _process_passive_triggers(trigger: DataManager.PassiveTrigger, value = null):

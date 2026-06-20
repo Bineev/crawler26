@@ -320,11 +320,7 @@ func play_card(target = null):
 	# Выполняем эффекты карты (после анимации)
 	for effect in card_data.effects:
 		var targets = _get_targets_for_effect(effect, target)
-		if effect.category == DataManager.EffectCategory.SACRIFICE_CARD:
-			# Не передаём текущую карту для сожжения
-			EffectExecutor.execute(effect, player_stats, targets, {"card_data": null, "card": null})
-		else:
-			EffectExecutor.execute(effect, player_stats, targets, {"card": self, "card_data": card_data})
+		EffectExecutor.execute(effect, player_stats, targets, {"card": self, "card_data": card_data})
 	
 	# Если карта сожжена — она уже удалится через burn анимацию
 	if state != DataManager.CardState.BURNED:
@@ -610,7 +606,7 @@ func play_burn_animation():
 	burn_material.set_shader_parameter("death_progress", 0.0)
 	
 	# Высчитываем целевую глобальную позицию (замените вектор на нужный вам)
-	var target_global_position = Vector2(100, 800)
+	var target_global_position = Vector2(50, 600)
 	
 	var tween = create_tween()
 	
@@ -622,7 +618,7 @@ func play_burn_animation():
 		self,
 		"global_position", 
 		target_global_position, 
-		1
+		0.5
 	)
 	
 	effect_overlay3.show()

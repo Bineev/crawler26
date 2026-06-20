@@ -130,13 +130,23 @@ func sacrifice_card(card_ui: CardUI, card_data: CardData):
 		
 		if card_ui:
 			card_ui.state = DataManager.CardState.BURNED  # помечаем как сожжённую
+			if hand_ui:
+				hand_ui.move_card_to_burn(card_ui)
 			await card_ui.play_burn_animation()
 		else:
-			queue_free()
+		   # Если нет CardUI, просто удаляем карту (карта удаляется навсегда)
+			# queue_free() не нужен — это BattleDeck, а не CardUI
+			pass
 		
-		SignalManager.card_discarded.emit(card_data)
+		# Сожжённая карта НЕ отправляется в discard
+		# SignalManager.card_discarded.emit(card_data)  # ← УБРАТЬ
+		
+		print("Card sacrificed: ", card_data.get_localized_name())
+		
+		# Перестраиваем руку после сжигания
+		if hand_ui:
+			hand_ui.layout_cards()
 	
-
 
 func draw_cards(amount: int, ignore_hand_limit: bool = false):
 	var drawn = 0

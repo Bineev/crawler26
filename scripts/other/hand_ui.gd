@@ -3,6 +3,7 @@ extends Control
 class_name HandUI
 
 var cards_container: Node2D = null
+var burn_container: Node2D = null
 var is_manual_layout: bool = true
 var is_aiming_mode: bool = false
 
@@ -16,6 +17,7 @@ var arrow_head: Sprite2D
 
 func _ready():
 	cards_container = $CardsContainer
+	burn_container = $BurnContainer
 	if not cards_container:
 		print("ERROR: CardsContainer not found!")
 	is_manual_layout = true
@@ -78,6 +80,7 @@ func remove_card(card_ui: CardUI):
 			layout_cards()
 
 func layout_cards():
+	#BUG
 	var card_count = cards_container.get_child_count()
 	if card_count == 0:
 		return
@@ -256,3 +259,19 @@ func get_card_uis() -> Array[CardUI]:
 			if child is CardUI:
 				result.append(child)
 	return result
+
+
+func move_card_to_burn(card_ui: CardUI) -> void:
+	if not burn_container or not card_ui:
+		return
+	
+	# Сохраняем глобальную позицию карты
+	var global_pos = card_ui.global_position
+	
+	# Перемещаем карту в burn_container
+	cards_container.remove_child(card_ui)
+	burn_container.add_child(card_ui)
+	
+	# Восстанавливаем позицию (сохраняем визуальное положение)
+	card_ui.global_position = global_pos
+	card_ui.z_index = 100

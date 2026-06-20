@@ -117,12 +117,12 @@ func _setup_bars():
 	# ===== ЗДОРОВЬЕ =====
 	# Фон
 	var health_bg = StyleBoxFlat.new()
-	health_bg.bg_color = Color(0.15, 0.05, 0.05, 0.8)
+	health_bg.bg_color = Color.BLACK
 	health_bg.border_width_bottom = 2
 	health_bg.border_width_top = 2
 	health_bg.border_width_left = 2
 	health_bg.border_width_right = 2
-	health_bg.border_color = Color(0.3, 0.1, 0.1)
+	health_bg.border_color = DataManager.COLOR_MOLE_TUNNELS_ART_BG_LIGHT
 	health_bar.add_theme_stylebox_override("background", health_bg)
 	
 	# Заливка (красный)
@@ -132,11 +132,11 @@ func _setup_bars():
 	health_fill.border_width_top = 1
 	health_fill.border_width_left = 1
 	health_fill.border_width_right = 1
-	health_fill.border_color = Color(0.5, 0.15, 0.15)
+	health_fill.border_color = DataManager.COLOR_MOLE_TUNNELS_ART_BG_LIGHT
 	health_bar.add_theme_stylebox_override("fill", health_fill)
 	
 	# Текст
-	health_label.add_theme_color_override("font_color", Color.WHITE)
+	health_label.add_theme_color_override("font_color", DataManager.COLOR_MOLE_TUNNELS_ART_BG_LIGHT)
 	health_label.add_theme_font_override("font", DataManager.FONT_MAIN)
 	health_label.add_theme_font_size_override("font_size", 14)
 	health_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -145,26 +145,26 @@ func _setup_bars():
 	# ===== ИСКУПЛЕНИЕ =====
 	# Фон
 	var atonement_bg = StyleBoxFlat.new()
-	atonement_bg.bg_color = Color(0.1, 0.08, 0.05, 0.8)
+	atonement_bg.bg_color = Color.BLACK
 	atonement_bg.border_width_bottom = 2
 	atonement_bg.border_width_top = 2
 	atonement_bg.border_width_left = 2
 	atonement_bg.border_width_right = 2
-	atonement_bg.border_color = Color(0.2, 0.15, 0.1)
+	atonement_bg.border_color = DataManager.COLOR_MOLE_TUNNELS_ART_BG_LIGHT
 	atonement_bar.add_theme_stylebox_override("background", atonement_bg)
 	
 	# Заливка (бежевый)
 	var atonement_fill = StyleBoxFlat.new()
-	atonement_fill.bg_color = DataManager.COLOR_PENITENT_ART_BG_LIGHT
+	atonement_fill.bg_color = DataManager.COLOR_ATONEMENT_DARK
 	atonement_fill.border_width_bottom = 1
 	atonement_fill.border_width_top = 1
 	atonement_fill.border_width_left = 1
 	atonement_fill.border_width_right = 1
-	atonement_fill.border_color = Color(0.4, 0.3, 0.2)
+	atonement_fill.border_color = DataManager.COLOR_MOLE_TUNNELS_ART_BG_LIGHT
 	atonement_bar.add_theme_stylebox_override("fill", atonement_fill)
 	
 	# Текст
-	atonement_label.add_theme_color_override("font_color", Color.WHITE)
+	atonement_label.add_theme_color_override("font_color", DataManager.COLOR_MOLE_TUNNELS_ART_BG_LIGHT)
 	atonement_label.add_theme_font_override("font", DataManager.FONT_MAIN)
 	atonement_label.add_theme_font_size_override("font_size", 14)
 	atonement_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER

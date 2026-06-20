@@ -348,7 +348,7 @@ const MAX_ENERGY: int = 3
 ## === Сломленный (Penitent) ===
 const PENITENT_STARTING_HEALTH: int = 80
 const PENITENT_MAX_ATONEMENT: int = 30
-const PENITENT_ATONEMENT_GAIN_PER_DAMAGE: int = 0.2
+const PENITENT_ATONEMENT_GAIN_PER_ATTACK: int = 3
 
 ## === Статусы ===
 
@@ -1096,6 +1096,19 @@ const COLOR_BONE_LABYRINTH_ART_BG_LIGHT: Color = Color("BFB8A6")   # светл�
 const COLOR_DAMAGE_LOG: Color = Color(1, 0.3, 0.2)
 const COLOR_HEAL_LOG: Color = Color(0.4, 0.8, 0.3)
 
+## ============================================================
+## ЦВЕТА ИСКУПЛЕНИЯ (ATONEMENT)
+## ============================================================
+
+# Тёмный космический фиолетово-синий
+const COLOR_ATONEMENT_DARK: Color = Color("1a0a2e")     # глубокий фиолетовый
+const COLOR_ATONEMENT_MID: Color = Color("3d1f6d")      # средне-фиолетовый
+const COLOR_ATONEMENT_LIGHT: Color = Color("7a4db3")    # светло-фиолетовый
+const COLOR_ATONEMENT_GLOW: Color = Color("a87fd4")     # свечение
+
+# Альтернативный вариант — глубокий синий с фиолетовым отливом
+const COLOR_ATONEMENT_BLUE: Color = Color("0a1628")     # космический синий
+const COLOR_ATONEMENT_PURPLE: Color = Color("2d1b4e")    # фиолетово-синий
 ## ============================================================
 ## ЦВЕТА ПОДЛОЖКИ КАРТ (CARDBACKGROUND)
 ## ============================================================

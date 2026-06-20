@@ -1,8 +1,17 @@
-[gd_scene load_steps=5 format=3 uid="uid://rfsuaeky3l17"]
+[gd_scene load_steps=7 format=3 uid="uid://rfsuaeky3l17"]
 
 [ext_resource type="Script" uid="uid://cujnkju5sswv0" path="res://scripts/other/enemy_instance.gd" id="1_7p1mj"]
 [ext_resource type="Script" uid="uid://hpnp0qu0c4eu" path="res://scripts/other/enemy_ui.gd" id="2_md0e3"]
 [ext_resource type="Shader" uid="uid://docxqw4n3pjei" path="res://shaders/get_hit_shader.gdshader" id="3_4ra3w"]
+[ext_resource type="Shader" uid="uid://bni0wehijhgim" path="res://shaders/ui_shadow.gdshader" id="3_5uy6h"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_c4w8v"]
+shader = ExtResource("3_5uy6h")
+shader_parameter/shadow_height = 0.350000016625
+shader_parameter/shadow_width = 0.80000001425
+shader_parameter/shadow_skew = 4.7499999933364734e-08
+shader_parameter/vertical_offset = 0.050000026124999986
+shader_parameter/shadow_color = Color(0, 0, 0, 0.3529412)
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_5uy6h"]
 shader = ExtResource("3_4ra3w")
@@ -45,6 +54,10 @@ offset_top = 10.0
 offset_right = 40.0
 offset_bottom = 10.0
 
+[node name="EnemySpriteCopy" type="TextureRect" parent="EnemyUI/VBoxContainer/LivingContainer/SpriteContainer"]
+material = SubResource("ShaderMaterial_c4w8v")
+layout_mode = 2
+
 [node name="EnemySprite" type="TextureRect" parent="EnemyUI/VBoxContainer/LivingContainer/SpriteContainer"]
 material = SubResource("ShaderMaterial_5uy6h")
 layout_mode = 2
@@ -52,11 +65,17 @@ layout_mode = 2
 [node name="HealthBar" type="ProgressBar" parent="EnemyUI/VBoxContainer"]
 layout_mode = 2
 mouse_filter = 1
+show_percentage = false
 
 [node name="HealthLabel" type="Label" parent="EnemyUI/VBoxContainer/HealthBar"]
-layout_mode = 0
-offset_right = 40.0
-offset_bottom = 23.0
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="BottomPanel" type="HBoxContainer" parent="EnemyUI/VBoxContainer"]
 layout_mode = 2

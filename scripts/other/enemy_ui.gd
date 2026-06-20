@@ -14,6 +14,7 @@ class_name EnemyUI
 @onready var living_container: Control = $VBoxContainer/LivingContainer  # новая нода
 @onready var click_area: Area2D = $ClickArea
 @onready var collision_shape: CollisionShape2D = $ClickArea/CollisionShape2D
+@onready var enemy_sprite_copy: TextureRect = $VBoxContainer/LivingContainer/SpriteContainer/EnemySpriteCopy
 
 var enemy_instance: EnemyInstance = null
 var breath_tween: Tween = null
@@ -31,6 +32,7 @@ func setup(enemy: EnemyInstance):
 	enemy_instance = enemy
 	update_display()
 	_setup_click_area()
+	_setup_health_bar()  # ← добавить
 	living_container.custom_minimum_size = enemy_instance.resource.get_size_pixels()
 	
 	# Поднимаем врага выше дыма
@@ -50,6 +52,7 @@ func setup(enemy: EnemyInstance):
 	SignalManager.enemy_health_changed.connect(_on_enemy_health_changed)
 	SignalManager.enemy_status_changed.connect(_on_enemy_status_changed)
 	SignalManager.enemy_intent_changed.connect(_on_enemy_intent_changed)
+	SignalManager.passive_removed.connect(_on_passive_changed)  # ← проверь, что есть
 	
 
 func _add_aura_effect():
@@ -177,7 +180,9 @@ func update_display():
 	# Спрайт
 	if enemy_sprite:
 		enemy_sprite.texture = enemy_instance.get_sprite()
-	
+		# Копия спрайта
+	if enemy_sprite_copy:
+		enemy_sprite_copy.texture = enemy_instance.get_sprite()
 	# Здоровье
 	var current_health = enemy_instance.get_health()
 	var max_health = enemy_instance.get_max_health()
@@ -609,3 +614,46 @@ func play_debuff_animation():
 
 func play_delay(duration: float = 0.3):
 	await get_tree().create_timer(duration).timeout
+
+
+func _on_passive_changed(target: Node, passive_id: int):
+	print("_on_passive_changed: target=", target, " passive_id=", passive_id, " enemy_instance=", enemy_instance)
+	if target == enemy_instance:
+		print("  Updating passives for enemy")
+		update_passives()
+
+
+func _setup_health_bar():
+	if not health_bar:
+		return
+	
+	# Фон
+	var health_bg = StyleBoxFlat.new()
+	health_bg.bg_color = Color.BLACK
+	health_bg.border_width_bottom = 2
+	health_bg.border_width_top = 2
+	health_bg.border_width_left = 2
+	health_bg.border_width_right = 2
+	health_bg.border_color = DataManager.COLOR_MOLE_TUNNELS_ART_BG_LIGHT
+	health_bar.add_theme_stylebox_override("background", health_bg)
+	
+	# Заливка (красный)
+	var health_fill = StyleBoxFlat.new()
+	health_fill.bg_color = DataManager.COLOR_FLESH_CAVES_ART_BG_DARK
+	health_fill.border_width_bottom = 1
+	health_fill.border_width_top = 1
+	health_fill.border_width_left = 1
+	health_fill.border_width_right = 1
+	health_fill.border_color = DataManager.COLOR_MOLE_TUNNELS_ART_BG_LIGHT
+	health_bar.add_theme_stylebox_override("fill", health_fill)
+	
+	# Текст
+	if health_label:
+		health_label.add_theme_color_override("font_color", DataManager.COLOR_MOLE_TUNNELS_ART_BG_LIGHT)
+		health_label.add_theme_font_override("font", DataManager.FONT_MAIN)
+		health_label.add_theme_font_size_override("font_size", 14)
+		health_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		health_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	
+	# Высота бара
+	health_bar.custom_minimum_size = Vector2(0, 24)

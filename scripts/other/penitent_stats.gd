@@ -70,6 +70,13 @@ func spend_atonement(amount: int) -> bool:
 ## ============================================================
 
 func on_take_damage_gain_resource(amount: int):
-	var gain = floor(amount * get_modifier(DataManager.ModifierStat.ATONEMENT_GAIN_MULTIPLIER))
+	# Получаем базовое количество Искупления за атаку
+	var gain = DataManager.PENITENT_ATONEMENT_GAIN_PER_ATTACK
+	
+	# Учитываем модификатор (Shame и т.д.)
+	var multiplier = get_modifier(DataManager.ModifierStat.ATONEMENT_GAIN_MULTIPLIER)
+	gain = floor(gain * multiplier)
+	
 	if gain > 0:
-		gain_atonement(gain)
+		modify_flat(DataManager.FlatStat.ATONEMENT, gain)
+		SignalManager.log_message.emit("Получено %d Искупления" % gain)
