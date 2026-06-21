@@ -66,8 +66,8 @@ func add_card(card_data: CardData, card_scene: PackedScene):
 	card_instance.display()
 	card_instance.set_hand_scale()
 	
-	if is_manual_layout:
-		layout_cards()
+	#if is_manual_layout:
+		#layout_cards()
 
 
 func remove_card(card_ui: CardUI):
@@ -275,3 +275,80 @@ func move_card_to_burn(card_ui: CardUI) -> void:
 	# Восстанавливаем позицию (сохраняем визуальное положение)
 	card_ui.global_position = global_pos
 	card_ui.z_index = 100
+
+
+func apply_layout(animate: bool = true):
+	# Получаем целевые позиции
+	var target_positions = _calculate_card_positions()
+	var card_count = cards_container.get_child_count()
+	
+	if animate:
+		# Анимируем прилёт карт
+		for i in range(card_count):
+			var card = cards_container.get_child(i) as CardUI
+			if not card:
+				continue
+			
+			var target_pos = target_positions[i] if i < target_positions.size() else Vector2.ZERO
+			var delay = i * 0.06  # Задержка между картами
+			
+			# Анимация прилёта
+			card.play_appear_animation(target_pos, delay)
+	else:
+		# Без анимации
+		for i in range(card_count):
+			var card = cards_container.get_child(i) as CardUI
+			if not card:
+				continue
+			
+			var target_pos = target_positions[i] if i < target_positions.size() else Vector2.ZERO
+			card.position = target_pos
+			card.original_position = target_pos
+
+
+func _calculate_card_positions() -> Array[Vector2]:
+	var card_count = cards_container.get_child_count()
+	if card_count == 0:
+		return []
+	
+	var positions: Array[Vector2] = []
+	
+	var card_width = DataManager.CARD_BASE_WIDTH * DataManager.CARD_SCALE_IN_HAND
+	var card_height = DataManager.CARD_BASE_HEIGHT * DataManager.CARD_SCALE_IN_HAND
+	var screen_size = get_viewport().get_visible_rect().size
+	
+	var total_width = card_width * card_count + DataManager.CARD_SPACING_IN_HAND * (card_count - 1)
+	var start_x = (screen_size.x - total_width) / 2
+	var base_y = screen_size.y - card_height - DataManager.CARD_HAND_Y_OFFSET
+	var arc_height = 40.0
+	
+	for i in range(card_count):
+		var x_pos = start_x + i * (card_width + DataManager.CARD_SPACING_IN_HAND)
+		var t = float(i) / float(card_count - 1)
+		var y_offset = -arc_height * (1.0 - abs(t * 2.0 - 1.0))
+		var y_pos = base_y + y_offset
+		
+		var target_position = Vector2(x_pos, y_pos)
+		positions.append(target_position)
+		
+		# Обновляем оригинальные позиции карт
+		var card = cards_container.get_child(i) as CardUI
+		if card:
+			card.original_position = target_position
+			card.original_z_index = i
+			card.z_index = i
+	
+	return positions
+
+
+func add_card_silent(card_data: CardData, card_scene: PackedScene):
+	var card_instance = card_scene.instantiate() as CardUI
+	card_instance.set_hand_ui(self)
+	cards_container.add_child(card_instance)
+	card_instance.card_data = card_data
+	card_instance.display()
+	card_instance.set_hand_scale()
+	
+	# Прячем карту за пределами экрана
+	card_instance.position = Vector2(2200, 1200)
+	card_instance._needs_appear_animation = true

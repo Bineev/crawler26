@@ -25,8 +25,13 @@ func shuffle_draw_pile():
 
 
 func draw_initial_hand():
+	# Раздаём карты без анимации
 	for i in range(max_hand_size):
-		draw_card()
+		draw_card_silent()
+	
+	# После раздачи применяем layout с анимацией
+	if hand_ui:
+		hand_ui.apply_layout(true)
 
 
 func draw_card(ignore_hand_limit: bool = false) -> bool:
@@ -44,9 +49,9 @@ func draw_card(ignore_hand_limit: bool = false) -> bool:
 	
 	SignalManager.card_drawn.emit(card_data)
 	
-	# Отрисовываем одну карту
+	# Отрисовываем одну карту с анимацией
 	if hand_ui:
-		hand_ui.add_card(card_data, card_ui_scene)
+		hand_ui.add_card(card_data, card_ui_scene)  # этот метод вызывает layout_cards()
 	
 	SignalManager.deck_size_changed.emit(draw_pile.size())
 	return true
@@ -61,8 +66,7 @@ func reshuffle_discard_into_draw():
 
 
 func start_turn():
-	for i in range(cards_to_draw_per_turn):
-		draw_card()
+	draw_initial_hand()
 
 
 func discard_card(card_ui: CardUI, card_data: CardData):
@@ -92,18 +96,18 @@ func discard_hand():
 
 
 func draw_new_hand():
-	# Очищаем UI
 	if hand_ui:
 		hand_ui.clear_hand()
 	
-	# Очищаем массив
 	hand.clear()
 	
-	# Добираем карты
+	# Добавляем все карты (без layout)
 	for i in range(max_hand_size):
-		draw_card()
+		draw_card_without_layout()
 	
-	print("New hand drawn, hand size: ", hand.size())
+	# Применяем layout с анимацией
+	if hand_ui:
+		hand_ui.apply_layout(true)
 
 
 func play_card(card_ui: CardUI, card_data: CardData, target = null):
@@ -160,3 +164,46 @@ func draw_cards(amount: int, ignore_hand_limit: bool = false):
 
 func get_hand() -> Array[CardData]:
 	return hand
+
+
+func draw_card_without_layout() -> bool:
+	if hand.size() >= max_hand_size:
+		return false
+	
+	if draw_pile.is_empty():
+		if discard_pile.is_empty():
+			return false
+		reshuffle_discard_into_draw()
+	
+	var card_data = draw_pile.pop_front()
+	hand.append(card_data)
+	
+	SignalManager.card_drawn.emit(card_data)
+	
+	if hand_ui:
+		hand_ui.add_card(card_data, card_ui_scene)
+	
+	SignalManager.deck_size_changed.emit(draw_pile.size())
+	return true
+
+
+func draw_card_silent() -> bool:
+	if hand.size() >= max_hand_size:
+		return false
+	
+	if draw_pile.is_empty():
+		if discard_pile.is_empty():
+			return false
+		reshuffle_discard_into_draw()
+	
+	var card_data = draw_pile.pop_front()
+	hand.append(card_data)
+	
+	SignalManager.card_drawn.emit(card_data)
+	
+	# Добавляем карту в UI без вызова layout
+	if hand_ui:
+		hand_ui.add_card_silent(card_data, card_ui_scene)
+	
+	SignalManager.deck_size_changed.emit(draw_pile.size())
+	return true

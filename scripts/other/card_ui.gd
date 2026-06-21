@@ -47,6 +47,8 @@ var original_parent: Node = null
 var hand_ui_ref: HandUI = null
 var current_tween: Tween = null
 
+var _needs_appear_animation: bool = false
+var _appear_delay: float = 0.0
 ## ============================================================
 ## ИНИЦИАЛИЗАЦИЯ
 ## ============================================================
@@ -682,3 +684,26 @@ func animate_to_center():
 	
 	await current_tween.finished
 	queue_free()
+
+
+func play_appear_animation(target_position: Vector2, delay: float = 0.0):
+	# Стартовая позиция: сбоку от экрана (справа)
+	var start_pos = Vector2(2200, target_position.y)
+	position = start_pos
+	scale = Vector2(0.7, 0.7)
+	modulate = Color(1, 1, 1, 1)
+	z_index = 0
+	
+	if delay > 0:
+		await get_tree().create_timer(delay).timeout
+	
+	var tween = create_tween()
+	tween.set_parallel(true)
+	
+	# Летим к цели
+	tween.tween_property(self, "position", target_position, 0.25).set_ease(Tween.EASE_OUT)
+	tween.tween_property(self, "scale", Vector2(1, 1), 0.2).set_ease(Tween.EASE_OUT)
+	tween.tween_property(self, "position", target_position + Vector2(0, -8), 0.02).set_delay(0.23)
+	tween.tween_property(self, "position", target_position, 0.02).set_delay(0.25)
+	
+	await tween.finished
