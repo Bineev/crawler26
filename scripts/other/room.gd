@@ -28,6 +28,8 @@ func _ready():
 		_pending_room_data.clear()
 	_setup_dark_overlay()
 	_setup_horror_overlay()
+		# Анимация входа
+	_enter_room_animation()
 
 
 func _setup_dark_overlay():
@@ -93,3 +95,171 @@ func get_content_container() -> Node2D:
 
 func get_room_type() -> DataManager.RoomType:
 	return room_type
+
+
+func _close_room_animation() -> void:
+	# Затемнение
+	var dark_overlay = ColorRect.new()
+	dark_overlay.color = Color(0, 0, 0, 0)
+	dark_overlay.size = get_viewport().get_visible_rect().size
+	dark_overlay.position = Vector2.ZERO
+	dark_overlay.z_index = 100
+	add_child(dark_overlay)
+	
+	# Включаем обрезку для комнаты, чтобы контент не выходил за границы
+	clip_contents = true
+	
+	var tween = create_tween()
+	tween.set_parallel(true)
+	
+	# Затемнение
+	tween.tween_property(dark_overlay, "color", Color(0, 0, 0, 1), 0.5)
+	
+	# Масштабируем только background, а не всю комнату
+	var room_size = background.size
+	var target_scale = 1.5
+	var center = background.global_position + room_size / 2
+	var new_size = room_size * target_scale
+	var new_pos = center - new_size / 2
+	
+	if background:
+		tween.tween_property(background, "scale", Vector2(target_scale, target_scale), 0.5)
+		tween.tween_property(background, "global_position", new_pos, 0.5)
+	
+	# Также масштабируем контент (врагов, объекты)
+	if content:
+		tween.tween_property(content, "scale", Vector2(target_scale, target_scale), 0.5)
+		tween.tween_property(content, "global_position", new_pos, 0.5)
+	
+	await tween.finished
+	await get_tree().create_timer(0.1).timeout
+
+
+#func _enter_room_animation() -> void:
+	## Затемнение
+	#var dark_overlay = ColorRect.new()
+	#dark_overlay.color = Color(0, 0, 0, 1)
+	#dark_overlay.size = get_viewport().get_visible_rect().size
+	#dark_overlay.position = Vector2.ZERO
+	#dark_overlay.z_index = 100
+	#add_child(dark_overlay)
+	#
+	## Получаем размер и позицию background
+	#var bg_global_pos = background.global_position
+	#var bg_size = background.size
+	#var center_x = bg_global_pos.x + bg_size.x / 2
+	#var door_width = bg_size.x / 2
+	#
+	## Левая створка
+	#var left_door = ColorRect.new()
+	#left_door.color = Color(0, 0, 0)
+	#left_door.size = Vector2(door_width, bg_size.y)
+	#left_door.position = Vector2(center_x - door_width, bg_global_pos.y)
+	#left_door.z_index = 101
+	#add_child(left_door)
+	#
+	## Правая створка
+	#var right_door = ColorRect.new()
+	#right_door.color = Color(0, 0, 0)
+	#right_door.size = Vector2(door_width, bg_size.y)
+	#right_door.position = Vector2(center_x, bg_global_pos.y)
+	#right_door.z_index = 101
+	#add_child(right_door)
+	#
+	#var tween = create_tween()
+	#tween.set_parallel(true)
+	#
+	## Левая створка уезжает влево
+	#tween.tween_property(left_door, "position", Vector2(center_x - door_width - door_width, bg_global_pos.y), 0.7).set_ease(Tween.EASE_OUT)
+	#
+	## Правая створка уезжает вправо
+	#tween.tween_property(right_door, "position", Vector2(center_x + door_width, bg_global_pos.y), 0.7).set_ease(Tween.EASE_OUT)
+	#
+	## Затемнение исчезает
+	#tween.tween_property(dark_overlay, "color", Color(0, 0, 0, 0), 1)
+	#
+	#await tween.finished
+	#
+	#left_door.queue_free()
+	#right_door.queue_free()
+	#dark_overlay.queue_free()
+
+func _enter_room_animation() -> void:
+	# Затемнение
+	var dark_overlay = ColorRect.new()
+	dark_overlay.color = Color(0, 0, 0, 1)
+	dark_overlay.size = get_viewport().get_visible_rect().size
+	dark_overlay.position = Vector2.ZERO
+	dark_overlay.z_index = 100
+	add_child(dark_overlay)
+	
+	# Получаем размер и позицию background
+	var bg_global_pos = background.global_position
+	var bg_size = background.size
+	var center_x = bg_global_pos.x + bg_size.x / 2
+	var door_width = bg_size.x / 2
+	
+	# Левая створка
+	var left_door = ColorRect.new()
+	left_door.color = Color(0, 0, 0)
+	left_door.size = Vector2(door_width, bg_size.y)
+	left_door.position = Vector2(center_x - door_width, bg_global_pos.y)
+	left_door.z_index = 101
+	add_child(left_door)
+	
+	# Правая створка
+	var right_door = ColorRect.new()
+	right_door.color = Color(0, 0, 0)
+	right_door.size = Vector2(door_width, bg_size.y)
+	right_door.position = Vector2(center_x, bg_global_pos.y)
+	right_door.z_index = 101
+	add_child(right_door)
+	
+	var tween = create_tween()
+	
+	# Этап 1: Открываем на четверть (с задержкой 0.1)
+	tween.set_parallel(true)
+	
+	# Левая створка на четверть влево
+	var quarter_open = door_width * 0.25
+	tween.tween_property(left_door, "position", Vector2(center_x - door_width - quarter_open, bg_global_pos.y), 0.15).set_ease(Tween.EASE_OUT)
+	
+	# Правая створка на четверть вправо
+	tween.tween_property(right_door, "position", Vector2(center_x + quarter_open, bg_global_pos.y), 0.15).set_ease(Tween.EASE_OUT)
+	
+	await tween.finished
+	
+	# Этап 2: Застывание (пауза 0.3 сек)
+	await get_tree().create_timer(0.3).timeout
+	
+	# Этап 3: Отскок назад на немного (на 10% обратно)
+	var bounce_back = door_width * 0.1
+	tween = create_tween()
+	tween.set_parallel(true)
+	
+	tween.tween_property(left_door, "position", Vector2(center_x - door_width - quarter_open + bounce_back, bg_global_pos.y), 0.08).set_ease(Tween.EASE_IN_OUT)
+	tween.tween_property(right_door, "position", Vector2(center_x + quarter_open - bounce_back, bg_global_pos.y), 0.08).set_ease(Tween.EASE_IN_OUT)
+	
+	await tween.finished
+	
+	# Этап 4: Пауза 0.1 сек
+	await get_tree().create_timer(0.1).timeout
+	
+	# Этап 5: Полное открытие
+	tween = create_tween()
+	tween.set_parallel(true)
+	
+	# Левая створка полностью влево
+	tween.tween_property(left_door, "position", Vector2(center_x - door_width - door_width, bg_global_pos.y), 0.4).set_ease(Tween.EASE_OUT)
+	
+	# Правая створка полностью вправо
+	tween.tween_property(right_door, "position", Vector2(center_x + door_width, bg_global_pos.y), 0.4).set_ease(Tween.EASE_OUT)
+	
+	# Затемнение исчезает
+	tween.tween_property(dark_overlay, "color", Color(0, 0, 0, 0), 2)
+	
+	await tween.finished
+	
+	left_door.queue_free()
+	right_door.queue_free()
+	dark_overlay.queue_free()

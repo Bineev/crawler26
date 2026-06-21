@@ -134,15 +134,15 @@ func _start_living_animation():
 	if not living_container:
 		return
 	
-	#breath_tween = create_tween()
-	#breath_tween.set_loops()
-	#breath_tween.tween_property(living_container, "scale", Vector2(1.008, 1.008), 5.0).set_ease(Tween.EASE_IN_OUT)
-	#breath_tween.tween_property(living_container, "scale", Vector2(0.992, 0.992), 5.0).set_ease(Tween.EASE_IN_OUT)
+	breath_tween = create_tween()
+	breath_tween.set_loops()
+	breath_tween.tween_property(living_container, "scale", Vector2(1.008, 1.008), 5.0).set_ease(Tween.EASE_IN_OUT)
+	breath_tween.tween_property(living_container, "scale", Vector2(0.992, 0.992), 5.0).set_ease(Tween.EASE_IN_OUT)
 	
-	#wobble_tween = create_tween()
-	#wobble_tween.set_loops()
-	#wobble_tween.tween_property(living_container, "position", Vector2(2, 0), 3.5).set_ease(Tween.EASE_IN_OUT).as_relative()
-	#wobble_tween.tween_property(living_container, "position", Vector2(-2, 0), 3.5).set_ease(Tween.EASE_IN_OUT).as_relative()
+	wobble_tween = create_tween()
+	wobble_tween.set_loops()
+	wobble_tween.tween_property(living_container, "position", Vector2(2, 0), 3.5).set_ease(Tween.EASE_IN_OUT).as_relative()
+	wobble_tween.tween_property(living_container, "position", Vector2(-2, 0), 3.5).set_ease(Tween.EASE_IN_OUT).as_relative()
 
 
 func _stop_living_animation():
@@ -663,3 +663,22 @@ func _setup_health_bar():
 	
 	# Высота бара
 	health_bar.custom_minimum_size = Vector2(0, 24)
+
+
+func play_appear_animation() -> void:
+	# Начальное состояние: враг скрыт и уменьшен
+	modulate = Color(1, 1, 1, 0)
+	scale = Vector2(0.5, 0.5)
+	
+	var tween = create_tween()
+	tween.set_parallel(true)
+	
+	# Появляется и увеличивается
+	tween.tween_property(self, "modulate", Color(1, 1, 1, 1), 2)
+	tween.tween_property(self, "scale", Vector2(1, 1), 1).set_ease(Tween.EASE_OUT)
+	
+	# Небольшой перелёт (overshoot)
+	tween.tween_property(self, "position", position + Vector2(0, -10), 0.15).set_delay(1)
+	tween.tween_property(self, "position", position, 1).set_delay(1)
+	
+	await tween.finished

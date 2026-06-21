@@ -4,4 +4,10 @@
 [ext_resource type="Script" uid="uid://dc1tva02d5h4p" path="res://scripts/other/combat_room.gd" id="2_7cdi2"]
 
 [node name="CombatRoom" instance=ExtResource("1_xm0ie")]
+clip_contents = true
+offset_right = 1024.0
+offset_bottom = 800.0
 script = ExtResource("2_7cdi2")
+
+[node name="Background" parent="." index="0"]
+clip_contents = true

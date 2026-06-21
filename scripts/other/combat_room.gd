@@ -61,7 +61,8 @@ func spawn_enemies(enemy_resources: Array[EnemyResource]):
 		
 		# Сохраняем для позиционирования
 		enemies.append(enemy_instance)
-	
+		if enemy_ui:
+			enemy_ui.play_appear_animation()
 	layout_enemies()
 
 
@@ -146,7 +147,10 @@ func on_battle_victory():
 		await hand_ui.wait_for_fly_away()
 	
 	await get_tree().create_timer(0.2).timeout
-	
+
+	# Анимация закрытия комнаты
+	await _close_room_animation()
+
 	GameTestManager.clear_ui()
 	FloorManager.process_next()
 	queue_free()
