@@ -185,6 +185,8 @@ func _close_room_animation() -> void:
 	#dark_overlay.queue_free()
 
 func _enter_room_animation() -> void:
+	# Включаем обрезку для комнаты, чтобы контент не выходил за границы
+	clip_contents = true
 	# Затемнение
 	var dark_overlay = ColorRect.new()
 	dark_overlay.color = Color(0, 0, 0, 1)

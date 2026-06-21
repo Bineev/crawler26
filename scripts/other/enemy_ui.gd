@@ -532,7 +532,7 @@ func _on_heal_received(target: Node, amount: int):
 func die():
 	if not enemy_sprite:
 		return
-	
+	_hide_ui_elements()
 	# Получаем или создаём материал с шейдером смерти
 	var shader = preload("res://shaders/death_dissolve.gdshader")
 	var death_material = ShaderMaterial.new()
@@ -547,6 +547,27 @@ func die():
 	var tween = create_tween()
 	tween.tween_method(_set_death_progress, 0.0, 1.0, 1.0)
 	tween.finished.connect(_on_death_animation_finished.bind(death_material, original_material))
+
+
+func _hide_ui_elements():
+	# Скрываем всё, кроме спрайта
+	if intents_container:
+		intents_container.visible = false
+	
+	if health_bar:
+		health_bar.visible = false
+	
+	if health_label:
+		health_label.visible = false
+	
+	if status_container:
+		status_container.visible = false
+	
+	if passive_container:
+		passive_container.visible = false
+	
+	if enemy_sprite_copy:
+		enemy_sprite_copy.visible = false
 
 
 func _set_death_progress(value: float):

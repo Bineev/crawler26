@@ -29,6 +29,8 @@ var is_ending_turn: bool = false
 
 func start_test(world_node: Node):
 	print("=== GAME TEST START ===")
+		# Устанавливаем русский язык
+	TranslationServer.set_locale("ru")
 	game_world = world_node
 	_reset_game_state()
 	# Загружаем данные намерений для биома

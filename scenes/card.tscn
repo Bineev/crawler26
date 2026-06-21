@@ -1,12 +1,21 @@
-[gd_scene load_steps=13 format=3 uid="uid://coec2fnqd70g0"]
+[gd_scene load_steps=14 format=3 uid="uid://coec2fnqd70g0"]
 
 [ext_resource type="Script" uid="uid://b7y61xslq656g" path="res://scripts/other/card_ui.gd" id="1_d81rb"]
 [ext_resource type="LabelSettings" uid="uid://eu2gkwf45dgn" path="res://styles/label_black_32.tres" id="2_kg30u"]
-[ext_resource type="LabelSettings" uid="uid://cho2cb5x0hrmf" path="res://styles/label_red_24.tres" id="3_ktuci"]
+[ext_resource type="FontFile" uid="uid://dqwy07f4watts" path="res://fonts/KellySlab-Regular.ttf" id="3_8w5pg"]
 [ext_resource type="FontFile" uid="uid://cfcw32u84nc63" path="res://fonts/RobotoCondensed-VariableFont_wght.ttf" id="4_kg30u"]
 [ext_resource type="Shader" uid="uid://xlaxko82yrc2" path="res://shaders/card_shader.gdshader" id="5_sy11y"]
 [ext_resource type="Shader" uid="uid://cltqs0v1xgjjb" path="res://shaders/card2_shader.gdshader" id="6_6ligt"]
 [ext_resource type="Shader" uid="uid://nnhafgmukg3v" path="res://shaders/card_burn.gdshader" id="7_8w5pg"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_nvopj"]
+line_spacing = 0.0
+font = ExtResource("3_8w5pg")
+font_size = 40
+font_color = Color(0.34901962, 0.14901961, 0.14901961, 1)
+outline_color = Color(0.34901962, 0.14901961, 0.14901961, 1)
+shadow_size = 0
+shadow_offset = Vector2(1, 0)
 
 [sub_resource type="Theme" id="Theme_ktuci"]
 
@@ -98,7 +107,7 @@ offset_right = 200.0
 offset_bottom = 59.0
 scale = Vector2(0.5, 0.5)
 theme_override_constants/line_spacing = 0
-label_settings = ExtResource("3_ktuci")
+label_settings = SubResource("LabelSettings_nvopj")
 horizontal_alignment = 1
 vertical_alignment = 1
 autowrap_mode = 2
@@ -177,7 +186,7 @@ mouse_filter = 2
 theme_override_colors/default_color = Color(0, 0, 0, 1)
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_fonts/normal_font = ExtResource("4_kg30u")
-theme_override_font_sizes/normal_font_size = 36
+theme_override_font_sizes/normal_font_size = 32
 fit_content = true
 scroll_active = false
 horizontal_alignment = 1

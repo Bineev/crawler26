@@ -43,7 +43,6 @@ expand_mode = 2
 stretch_mode = 5
 
 [node name="DarkOverlay" type="ColorRect" parent="."]
-visible = false
 material = SubResource("ShaderMaterial_jxe34")
 custom_minimum_size = Vector2(1024, 800)
 layout_mode = 1

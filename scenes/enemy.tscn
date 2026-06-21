@@ -10,7 +10,7 @@ shader = ExtResource("3_5uy6h")
 shader_parameter/shadow_height = 0.350000016625
 shader_parameter/shadow_width = 0.80000001425
 shader_parameter/shadow_skew = 4.7499999933364734e-08
-shader_parameter/vertical_offset = 0.050000026124999986
+shader_parameter/vertical_offset = 0.05000002612499998
 shader_parameter/shadow_color = Color(0, 0, 0, 0.3529412)
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_5uy6h"]
