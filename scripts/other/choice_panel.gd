@@ -19,6 +19,8 @@ func setup(paths: Array[Array]):
 		for j in range(room_count - 1, -1, -1):
 			var room = paths[i][j]
 			var icon = TextureRect.new()
+			# добавить шейдер на обводку
+			apply_shader_to_icon(icon, "res://shaders/highlight_enemy.gdshader")
 			icon.custom_minimum_size = Vector2(64, 64)
 			icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 			icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
@@ -49,10 +51,17 @@ func setup(paths: Array[Array]):
 				arrow.horizontal_alignment = 1
 				path_container.add_child(arrow)
 		
-		# Кнопка выбора пути под всей цепочкой (внизу)
+		# Кнопка выбора пути
 		var select_button = Button.new()
-		select_button.text = "Вперед"
+		select_button.text = "ВПЕРЕД"
 		select_button.pressed.connect(_on_path_selected.bind(i))
+		
+		# Применяем стиль как у кнопки "Конец хода"
+		select_button.add_theme_font_override("font", DataManager.FONT_HEADERS)
+		select_button.add_theme_font_size_override("font_size", 20)
+		#select_button.add_theme_color_override("font_color", Color(DataManager.COLOR_PENITENT_ART_BG_DARK))
+		#select_button.add_theme_color_override("font_hover_color", Color(DataManager.COLOR_PENITENT_ART_BG_DARK))
+		select_button.custom_minimum_size = Vector2(200, 60)
 		path_container.add_child(select_button)
 		
 		buttons_container.add_child(path_container)
@@ -82,3 +91,33 @@ func _get_room_description(room_node: RoomNode) -> String:
 func _on_path_selected(path_index: int):
 	SignalManager.choice_panel_selected.emit(path_index)
 	queue_free()
+
+
+# Добавление шейдера на TextureRect
+func apply_shader_to_icon(icon: TextureRect, shader_path: String):
+	var shader = load(shader_path)
+	if not shader:
+		print("Shader not found: ", shader_path)
+		return
+	
+	var shader_material = ShaderMaterial.new()
+	shader_material.shader = shader
+	
+	shader_material.set_shader_parameter("hover_intensity", 1.0)
+	shader_material.set_shader_parameter("pulse_speed", 0)
+	icon.material = shader_material
+
+
+func _create_button_style(bg_color: Color) -> StyleBoxFlat:
+	var style = StyleBoxFlat.new()
+	style.bg_color = bg_color
+	style.border_width_bottom = 2
+	style.border_width_top = 2
+	style.border_width_left = 2
+	style.border_width_right = 2
+	style.border_color = Color(0.4, 0.3, 0.2)
+	style.corner_radius_top_left = 4
+	style.corner_radius_top_right = 4
+	style.corner_radius_bottom_left = 4
+	style.corner_radius_bottom_right = 4
+	return style

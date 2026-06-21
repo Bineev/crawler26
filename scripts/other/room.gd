@@ -189,6 +189,7 @@ func _enter_room_animation() -> void:
 	clip_contents = true
 	# Затемнение
 	var dark_overlay = ColorRect.new()
+	dark_overlay.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	dark_overlay.color = Color(0, 0, 0, 1)
 	dark_overlay.size = get_viewport().get_visible_rect().size
 	dark_overlay.position = Vector2.ZERO
@@ -203,6 +204,7 @@ func _enter_room_animation() -> void:
 	
 	# Левая створка
 	var left_door = ColorRect.new()
+	left_door.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	left_door.color = Color(0, 0, 0)
 	left_door.size = Vector2(door_width, bg_size.y)
 	left_door.position = Vector2(center_x - door_width, bg_global_pos.y)
@@ -211,6 +213,7 @@ func _enter_room_animation() -> void:
 	
 	# Правая створка
 	var right_door = ColorRect.new()
+	right_door.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	right_door.color = Color(0, 0, 0)
 	right_door.size = Vector2(door_width, bg_size.y)
 	right_door.position = Vector2(center_x, bg_global_pos.y)
@@ -258,7 +261,7 @@ func _enter_room_animation() -> void:
 	tween.tween_property(right_door, "position", Vector2(center_x + door_width, bg_global_pos.y), 0.4).set_ease(Tween.EASE_OUT)
 	
 	# Затемнение исчезает
-	tween.tween_property(dark_overlay, "color", Color(0, 0, 0, 0), 2)
+	tween.tween_property(dark_overlay, "color", Color(0, 0, 0, 0), 1.5)
 	
 	await tween.finished
 	

@@ -22,6 +22,7 @@ var collision_shape: CollisionShape2D = null
 var effect_overlay: ColorRect = null
 var effect_overlay2: ColorRect = null
 var effect_overlay3: ColorRect = null
+var background : TextureRect = null
 
 ## ============================================================
 ## ДАННЫЕ КАРТЫ
@@ -46,10 +47,13 @@ var original_z_index: int = 0
 var original_parent: Node = null
 var hand_ui_ref: HandUI = null
 var current_tween: Tween = null
+var highlight_tween: Tween = null
 
 var _needs_appear_animation: bool = false
 var _appear_delay: float = 0.0
-
+var highlight_material: ShaderMaterial = null
+var base_material: ShaderMaterial = null
+var is_highlighted: bool = false
 ## ============================================================
 ## ИНИЦИАЛИЗАЦИЯ
 ## ============================================================
@@ -57,6 +61,7 @@ func _ready():
 	# Инициализируем ссылки на ноды
 	template = $CardTemplate
 	cost_label = $CardTemplate/CardBackground/CostLabel
+	background = $CardTemplate/CardBackground
 	name_label = $CardTemplate/MarginContainer/MainLayout/HeaderLayout/Control/CardName
 	art_image = $CardTemplate/MarginContainer/MainLayout/MiddleLayout/ArtContainer/ArtImage
 	art_background = $CardTemplate/MarginContainer/MainLayout/MiddleLayout/ArtContainer/ArtBackground
@@ -79,8 +84,9 @@ func _ready():
 	left_icons.custom_minimum_size = Vector2(32, 0)
 	right_icons.custom_minimum_size = Vector2(32, 0)
 
-	set_glow(false)
-	effect_overlay.show()
+	#set_glow(false)
+	#_apply_highlight(false)
+	#effect_overlay.show()
 		# Делаем материал уникальным для этой конкретной карты
 	if effect_overlay.material:
 		effect_overlay.material = effect_overlay.material.duplicate()
@@ -296,8 +302,56 @@ func on_card_clicked():
 		SignalManager.log_message.emit(tr("msg_not_enough_energy"))
 		return
 	
+	#TODO
 	state = DataManager.CardState.SELECTED
-	set_glow(true)
+	#set_glow(true)
+	set_highlight(true)
+	
+	
+#func _apply_highlight(enabled: bool):
+	#if not background:
+		#return
+	#
+	#if enabled:
+		#if not highlight_material:
+			#var shader = preload("res://shaders/highlight_enemy2.gdshader")
+			#highlight_material = ShaderMaterial.new()
+			#highlight_material.shader = shader
+		#highlight_material.set_shader_parameter("pulse_color", DataManager.COLOR_BONE_LABYRINTH_CARD_BG)  # оранжевый
+		#base_material = background.material
+		#highlight_material.set_shader_parameter("hover_intensity", 0.3)
+		#background.material = highlight_material
+		#
+		## Анимируем интенсивность пульсации через Tween
+		#var tween = create_tween()
+		#tween.set_loops()
+		#tween.tween_property(highlight_material, "shader_parameter/hover_intensity", 0.5, 0.4)
+		#tween.tween_property(highlight_material, "shader_parameter/hover_intensity", 1.5, 0.4)
+	#else:
+		#if highlight_material:
+			#highlight_material.set_shader_parameter("hover_intensity", 0.0)
+			#background.material = base_material
+			#highlight_material = null
+
+
+func _apply_highlight_shader(enabled: bool):
+	if not background:
+		return
+	
+	if enabled:
+		var shader = preload("res://shaders/highlight_enemy3.gdshader")
+		var shader_material = ShaderMaterial.new()
+		shader_material.shader = shader
+		
+		# Настройки шейдера
+		shader_material.set_shader_parameter("contrast", 1.8)
+		shader_material.set_shader_parameter("grayscale_intensity", 0.8)
+		shader_material.set_shader_parameter("tint_color", Color(1.0, 0.85, 0.3, 1.0))
+		shader_material.set_shader_parameter("tint_intensity", 0.15)
+		
+		background.material = shader_material
+	else:
+		background.material = null
 
 
 func play_card(target = null):
@@ -376,7 +430,7 @@ func cancel_selection():
 			hand_ui_ref.clear_hovered_card(self)
 		
 		SignalManager.target_selection_cancelled.emit()
-		set_glow(false)
+		reset_highlight()
 
 
 func confirm_target(target):
@@ -584,10 +638,10 @@ func set_hand_ui(hand_ui: HandUI):
 func _on_click_area_input(viewport, event, shape_idx):
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
 		on_card_clicked()
-
-
-func set_highlight(enabled: bool):
-	modulate = Color(1, 0.5, 0.2) if enabled else Color.WHITE
+#
+#
+#func set_highlight(enabled: bool):
+	#modulate = Color(1, 0.5, 0.2) if enabled else Color.WHITE
 
 
 func _on_animation_finished():
@@ -752,3 +806,54 @@ func fly_away_left(delay: float = 0.0):
 	
 	await tween.finished
 	queue_free()
+
+
+func set_highlight(enabled: bool):
+	if is_highlighted == enabled:
+		return
+	
+	is_highlighted = enabled
+	
+	if enabled:
+		# Сохраняем оригинальную позицию
+		#original_position = position
+		
+		# Применяем шейдер подсветки
+		_apply_highlight_shader(true)
+		
+		# Запускаем раскачивание
+		_start_bobbing()
+	else:
+		# Останавливаем раскачивание
+		_stop_bobbing()
+		
+		# Убираем шейдер
+		_apply_highlight_shader(false)
+
+
+func _start_bobbing():
+	if highlight_tween:
+		highlight_tween.kill()
+	
+	var start_pos = position
+	
+	highlight_tween = create_tween()
+	highlight_tween.set_loops()
+	highlight_tween.tween_property(self, "position", start_pos + Vector2(0, -10), 0.5).set_ease(Tween.EASE_OUT_IN)
+	highlight_tween.tween_property(self, "position", start_pos + Vector2(0, 10), 0.5).set_ease(Tween.EASE_OUT_IN)
+
+
+func _stop_bobbing():
+	if highlight_tween:
+		highlight_tween.kill()
+		highlight_tween = null
+	
+	# Возвращаемся в исходную позицию (из original_position)
+	position = original_position
+
+
+func reset_highlight():
+	set_highlight(false)
+	position = original_position
+	scale = original_scale
+	modulate = Color(1, 1, 1, 1)

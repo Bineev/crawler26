@@ -23,6 +23,7 @@ var aura_particles: GPUParticles2D = null
 
 var highlight_material: ShaderMaterial = null
 var is_highlighted: bool = false
+var base_material: Material = null
 
 ## ============================================================
 ## ПУБЛИЧНЫЕ МЕТОДЫ
@@ -42,7 +43,11 @@ func setup(enemy: EnemyInstance):
 	_add_aura_effect()
 	_start_living_animation()
 	_start_random_jitter()
-
+	if enemy_sprite:
+		base_material = enemy_sprite.material.duplicate() as ShaderMaterial
+		base_material.set_shader_parameter('jitter_speed', randf_range(1.5, 2.5))
+		base_material.set_shader_parameter('jitter_amount', randf_range(0.003, 0.006))
+		enemy_sprite.material = base_material
 	# Подключаем сигнал получения урона
 	# Подписываемся на сигнал подсветки
 	SignalManager.damage_dealt.connect(_on_damage_dealt)
@@ -447,27 +452,9 @@ func _hit_effect():
 	
 		# Ждём завершения анимации
 	await tween.finished
-	# 2. Дёрганье (смещение) всей ноды Enemy
-	var original_position = position
-	
-	# Создаём отдельный твин для дёрганья
-	var shake_tween = create_tween()
-	shake_tween.set_parallel(true)
-	
-	# Смещаем вправо-влево несколько раз
-	shake_tween.tween_property(self, "position", original_position + Vector2(8, 0), 0.05)
-	shake_tween.tween_property(self, "position", original_position - Vector2(6, 0), 0.05).set_delay(0.05)
-	shake_tween.tween_property(self, "position", original_position + Vector2(4, 0), 0.05).set_delay(0.1)
-	shake_tween.tween_property(self, "position", original_position - Vector2(2, 0), 0.05).set_delay(0.15)
-	shake_tween.tween_property(self, "position", original_position, 0.05).set_delay(0.2)
-	
-	# 3. Небольшое сжатие
-	var original_scale = scale
-	var scale_tween = create_tween()
-	scale_tween.set_parallel(true)
-	scale_tween.tween_property(self, "scale", Vector2(0.9, 1.1), 0.05)
-	scale_tween.tween_property(self, "scale", Vector2(1.05, 0.95), 0.05).set_delay(0.05)
-	scale_tween.tween_property(self, "scale", original_scale, 0.1).set_delay(0.1)
+	# Возвращаем базовый материал
+	if get_parent().get_flat(DataManager.FlatStat.HEALTH > 0):
+		enemy_sprite.material = base_material
 
 
 func _on_highlight_requested(enemy: EnemyInstance, enabled: bool):
@@ -502,6 +489,8 @@ func _apply_highlight(enabled: bool):
 		# Убираем шейдер
 		if enemy_sprite.material == highlight_material:
 			enemy_sprite.material = null
+				# Возвращаем базовый материал
+		enemy_sprite.material = base_material
 		highlight_material = null
 
 
@@ -552,22 +541,22 @@ func die():
 func _hide_ui_elements():
 	# Скрываем всё, кроме спрайта
 	if intents_container:
-		intents_container.visible = false
+		intents_container.modulate = Color(1, 1, 1, 0)
 	
 	if health_bar:
-		health_bar.visible = false
+		health_bar.modulate = Color(1, 1, 1, 0)
 	
 	if health_label:
-		health_label.visible = false
+		health_label.modulate = Color(1, 1, 1, 0)
 	
 	if status_container:
-		status_container.visible = false
+		status_container.modulate = Color(1, 1, 1, 0)
 	
 	if passive_container:
-		passive_container.visible = false
+		passive_container.modulate = Color(1, 1, 1, 0)
 	
 	if enemy_sprite_copy:
-		enemy_sprite_copy.visible = false
+		enemy_sprite_copy.modulate = Color(1, 1, 1, 0)
 
 
 func _set_death_progress(value: float):

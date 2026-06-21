@@ -53,8 +53,16 @@ texture = ExtResource("2_yotol")
 expand_mode = 3
 stretch_mode = 5
 
+[node name="Filler" type="Control" parent="VBoxContainer"]
+custom_minimum_size = Vector2(0, 10)
+layout_mode = 2
+
 [node name="StatusContainer" type="HBoxContainer" parent="VBoxContainer"]
 custom_minimum_size = Vector2(0, 40)
+layout_mode = 2
+
+[node name="Filler2" type="Control" parent="VBoxContainer"]
+custom_minimum_size = Vector2(0, 10)
 layout_mode = 2
 
 [node name="HealthBar" type="ProgressBar" parent="VBoxContainer"]

@@ -1,12 +1,15 @@
-[gd_scene load_steps=14 format=3 uid="uid://coec2fnqd70g0"]
+[gd_scene load_steps=19 format=3 uid="uid://coec2fnqd70g0"]
 
 [ext_resource type="Script" uid="uid://b7y61xslq656g" path="res://scripts/other/card_ui.gd" id="1_d81rb"]
 [ext_resource type="LabelSettings" uid="uid://eu2gkwf45dgn" path="res://styles/label_black_32.tres" id="2_kg30u"]
 [ext_resource type="FontFile" uid="uid://dqwy07f4watts" path="res://fonts/KellySlab-Regular.ttf" id="3_8w5pg"]
 [ext_resource type="FontFile" uid="uid://cfcw32u84nc63" path="res://fonts/RobotoCondensed-VariableFont_wght.ttf" id="4_kg30u"]
+[ext_resource type="Shader" uid="uid://nyqt5rf23ph0" path="res://shaders/comic_shader.gdshader" id="4_nvopj"]
 [ext_resource type="Shader" uid="uid://xlaxko82yrc2" path="res://shaders/card_shader.gdshader" id="5_sy11y"]
 [ext_resource type="Shader" uid="uid://cltqs0v1xgjjb" path="res://shaders/card2_shader.gdshader" id="6_6ligt"]
 [ext_resource type="Shader" uid="uid://nnhafgmukg3v" path="res://shaders/card_burn.gdshader" id="7_8w5pg"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_we8pq"]
 
 [sub_resource type="LabelSettings" id="LabelSettings_nvopj"]
 line_spacing = 0.0
@@ -18,6 +21,23 @@ shadow_size = 0
 shadow_offset = Vector2(1, 0)
 
 [sub_resource type="Theme" id="Theme_ktuci"]
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_1yd6c"]
+noise_type = 2
+seed = 2
+frequency = 0.232
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_we8pq"]
+noise = SubResource("FastNoiseLite_1yd6c")
+seamless = true
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_4wvaf"]
+shader = ExtResource("4_nvopj")
+shader_parameter/grunge_noise_tex = SubResource("NoiseTexture2D_we8pq")
+shader_parameter/grunge_intensity = 0.35
+shader_parameter/jitter_speed = 8.0
+shader_parameter/jitter_amount = 0.003
+shader_parameter/paper_tint = Color(0.9, 0.85, 0.8, 1)
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_1yd6c"]
 shader = ExtResource("5_sy11y")
@@ -65,6 +85,7 @@ offset_right = 234.0
 offset_bottom = 330.0
 
 [node name="CardBackground" type="TextureRect" parent="CardTemplate"]
+material = SubResource("ShaderMaterial_we8pq")
 layout_mode = 2
 mouse_filter = 2
 
@@ -141,6 +162,7 @@ grow_vertical = 2
 mouse_filter = 2
 
 [node name="ArtImage" type="TextureRect" parent="CardTemplate/MarginContainer/MainLayout/MiddleLayout/ArtContainer"]
+material = SubResource("ShaderMaterial_4wvaf")
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
