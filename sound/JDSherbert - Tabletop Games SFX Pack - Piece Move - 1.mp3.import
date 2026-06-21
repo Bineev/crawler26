@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://bef6c4gtq3a7b"
+path="res://.godot/imported/JDSherbert - Tabletop Games SFX Pack - Piece Move - 1.mp3-0972a31f10c9a2ef42bb4e9738af8457.mp3str"
+
+[deps]
+
+source_file="res://sound/JDSherbert - Tabletop Games SFX Pack - Piece Move - 1.mp3"
+dest_files=["res://.godot/imported/JDSherbert - Tabletop Games SFX Pack - Piece Move - 1.mp3-0972a31f10c9a2ef42bb4e9738af8457.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

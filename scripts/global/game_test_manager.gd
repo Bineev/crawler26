@@ -17,6 +17,7 @@ var battle_log: BattleLogUI = null
 var end_turn_button : EndTurnButton = null
 var player_portrait: PlayerPortrait = null
 var player : PenitentStats = null
+var energy_display: EnergyDisplay = null
 # Ссылка на RoomManager (будет доступен как автолоад)
 # RoomManager уже загружен как синглтон
 var is_ending_turn: bool = false
@@ -29,6 +30,7 @@ var is_ending_turn: bool = false
 
 func start_test(world_node: Node):
 	print("=== GAME TEST START ===")
+	DataManager.load_sounds()
 		# Устанавливаем русский язык
 	TranslationServer.set_locale("ru")
 	game_world = world_node
@@ -54,6 +56,7 @@ func start_test(world_node: Node):
 	SignalManager.player_took_damage.connect(_on_player_took_damage)
 	# Сбрасываем менеджеры
 	FloorManager.reset()
+	SoundManager.start_gameplay_playlist()
 	
 	_create_blood_screen()
 	_create_player_portrait()
@@ -155,8 +158,6 @@ func _on_room_selected(room_node: RoomNode):
 	current_room_index += 1
 	
 	_create_battle_log()
-	
-	SoundManager.start_gameplay_playlist()
 
 
 func _on_floor_completed():
@@ -292,3 +293,10 @@ func _create_player_portrait():
 	player_portrait.position = Vector2(50, 80)
 	game_world.add_child(player_portrait)
 	player_portrait.setup(BattleManager.get_player())
+
+
+func _create_energy_display():
+	var energy_scene = preload("res://scenes/energy_display.tscn")
+	energy_display = energy_scene.instantiate() as EnergyDisplay
+	energy_display.position = DataManager.END_BUTTON_POSITION + Vector2(10, -100)
+	game_world.add_child(energy_display)

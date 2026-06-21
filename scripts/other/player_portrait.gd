@@ -284,25 +284,11 @@ func _create_icon(texture: Texture2D, tooltip: String) -> TextureRect:
 	icon_rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	icon_rect.tooltip_text = tooltip
 	# добавить шейдер на обводку
-	apply_shader_to_icon(icon_rect, "res://shaders/highlight_enemy.gdshader")
+	DataManager.apply_shader_to_icon(icon_rect, "res://shaders/highlight_enemy.gdshader", {'hover_intensity' : 1.0})
+	DataManager.apply_shader_overlay(icon_rect, "res://shaders/horror_shader.gdshader", {})
 	return icon_rect
 
 
 func _on_icons_changed(target: Node, arg1 = null, arg2 = null, arg3 = null):
 	if target == player_stats:
 		_update_icons()
-
-
-# Добавление шейдера на TextureRect
-func apply_shader_to_icon(icon: TextureRect, shader_path: String):
-	var shader = load(shader_path)
-	if not shader:
-		print("Shader not found: ", shader_path)
-		return
-	
-	var shader_material = ShaderMaterial.new()
-	shader_material.shader = shader
-	
-	shader_material.set_shader_parameter("hover_intensity", 1.0)
-	shader_material.set_shader_parameter("pulse_speed", 0)
-	icon.material = shader_material

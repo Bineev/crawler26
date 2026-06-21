@@ -7,7 +7,9 @@ var options: Array[Array] = []
 func setup(paths: Array[Array]):
 	options = paths
 	var buttons_container = $VBoxContainer/ButtonsContainer
+	var title = $VBoxContainer/Title
 	buttons_container.add_theme_constant_override("separation", 40)
+	title.add_theme_color_override("font_color", DataManager.COLOR_FLESH_CAVES_ART_BG_DARK)
 	
 	for i in range(paths.size()):
 		var path_container = VBoxContainer.new()
@@ -20,7 +22,8 @@ func setup(paths: Array[Array]):
 			var room = paths[i][j]
 			var icon = TextureRect.new()
 			# добавить шейдер на обводку
-			apply_shader_to_icon(icon, "res://shaders/highlight_enemy.gdshader")
+			DataManager.apply_shader_to_icon(icon, "res://shaders/highlight_enemy.gdshader", {'hover_intensity' : 1.0})
+			DataManager.apply_shader_overlay(icon, "res://shaders/horror_shader.gdshader")
 			icon.custom_minimum_size = Vector2(64, 64)
 			icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 			icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
@@ -91,21 +94,6 @@ func _get_room_description(room_node: RoomNode) -> String:
 func _on_path_selected(path_index: int):
 	SignalManager.choice_panel_selected.emit(path_index)
 	queue_free()
-
-
-# Добавление шейдера на TextureRect
-func apply_shader_to_icon(icon: TextureRect, shader_path: String):
-	var shader = load(shader_path)
-	if not shader:
-		print("Shader not found: ", shader_path)
-		return
-	
-	var shader_material = ShaderMaterial.new()
-	shader_material.shader = shader
-	
-	shader_material.set_shader_parameter("hover_intensity", 1.0)
-	shader_material.set_shader_parameter("pulse_speed", 0)
-	icon.material = shader_material
 
 
 func _create_button_style(bg_color: Color) -> StyleBoxFlat:

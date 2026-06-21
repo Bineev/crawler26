@@ -446,6 +446,8 @@ func _on_mouse_entered():
 		state = DataManager.CardState.HOVERED
 		print('go hovered')
 		
+		SoundManager.play(null, DataManager.get_sound(DataManager.SoundType.CARD_HOVER))
+		
 		if current_tween:
 			current_tween.kill()
 			current_tween = null

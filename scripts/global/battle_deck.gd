@@ -32,6 +32,8 @@ func draw_initial_hand():
 	# После раздачи применяем layout с анимацией
 	if hand_ui:
 		hand_ui.apply_layout(true)
+		SoundManager.play(null, DataManager.get_sound(DataManager.SoundType.CARD_DRAW))
+		
 
 
 func draw_card(ignore_hand_limit: bool = false) -> bool:

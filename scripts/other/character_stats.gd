@@ -163,8 +163,11 @@ func take_damage(amount: int, ignore_block: bool = false, attacker: CharacterSta
 		else:
 			reduce_status_stacks(DataManager.Status.SHIELD, shield_stacks)
 			damage -= shield_stacks
+	if self is EnemyInstance:
+		SoundManager.play(null, DataManager.get_sound(DataManager.SoundType.ENEMY_GET_DAMAGE))
 	if self is PenitentStats:
 		SignalManager.player_damage_dealt.emit(damage)
+		SoundManager.play(null, DataManager.get_sound(DataManager.SoundType.PLAYER_GET_DAMAGE))
 	if damage > 0:
 		SignalManager.log_message.emit("%s получил %d урона" % [get_display_name(), damage])
 		SignalManager.damage_dealt.emit(self, damage)

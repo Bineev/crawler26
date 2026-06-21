@@ -27,6 +27,7 @@ func setup(room_data: Dictionary):
 
 
 func _init_content(room_data: Dictionary):
+	GameTestManager._create_energy_display()
 	spawn_enemies(_pending_enemies)
 	# После того как враги созданы, начинаем бой
 	call_deferred("_start_battle")

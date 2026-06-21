@@ -131,6 +131,45 @@ enum ScaledResource {
 	BLEED_STACKS,
 }
 
+## ============================================================
+## ЗВУКИ
+## ============================================================
+
+enum SoundType {
+	# UI
+	CARD_HOVER,
+	CARD_CLICK,
+	CARD_PLAY,
+	CARD_DISCARD,
+	CARD_BURN,
+	CARD_DRAW,
+	BUTTON_CLICK,
+	BUTTON_HOVER,
+	
+	# Бой
+	ENEMY_GET_DAMAGE,
+	ENEMY_ATTACK,
+	PLAYER_GET_DAMAGE,
+	PLAYER_ATTACK,
+	BLOCK,
+	HEAL,
+	DEATH,
+	
+	# Статусы
+	POISON_TICK,
+	BLEED_TICK,
+	BURN_TICK,
+	
+	# Победа/поражение
+	VICTORY,
+	DEFEAT,
+	
+	# Музыка
+	MUSIC_MENU,
+	MUSIC_GAMEPLAY,
+	MUSIC_BOSS,
+}
+
 enum ScaledCompare {
 	GREATER_EQUAL,   # значение >= порога
 	LESSER_EQUAL,    # значение <= порога
@@ -1213,3 +1252,126 @@ func get_room_icon(room_type: DataManager.RoomType, combat_type: DataManager.Com
 		DataManager.RoomType.OBJECT:
 			return preload("res://img/icons/card_types/utility.png")
 	return preload("res://img/icons/intents/unknown.png")
+
+
+## ============================================================
+## ЗВУКОВЫЕ ЭФФЕКТЫ
+## ============================================================
+
+var _sounds: Dictionary = {}
+var _sounds_loaded: bool = false
+
+func load_sounds():
+	if _sounds_loaded:
+		return
+	
+	# UI
+	_sounds[SoundType.CARD_HOVER] = preload("res://sound/JDSherbert - Tabletop Games SFX Pack - Piece Move - 1.mp3")
+	#_sounds[SoundType.CARD_CLICK] = preload("res://audio/sfx/ui/card_click.wav")
+	#_sounds[SoundType.CARD_PLAY] = preload("res://audio/sfx/ui/card_play.wav")
+	#_sounds[SoundType.CARD_DISCARD] = preload("res://audio/sfx/ui/card_discard.wav")
+	#_sounds[SoundType.CARD_BURN] = preload("res://audio/sfx/ui/card_burn.wav")
+	_sounds[SoundType.CARD_DRAW] = preload("res://sound/JDSherbert - Tabletop Games SFX Pack - Deck Deal - 1.mp3")
+	#_sounds[SoundType.BUTTON_CLICK] = preload("res://audio/sfx/ui/button_click.wav")
+	#_sounds[SoundType.BUTTON_HOVER] = preload("res://audio/sfx/ui/button_hover.wav")
+	
+	# Бой
+	_sounds[SoundType.ENEMY_GET_DAMAGE] = preload("res://sound/DesignedPunch1.wav")
+	#_sounds[SoundType.ENEMY_ATTACK] = preload("res://audio/sfx/battle/enemy_attack.wav")
+	_sounds[SoundType.PLAYER_GET_DAMAGE] = preload("res://sound/DesignedPunch4.wav")
+	#_sounds[SoundType.PLAYER_ATTACK] = preload("res://audio/sfx/battle/player_attack.wav")
+	_sounds[SoundType.BLOCK] = preload("res://sound/DesignedPickaxe1.wav")
+	#_sounds[SoundType.HEAL] = preload("res://audio/sfx/battle/heal.wav")
+	#_sounds[SoundType.DEATH] = preload("res://audio/sfx/battle/death.wav")
+	#
+	## Статусы
+	#_sounds[SoundType.POISON_TICK] = preload("res://audio/sfx/status/poison_tick.wav")
+	#_sounds[SoundType.BLEED_TICK] = preload("res://audio/sfx/status/bleed_tick.wav")
+	#_sounds[SoundType.BURN_TICK] = preload("res://audio/sfx/status/burn_tick.wav")
+	#
+	## Победа/поражение
+	#_sounds[SoundType.VICTORY] = preload("res://audio/sfx/ui/victory.wav")
+	#_sounds[SoundType.DEFEAT] = preload("res://audio/sfx/ui/defeat.wav")
+	#
+	## Музыка
+	#_sounds[SoundType.MUSIC_MENU] = preload("res://audio/music/menu_theme.ogg")
+	#_sounds[SoundType.MUSIC_GAMEPLAY] = preload("res://audio/music/gameplay_theme.ogg")
+	#_sounds[SoundType.MUSIC_BOSS] = preload("res://audio/music/boss_theme.ogg")
+	
+	_sounds_loaded = true
+
+
+func get_sound(sound_type: SoundType) -> AudioStream:
+	if not _sounds_loaded:
+		load_sounds()
+	return _sounds.get(sound_type, null)
+
+
+## ============================================================
+## ШЕЙДЕРЫ ДЛЯ UI
+## ============================================================
+
+## Применяет шейдер напрямую к TextureRect
+func apply_shader_to_icon(icon: TextureRect, shader_path: String, params: Dictionary = {}):
+	var shader = load(shader_path)
+	if not shader:
+		printerr("Shader not found: ", shader_path)
+		return null
+	
+	var shader_material = ShaderMaterial.new()
+	shader_material.shader = shader
+	
+	# Применяем параметры
+	for key in params.keys():
+		shader_material.set_shader_parameter(key, params[key])
+	
+	icon.material = shader_material
+	return shader_material
+
+
+## Применяет шейдер через ColorRect-оверлей поверх TextureRect
+func apply_shader_overlay(icon: TextureRect, shader_path: String, params: Dictionary = {}):
+	var shader = load(shader_path)
+	if not shader:
+		printerr("Shader not found: ", shader_path)
+		return null
+	
+	var overlay = ColorRect.new()
+	overlay.color = Color(1, 1, 1, 1)  # полностью прозрачныйcreen_texture
+	
+	overlay.anchor_left = 0.0
+	overlay.anchor_top = 0.0
+	overlay.anchor_right = 1.0
+	overlay.anchor_bottom = 1.0
+	overlay.offset_left = 0
+	overlay.offset_top = 0
+	overlay.offset_right = 0
+	overlay.offset_bottom = 0
+	
+	overlay.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	overlay.z_index = 1
+	
+	var shader_material = ShaderMaterial.new()
+	shader_material.shader = shader
+	
+	for key in params.keys():
+		shader_material.set_shader_parameter(key, params[key])
+	
+	overlay.material = shader_material
+	
+	icon.add_child(overlay)
+	return overlay
+
+
+## Удаляет оверлей с иконки
+func remove_shader_overlay(icon: TextureRect):
+	if icon.get_child_count() > 0:
+		var overlay = icon.get_child(0)
+		if overlay is ColorRect:
+			icon.remove_child(overlay)
+			overlay.queue_free()
+
+
+## Удаляет шейдер с иконки
+func remove_shader_from_icon(icon: TextureRect):
+	icon.material = null

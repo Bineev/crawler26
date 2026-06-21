@@ -222,33 +222,20 @@ func update_intents():
 		if intent_item:
 			intents_container.add_child(intent_item)
 
-# Добавление шейдера на TextureRect
-func apply_shader_to_icon(icon: TextureRect, shader_path: String):
-	var shader = load(shader_path)
-	if not shader:
-		print("Shader not found: ", shader_path)
-		return
-	
-	var shader_material = ShaderMaterial.new()
-	shader_material.shader = shader
-	
-	shader_material.set_shader_parameter("hover_intensity", 1.0)
-	shader_material.set_shader_parameter("pulse_speed", 0)
-	icon.material = shader_material
-
 
 func _create_intent_item(effect: EffectEntry) -> Control:
 	var container = HBoxContainer.new()
 	container.mouse_filter = Control.MOUSE_FILTER_PASS
 	
 	var icon = TextureRect.new()
-	icon.custom_minimum_size = Vector2(32, 32)
+	icon.custom_minimum_size = Vector2(48, 48)
 	icon.expand_mode = TextureRect.EXPAND_FIT_WIDTH_PROPORTIONAL
 	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	
 	# добавить шейдер на обводку
-	apply_shader_to_icon(icon, "res://shaders/highlight_enemy.gdshader")
+	DataManager.apply_shader_to_icon(icon, "res://shaders/highlight_enemy.gdshader", {'hover_intensity' : 1.0})
+	DataManager.apply_shader_overlay(icon, "res://shaders/card3_shader.gdshader")
 	
 	var value_label = Label.new()
 	value_label.add_theme_font_size_override("font_size", 16)
@@ -312,7 +299,8 @@ func update_statuses():
 		if status_data.get("duration", 0) > 0:
 			tooltip += " (осталось: %d)" % status_data["duration"]
 		var icon = _create_icon(status_data["icon"], 32, tooltip)
-		apply_shader_to_icon(icon, "res://shaders/highlight_enemy.gdshader")
+		DataManager.apply_shader_to_icon(icon, "res://shaders/highlight_enemy.gdshader", {'hover_intensity' : 1.0})
+		#DataManager.apply_shader_overlay(icon, "res://shaders/horror_shader.gdshader")
 		status_container.add_child(icon)
 
 
@@ -329,7 +317,8 @@ func update_passives():
 	for passive_data in enemy_instance.get_active_passives_for_ui():
 		var tooltip = "%s\n%s" % [passive_data["name"], passive_data["description"]]
 		var icon = _create_icon(passive_data["icon"], 32, tooltip)
-		apply_shader_to_icon(icon, "res://shaders/highlight_enemy.gdshader")
+		DataManager.apply_shader_to_icon(icon, "res://shaders/highlight_enemy.gdshader", {'hover_intensity' : 1.0})
+		#DataManager.apply_shader_overlay(icon, "res://shaders/horror_shader.gdshader")
 		passive_container.add_child(icon)
 
 
@@ -436,25 +425,26 @@ func _hit_effect():
 	if not enemy_sprite:
 		return
 	
-	# 1. Шейдерный эффект (как было)
-	var material = enemy_sprite.material
-	if not material:
-		var shader = preload("res://shaders/get_hit_shader.gdshader")
-		var shader_material = ShaderMaterial.new()
-		shader_material.shader = shader
-		enemy_sprite.material = shader_material
-		material = shader_material
+	# Сохраняем текущий материал
+	base_material = enemy_sprite.material
 	
-	material.set_shader_parameter("hit_progress", 1.0)
+	# 1. Шейдерный эффект
+	var shader = preload("res://shaders/get_hit_shader.gdshader")
+	var shader_material = ShaderMaterial.new()
+	shader_material.shader = shader
+	enemy_sprite.material = shader_material
+	
+	shader_material.set_shader_parameter("hit_progress", 1.0)
 	
 	var tween = create_tween()
-	tween.tween_property(material, "shader_parameter/hit_progress", 0.0, 0.3).set_trans(Tween.TRANS_QUART).set_ease(Tween.EASE_OUT)
+	tween.tween_property(shader_material, "shader_parameter/hit_progress", 0.0, 0.3).set_trans(Tween.TRANS_QUART).set_ease(Tween.EASE_OUT)
 	
-		# Ждём завершения анимации
 	await tween.finished
-	# Возвращаем базовый материал
-	if get_parent().get_flat(DataManager.FlatStat.HEALTH > 0):
+	
+	# Возвращаем базовый материал, если враг ещё жив
+	if enemy_instance and enemy_instance.get_health() > 0:
 		enemy_sprite.material = base_material
+
 
 
 func _on_highlight_requested(enemy: EnemyInstance, enabled: bool):
