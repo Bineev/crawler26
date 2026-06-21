@@ -49,9 +49,11 @@ func draw_card(ignore_hand_limit: bool = false) -> bool:
 	
 	SignalManager.card_drawn.emit(card_data)
 	
-	# Отрисовываем одну карту с анимацией
+	# Добавляем карту без перестроения
 	if hand_ui:
-		hand_ui.add_card(card_data, card_ui_scene)  # этот метод вызывает layout_cards()
+		hand_ui.add_card_silent(card_data, card_ui_scene)
+		# Перестраиваем все карты с анимацией
+		hand_ui.rearrange_cards_with_animation()
 	
 	SignalManager.deck_size_changed.emit(draw_pile.size())
 	return true
@@ -83,11 +85,14 @@ func discard_card(card_ui: CardUI, card_data: CardData):
 
 
 func discard_hand():
+	# Перемещаем все карты из руки в сброс
 	for card_data in hand:
 		discard_pile.append(card_data)
 		SignalManager.card_discarded.emit(card_data)
+	
 	hand.clear()
 	
+	# Очищаем UI без анимации
 	if hand_ui:
 		hand_ui.clear_hand()
 	
@@ -101,11 +106,11 @@ func draw_new_hand():
 	
 	hand.clear()
 	
-	# Добавляем все карты (без layout)
+	# Добавляем все карты (без анимации)
 	for i in range(max_hand_size):
-		draw_card_without_layout()
+		draw_card_silent()
 	
-	# Применяем layout с анимацией
+	# Применяем layout с анимацией после раздачи
 	if hand_ui:
 		hand_ui.apply_layout(true)
 
@@ -133,17 +138,13 @@ func sacrifice_card(card_ui: CardUI, card_data: CardData):
 		hand.remove_at(index)
 		
 		if card_ui:
-			card_ui.state = DataManager.CardState.BURNED  # помечаем как сожжённую
+			card_ui.state = DataManager.CardState.BURNED
+			# Перемещаем в burn контейнер
 			if hand_ui:
 				hand_ui.move_card_to_burn(card_ui)
-			await card_ui.play_burn_animation()
+			card_ui.play_burn_animation()
 		else:
-		   # Если нет CardUI, просто удаляем карту (карта удаляется навсегда)
-			# queue_free() не нужен — это BattleDeck, а не CardUI
 			pass
-		
-		# Сожжённая карта НЕ отправляется в discard
-		# SignalManager.card_discarded.emit(card_data)  # ← УБРАТЬ
 		
 		print("Card sacrificed: ", card_data.get_localized_name())
 		

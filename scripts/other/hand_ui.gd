@@ -66,8 +66,12 @@ func add_card(card_data: CardData, card_scene: PackedScene):
 	card_instance.display()
 	card_instance.set_hand_scale()
 	
-	#if is_manual_layout:
-		#layout_cards()
+	# Прячем карту за пределами экрана
+	card_instance.position = Vector2(2200, 1200)
+	card_instance._needs_appear_animation = true
+	
+	# Перестраиваем с анимацией
+	apply_layout(true)
 
 
 func remove_card(card_ui: CardUI):
@@ -278,24 +282,25 @@ func move_card_to_burn(card_ui: CardUI) -> void:
 
 
 func apply_layout(animate: bool = true):
-	# Получаем целевые позиции
 	var target_positions = _calculate_card_positions()
 	var card_count = cards_container.get_child_count()
 	
 	if animate:
-		# Анимируем прилёт карт
 		for i in range(card_count):
 			var card = cards_container.get_child(i) as CardUI
 			if not card:
 				continue
 			
 			var target_pos = target_positions[i] if i < target_positions.size() else Vector2.ZERO
-			var delay = i * 0.06  # Задержка между картами
 			
-			# Анимация прилёта
-			card.play_appear_animation(target_pos, delay)
+			if card._needs_appear_animation:
+				# Новая карта — прилетает с эффектом
+				card._needs_appear_animation = false
+				card.play_appear_animation(target_pos, i * 0.05)
+			else:
+				# Старая карта — плавно переезжает
+				card.move_to_position(target_pos, i * 0.03)
 	else:
-		# Без анимации
 		for i in range(card_count):
 			var card = cards_container.get_child(i) as CardUI
 			if not card:
@@ -352,3 +357,60 @@ func add_card_silent(card_data: CardData, card_scene: PackedScene):
 	# Прячем карту за пределами экрана
 	card_instance.position = Vector2(2200, 1200)
 	card_instance._needs_appear_animation = true
+
+
+func rearrange_cards_with_animation():
+	var card_count = cards_container.get_child_count()
+	if card_count == 0:
+		return
+	
+	# Сначала рассчитываем новые позиции
+	var target_positions = _calculate_card_positions()
+	
+	# Обновляем original_position для всех карт
+	for i in range(card_count):
+		var card = cards_container.get_child(i) as CardUI
+		if not card:
+			continue
+		
+		var target_pos = target_positions[i] if i < target_positions.size() else Vector2.ZERO
+		card.original_position = target_pos
+		card.original_z_index = i
+		card.z_index = i
+	
+	# Запускаем анимацию
+	_animate_cards_to_positions()
+
+
+func _animate_cards_to_positions():
+	var card_count = cards_container.get_child_count()
+	if card_count == 0:
+		return
+	
+	# Сначала прячем все карты
+	for i in range(card_count):
+		var card = cards_container.get_child(i) as CardUI
+		if card and not card._needs_appear_animation:
+			# Старые карты временно скрываем
+			card.modulate = Color(1, 1, 1, 0)
+			card.position = card.original_position + Vector2(0, -30)
+	
+	# Ждём кадр
+	await get_tree().process_frame
+	
+	# Показываем и анимируем все карты
+	for i in range(card_count):
+		var card = cards_container.get_child(i) as CardUI
+		if not card:
+			continue
+		
+		var delay = i * 0.04
+		
+		if card._needs_appear_animation:
+			# Новая карта — прилетает с эффектом
+			card._needs_appear_animation = false
+			card.play_appear_animation(card.original_position, delay)
+		else:
+			# Старая карта — появляется с задержкой
+			card.modulate = Color(1, 1, 1, 1)
+			card.move_to_position(card.original_position, delay)

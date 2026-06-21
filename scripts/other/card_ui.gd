@@ -49,6 +49,7 @@ var current_tween: Tween = null
 
 var _needs_appear_animation: bool = false
 var _appear_delay: float = 0.0
+
 ## ============================================================
 ## ИНИЦИАЛИЗАЦИЯ
 ## ============================================================
@@ -645,7 +646,7 @@ func _on_burn_animation_finished():
 	if hand_ui:
 		if get_parent():
 			get_parent().remove_child(self)
-		hand_ui.layout_cards()
+		#hand_ui.layout_cards()
 	
 	queue_free()
 
@@ -692,7 +693,10 @@ func play_appear_animation(target_position: Vector2, delay: float = 0.0):
 	position = start_pos
 	scale = Vector2(0.7, 0.7)
 	modulate = Color(1, 1, 1, 1)
-	z_index = 0
+
+	# Ставим карту поверх всех во время анимации
+	z_index = 100
+	z_as_relative = false
 	
 	if delay > 0:
 		await get_tree().create_timer(delay).timeout
@@ -707,3 +711,28 @@ func play_appear_animation(target_position: Vector2, delay: float = 0.0):
 	tween.tween_property(self, "position", target_position, 0.02).set_delay(0.25)
 	
 	await tween.finished
+
+	# Возвращаем правильный z_index
+	z_index = original_z_index
+	z_as_relative = false
+
+#func move_to_position(target_position: Vector2, delay: float = 0.0):
+	#if delay > 0:
+		#await get_tree().create_timer(delay).timeout
+	#
+	#var tween = create_tween()
+	#tween.tween_property(self, "position", target_position, 0.12).set_ease(Tween.EASE_OUT)
+	#
+	#await tween.finished
+	#original_position = target_position
+
+
+func move_to_position(target_position: Vector2, delay: float = 0.0):
+	if delay > 0:
+		await get_tree().create_timer(delay).timeout
+	
+	var tween = create_tween()
+	tween.tween_property(self, "position", target_position, 0.15).set_ease(Tween.EASE_OUT)
+	
+	await tween.finished
+	original_position = target_position

@@ -62,7 +62,7 @@ func _add_log_entry(text: String):
 	entry.add_theme_color_override("font_color", _get_color_by_text(text))
 	entry.autowrap_mode = TextServer.AUTOWRAP_WORD
 	entry.add_theme_font_override("font", DataManager.FONT_MAIN)
-	entry.add_theme_font_size_override("font_size", 14)
+	entry.add_theme_font_size_override("font_size", 16)
 	
 	log_container.add_child(entry)
 	entry.custom_minimum_size.x = size.x - 30
