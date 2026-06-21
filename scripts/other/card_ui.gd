@@ -736,3 +736,19 @@ func move_to_position(target_position: Vector2, delay: float = 0.0):
 	
 	await tween.finished
 	original_position = target_position
+
+
+func fly_away_left(delay: float = 0.0):
+	if delay > 0:
+		await get_tree().create_timer(delay).timeout
+	
+	var target_pos = Vector2(-300, position.y - 50)  # улетает влево и вверх
+	
+	var tween = create_tween()
+	tween.set_parallel(true)
+	tween.tween_property(self, "position", target_pos, 0.3).set_ease(Tween.EASE_IN)
+	tween.tween_property(self, "scale", Vector2(0.5, 0.5), 0.3)
+	tween.tween_property(self, "modulate", Color(1, 1, 1, 0), 0.25)
+	
+	await tween.finished
+	queue_free()

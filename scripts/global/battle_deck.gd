@@ -85,16 +85,16 @@ func discard_card(card_ui: CardUI, card_data: CardData):
 
 
 func discard_hand():
-	# Перемещаем все карты из руки в сброс
+	# Анимируем улёт карт
+	if hand_ui:
+		hand_ui.fly_hand_away()
+	
+	# Перемещаем карты в сброс (без ожидания)
 	for card_data in hand:
 		discard_pile.append(card_data)
 		SignalManager.card_discarded.emit(card_data)
 	
 	hand.clear()
-	
-	# Очищаем UI без анимации
-	if hand_ui:
-		hand_ui.clear_hand()
 	
 	SignalManager.discard_size_changed.emit(discard_pile.size())
 	print("Hand discarded, discard pile size: ", discard_pile.size())

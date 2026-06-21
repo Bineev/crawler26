@@ -383,34 +383,60 @@ func rearrange_cards_with_animation():
 
 
 func _animate_cards_to_positions():
-	var card_count = cards_container.get_child_count()
+	var children = cards_container.get_children()
+	var card_count = children.size()
 	if card_count == 0:
 		return
 	
 	# Сначала прячем все карты
 	for i in range(card_count):
-		var card = cards_container.get_child(i) as CardUI
+		var card = children[i] as CardUI
 		if card and not card._needs_appear_animation:
-			# Старые карты временно скрываем
 			card.modulate = Color(1, 1, 1, 0)
 			card.position = card.original_position + Vector2(0, -30)
 	
-	# Ждём кадр
 	await get_tree().process_frame
+	
+	# Обновляем список детей (на случай, если он изменился)
+	children = cards_container.get_children()
+	card_count = children.size()
 	
 	# Показываем и анимируем все карты
 	for i in range(card_count):
-		var card = cards_container.get_child(i) as CardUI
+		var card = children[i] as CardUI
 		if not card:
 			continue
 		
 		var delay = i * 0.04
 		
 		if card._needs_appear_animation:
-			# Новая карта — прилетает с эффектом
 			card._needs_appear_animation = false
 			card.play_appear_animation(card.original_position, delay)
 		else:
-			# Старая карта — появляется с задержкой
 			card.modulate = Color(1, 1, 1, 1)
 			card.move_to_position(card.original_position, delay)
+
+
+func fly_hand_away() -> bool:
+	if not cards_container:
+		return false
+	
+	var children = cards_container.get_children()
+	var card_count = children.size()
+	
+	if card_count == 0:
+		return false
+	
+	for i in range(card_count):
+		var card = children[i] as CardUI
+		if card:
+			var delay = i * 0.04
+			card.fly_away_left(delay)
+	
+	# Возвращаем true, если карты были
+	return true
+
+
+func wait_for_fly_away():
+	# Ждём, пока все карты улетят
+	await get_tree().create_timer(0.5 + (cards_container.get_child_count() * 0.04)).timeout

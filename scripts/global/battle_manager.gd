@@ -285,8 +285,14 @@ func end_player_turn():
 	# Сбрасываем руку
 	if battle_deck:
 		battle_deck.discard_hand()
+		
+		# Ждём, пока карты улетят (через HandUI)
+		if hand_ui:
+			await hand_ui.wait_for_fly_away()
 	
 	SignalManager.turn_ended.emit()
+	
+	# Начинаем ход врага
 	start_enemy_turn()
 
 

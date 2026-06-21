@@ -140,16 +140,26 @@ func _create_hand_ui() -> HandUI:
 
 
 func on_battle_victory():
-	await get_tree().create_timer(1.5).timeout
+	var hand_ui = BattleManager.get_hand_ui()
+	if hand_ui:
+		hand_ui.fly_hand_away()
+		await hand_ui.wait_for_fly_away()
+	
+	await get_tree().create_timer(0.2).timeout
+	
 	GameTestManager.clear_ui()
-	
-	# Просто говорим FloorManager, что комната пройдена
 	FloorManager.process_next()
-	
 	queue_free()
 
 
 func _on_battle_defeat():
+	# Карты улетают
+	var hand_ui = BattleManager.get_hand_ui()
+	if hand_ui:
+		hand_ui.fly_hand_away()
+	
+	await get_tree().create_timer(0.6).timeout
+	
 	# Удаляем комнату
 	queue_free()
 	
