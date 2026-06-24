@@ -283,6 +283,16 @@ enum CardId {
 	MOLERAT_HIDE,          # Шкура кротокрыса
 	TUNNEL_AMBUSH,         # Туннельная засада
 	BLOODLETTING,          # Кровопускание
+	BLOOD_TRAIL,           # Кровавый след
+	FROZEN_EARTH,          # Стылая земля
+	RODENT_AGILITY,        # Проворство грызуна
+	FROZEN_BITE,           # Мерзлый укус
+	BEAST_PULSE,           # Пульс зверя
+	BLOOD_THREAD,          # Кровавая нить
+	ROTTEN_CUT,            # Гнилой порез
+	MOLE_TOSS,             # Бросок слепыша
+	WORM_SPIRIT,           # Дух червя
+	FLESH_RAGE,            # Ярость плоти
 }
 
 ## Намерения врагов
@@ -1014,6 +1024,16 @@ func load_all_cards():
 	_register_card(CardId.SHIELD_OF_PENANCE, "res://resources/cards/penitent/shield_of_penance.tres")
 	_register_card(CardId.VOID_STRIKE, "res://resources/cards/penitent/void_strike.tres")
 	_register_card(CardId.CRY_OF_DESPAIR, "res://resources/cards/penitent/cry_of_despair.tres")
+	_register_card(CardId.BLOOD_TRAIL, "res://resources/cards/mole_tunnels/blood_trail.tres")
+	_register_card(CardId.FROZEN_EARTH, "res://resources/cards/mole_tunnels/frozen_earth.tres")
+	_register_card(CardId.RODENT_AGILITY, "res://resources/cards/mole_tunnels/rodent_agility.tres")
+	_register_card(CardId.FROZEN_BITE, "res://resources/cards/mole_tunnels/frozen_bite.tres")
+	_register_card(CardId.ROTTEN_CUT, "res://resources/cards/mole_tunnels/rotten_cut.tres")
+	_register_card(CardId.BEAST_PULSE, "res://resources/cards/mole_tunnels/beast_pulse.tres")
+	_register_card(CardId.BLOOD_THREAD, "res://resources/cards/mole_tunnels/blood_thread.tres")
+	_register_card(CardId.MOLE_TOSS, "res://resources/cards/mole_tunnels/mole_toss.tres")
+	_register_card(CardId.WORM_SPIRIT, "res://resources/cards/mole_tunnels/worm_spirit.tres")
+	_register_card(CardId.FLESH_RAGE, "res://resources/cards/mole_tunnels/flesh_rage.tres")
 	
 	_cards_loaded = true
 
@@ -1032,15 +1052,26 @@ func get_card(card_id: CardId) -> CardData:
 func get_starting_deck() -> Array[CardData]:
 	var deck: Array[CardData] = []
 	
-	deck.append(get_card(CardId.ATONEMENT_STRIKE))
-	deck.append(get_card(CardId.ATONEMENT_STRIKE))
-	deck.append(get_card(CardId.ATONEMENT_STRIKE))
-	deck.append(get_card(CardId.SINFUL_STRIKE))
-	deck.append(get_card(CardId.SINFUL_STRIKE))
-	deck.append(get_card(CardId.SINFUL_STRIKE))
-	deck.append(get_card(CardId.PENITENT_REVELATION))
-	deck.append(get_card(CardId.ATONEMENT_BARRIER))
-	deck.append(get_card(CardId.ATONEMENT_BARRIER))
+	deck.append(get_card(CardId.BLOOD_TRAIL))
+	deck.append(get_card(CardId.FROZEN_EARTH))
+	deck.append(get_card(CardId.RODENT_AGILITY))
+	deck.append(get_card(CardId.FROZEN_BITE))
+	deck.append(get_card(CardId.BEAST_PULSE))
+	deck.append(get_card(CardId.BLOOD_THREAD))
+	deck.append(get_card(CardId.ROTTEN_CUT))
+	deck.append(get_card(CardId.MOLE_TOSS))
+	deck.append(get_card(CardId.WORM_SPIRIT))
+	deck.append(get_card(CardId.FLESH_RAGE))
+
+	#deck.append(get_card(CardId.ATONEMENT_STRIKE))
+	#deck.append(get_card(CardId.ATONEMENT_STRIKE))
+	#deck.append(get_card(CardId.ATONEMENT_STRIKE))
+	#deck.append(get_card(CardId.SINFUL_STRIKE))
+	#deck.append(get_card(CardId.SINFUL_STRIKE))
+	#deck.append(get_card(CardId.SINFUL_STRIKE))
+	#deck.append(get_card(CardId.PENITENT_REVELATION))
+	#deck.append(get_card(CardId.ATONEMENT_BARRIER))
+	#deck.append(get_card(CardId.ATONEMENT_BARRIER))
 	
 	return deck
 	
@@ -1052,7 +1083,7 @@ var _card_backgrounds: Dictionary = {}
 
 func load_card_backgrounds():
 	# Фоны биомов
-	#_card_backgrounds["biome_" + str(Biome.MOLE_TUNNELS)] = preload("res://img/cards/backgrounds/mole_tunnels_card_bg.png")
+	_card_backgrounds["biome_" + str(Biome.MOLE_TUNNELS)] = preload("res://img/cards/backgrounds/mole_tunnels_card_bg.png")
 	
 	# Фоны классов персонажей
 	_card_backgrounds["class_" + str(CharacterClass.PENITENT)] = preload("res://img/cards/backgrounds/penitent_card_bg.png")
@@ -1092,6 +1123,22 @@ func load_card_illustrations():
 	_card_illustrations[CardId.CRY_OF_DESPAIR] = preload("res://img/cards/penitent/cry_of_despair.png")
 	
 	## Карты биома Кротовые норы
+	_card_illustrations[CardId.BLOOD_TRAIL] = preload("res://img/cards/mole_tunnels/blood_trail.png")
+	_card_illustrations[CardId.FROZEN_EARTH] = preload("res://img/cards/mole_tunnels/frozen_earth.png")
+	_card_illustrations[CardId.RODENT_AGILITY] = preload("res://img/cards/mole_tunnels/rodent_agility.png")
+	_card_illustrations[CardId.FROZEN_BITE] = preload("res://img/cards/mole_tunnels/frozen_bite.png")
+	_card_illustrations[CardId.ROTTEN_CUT] = preload("res://img/cards/mole_tunnels/rotten_cut.png")
+	_card_illustrations[CardId.BEAST_PULSE] = preload("res://img/cards/mole_tunnels/beast_pulse.png")
+	_card_illustrations[CardId.BLOOD_THREAD] = preload("res://img/cards/mole_tunnels/blood_thread.png")
+	_card_illustrations[CardId.MOLE_TOSS] = preload("res://img/cards/mole_tunnels/mole_toss.png")
+	_card_illustrations[CardId.WORM_SPIRIT] = preload("res://img/cards/mole_tunnels/worm_spirit.png")
+	_card_illustrations[CardId.FLESH_RAGE] = preload("res://img/cards/mole_tunnels/flesh_rage.png")
+
+	
+	
+	
+	
+	
 	#_card_illustrations[CardId.BLIND_FURY] = preload("res://img/cards/mole_tunnels/blind_fury.png")
 	#_card_illustrations[CardId.SMELL_OF_BLOOD] = preload("res://img/cards/mole_tunnels/smell_of_blood.png")
 	#_card_illustrations[CardId.MOLERAT_HIDE] = preload("res://img/cards/mole_tunnels/molerat_hide.png")
@@ -1129,6 +1176,7 @@ const COLOR_MYSTIC_ART_BG_LIGHT: Color = Color("8A5ABF")       # светло-ф
 const COLOR_ROGUE_ART_BG_LIGHT: Color = Color("6ABF6A")        # светло-зелёный
 
 const COLOR_MOLE_TUNNELS_ART_BG_LIGHT: Color = Color("BFA86A")     # светло-коричневый
+const COLOR_MOLE_TUNNELS_ART_BG_LIGHT2: Color = Color("e9dab0ff")     # светло-коричневый
 const COLOR_FLESH_CAVES_ART_BG_LIGHT: Color = Color("BF6A6A")      # светло-красный
 const COLOR_BONE_LABYRINTH_ART_BG_LIGHT: Color = Color("BFB8A6")   # светло-серый
 
@@ -1220,7 +1268,7 @@ func _get_card_art_background_color_light(origin: CardOrigin, character_class: C
 		CardOrigin.BIOME:
 			match biome:
 				Biome.MOLE_TUNNELS:
-					return COLOR_MOLE_TUNNELS_ART_BG_LIGHT
+					return COLOR_MOLE_TUNNELS_ART_BG_LIGHT2
 				Biome.FLESH_CAVES:
 					return COLOR_FLESH_CAVES_ART_BG_LIGHT
 				Biome.BONE_LABYRINTH:

@@ -6,5 +6,6 @@
 custom_minimum_size = Vector2(200, 60)
 offset_right = 8.0
 offset_bottom = 8.0
+focus_mode = 0
 text = "Завершить ход"
 script = ExtResource("1_tql3q")

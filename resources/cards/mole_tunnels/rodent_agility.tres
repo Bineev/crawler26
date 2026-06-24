@@ -1,0 +1,30 @@
+[gd_resource type="Resource" script_class="CardData" load_steps=6 format=3 uid="uid://c6b7412rloksl"]
+
+[ext_resource type="Script" uid="uid://cmra25r1r3ivt" path="res://resources/res_scripts/effect_entry.gd" id="1_rgsrd"]
+[ext_resource type="Script" uid="uid://badcs22cck6n5" path="res://resources/res_scripts/card_data.gd" id="2_b2vxs"]
+[ext_resource type="Resource" uid="uid://b68cda611rabw" path="res://resources/statuses/bleed.tres" id="2_vnrwb"]
+
+[sub_resource type="Resource" id="Resource_bhgfb"]
+script = ExtResource("1_rgsrd")
+category = 8
+target = 0
+amount = 2
+metadata/_custom_type_script = "uid://cmra25r1r3ivt"
+
+[sub_resource type="Resource" id="Resource_njfge"]
+script = ExtResource("1_rgsrd")
+category = 4
+target = 0
+status = ExtResource("2_vnrwb")
+duration = 2
+metadata/_custom_type_script = "uid://cmra25r1r3ivt"
+
+[resource]
+script = ExtResource("2_b2vxs")
+id = 19
+origin = 1
+name_key = "card_rodent_agility_name"
+description_key = "card_rodent_agility_desc"
+cost = 0
+effects = Array[ExtResource("1_rgsrd")]([SubResource("Resource_bhgfb"), SubResource("Resource_njfge")])
+metadata/_custom_type_script = "uid://badcs22cck6n5"

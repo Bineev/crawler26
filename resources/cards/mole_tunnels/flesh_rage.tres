@@ -1,0 +1,29 @@
+[gd_resource type="Resource" script_class="CardData" load_steps=6 format=3 uid="uid://1gpy0sned3md"]
+
+[ext_resource type="Script" uid="uid://cmra25r1r3ivt" path="res://resources/res_scripts/effect_entry.gd" id="1_2x3em"]
+[ext_resource type="Script" uid="uid://badcs22cck6n5" path="res://resources/res_scripts/card_data.gd" id="2_3sgxg"]
+[ext_resource type="Script" uid="uid://b0sj1pmsfay7x" path="res://scripts/effects/flesh_rage.gd" id="2_mghm6"]
+
+[sub_resource type="Resource" id="Resource_5rods"]
+script = ExtResource("1_2x3em")
+category = 4
+target = 0
+duration = 2
+metadata/_custom_type_script = "uid://cmra25r1r3ivt"
+
+[sub_resource type="Resource" id="Resource_71rmg"]
+script = ExtResource("1_2x3em")
+category = 15
+target = 0
+custom_script = ExtResource("2_mghm6")
+metadata/_custom_type_script = "uid://cmra25r1r3ivt"
+
+[resource]
+script = ExtResource("2_3sgxg")
+id = 26
+origin = 1
+name_key = "card_flesh_rage_name"
+description_key = "card_flesh_rage_desc"
+cost = 0
+effects = Array[ExtResource("1_2x3em")]([SubResource("Resource_5rods"), SubResource("Resource_71rmg")])
+metadata/_custom_type_script = "uid://badcs22cck6n5"

@@ -1,0 +1,46 @@
+[gd_resource type="Resource" script_class="CardData" load_steps=9 format=3 uid="uid://dhoqowui0r55"]
+
+[ext_resource type="Script" uid="uid://cmra25r1r3ivt" path="res://resources/res_scripts/effect_entry.gd" id="1_w7gca"]
+[ext_resource type="Resource" uid="uid://do4j6drxrdsqt" path="res://resources/passives/regrowth.tres" id="2_aihnu"]
+[ext_resource type="Script" uid="uid://badcs22cck6n5" path="res://resources/res_scripts/card_data.gd" id="2_gh2gt"]
+[ext_resource type="Script" uid="uid://dkltfvos6fmk2" path="res://scripts/conditions/health_less_than_30.gd" id="3_vsd2v"]
+
+[sub_resource type="Resource" id="Resource_y8pnk"]
+script = ExtResource("1_w7gca")
+category = 5
+target = 0
+passive = ExtResource("2_aihnu")
+passive_duration = 5
+metadata/_custom_type_script = "uid://cmra25r1r3ivt"
+
+[sub_resource type="Resource" id="Resource_fukw5"]
+script = ExtResource("1_w7gca")
+category = 9
+target = 0
+metadata/_custom_type_script = "uid://cmra25r1r3ivt"
+
+[sub_resource type="Resource" id="Resource_gc07k"]
+script = ExtResource("1_w7gca")
+category = 9
+target = 0
+amount = 2
+metadata/_custom_type_script = "uid://cmra25r1r3ivt"
+
+[sub_resource type="Resource" id="Resource_662fl"]
+script = ExtResource("1_w7gca")
+category = 14
+target = 0
+condition_script = ExtResource("3_vsd2v")
+true_effect = SubResource("Resource_gc07k")
+false_effect = SubResource("Resource_fukw5")
+metadata/_custom_type_script = "uid://cmra25r1r3ivt"
+
+[resource]
+script = ExtResource("2_gh2gt")
+id = 21
+origin = 1
+name_key = "card_beast_pulse_name"
+description_key = "card_beast_pulse_desc"
+grade = 1
+effects = Array[ExtResource("1_w7gca")]([SubResource("Resource_y8pnk"), SubResource("Resource_662fl")])
+metadata/_custom_type_script = "uid://badcs22cck6n5"

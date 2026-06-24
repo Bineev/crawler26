@@ -134,3 +134,45 @@ msg_not_enough_energy,Not enough energy!
 msg_target_selection,Select target
 msg_victory,Victory!
 msg_defeat,Defeat...
+
+card_blood_trail_name,Blood Trail
+card_blood_trail_desc,"Deals 6 damage.\nIf enemy has Bleed, deals 10 damage."
+
+card_frozen_earth_name,Frozen Earth
+card_frozen_earth_desc,"Gain 10 Block.\nApply 3 Cold to yourself.\nIf you have Cold, gain 4 additional Block."
+
+card_rodent_agility_name,Rodent Agility
+card_rodent_agility_desc,"Draw 2 cards.\nApply 1 Bleed to yourself for 2 turns."
+
+card_frozen_bite_name,Frozen Bite
+card_frozen_bite_desc,"Deals 5 damage.\nApplies 5 stacks of Cold to the enemy."
+
+card_rotten_cut_name,Rotten Cut
+card_rotten_cut_desc,"Deals 2 damage.\nDoubles Bleed stacks on the enemy."
+
+card_beast_pulse_name,Beast Pulse
+card_beast_pulse_desc,"Apply Regrowth passive (5 charges).\nIf health < 30, gain 2 energy."
+
+card_blood_thread_name,Blood Thread
+card_blood_thread_desc,"All enemies gain 1 Bleed.\nGain 3 Strength per enemy."
+
+card_mole_toss_name,Mole Toss
+card_mole_toss_desc,"Deals random damage from 1 to 10."
+
+card_worm_spirit_name,Worm Spirit
+card_worm_spirit_desc,"Removes all statuses and passives from the hero.\nGrants Regeneration for 3 turns.\nBase healing: 2, +1 per removed effect."
+
+card_flesh_rage_name,Flesh Rage
+card_flesh_rage_desc,"Apply 1 Bleed to yourself.\nIf you have Bleed — gain 1 energy.\nIf not — draw 1 card."
+
+status_bleed_name,Bleed
+status_bleed_desc,"Deals %d damage per stack every %d turns."
+
+status_cold_name,Cold
+status_cold_desc,"Reduces outgoing damage by %.0f%% per stack (max 25%%)."
+
+status_regen_name,Regeneration
+status_regen_desc,"Heals %d HP per stack at end of turn."
+
+passive_regrowth_name,Regrowth
+passive_regrowth_desc,"Heals increasing amount each turn."

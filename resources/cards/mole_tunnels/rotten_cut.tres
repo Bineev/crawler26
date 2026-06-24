@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="CardData" load_steps=6 format=3 uid="uid://378068gewf0g"]
+
+[ext_resource type="Script" uid="uid://cmra25r1r3ivt" path="res://resources/res_scripts/effect_entry.gd" id="1_0v0gs"]
+[ext_resource type="Script" uid="uid://cojs2m6l2ijjw" path="res://scripts/effects/rotten_cut.gd" id="2_glj01"]
+[ext_resource type="Script" uid="uid://badcs22cck6n5" path="res://resources/res_scripts/card_data.gd" id="2_gtsh6"]
+
+[sub_resource type="Resource" id="Resource_hrcpl"]
+script = ExtResource("1_0v0gs")
+base_value = 2
+metadata/_custom_type_script = "uid://cmra25r1r3ivt"
+
+[sub_resource type="Resource" id="Resource_4hac5"]
+script = ExtResource("1_0v0gs")
+category = 15
+custom_script = ExtResource("2_glj01")
+metadata/_custom_type_script = "uid://cmra25r1r3ivt"
+
+[resource]
+script = ExtResource("2_gtsh6")
+id = 23
+origin = 1
+name_key = "card_rotten_cut_name"
+description_key = "card_rotten_cut_desc"
+grade = 1
+effects = Array[ExtResource("1_0v0gs")]([SubResource("Resource_hrcpl"), SubResource("Resource_4hac5")])
+metadata/_custom_type_script = "uid://badcs22cck6n5"

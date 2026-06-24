@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="CardData" load_steps=5 format=3 uid="uid://bwmas8exbjqj5"]
+
+[ext_resource type="Script" uid="uid://cmra25r1r3ivt" path="res://resources/res_scripts/effect_entry.gd" id="1_k3kx4"]
+[ext_resource type="Script" uid="uid://caxalwm0a2jd2" path="res://scripts/effects/mole_toss.gd" id="2_534gs"]
+[ext_resource type="Script" uid="uid://badcs22cck6n5" path="res://resources/res_scripts/card_data.gd" id="2_fj4l1"]
+
+[sub_resource type="Resource" id="Resource_6hg4m"]
+script = ExtResource("1_k3kx4")
+category = 15
+base_value = 10
+custom_script = ExtResource("2_534gs")
+metadata/_custom_type_script = "uid://cmra25r1r3ivt"
+
+[resource]
+script = ExtResource("2_fj4l1")
+id = 24
+origin = 1
+name_key = "card_mole_toss_name"
+description_key = "card_mole_toss_desc"
+effects = Array[ExtResource("1_k3kx4")]([SubResource("Resource_6hg4m")])
+metadata/_custom_type_script = "uid://badcs22cck6n5"

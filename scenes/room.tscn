@@ -6,8 +6,11 @@
 [ext_resource type="Shader" uid="uid://1kutc6pr0rfa" path="res://shaders/card3_shader.gdshader" id="4_14vil"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_jxe34"]
-render_priority = 0
 shader = ExtResource("2_85yof")
+shader_parameter/darkness = 0.4
+shader_parameter/vignette_strength = 0.5
+shader_parameter/noise_amount = 0.03
+shader_parameter/tint_color = Color(0.2, 0.05, 0.1, 1)
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_jn645"]
 shader = ExtResource("3_14vil")

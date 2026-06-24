@@ -1,0 +1,54 @@
+[gd_resource type="Resource" script_class="CardData" load_steps=10 format=3 uid="uid://b7wis407h6f0n"]
+
+[ext_resource type="Script" uid="uid://cmra25r1r3ivt" path="res://resources/res_scripts/effect_entry.gd" id="1_2fb0f"]
+[ext_resource type="Resource" uid="uid://43fdfybkbvp" path="res://resources/statuses/cold.tres" id="2_bwovg"]
+[ext_resource type="Script" uid="uid://badcs22cck6n5" path="res://resources/res_scripts/card_data.gd" id="2_g0n1e"]
+[ext_resource type="Script" uid="uid://bxk05267jqov" path="res://scripts/conditions/has_cold.gd" id="3_bwovg"]
+
+[sub_resource type="Resource" id="Resource_gvso6"]
+script = ExtResource("1_2fb0f")
+category = 1
+target = 0
+base_value = 10
+metadata/_custom_type_script = "uid://cmra25r1r3ivt"
+
+[sub_resource type="Resource" id="Resource_0dpfl"]
+script = ExtResource("1_2fb0f")
+category = 4
+target = 0
+status = ExtResource("2_bwovg")
+value = 3
+duration = 2
+metadata/_custom_type_script = "uid://cmra25r1r3ivt"
+
+[sub_resource type="Resource" id="Resource_ipgf6"]
+script = ExtResource("1_2fb0f")
+category = 1
+target = 0
+metadata/_custom_type_script = "uid://cmra25r1r3ivt"
+
+[sub_resource type="Resource" id="Resource_ebkpl"]
+script = ExtResource("1_2fb0f")
+category = 1
+target = 0
+base_value = 5
+metadata/_custom_type_script = "uid://cmra25r1r3ivt"
+
+[sub_resource type="Resource" id="Resource_krruo"]
+script = ExtResource("1_2fb0f")
+category = 14
+target = 0
+condition_script = ExtResource("3_bwovg")
+true_effect = SubResource("Resource_ebkpl")
+false_effect = SubResource("Resource_ipgf6")
+metadata/_custom_type_script = "uid://cmra25r1r3ivt"
+
+[resource]
+script = ExtResource("2_g0n1e")
+id = 18
+origin = 1
+name_key = "card_frozen_earth_name"
+description_key = "card_frozen_earth_desc"
+cost = 2
+effects = Array[ExtResource("1_2fb0f")]([SubResource("Resource_gvso6"), SubResource("Resource_0dpfl"), SubResource("Resource_krruo")])
+metadata/_custom_type_script = "uid://badcs22cck6n5"

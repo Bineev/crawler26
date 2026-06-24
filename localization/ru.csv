@@ -134,3 +134,45 @@ msg_not_enough_energy,Недостаточно энергии!
 msg_target_selection,Выберите цель
 msg_victory,Победа!
 msg_defeat,Поражение...
+
+card_blood_trail_name,Кровавый след
+card_blood_trail_desc,"Наносит 6 урона.\nЕсли у врага есть Кровотечение, наносит 10 урона."
+
+card_frozen_earth_name,Стылая земля
+card_frozen_earth_desc,"Даёт 10 блока.\nНакладывает 3 стака Холода.\nПри наличии Холода даёт ещё 4 блока."
+
+card_rodent_agility_name,Проворство грызуна
+card_rodent_agility_desc,"Добирает 2 карты.\nНакладывает на себя 1 стак Кровотечения на 2 хода."
+
+card_frozen_bite_name,Мерзлый укус
+card_frozen_bite_desc,"Наносит 5 урона.\nНакладывает на врага 5 стаков Холода."
+
+card_rotten_cut_name,Гнилой порез
+card_rotten_cut_desc,"Наносит 2 урона.\nУдваивает стаки Кровотечения на враге."
+
+card_beast_pulse_name,Пульс зверя
+card_beast_pulse_desc,"Накладывает пассивку Regrowth (5 зарядов).\nЕсли здоровье < 30, даёт 2 энергии."
+
+card_blood_thread_name,Кровавая нить
+card_blood_thread_desc,"Все враги получают 1 стак Кровотечения.\nДаёт 3 Силы за каждого врага."
+
+card_mole_toss_name,Бросок слепыша
+card_mole_toss_desc,"Наносит случайное число урона от 1 до 10."
+
+card_worm_spirit_name,Дух червя
+card_worm_spirit_desc,"Снимает все статусы и пассивки с героя.\nДаёт Регенерацию на 3 хода.\nБазовое лечение: 2, +1 за каждый снятый эффект."
+
+card_flesh_rage_name,Ярость плоти
+card_flesh_rage_desc,"Накладывает на себя 1 стак Кровотечения.\nЕсли есть Кровотечение — +1 энергия.\nЕсли нет — добор 1 карты."
+
+status_bleed_name,Кровотечение
+status_bleed_desc,"Наносит %d урона за каждый стак раз в 2 хода."
+
+status_cold_name,Холод
+status_cold_desc,"Снижает исходящий урон на %.0f%% за стек (макс 25%%)."
+
+status_regen_name,Регенерация
+status_regen_desc,"Лечит %d HP в конце хода за каждый стек."
+
+passive_regrowth_name,Оживление
+passive_regrowth_desc,"Каждый ход лечит на растущую величину."
