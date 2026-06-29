@@ -15,6 +15,9 @@ class_name EnemyUI
 @onready var click_area: Area2D = $ClickArea
 @onready var collision_shape: CollisionShape2D = $ClickArea/CollisionShape2D
 @onready var enemy_sprite_copy: TextureRect = $VBoxContainer/SpriteContainer/EnemySpriteCopy
+@onready var sprite_container: CenterContainer = $VBoxContainer/SpriteContainer
+@onready var highlight_sprite: TextureRect = $VBoxContainer/SpriteContainer/HighlightSprite
+
 
 var enemy_instance: EnemyInstance = null
 var breath_tween: Tween = null
@@ -25,6 +28,17 @@ var highlight_material: ShaderMaterial = null
 var is_highlighted: bool = false
 var base_material: Material = null
 
+var current_shader_priority: DataManager.EnemyShaderPriority = DataManager.EnemyShaderPriority.NONE
+var pending_death: bool = false
+var pending_freeze: bool = false
+var _is_pushing: bool = false
+
+var _saved_modulate: Color = Color(1, 1, 1, 1)
+
+const FREEZE_SHADER = preload("res://shaders/frozen.gdshader")
+var ice_noise: NoiseTexture2D = null
+var hit_tween: Tween = null
+var freeze_tween: Tween = null
 ## ============================================================
 ## ПУБЛИЧНЫЕ МЕТОДЫ
 ## ============================================================
@@ -188,6 +202,9 @@ func update_display():
 		# Копия спрайта
 	if enemy_sprite_copy:
 		enemy_sprite_copy.texture = enemy_instance.get_sprite()
+	
+	if highlight_sprite:
+		highlight_sprite.texture = enemy_instance.get_sprite()
 	# Здоровье
 	var current_health = enemy_instance.get_health()
 	var max_health = enemy_instance.get_max_health()
@@ -422,30 +439,62 @@ func _on_get_hit(target: Node):
 
 
 func _hit_effect():
+	# Если враг заморожен или умирает — игнорируем урон
+	if current_shader_priority >= DataManager.EnemyShaderPriority.FREEZE:
+		return
+	
 	if not enemy_sprite:
 		return
 	
 	# Сохраняем текущий материал
-	base_material = enemy_sprite.material
+	var current_material = enemy_sprite.material
 	
-	# 1. Шейдерный эффект
+	# Применяем шейдер удара
 	var shader = preload("res://shaders/get_hit_shader.gdshader")
 	var shader_material = ShaderMaterial.new()
 	shader_material.shader = shader
 	enemy_sprite.material = shader_material
-	
 	shader_material.set_shader_parameter("hit_progress", 1.0)
 	
-	var tween = create_tween()
-	tween.tween_property(shader_material, "shader_parameter/hit_progress", 0.0, 0.3).set_trans(Tween.TRANS_QUART).set_ease(Tween.EASE_OUT)
+	current_shader_priority = DataManager.EnemyShaderPriority.HIT
 	
-	await tween.finished
+	if hit_tween:
+		hit_tween.kill()
 	
-	# Возвращаем базовый материал, если враг ещё жив
-	if enemy_instance and enemy_instance.get_health() > 0:
-		enemy_sprite.material = base_material
+	hit_tween = create_tween()
+	hit_tween.tween_property(shader_material, "shader_parameter/hit_progress", 0.0, 0.3)\
+		.set_trans(Tween.TRANS_QUART)\
+		.set_ease(Tween.EASE_OUT)
+	
+	await hit_tween.finished
+	hit_tween = null
+	
+	_on_hit_finished(current_material)
 
 
+func _on_hit_finished(current_material: Material = null):
+	# Проверяем, не умер ли враг
+	if pending_death:
+		pending_death = false
+		_apply_death_effect()
+		return
+	
+	# Проверяем, не нужно ли заморозить
+	if pending_freeze:
+		pending_freeze = false
+		_apply_freeze_effect_immediate()
+		return
+	
+	# Возвращаем базовый материал
+	if enemy_sprite:
+		if current_material:
+			enemy_sprite.material = current_material
+		elif base_material:
+			enemy_sprite.material = base_material
+		else:
+			enemy_sprite.material = null
+	
+	current_shader_priority = DataManager.EnemyShaderPriority.NONE
 
 func _on_highlight_requested(enemy: EnemyInstance, enabled: bool):
 	if enemy != enemy_instance:
@@ -459,9 +508,9 @@ func _on_highlight_requested(enemy: EnemyInstance, enabled: bool):
 
 
 func _apply_highlight(enabled: bool):
-	if not enemy_sprite:
+	if not highlight_sprite:
 		return
-	
+		
 	if enabled:
 		# Загружаем шейдер
 		if not highlight_material:
@@ -470,18 +519,20 @@ func _apply_highlight(enabled: bool):
 			highlight_material.shader = shader
 		
 		# Сохраняем оригинальный материал, если нужно
-		if not enemy_sprite.material or enemy_sprite.material == highlight_material:
+		if not highlight_sprite.material or highlight_sprite.material == highlight_material:
 			pass
 		
 		highlight_material.set_shader_parameter("hover_intensity", 1.0)
-		enemy_sprite.material = highlight_material
+		highlight_sprite.material = highlight_material
+		highlight_sprite.visible = true
 	else:
 		# Убираем шейдер
-		if enemy_sprite.material == highlight_material:
-			enemy_sprite.material = null
+		if highlight_sprite.material == highlight_material:
+			highlight_sprite.material = null
 				# Возвращаем базовый материал
-		enemy_sprite.material = base_material
+		highlight_sprite.material = base_material
 		highlight_material = null
+		highlight_sprite.visible = false
 
 
 func show_floating_text(text: String, color: Color):
@@ -509,20 +560,43 @@ func _on_heal_received(target: Node, amount: int):
 	show_floating_text("+" + str(amount), color)
 
 func die():
+	# Если есть hit — дожидаемся его окончания
+	if current_shader_priority == DataManager.EnemyShaderPriority.HIT:
+		pending_death = true
+		return
+	
+	# Если есть freeze — сначала убираем его
+	if current_shader_priority == DataManager.EnemyShaderPriority.FREEZE:
+		# Убираем freeze и ждём окончания анимации
+		remove_freeze_effect()
+		if freeze_tween:
+			await freeze_tween.finished
+	
+	_apply_death_effect()
+
+
+func _apply_death_effect():
+	current_shader_priority = DataManager.EnemyShaderPriority.DEATH
+	pending_death = false
+	
 	if not enemy_sprite:
 		return
+	
+	# Скрываем все UI элементы
 	_hide_ui_elements()
-	# Получаем или создаём материал с шейдером смерти
+	
+	# Применяем шейдер смерти
 	var shader = preload("res://shaders/death_dissolve.gdshader")
 	var death_material = ShaderMaterial.new()
 	death_material.shader = shader
 	
-	# Сохраняем оригинальный материал
-	var original_material = enemy_sprite.material
+	# Устанавливаем текстуру шума
+	if ice_noise:
+		death_material.set_shader_parameter("grunge_noise_tex", ice_noise)
 	
+	var original_material = enemy_sprite.material
 	enemy_sprite.material = death_material
 	
-	# Анимируем death_progress от 0 до 1
 	var tween = create_tween()
 	tween.tween_method(_set_death_progress, 0.0, 1.0, 1.0)
 	tween.finished.connect(_on_death_animation_finished.bind(death_material, original_material))
@@ -554,13 +628,14 @@ func _set_death_progress(value: float):
 		enemy_sprite.material.set_shader_parameter("death_progress", value)
 
 
-func _on_death_animation_finished(death_material: ShaderMaterial, original_material: ShaderMaterial):
-	# Восстанавливаем материал
+func _on_death_animation_finished(death_material: ShaderMaterial, original_material: Material):
 	if enemy_sprite:
 		enemy_sprite.material = original_material
 	
-	# Удаляем врага
-	enemy_instance.queue_free()
+	current_shader_priority = DataManager.EnemyShaderPriority.NONE
+	
+	if enemy_instance:
+		enemy_instance.queue_free()
 
 
 func _on_enemy_intent_changed(enemy: EnemyInstance, intent: IntentEntry):
@@ -682,3 +757,123 @@ func play_appear_animation() -> void:
 	tween.tween_property(self, "position", position, 1).set_delay(1)
 	
 	await tween.finished
+
+
+func _init_ice_texture():
+	ice_noise = NoiseTexture2D.new()
+	ice_noise.seamless = true
+	
+	var noise = FastNoiseLite.new()
+	noise.noise_type = FastNoiseLite.TYPE_CELLULAR
+	noise.frequency = 0.05
+	
+	ice_noise.noise = noise
+
+
+func apply_freeze_effect():
+	# Если враг умирает — откладываем заморозку
+	if current_shader_priority == DataManager.EnemyShaderPriority.DEATH:
+		pending_freeze = true
+		return
+	
+	# Если уже есть заморозка — не применяем повторно
+	if current_shader_priority == DataManager.EnemyShaderPriority.FREEZE:
+		return
+	
+	# Если есть hit — дожидаемся его окончания
+	if current_shader_priority == DataManager.EnemyShaderPriority.HIT:
+		pending_freeze = true
+		return
+	
+	_apply_freeze_effect_immediate()
+
+
+func _apply_freeze_effect_immediate():
+	current_shader_priority = DataManager.EnemyShaderPriority.FREEZE
+	pending_freeze = false
+	
+	if not enemy_sprite:
+		return
+	
+	# Инициализируем текстуру если ещё не сделали
+	if not ice_noise:
+		_init_ice_texture()
+	
+	# Сохраняем базовый материал
+	if not base_material:
+		base_material = enemy_sprite.material
+	
+	# Создаём уникальный материал
+	var shader = preload("res://shaders/frozen.gdshader")
+	var shader_material = ShaderMaterial.new()
+	shader_material.shader = shader
+	
+	# Передаём параметры
+	shader_material.set_shader_parameter("ice_cracks_tex", ice_noise)
+	shader_material.set_shader_parameter("ice_color", Color("4cb0f2"))
+	shader_material.set_shader_parameter("glow_color", Color("99daff"))
+	shader_material.set_shader_parameter("freeze_amount", 0.0)
+	
+	enemy_sprite.material = shader_material
+	
+	if freeze_tween:
+		freeze_tween.kill()
+	
+	freeze_tween = create_tween()
+	freeze_tween.tween_property(shader_material, "shader_parameter/freeze_amount", 1.0, 0.6)\
+		.set_trans(Tween.TRANS_CUBIC)\
+		.set_ease(Tween.EASE_OUT)
+
+
+func remove_freeze_effect():
+	pending_freeze = false
+	
+	if current_shader_priority != DataManager.EnemyShaderPriority.FREEZE:
+		return
+	
+	if not enemy_sprite or not enemy_sprite.material:
+		current_shader_priority = DataManager.EnemyShaderPriority.NONE
+		return
+	
+	if enemy_sprite.material is ShaderMaterial:
+		var shader_material = enemy_sprite.material as ShaderMaterial
+		
+		if freeze_tween:
+			freeze_tween.kill()
+		
+		freeze_tween = create_tween()
+		freeze_tween.tween_property(shader_material, "shader_parameter/freeze_amount", 0.0, 0.4)
+		freeze_tween.finished.connect(func(): 
+			if enemy_sprite:
+				enemy_sprite.material = base_material
+			current_shader_priority = DataManager.EnemyShaderPriority.NONE
+			freeze_tween = null
+		)
+
+
+func push_back():
+	if _is_pushing or not enemy_sprite:
+		return
+	
+	_is_pushing = true
+	
+	var original_scale = scale
+	var target_scale = Vector2(0.7, 0.7)
+	
+	# Вычисляем смещение для центрирования
+	var size = enemy_sprite.size
+	var offset = (size * original_scale - size * target_scale) / 2
+	var target_pos = position + offset
+	
+	var tween = create_tween()
+	tween.set_parallel(true)
+	
+	tween.tween_property(self, "scale", target_scale, 0.1).set_ease(Tween.EASE_OUT)
+	tween.tween_property(self, "position", target_pos, 0.1).set_ease(Tween.EASE_OUT)
+	
+	tween.tween_property(self, "scale", original_scale, 0.1).set_delay(0.1).set_ease(Tween.EASE_IN)
+	tween.tween_property(self, "position", position, 0.1).set_delay(0.1).set_ease(Tween.EASE_IN)
+	
+	await tween.finished
+	
+	_is_pushing = false

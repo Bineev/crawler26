@@ -61,6 +61,17 @@ enum CardOrigin {
 	BIOME,      # карта биома
 }
 
+## ============================================================
+## ШЕЙДЕРЫ ВРАГА
+## ============================================================
+
+enum EnemyShaderPriority {
+	NONE,
+	HIT,
+	FREEZE,
+	DEATH,
+}
+
 enum GrowType {
 	NONE,       # не растёт
 	ADD,        # +value_grow_value каждый раз

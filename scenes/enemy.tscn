@@ -45,6 +45,11 @@ mouse_filter = 1
 material = SubResource("ShaderMaterial_c4w8v")
 layout_mode = 2
 
+[node name="HighlightSprite" type="TextureRect" parent="EnemyUI/VBoxContainer/SpriteContainer"]
+visible = false
+material = ExtResource("4_5uy6h")
+layout_mode = 2
+
 [node name="EnemySprite" type="TextureRect" parent="EnemyUI/VBoxContainer/SpriteContainer"]
 material = ExtResource("4_5uy6h")
 layout_mode = 2

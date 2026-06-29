@@ -147,7 +147,11 @@ func add_block(amount: int):
 
 func take_damage(amount: int, ignore_block: bool = false, attacker: CharacterStats = null):    # Проверка на заморозку (если заморожена — урон не проходит)
 	var damage = amount
-
+	if damage > 0 and self is EnemyInstance:
+		var enemy_ui = get_node("EnemyUI") as EnemyUI
+		if enemy_ui:
+			# Урон — среднее отталкивание
+			enemy_ui.push_back()
 	# Если заморожен — -50% урона
 	if has_status(DataManager.Status.FROZEN):
 		damage = floor(damage * 0.5)
@@ -225,7 +229,11 @@ func on_take_damage_gain_resource(amount: int):
 func add_status(status: StatusResource, value: int, duration: int, caster: CharacterStats = null, passive_context: PassiveResource = null):
 	if not status:
 		return
-	
+	if self is EnemyInstance and DataManager.is_negative_status(status.id):
+		var enemy_ui = get_node("EnemyUI") as EnemyUI
+		if enemy_ui:
+			# Статусы — лёгкое отталкивание
+			enemy_ui.push_back()
 	# Если цель заморожена — нельзя накладывать новые статусы
 	if has_status(DataManager.Status.FROZEN):
 		SignalManager.log_message.emit("%s заморожен! Нельзя наложить статус." % get_display_name())
@@ -579,23 +587,19 @@ func trigger_poison_immediately():
 
 
 func _apply_freeze(caster: CharacterStats = null):
-	# Снимаем весь Холод
 	remove_status(DataManager.Status.COLD)
 	
-	# Накладываем статус FROZEN
 	var frozen_status = DataManager.get_status_resource(DataManager.Status.FROZEN)
 	if frozen_status:
-		# Сохраняем все активные статусы как "замороженные"
-		var frozen_statuses = active_statuses.duplicate()
-		# Очищаем все статусы
-		for status_id in active_statuses.keys():
-			if status_id != DataManager.Status.FROZEN:
-				remove_status(status_id)
-		# Сохраняем замороженные статусы в отдельном поле
-		_frozen_statuses = frozen_statuses
-		
 		add_status(frozen_status, 1, DataManager.FROZEN_DURATION, caster)
-		SignalManager.log_message.emit("%s заморожен! Все статусы приостановлены." % get_display_name())
+		
+		# Применяем визуальный эффект заморозки (для врагов)
+		if self is EnemyInstance:
+			var enemy_ui = get_node("EnemyUI") as EnemyUI
+			if enemy_ui:
+				enemy_ui.apply_freeze_effect()
+		
+		SignalManager.log_message.emit("%s заморожен!" % get_display_name())
 		SignalManager.frozen_applied.emit(self)
 
 
@@ -603,9 +607,15 @@ func thaw():
 	if not has_status(DataManager.Status.FROZEN):
 		return
 	
+	# Убираем визуальный эффект заморозки (для врагов)
+	if self is EnemyInstance:
+		var enemy_ui = get_node("EnemyUI") as EnemyUI
+		if enemy_ui:
+			enemy_ui.remove_freeze_effect()
+	
 	remove_status(DataManager.Status.FROZEN)
 	
-	# Восстанавливаем замороженные статусы
+	# Восстанавливаем статусы
 	for status_id in _frozen_statuses.keys():
 		var data = _frozen_statuses[status_id]
 		active_statuses[status_id] = data

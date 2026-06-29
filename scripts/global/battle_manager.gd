@@ -144,17 +144,17 @@ func start_enemy_turn():
 	for enemy in enemies:
 		if enemy.is_alive() and enemy.has_status(DataManager.Status.FROZEN):
 			frozen_enemies.append(enemy)
-			# Враг пропускает ход
-			enemy.thaw()  # снимаем заморозку после пропуска
+			enemy.thaw()
 			SignalManager.log_message.emit("%s пропускает ход из-за заморозки!" % enemy.get_display_name())
 			continue
 		
-		# Тик статусов только для незамороженных врагов
 		if enemy.is_alive():
 			enemy.process_start_of_turn()
 	
 	for enemy in enemies:
 		if enemy in frozen_enemies or not enemy.is_alive():
+			# Пауза для замороженных врагов (чтобы UI успел обновиться)
+			await get_tree().create_timer(0.5).timeout
 			continue
 		
 		var intent = enemy.current_intent
@@ -171,6 +171,10 @@ func start_enemy_turn():
 	SignalManager.turn_ended.emit()
 	
 	check_defeat()
+	if current_state == DataManager.BattleState.VICTORY or current_state == DataManager.BattleState.DEFEAT:
+		return
+	
+	start_player_turn()
 ## ============================================================
 ## КОНЕЦ ХОДА
 ## ============================================================

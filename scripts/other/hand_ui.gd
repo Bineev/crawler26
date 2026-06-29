@@ -86,6 +86,7 @@ func remove_card(card_ui: CardUI):
 func layout_cards():
 	#BUG
 	var card_count = cards_container.get_child_count()
+	print("layout_cards: card_count=", card_count)  # ← отладка
 	if card_count == 0:
 		return
 	
