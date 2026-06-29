@@ -227,6 +227,7 @@ enum Status {
 	STRENGTH,
 	REGEN,
 	SHIELD,
+	FROZEN,
 }
 
 ## Классы персонажей
@@ -416,6 +417,10 @@ const BURN_STRENGTH_DURATION: int = 2
 
 const COLD_EFFECT_PERCENT_PER_STACK: float = 0.01
 const COLD_MIN_EFFECT_MULTIPLIER: float = 0.75
+#BUG
+const COLD_FREEZE_THRESHOLD: int = 4
+const COLD_DEFAULT_DURATION: int = 5  # ← изменено с 3 на 5
+const FROZEN_DURATION: int = 1  # заморозка на 1 ход
 
 const WEAKNESS_DAMAGE_MULTIPLIER: float = 0.75
 const VULNERABILITY_DAMAGE_MULTIPLIER: float = 1.5
@@ -616,6 +621,7 @@ func is_negative_status(status: Status) -> bool:
 		Status.COLD,
 		Status.WEAKNESS,
 		Status.VULNERABILITY,
+		Status.FROZEN
 	]
 
 func get_status_name(status: Status) -> String:
@@ -629,6 +635,7 @@ func get_status_name(status: Status) -> String:
 		Status.STRENGTH: return "Strength"
 		Status.REGEN: return "Regeneration"
 		Status.SHIELD: return "Shield"
+		Status.FROZEN: return "Frozen"
 		_: return "Unknown"
 
 ##
@@ -665,12 +672,13 @@ const STATUS_ICONS: Dictionary = {
 	Status.POISON: preload("res://img/icons/statuses/poison.png"),
 	Status.BLEED: preload("res://img/icons/statuses/bleed.png"),
 	Status.BURN: preload("res://img/icons/statuses/burn.png"),
-	Status.COLD: preload("res://img/icons/statuses/cold.png"),
+	Status.COLD: preload("res://img/icons/statuses/frozen.png"),
 	Status.WEAKNESS: preload("res://img/icons/statuses/weakness.png"),
 	Status.VULNERABILITY: preload("res://img/icons/statuses/vulnerability.png"),
 	Status.STRENGTH: preload("res://img/icons/statuses/strength.png"),
 	Status.REGEN: preload("res://img/icons/statuses/regen.png"),
 	Status.SHIELD: preload("res://img/icons/statuses/shield.png"),
+	Status.FROZEN: preload("res://img/icons/statuses/cold.png"),
 }
 
 const PASSIVE_ICONS: Dictionary = {
@@ -720,6 +728,7 @@ func load_status_resources():
 	_status_resources[Status.STRENGTH] = load("res://resources/statuses/strength.tres")
 	_status_resources[Status.REGEN] = load("res://resources/statuses/regen.tres")
 	_status_resources[Status.SHIELD] = load("res://resources/statuses/shield.tres")
+	_status_resources[Status.FROZEN] = load("res://resources/statuses/frozen.tres")
 	
 	_status_resources_loaded = true
 

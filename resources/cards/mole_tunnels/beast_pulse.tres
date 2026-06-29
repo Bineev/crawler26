@@ -23,6 +23,7 @@ metadata/_custom_type_script = "uid://cmra25r1r3ivt"
 script = ExtResource("1_w7gca")
 category = 9
 target = 0
+base_value = 2
 amount = 2
 metadata/_custom_type_script = "uid://cmra25r1r3ivt"
 

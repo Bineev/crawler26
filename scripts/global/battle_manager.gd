@@ -75,23 +75,53 @@ func start_player_turn():
 		return
 	
 	current_state = DataManager.BattleState.PLAYER_TURN
-
+	
+	# === ОБРАБОТКА ЗАМОРОЗКИ ===
+	var is_frozen = player and player.has_status(DataManager.Status.FROZEN)
+	
+	if is_frozen:
+		# Уменьшаем энергию на 2 (но не меньше 0)
+		var current_energy = player.get_energy()
+		player.set_energy(max(0, current_energy - 2))
+		SignalManager.log_message.emit("Вы заморожены! Энергия уменьшена на 2. Статусы приостановлены.")
+		
+		# Выбираем намерения врагов (чтобы игрок видел, что они собираются делать)
+		for enemy in enemies:
+			if enemy.is_alive():
+				var intent = enemy.select_next_intent()
+				if intent:
+					SignalManager.enemy_intent_changed.emit(enemy, intent)
+		
+		# Добираем карты (игрок всё равно может играть)
+		if battle_deck:
+			battle_deck.start_turn()
+		
+		SignalManager.player_turn_started.emit()
+		SignalManager.turn_started.emit()
+		SignalManager.log_message.emit("--- Ход игрока (заморожен) ---")
+		return
+	
+	# === НОРМАЛЬНЫЙ ХОД ===
+	
+	# Тик статусов игрока (только если не заморожен)
 	if player:
 		player.process_start_of_turn()
-
-	# Сначала выбираем намерения для всех врагов
+	
+	# Выбираем намерения для всех врагов
 	for enemy in enemies:
 		if enemy.is_alive():
 			var intent = enemy.select_next_intent()
 			if intent:
 				SignalManager.enemy_intent_changed.emit(enemy, intent)
 	
+	# Восстанавливаем энергию
 	if player and player.has_method("restore_energy"):
 		player.restore_energy()
 	
+	# Добираем карты
 	if battle_deck:
 		battle_deck.start_turn()
-	#BUG
+	
 	SignalManager.player_turn_started.emit()
 	SignalManager.turn_started.emit()
 	SignalManager.log_message.emit("--- Ход игрока ---")
@@ -103,29 +133,34 @@ func start_player_turn():
 func start_enemy_turn():
 	print("=== ENEMY TURN START ===")
 	
-	# Удаляем мёртвых врагов
 	enemies = enemies.filter(func(e): return e != null and e.is_alive())
-	
 	print("Enemies alive: ", enemies.size())
 	
 	current_state = DataManager.BattleState.ENEMY_TURN
 	SignalManager.enemy_turn_started.emit()
 	SignalManager.turn_started.emit()
-
-	# Тик статусов каждого врага в начале хода
+	
+	var frozen_enemies = []
 	for enemy in enemies:
+		if enemy.is_alive() and enemy.has_status(DataManager.Status.FROZEN):
+			frozen_enemies.append(enemy)
+			# Враг пропускает ход
+			enemy.thaw()  # снимаем заморозку после пропуска
+			SignalManager.log_message.emit("%s пропускает ход из-за заморозки!" % enemy.get_display_name())
+			continue
+		
+		# Тик статусов только для незамороженных врагов
 		if enemy.is_alive():
 			enemy.process_start_of_turn()
-
+	
 	for enemy in enemies:
-		if not enemy.is_alive():
+		if enemy in frozen_enemies or not enemy.is_alive():
 			continue
 		
 		var intent = enemy.current_intent
 		if intent:
-			await enemy.execute_intent_with_animation(player)  # ← ждём анимацию
+			await enemy.execute_intent_with_animation(player)
 		
-		# Пауза между действиями врагов
 		await get_tree().create_timer(0.5).timeout
 		
 		if player and player.get_health() <= 0:
@@ -136,11 +171,6 @@ func start_enemy_turn():
 	SignalManager.turn_ended.emit()
 	
 	check_defeat()
-	
-	if current_state == DataManager.BattleState.VICTORY or current_state == DataManager.BattleState.DEFEAT:
-		return
-	
-	start_player_turn()
 ## ============================================================
 ## КОНЕЦ ХОДА
 ## ============================================================
@@ -282,17 +312,16 @@ func end_player_turn():
 	if current_state != DataManager.BattleState.PLAYER_TURN:
 		return
 	
+	# Снимаем заморозку с игрока в конце хода
+	if player and player.has_status(DataManager.Status.FROZEN):
+		player.thaw()
+		SignalManager.log_message.emit("Вы оттаяли! Статусы восстановлены.")
+	
 	# Сбрасываем руку
 	if battle_deck:
 		battle_deck.discard_hand()
-		
-		# Ждём, пока карты улетят (через HandUI)
-		if hand_ui:
-			await hand_ui.wait_for_fly_away()
 	
 	SignalManager.turn_ended.emit()
-	
-	# Начинаем ход врага
 	start_enemy_turn()
 
 

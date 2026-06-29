@@ -36,7 +36,7 @@ var modifiers: Dictionary = {
 ## ============================================================
 
 var active_statuses: Dictionary = {}
-
+var _frozen_statuses: Dictionary = {}  # сохранённые статусы на время заморозки
 ## ============================================================
 ## ПАССИВКИ
 ## ============================================================
@@ -145,9 +145,14 @@ func add_block(amount: int):
 		var shield_status = DataManager.get_status_resource(DataManager.Status.SHIELD)
 		add_status(shield_status, final_block, 1, self)  # на 1 ход
 
-func take_damage(amount: int, ignore_block: bool = false, attacker: CharacterStats = null):
+func take_damage(amount: int, ignore_block: bool = false, attacker: CharacterStats = null):    # Проверка на заморозку (если заморожена — урон не проходит)
 	var damage = amount
-	
+
+	# Если заморожен — -50% урона
+	if has_status(DataManager.Status.FROZEN):
+		damage = floor(damage * 0.5)
+		SignalManager.log_message.emit("%s заморожен! Урон снижен на 50%%." % get_display_name())
+
 	if has_status(DataManager.Status.COLD):
 		var cold_stacks = get_status_stacks(DataManager.Status.COLD)
 		var cold_multiplier = 1.0 - (cold_stacks * DataManager.COLD_EFFECT_PERCENT_PER_STACK)
@@ -158,10 +163,10 @@ func take_damage(amount: int, ignore_block: bool = false, attacker: CharacterSta
 	if not ignore_block and has_status(DataManager.Status.SHIELD):
 		var shield_stacks = get_status_stacks(DataManager.Status.SHIELD)
 		if shield_stacks >= damage:
-			reduce_status_stacks(DataManager.Status.SHIELD, damage)
+			modify_status_stacks(DataManager.Status.SHIELD, damage)
 			damage = 0
 		else:
-			reduce_status_stacks(DataManager.Status.SHIELD, shield_stacks)
+			modify_status_stacks(DataManager.Status.SHIELD, shield_stacks)
 			damage -= shield_stacks
 	if self is EnemyInstance:
 		SoundManager.play(null, DataManager.get_sound(DataManager.SoundType.ENEMY_GET_DAMAGE))
@@ -205,6 +210,9 @@ func heal(amount: int):
 	set_flat(DataManager.FlatStat.HEALTH, new_health)
 	SignalManager.log_message.emit("%s восстановил %d здоровья" % [get_display_name(), actual_heal])
 	SignalManager.heal_received.emit(self, actual_heal)
+	# Сигнал только для игрока (для UI)
+	if self is PenitentStats:
+		SignalManager.player_heal_received.emit(actual_heal)
 
 
 func on_take_damage_gain_resource(amount: int):
@@ -217,9 +225,21 @@ func on_take_damage_gain_resource(amount: int):
 func add_status(status: StatusResource, value: int, duration: int, caster: CharacterStats = null, passive_context: PassiveResource = null):
 	if not status:
 		return
+	
+	# Если цель заморожена — нельзя накладывать новые статусы
+	if has_status(DataManager.Status.FROZEN):
+		SignalManager.log_message.emit("%s заморожен! Нельзя наложить статус." % get_display_name())
+		return
+	
 	if _check_denial(status):
 		return
+	
 	if not StatusInteractionManager.can_apply(self, status.id):
+		return
+	
+	# Если накладываем Холод на замороженного — запрещено
+	if status.id == DataManager.Status.COLD and has_status(DataManager.Status.FROZEN):
+		SignalManager.log_message.emit("Цель заморожена! Нельзя наложить Холод.")
 		return
 	
 	var status_id = status.id
@@ -238,10 +258,22 @@ func add_status(status: StatusResource, value: int, duration: int, caster: Chara
 		_apply_status_modifiers(status)
 		StatusInteractionManager.on_status_applied(self, status_id, value)
 	
+	# Проверка на заморозку (только для COLD)
+	if status_id == DataManager.Status.COLD:
+		var total_stacks = get_status_stacks(DataManager.Status.COLD)
+		if total_stacks >= DataManager.COLD_FREEZE_THRESHOLD:
+			_apply_freeze(caster)
+			return  # после заморозки останавливаем дальнейшую обработку
+	
+	# Снятие Холода при наложении BURN
 	if status_id == DataManager.Status.BURN:
-		var strength_status = _get_strength_status_resource()
-		if strength_status:
-			add_status(strength_status, DataManager.BURN_STRENGTH_STACKS, DataManager.BURN_STRENGTH_DURATION, self, passive_context)
+		if has_status(DataManager.Status.COLD):
+			remove_status(DataManager.Status.COLD)
+			SignalManager.log_message.emit("Жар растопил лёд! Холод снят.")
+		else:
+			var strength_status = _get_strength_status_resource()
+			if strength_status:
+				add_status(strength_status, DataManager.BURN_STRENGTH_STACKS, DataManager.BURN_STRENGTH_DURATION, self, passive_context)
 	
 	SignalManager.status_added.emit(self, status_id, value, duration)
 	if self is EnemyInstance:
@@ -270,7 +302,7 @@ func get_status_stacks(status_id: DataManager.Status) -> int:
 	var data = active_statuses.get(status_id)
 	return data["stacks"] if data else 0
 
-func reduce_status_stacks(status_id: DataManager.Status, amount: int):
+func modify_status_stacks(status_id: DataManager.Status, amount: int):
 	if not active_statuses.has(status_id):
 		return
 	var data = active_statuses[status_id]
@@ -446,6 +478,9 @@ func set_energy(value: int):
 func restore_energy():
 	set_energy(get_max_energy())
 
+func gain_energy(amount: int):
+	set_energy(get_flat(DataManager.FlatStat.ENERGY) + amount)
+
 func get_display_name() -> String:
 	return name if name != "" else "Персонаж"
 
@@ -489,6 +524,9 @@ func process_start_of_turn():
 	# Снимаем SHIELD в начале хода
 	if has_status(DataManager.Status.SHIELD):
 		remove_status(DataManager.Status.SHIELD)
+	# Если заморожен — статусы не тикают
+	if has_status(DataManager.Status.FROZEN):
+		return
 	var statuses_to_remove = []
 	
 	for status_id in active_statuses.keys():
@@ -538,3 +576,41 @@ func trigger_poison_immediately():
 		take_damage(damage, true)
 		remove_status(DataManager.Status.POISON)
 		SignalManager.log_message.emit("Яд сработал мгновенно! %d урона" % damage)
+
+
+func _apply_freeze(caster: CharacterStats = null):
+	# Снимаем весь Холод
+	remove_status(DataManager.Status.COLD)
+	
+	# Накладываем статус FROZEN
+	var frozen_status = DataManager.get_status_resource(DataManager.Status.FROZEN)
+	if frozen_status:
+		# Сохраняем все активные статусы как "замороженные"
+		var frozen_statuses = active_statuses.duplicate()
+		# Очищаем все статусы
+		for status_id in active_statuses.keys():
+			if status_id != DataManager.Status.FROZEN:
+				remove_status(status_id)
+		# Сохраняем замороженные статусы в отдельном поле
+		_frozen_statuses = frozen_statuses
+		
+		add_status(frozen_status, 1, DataManager.FROZEN_DURATION, caster)
+		SignalManager.log_message.emit("%s заморожен! Все статусы приостановлены." % get_display_name())
+		SignalManager.frozen_applied.emit(self)
+
+
+func thaw():
+	if not has_status(DataManager.Status.FROZEN):
+		return
+	
+	remove_status(DataManager.Status.FROZEN)
+	
+	# Восстанавливаем замороженные статусы
+	for status_id in _frozen_statuses.keys():
+		var data = _frozen_statuses[status_id]
+		active_statuses[status_id] = data
+		_apply_status_modifiers(data["resource"])
+		StatusInteractionManager.on_status_applied(self, status_id, data.stacks)
+	
+	_frozen_statuses.clear()
+	SignalManager.log_message.emit("%s оттаял! Статусы восстановлены." % get_display_name())

@@ -306,6 +306,9 @@ func _execute_draw_card(effect: EffectEntry, source) -> void:
 func _execute_gain_energy(effect: EffectEntry, source) -> void:
 	if source and source.has_method("gain_energy"):
 		source.gain_energy(effect.amount)
+		SignalManager.log_message.emit("Получено %d энергии" % effect.amount)
+	else:
+		printerr("GAIN_ENERGY: source cannot gain energy!")
 
 
 func _execute_convert(effect: EffectEntry, source, targets: Array) -> void:

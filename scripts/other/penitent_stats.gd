@@ -80,3 +80,8 @@ func on_take_damage_gain_resource(amount: int):
 	if gain > 0:
 		modify_flat(DataManager.FlatStat.ATONEMENT, gain)
 		SignalManager.log_message.emit("Получено %d Искупления" % gain)
+
+
+func gain_energy(amount: int):
+	modify_flat(DataManager.FlatStat.ENERGY, amount)
+	SignalManager.log_message.emit("Получено %d энергии" % amount)
