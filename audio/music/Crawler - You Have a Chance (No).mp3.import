@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://bxc6p55jgap8f"
+path="res://.godot/imported/Crawler - You Have a Chance (No).mp3-1bf7572547ffcc31e4d5815814dde8f5.mp3str"
+
+[deps]
+
+source_file="res://audio/music/Crawler - You Have a Chance (No).mp3"
+dest_files=["res://.godot/imported/Crawler - You Have a Chance (No).mp3-1bf7572547ffcc31e4d5815814dde8f5.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

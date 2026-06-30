@@ -693,7 +693,7 @@ const STATUS_ICONS: Dictionary = {
 	Status.REGEN: preload("res://img/icons/statuses/regen.png"),
 	Status.SHIELD: preload("res://img/icons/statuses/shield.png"),
 	Status.FROZEN: preload("res://img/icons/statuses/cold.png"),
-	Status.GANGRENE: preload("res://img/icons/statuses/gangrene.png"),
+	Status.GANGRENE: preload("res://img/icons/passives/shame.png"),
 }
 
 const PASSIVE_ICONS: Dictionary = {

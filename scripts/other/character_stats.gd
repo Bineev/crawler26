@@ -667,3 +667,5 @@ func add_status_by_id(status_id: DataManager.Status, stacks: int, duration: int)
 	var status_resource = DataManager.get_status_resource(status_id)
 	if status_resource:
 		add_status(status_resource, stacks, duration, self)
+	else:
+		printerr("Status resource not found for id: ", status_id)

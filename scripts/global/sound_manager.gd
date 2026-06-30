@@ -9,6 +9,12 @@ var music_player : AudioStreamPlayer
 	preload("res://audio/music/Crawler - Dark Cave.ogg"),
 	preload("res://audio/music/Crawler - Explore.ogg"),
 	preload("res://audio/music/Crawler - Cultist Lair.ogg"),
+	preload("res://audio/music/Crawler - Dark Deep Fight.mp3"),
+	preload("res://audio/music/Crawler - Death in Water.mp3"),
+	preload("res://audio/music/Crawler - Hope is Lie.mp3"),
+	preload("res://audio/music/Crawler - Mole voices.mp3"),
+	preload("res://audio/music/Crawler - Too Deep.mp3"),
+	
 ]
 @export var menu_theme : AudioStream = preload("res://audio/music/Crawler - Main Menu.ogg")
 

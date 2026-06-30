@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://ddqdr5brh7vkm"
+path="res://.godot/imported/Crawler - Too Deep.mp3-ea6868d2e9e4a17b2591934dea1edcde.mp3str"
+
+[deps]
+
+source_file="res://audio/music/Crawler - Too Deep.mp3"
+dest_files=["res://.godot/imported/Crawler - Too Deep.mp3-ea6868d2e9e4a17b2591934dea1edcde.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

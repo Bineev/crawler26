@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://d1mpme2x7snxj"
+path="res://.godot/imported/Crawler - Dark Deep Fight.mp3-7b0bae2c0c41a9a0680198f84e5f3815.mp3str"
+
+[deps]
+
+source_file="res://audio/music/Crawler - Dark Deep Fight.mp3"
+dest_files=["res://.godot/imported/Crawler - Dark Deep Fight.mp3-7b0bae2c0c41a9a0680198f84e5f3815.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

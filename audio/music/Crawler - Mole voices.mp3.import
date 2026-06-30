@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://wqi4g0gi4w6n"
+path="res://.godot/imported/Crawler - Mole voices.mp3-7a3741cf3c25823f2235a6f5db8a2ce2.mp3str"
+
+[deps]
+
+source_file="res://audio/music/Crawler - Mole voices.mp3"
+dest_files=["res://.godot/imported/Crawler - Mole voices.mp3-7a3741cf3c25823f2235a6f5db8a2ce2.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://tiqxdai1f4d7"
+path="res://.godot/imported/Crawler - Death in Water.mp3-e2c7fd57873b511a0b74d8593a094c10.mp3str"
+
+[deps]
+
+source_file="res://audio/music/Crawler - Death in Water.mp3"
+dest_files=["res://.godot/imported/Crawler - Death in Water.mp3-e2c7fd57873b511a0b74d8593a094c10.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

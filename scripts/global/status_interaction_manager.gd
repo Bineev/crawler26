@@ -86,8 +86,8 @@ func _handle_interaction(target, new_status: DataManager.Status, last_status: Da
 		_handle_bleed_cold_gangrene(target)
 		return
 	
-	# Если нет взаимодействий — просто накладываем
-	target.add_status(new_status, stacks, duration)
+	# Если нет взаимодействий — просто накладываем статус
+	target.add_status_by_id(new_status, stacks, duration)  # ← исправлено
 
 
 func _handle_burn_cold_interaction(target, new_status: DataManager.Status, stacks: int, duration: int):
