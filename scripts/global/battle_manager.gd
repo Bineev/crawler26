@@ -30,6 +30,7 @@ var hand_ui: HandUI = null
 func _ready():
 	SignalManager.enemy_died.connect(_on_enemy_died)
 	SignalManager.player_died.connect(_on_player_died)
+	SignalManager.player_death_animation_finished.connect(_on_player_death_animation_finished)
 
 
 func _get_target_at_position(pos: Vector2) -> Node:
@@ -387,3 +388,8 @@ func _clear_all_passives(target: CharacterStats):
 
 func get_hand_ui() -> HandUI:
 	return hand_ui
+
+
+func _on_player_death_animation_finished():
+	# Показываем экран поражения после анимации
+	defeat()

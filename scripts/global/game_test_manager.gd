@@ -300,3 +300,7 @@ func _create_energy_display():
 	energy_display = energy_scene.instantiate() as EnergyDisplay
 	energy_display.position = DataManager.END_BUTTON_POSITION + Vector2(10, -100)
 	game_world.add_child(energy_display)
+
+
+func get_player_portrait() -> PlayerPortrait:
+	return player_portrait

@@ -37,6 +37,7 @@ var modifiers: Dictionary = {
 
 var active_statuses: Dictionary = {}
 var _frozen_statuses: Dictionary = {}  # сохранённые статусы на время заморозки
+var status_application_order: Array = []  # порядок наложения статусов (для UI и взаимодействий)
 ## ============================================================
 ## ПАССИВКИ
 ## ============================================================
@@ -178,6 +179,11 @@ func take_damage(amount: int, ignore_block: bool = false, attacker: CharacterSta
 		SignalManager.player_damage_dealt.emit(damage)
 		SoundManager.play(null, DataManager.get_sound(DataManager.SoundType.PLAYER_GET_DAMAGE))
 	if damage > 0:
+	# Визуальный эффект удара для игрока
+		if self is PenitentStats:
+			var portrait = GameTestManager.get_player_portrait()
+			if portrait:
+				portrait.apply_hit_effect()
 		SignalManager.log_message.emit("%s получил %d урона" % [get_display_name(), damage])
 		SignalManager.damage_dealt.emit(self, damage)
 		SignalManager.get_hit.emit(self)
@@ -229,11 +235,7 @@ func on_take_damage_gain_resource(amount: int):
 func add_status(status: StatusResource, value: int, duration: int, caster: CharacterStats = null, passive_context: PassiveResource = null):
 	if not status:
 		return
-	if self is EnemyInstance and DataManager.is_negative_status(status.id):
-		var enemy_ui = get_node("EnemyUI") as EnemyUI
-		if enemy_ui:
-			# Статусы — лёгкое отталкивание
-			enemy_ui.push_back()
+	
 	# Если цель заморожена — нельзя накладывать новые статусы
 	if has_status(DataManager.Status.FROZEN):
 		SignalManager.log_message.emit("%s заморожен! Нельзя наложить статус." % get_display_name())
@@ -254,17 +256,28 @@ func add_status(status: StatusResource, value: int, duration: int, caster: Chara
 	var existing = active_statuses.get(status_id)
 	
 	if existing:
+		# Обновляем существующий статус
 		existing.stacks += value
 		existing.duration = max(existing.duration, duration)
+		# Не меняем порядок — статус остаётся на своей позиции
 	else:
+		# Новый статус — добавляем в конец
 		active_statuses[status_id] = {
 			"stacks": value,
 			"duration": duration,
 			"resource": status,
 			"caster": caster if caster else self
 		}
+		status_application_order.append(status_id)
 		_apply_status_modifiers(status)
-		StatusInteractionManager.on_status_applied(self, status_id, value)
+		# Передаём duration для взаимодействий статусов
+		StatusInteractionManager.on_status_applied(self, status_id, value, duration)
+	
+	# Визуальный эффект для негативных статусов на враге
+	if self is EnemyInstance and DataManager.is_negative_status(status_id):
+		var enemy_ui = get_node("EnemyUI") as EnemyUI
+		if enemy_ui:
+			enemy_ui.push_back()
 	
 	# Проверка на заморозку (только для COLD)
 	if status_id == DataManager.Status.COLD:
@@ -278,10 +291,6 @@ func add_status(status: StatusResource, value: int, duration: int, caster: Chara
 		if has_status(DataManager.Status.COLD):
 			remove_status(DataManager.Status.COLD)
 			SignalManager.log_message.emit("Жар растопил лёд! Холод снят.")
-		else:
-			var strength_status = _get_strength_status_resource()
-			if strength_status:
-				add_status(strength_status, DataManager.BURN_STRENGTH_STACKS, DataManager.BURN_STRENGTH_DURATION, self, passive_context)
 	
 	SignalManager.status_added.emit(self, status_id, value, duration)
 	if self is EnemyInstance:
@@ -295,6 +304,7 @@ func remove_status(status_id: DataManager.Status):
 	var data = active_statuses[status_id]
 	var status = data["resource"]
 	active_statuses.erase(status_id)
+	status_application_order.erase(status_id)
 	
 	_remove_status_modifiers(status)
 	StatusInteractionManager.on_status_removed(self, status_id)
@@ -518,10 +528,14 @@ func has_immunity(status_id: DataManager.Status) -> bool:
 func _on_death():
 	SignalManager.log_message.emit("%s погиб!" % get_display_name())
 	
-	if self is EnemyInstance:
-		SignalManager.enemy_died.emit(self)
-	elif self is PenitentStats:
+	if self is PenitentStats:
+		var portrait = GameTestManager.get_player_portrait()
+		if portrait:
+			portrait.die()
+		# Сигнал о смерти игрока (показываем экран поражения после анимации)
 		SignalManager.player_died.emit(self)
+	elif self is EnemyInstance:
+		SignalManager.enemy_died.emit(self)
 
 
 func get_applied_statuses() -> Array:
@@ -598,7 +612,11 @@ func _apply_freeze(caster: CharacterStats = null):
 			var enemy_ui = get_node("EnemyUI") as EnemyUI
 			if enemy_ui:
 				enemy_ui.apply_freeze_effect()
-		
+		# Визуальный эффект удара для игрока
+		elif self is PenitentStats:
+			var portrait = BattleManager.get_player_portrait()
+			if portrait:
+				portrait.apply_freeze_effect()
 		SignalManager.log_message.emit("%s заморожен!" % get_display_name())
 		SignalManager.frozen_applied.emit(self)
 
@@ -612,6 +630,10 @@ func thaw():
 		var enemy_ui = get_node("EnemyUI") as EnemyUI
 		if enemy_ui:
 			enemy_ui.remove_freeze_effect()
+	elif self is PenitentStats:
+		var portrait = GameTestManager.get_player_portrait()
+		if portrait:
+			portrait.remove_freeze_effect()
 	
 	remove_status(DataManager.Status.FROZEN)
 	
@@ -620,7 +642,28 @@ func thaw():
 		var data = _frozen_statuses[status_id]
 		active_statuses[status_id] = data
 		_apply_status_modifiers(data["resource"])
-		StatusInteractionManager.on_status_applied(self, status_id, data.stacks)
+		# Восстанавливаем порядок наложения
+		if status_id not in status_application_order:
+			status_application_order.append(status_id)
+		# Отправляем сигнал о восстановлении статуса
+		StatusInteractionManager.on_status_applied(self, status_id, data.stacks, data.duration)
 	
 	_frozen_statuses.clear()
 	SignalManager.log_message.emit("%s оттаял! Статусы восстановлены." % get_display_name())
+
+
+func _get_last_status(exclude_status: DataManager.Status = -1) -> int:
+	var order = status_application_order.duplicate()
+	if exclude_status != -1:
+		order.erase(exclude_status)
+	
+	if order.is_empty():
+		return -1
+	
+	return order[-1]
+
+
+func add_status_by_id(status_id: DataManager.Status, stacks: int, duration: int):
+	var status_resource = DataManager.get_status_resource(status_id)
+	if status_resource:
+		add_status(status_resource, stacks, duration, self)

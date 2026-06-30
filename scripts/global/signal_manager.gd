@@ -99,3 +99,5 @@ signal player_heal_received(heal: int)
 signal card_burned(card_data: CardData)
 
 signal frozen_applied(target: Node)
+
+signal player_death_animation_finished()

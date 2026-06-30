@@ -239,6 +239,7 @@ enum Status {
 	REGEN,
 	SHIELD,
 	FROZEN,
+	GANGRENE,  # ← добавить
 }
 
 ## Классы персонажей
@@ -632,7 +633,8 @@ func is_negative_status(status: Status) -> bool:
 		Status.COLD,
 		Status.WEAKNESS,
 		Status.VULNERABILITY,
-		Status.FROZEN
+		Status.FROZEN,
+		Status.GANGRENE
 	]
 
 func get_status_name(status: Status) -> String:
@@ -647,6 +649,7 @@ func get_status_name(status: Status) -> String:
 		Status.REGEN: return "Regeneration"
 		Status.SHIELD: return "Shield"
 		Status.FROZEN: return "Frozen"
+		Status.GANGRENE: return "Gangrene"
 		_: return "Unknown"
 
 ##
@@ -690,6 +693,7 @@ const STATUS_ICONS: Dictionary = {
 	Status.REGEN: preload("res://img/icons/statuses/regen.png"),
 	Status.SHIELD: preload("res://img/icons/statuses/shield.png"),
 	Status.FROZEN: preload("res://img/icons/statuses/cold.png"),
+	Status.GANGRENE: preload("res://img/icons/statuses/gangrene.png"),
 }
 
 const PASSIVE_ICONS: Dictionary = {
@@ -740,6 +744,7 @@ func load_status_resources():
 	_status_resources[Status.REGEN] = load("res://resources/statuses/regen.tres")
 	_status_resources[Status.SHIELD] = load("res://resources/statuses/shield.tres")
 	_status_resources[Status.FROZEN] = load("res://resources/statuses/frozen.tres")
+	_status_resources[Status.GANGRENE] = load("res://resources/statuses/gangrene.tres")
 	
 	_status_resources_loaded = true
 

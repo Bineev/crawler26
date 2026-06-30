@@ -18,6 +18,21 @@ var floating_counter: int = 0
 var left_index: int = 0
 var right_index: int = 0
 
+const FREEZE_SHADER = preload("res://shaders/frozen.gdshader")
+const HIT_SHADER = preload("res://shaders/get_hit_shader.gdshader")  # если есть отдельный шейдер
+
+var ice_noise: NoiseTexture2D = null
+var freeze_tween: Tween = null
+var hit_tween: Tween = null
+
+var _base_portrait_material: Material = null
+
+# Приоритеты шейдеров (как у врага)
+var current_shader_priority: DataManager.EnemyShaderPriority = DataManager.EnemyShaderPriority.NONE
+var pending_death: bool = false
+var pending_freeze: bool = false
+
+
 func _ready() -> void:
 	vbox = $VBoxContainer
 	portrait_texture = $VBoxContainer/TextureRect
@@ -292,3 +307,202 @@ func _create_icon(texture: Texture2D, tooltip: String) -> TextureRect:
 func _on_icons_changed(target: Node, arg1 = null, arg2 = null, arg3 = null):
 	if target == player_stats:
 		_update_icons()
+
+
+func _init_ice_texture():
+	ice_noise = NoiseTexture2D.new()
+	ice_noise.seamless = true
+	
+	var noise = FastNoiseLite.new()
+	noise.noise_type = FastNoiseLite.TYPE_CELLULAR
+	noise.frequency = 0.05
+	
+	ice_noise.noise = noise
+
+
+# ===== УДАР (HIT) =====
+
+func apply_hit_effect():
+	# Если заморожен или умираем — игнорируем
+	if current_shader_priority >= DataManager.EnemyShaderPriority.FREEZE:
+		return
+	
+	if not portrait_texture:
+		return
+	
+	# Сохраняем базовый материал
+	if not _base_portrait_material:
+		_base_portrait_material = portrait_texture.material
+	
+	# Применяем шейдер удара (можно использовать тот же hit шейдер, что и у врага)
+	var shader = preload("res://shaders/get_hit_shader.gdshader")
+	var shader_material = ShaderMaterial.new()
+	shader_material.shader = shader
+	shader_material.set_shader_parameter("hit_progress", 1.0)
+	
+	portrait_texture.material = shader_material
+	current_shader_priority = DataManager.EnemyShaderPriority.HIT
+	
+	if hit_tween:
+		hit_tween.kill()
+	
+	hit_tween = create_tween()
+	hit_tween.tween_property(shader_material, "shader_parameter/hit_progress", 0.0, 0.3)\
+		.set_trans(Tween.TRANS_QUART)\
+		.set_ease(Tween.EASE_OUT)
+	
+	await hit_tween.finished
+	hit_tween = null
+	
+	_on_hit_finished()
+
+
+func _on_hit_finished():
+	# Проверяем, не нужно ли заморозить
+	if pending_freeze:
+		pending_freeze = false
+		_apply_freeze_effect_immediate()
+		return
+	
+	# Возвращаем базовый материал
+	if portrait_texture:
+		portrait_texture.material = _base_portrait_material
+	
+	current_shader_priority = DataManager.EnemyShaderPriority.NONE
+
+
+# ===== ЗАМОРОЗКА (FREEZE) =====
+
+func apply_freeze_effect():
+	# Если умираем — откладываем заморозку
+	if current_shader_priority == DataManager.EnemyShaderPriority.DEATH:
+		pending_freeze = true
+		return
+	
+	# Если уже есть заморозка — не применяем повторно
+	if current_shader_priority == DataManager.EnemyShaderPriority.FREEZE:
+		return
+	
+	# Если есть hit — дожидаемся его окончания
+	if current_shader_priority == DataManager.EnemyShaderPriority.HIT:
+		pending_freeze = true
+		return
+	
+	_apply_freeze_effect_immediate()
+
+
+func _apply_freeze_effect_immediate():
+	current_shader_priority = DataManager.EnemyShaderPriority.FREEZE
+	pending_freeze = false
+	
+	if not portrait_texture:
+		return
+	
+	if not ice_noise:
+		_init_ice_texture()
+	
+	if not _base_portrait_material:
+		_base_portrait_material = portrait_texture.material
+	
+	var shader_material = ShaderMaterial.new()
+	shader_material.shader = FREEZE_SHADER
+	shader_material.set_shader_parameter("ice_cracks_tex", ice_noise)
+	shader_material.set_shader_parameter("ice_color", Color("4cb0f2"))
+	shader_material.set_shader_parameter("glow_color", Color("99daff"))
+	shader_material.set_shader_parameter("freeze_amount", 0.0)
+	
+	portrait_texture.material = shader_material
+	
+	if freeze_tween:
+		freeze_tween.kill()
+	
+	freeze_tween = create_tween()
+	freeze_tween.tween_property(shader_material, "shader_parameter/freeze_amount", 1.0, 0.6)\
+		.set_trans(Tween.TRANS_CUBIC)\
+		.set_ease(Tween.EASE_OUT)
+
+
+func remove_freeze_effect():
+	pending_freeze = false
+	
+	if current_shader_priority != DataManager.EnemyShaderPriority.FREEZE:
+		return
+	
+	if not portrait_texture or not portrait_texture.material:
+		current_shader_priority = DataManager.EnemyShaderPriority.NONE
+		return
+	
+	if portrait_texture.material is ShaderMaterial:
+		var shader_material = portrait_texture.material as ShaderMaterial
+		
+		if freeze_tween:
+			freeze_tween.kill()
+		
+		freeze_tween = create_tween()
+		freeze_tween.tween_property(shader_material, "shader_parameter/freeze_amount", 0.0, 0.4)
+		freeze_tween.finished.connect(func(): 
+			if portrait_texture:
+				portrait_texture.material = _base_portrait_material
+			current_shader_priority = DataManager.EnemyShaderPriority.NONE
+			freeze_tween = null
+		)
+
+
+# ===== СМЕРТЬ (пока заглушка) =====
+
+func die():
+	# Если есть hit — дожидаемся его окончания
+	if current_shader_priority == DataManager.EnemyShaderPriority.HIT:
+		pending_death = true
+		return
+	
+	# Если есть freeze — сначала убираем его
+	if current_shader_priority == DataManager.EnemyShaderPriority.FREEZE:
+		remove_freeze_effect()
+		if freeze_tween:
+			await freeze_tween.finished
+	
+	_apply_death_effect()
+
+
+func _apply_death_effect():
+	current_shader_priority = DataManager.EnemyShaderPriority.DEATH
+	pending_death = false
+	
+	if not portrait_texture:
+		return
+	
+	# Сохраняем оригинальный материал
+	var original_material = portrait_texture.material
+	
+	# Применяем шейдер смерти
+	var shader = preload("res://shaders/death_dissolve.gdshader")
+	var death_material = ShaderMaterial.new()
+	death_material.shader = shader
+	
+	# Устанавливаем текстуру шума
+	if not ice_noise:
+		_init_ice_texture()
+	if ice_noise:
+		death_material.set_shader_parameter("grunge_noise_tex", ice_noise)
+	
+	portrait_texture.material = death_material
+	
+	var tween = create_tween()
+	tween.tween_method(_set_death_progress, 0.0, 1.0, 1.0)
+	tween.finished.connect(_on_death_animation_finished.bind(death_material, original_material))
+
+
+func _set_death_progress(value: float):
+	if portrait_texture and portrait_texture.material:
+		portrait_texture.material.set_shader_parameter("death_progress", value)
+
+
+func _on_death_animation_finished(death_material: ShaderMaterial, original_material: Material):
+	if portrait_texture:
+		portrait_texture.material = original_material
+	
+	current_shader_priority = DataManager.EnemyShaderPriority.NONE
+	
+	# Сигнал о смерти игрока
+	SignalManager.player_death_animation_finished.emit()

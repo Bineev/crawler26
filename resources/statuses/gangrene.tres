@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="StatusResource" load_steps=3 format=3 uid="uid://b68wabujkjyqh"]
+
+[ext_resource type="Script" uid="uid://0mjn55jcxdti" path="res://resources/res_scripts/modifier_entry.gd" id="1_vg3g6"]
+[ext_resource type="Script" uid="uid://cdpdi1bblp6st" path="res://resources/res_scripts/status_resource.gd" id="2_ctub7"]
+
+[resource]
+script = ExtResource("2_ctub7")
+name_key = "status_gangrene_name"
+description_key = "status_gangrene_desc"
+is_ticking = true
+is_stacking = true
+max_stacks = 999
+effect_per_stack = 1.0
+metadata/_custom_type_script = "uid://cdpdi1bblp6st"
