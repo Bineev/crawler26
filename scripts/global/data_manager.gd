@@ -418,7 +418,7 @@ const POISON_BASE_DAMAGE_PER_STACK: int = 5
 const POISON_TICK_INTERVAL: int = 1
 
 const BLEED_BASE_DAMAGE_PER_STACK: int = 3
-const BLEED_TICK_INTERVAL: int = 2
+const BLEED_TICK_INTERVAL: int = 1
 
 const BURN_BASE_DAMAGE_PER_STACK: int = 1
 const BURN_TICK_INTERVAL: int = 1
@@ -563,6 +563,26 @@ const HINT_PANEL_SIZE: Vector2 = Vector2(350, 268)
 
 const LOCATION_SPRITE_SIZE: Vector2 = Vector2(1024, 768)
 
+
+## ============================================================
+## ВЗАИМОДЕЙСТВИЯ СТАТУСОВ
+## ============================================================
+
+## Bleed + Poison → Мука (Bleed стаки += Poison длительность / 3)
+const BLEED_POISON_FLOUR_DIVIDER: int = 3
+
+## Poison + Bleed → Агония (Poison длительность += Bleed стаки × 3)
+const POISON_BLEED_AGONY_MULTIPLIER: int = 3
+
+## Poison + Burn → Химический взрыв (урон = стаки Poison × длительность Poison)
+const POISON_EXPLOSION_MULTIPLIER: int = 1
+
+## Bleed + Cold → Гангрена (стаки = Bleed × Cold × 2, длительность = (Bleed + Cold) / 3)
+const GANGRENE_MULTIPLIER: int = 2
+const GANGRENE_DURATION_DIVIDER: int = 3
+
+## Burn ↔ Cold (контр-статусы, 1:1 вычитание)
+# Константа не нужна, так как вычитание 1:1
 
 ## ============================================================
 ## 5. КОЛОДА

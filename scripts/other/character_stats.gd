@@ -334,15 +334,23 @@ func modify_status_stacks(status_id: DataManager.Status, amount: int):
 
 func _apply_status_modifiers(status: StatusResource):
 	for mod in status.modifiers:
-		modifiers[mod.stat] = modifiers.get(mod.stat, 1.0) * mod.multiplier
-		if mod.flat_bonus != 0:
-			modifiers[mod.stat] = modifiers.get(mod.stat, 0) + mod.flat_bonus
+		match mod.change_type:
+			DataManager.ModifierChangeType.MULTIPLIER:
+				modifiers[mod.stat] = modifiers.get(mod.stat, 1.0) * mod.value
+			DataManager.ModifierChangeType.PERCENT:
+				modifiers[mod.stat] = modifiers.get(mod.stat, 1.0) + mod.value
+			DataManager.ModifierChangeType.FLAT_BONUS:
+				modifiers[mod.stat] = modifiers.get(mod.stat, 0.0) + mod.value
 
 func _remove_status_modifiers(status: StatusResource):
 	for mod in status.modifiers:
-		modifiers[mod.stat] = modifiers.get(mod.stat, 1.0) / mod.multiplier
-		if mod.flat_bonus != 0:
-			modifiers[mod.stat] = modifiers.get(mod.stat, 0) - mod.flat_bonus
+		match mod.change_type:
+			DataManager.ModifierChangeType.MULTIPLIER:
+				modifiers[mod.stat] = modifiers.get(mod.stat, 1.0) / mod.value
+			DataManager.ModifierChangeType.PERCENT:
+				modifiers[mod.stat] = modifiers.get(mod.stat, 1.0) - mod.value
+			DataManager.ModifierChangeType.FLAT_BONUS:
+				modifiers[mod.stat] = modifiers.get(mod.stat, 0.0) - mod.valuelat_bonus
 
 func _check_denial(status: StatusResource) -> bool:
 	for passive in active_passives:
@@ -438,6 +446,10 @@ func _process_passive_triggers(trigger: DataManager.PassiveTrigger, attacker = n
 ## ============================================================
 
 func process_end_of_turn():
+	# Если заморожен — размораживаем и выходим (ничего не уменьшаем)
+	if has_status(DataManager.Status.FROZEN):
+		thaw()
+		return
 	# Убираем тик статусов (он теперь в process_start_of_turn)
 	# Оставляем только уменьшение длительности и удаление истекших статусов
 	var statuses_to_remove = []
@@ -547,12 +559,10 @@ func get_applied_statuses() -> Array:
 
 
 func process_start_of_turn():
-	# Снимаем SHIELD в начале хода
-	if has_status(DataManager.Status.SHIELD):
-		remove_status(DataManager.Status.SHIELD)
 	# Если заморожен — статусы не тикают
 	if has_status(DataManager.Status.FROZEN):
 		return
+	
 	var statuses_to_remove = []
 	
 	for status_id in active_statuses.keys():
@@ -560,32 +570,27 @@ func process_start_of_turn():
 		var status = data["resource"]
 		
 		if status.is_ticking:
-			data.turn_counter = data.get("turn_counter", 0) + 1
-			
-			if data.turn_counter >= status.tick_interval:
-				if status.tick_effect:
-					var tick_effect = status.tick_effect.duplicate_for_instance()
-					var caster = data.get("caster", null)
-					
-					# Вычисляем значение тика
-					var tick_value = status.get_tick_value(data.stacks, caster)
-					
-					# В зависимости от категории эффекта
-					match tick_effect.category:
-						DataManager.EffectCategory.DAMAGE:
-							tick_effect.base_value = tick_value
-						DataManager.EffectCategory.HEAL:
-							tick_effect.base_value = tick_value
-						DataManager.EffectCategory.BLOCK:
-							tick_effect.base_value = tick_value
-						DataManager.EffectCategory.APPLY_STATUS:
-							tick_effect.value = tick_value
-						_:
-							tick_effect.base_value = tick_value
-					
-					EffectExecutor.execute(tick_effect, self, [self])
+			# turn_counter больше не нужен для Bleed
+			# Просто выполняем тик каждый ход
+			if status.tick_effect:
+				var tick_effect = status.tick_effect.duplicate_for_instance()
+				var caster = data.get("caster", null)
 				
-				data.turn_counter = 0
+				var tick_value = status.get_tick_value(data.stacks, caster)
+				
+				match tick_effect.category:
+					DataManager.EffectCategory.DAMAGE:
+						tick_effect.base_value = tick_value
+					DataManager.EffectCategory.HEAL:
+						tick_effect.base_value = tick_value
+					DataManager.EffectCategory.BLOCK:
+						tick_effect.base_value = tick_value
+					DataManager.EffectCategory.APPLY_STATUS:
+						tick_effect.value = tick_value
+					_:
+						tick_effect.base_value = tick_value
+				
+				EffectExecutor.execute(tick_effect, self, [self])
 			
 			if status.id == DataManager.Status.BURN and data.stacks >= DataManager.BURN_THRESHOLD_STACKS:
 				_trigger_burn_explosion(data.stacks)
@@ -593,6 +598,9 @@ func process_start_of_turn():
 	
 	for status_id in statuses_to_remove:
 		remove_status(status_id)
+	# Снимаем SHIELD в начале хода
+	if has_status(DataManager.Status.SHIELD):
+		remove_status(DataManager.Status.SHIELD)
 
 
 func trigger_poison_immediately():
@@ -609,6 +617,7 @@ func _apply_freeze(caster: CharacterStats = null):
 	
 	var frozen_status = DataManager.get_status_resource(DataManager.Status.FROZEN)
 	if frozen_status:
+		# Просто накладываем FROZEN поверх существующих статусов
 		add_status(frozen_status, 1, DataManager.FROZEN_DURATION, caster)
 		
 		# Применяем визуальный эффект заморозки (для врагов)
@@ -616,12 +625,12 @@ func _apply_freeze(caster: CharacterStats = null):
 			var enemy_ui = get_node("EnemyUI") as EnemyUI
 			if enemy_ui:
 				enemy_ui.apply_freeze_effect()
-		# Визуальный эффект удара для игрока
 		elif self is PenitentStats:
 			var portrait = GameTestManager.get_player_portrait()
 			if portrait:
 				portrait.apply_freeze_effect()
-		SignalManager.log_message.emit("%s заморожен!" % get_display_name())
+		
+		SignalManager.log_message.emit("%s заморожен! Статусы приостановлены." % get_display_name())
 		SignalManager.frozen_applied.emit(self)
 
 
@@ -629,7 +638,7 @@ func thaw():
 	if not has_status(DataManager.Status.FROZEN):
 		return
 	
-	# Убираем визуальный эффект заморозки (для врагов)
+	# Убираем визуальный эффект заморозки
 	if self is EnemyInstance:
 		var enemy_ui = get_node("EnemyUI") as EnemyUI
 		if enemy_ui:
@@ -641,31 +650,7 @@ func thaw():
 	
 	remove_status(DataManager.Status.FROZEN)
 	
-	# Восстанавливаем статусы
-	for status_id in _frozen_statuses.keys():
-		var data = _frozen_statuses[status_id]
-		var status_resource = data.get("resource")
-		
-		if status_resource:
-			# Восстанавливаем статус напрямую
-			active_statuses[status_id] = {
-				"stacks": data.stacks,
-				"duration": data.duration,
-				"resource": status_resource,
-				"caster": self
-			}
-			if status_id not in status_application_order:
-				status_application_order.append(status_id)
-			_apply_status_modifiers(status_resource)
-			
-			# Сигнал о восстановлении статуса
-			SignalManager.status_added.emit(self, status_id, data.stacks, data.duration)
-			if self is EnemyInstance:
-				SignalManager.enemy_status_changed.emit(self)
-			SignalManager.log_message.emit("Восстановлен %s: %d стаков на %d ходов" % [status_resource.get_localized_name(), data.stacks, data.duration])
-	
-	_frozen_statuses.clear()
-	SignalManager.log_message.emit("%s оттаял! Статусы восстановлены." % get_display_name())
+	SignalManager.log_message.emit("%s оттаял! Статусы возобновлены." % get_display_name())
 
 
 func _get_last_status(exclude_status: DataManager.Status = -1) -> int:

@@ -7,6 +7,8 @@
 [sub_resource type="Resource" id="Resource_moyce"]
 script = ExtResource("1_b4dch")
 stat = 3
+change_type = 1
+value = -0.25
 metadata/_custom_type_script = "uid://0mjn55jcxdti"
 
 [resource]

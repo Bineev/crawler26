@@ -145,8 +145,8 @@ func start_enemy_turn():
 	for enemy in enemies:
 		if enemy.is_alive() and enemy.has_status(DataManager.Status.FROZEN):
 			frozen_enemies.append(enemy)
-			enemy.thaw()
-			SignalManager.log_message.emit("%s пропускает ход из-за заморозки!" % enemy.get_display_name())
+			# НЕ размораживаем здесь!
+			SignalManager.log_message.emit("%s заморожен и пропускает ход!" % enemy.get_display_name())
 			continue
 		
 		if enemy.is_alive():
@@ -182,6 +182,7 @@ func start_enemy_turn():
 
 func process_end_of_turn():
 	# Тик статусов игрока
+	# Если заморожен — длительность статусов не уменьшается
 	if player and player.has_method("process_end_of_turn"):
 		player.process_end_of_turn()
 	
@@ -318,9 +319,8 @@ func end_player_turn():
 		return
 	
 	# Снимаем заморозку с игрока в конце хода
-	if player and player.has_status(DataManager.Status.FROZEN):
-		player.thaw()
-		SignalManager.log_message.emit("Вы оттаяли! Статусы восстановлены.")
+	if player:
+		player.process_end_of_turn()  # внутри сам проверит FROZENатусы восстановлены.")
 	
 	# Сбрасываем руку
 	if battle_deck:

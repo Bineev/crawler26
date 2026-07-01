@@ -10,7 +10,6 @@ id = 1
 name_key = "status_bleed_name"
 description_key = "status_bleed_desc"
 is_ticking = true
-tick_interval = 2
 is_stacking = true
 max_stacks = 99
 tick_effect = ExtResource("3_rv62b")
