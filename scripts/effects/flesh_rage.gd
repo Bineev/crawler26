@@ -11,5 +11,5 @@ static func apply(effect: EffectEntry, source, targets: Array, card_info: Dictio
 	else:
 		var battle_deck = BattleManager.get_battle_deck()
 		if battle_deck:
-			battle_deck.draw_cards(1, false)
+			battle_deck.draw_cards(1, true)
 			SignalManager.log_message.emit("Ярость плоти: нет кровотечения — добор 1 карты.")

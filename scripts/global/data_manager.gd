@@ -414,16 +414,16 @@ const PENITENT_ATONEMENT_GAIN_PER_ATTACK: int = 5
 
 ## === Статусы ===
 
-const POISON_BASE_DAMAGE_PER_STACK: int = 1
+const POISON_BASE_DAMAGE_PER_STACK: int = 5
 const POISON_TICK_INTERVAL: int = 1
 
-const BLEED_BASE_DAMAGE_PER_STACK: int = 5
+const BLEED_BASE_DAMAGE_PER_STACK: int = 3
 const BLEED_TICK_INTERVAL: int = 2
 
-const BURN_BASE_DAMAGE_PER_STACK: int = 2
+const BURN_BASE_DAMAGE_PER_STACK: int = 1
 const BURN_TICK_INTERVAL: int = 1
-const BURN_THRESHOLD_STACKS: int = 10
-const BURN_EXPLOSION_DAMAGE_PER_STACK: int = 3
+const BURN_THRESHOLD_STACKS: int = 25
+const BURN_EXPLOSION_DAMAGE_PER_STACK: int = 2
 const BURN_STRENGTH_STACKS: int = 1
 const BURN_STRENGTH_DURATION: int = 2
 
@@ -693,7 +693,7 @@ const STATUS_ICONS: Dictionary = {
 	Status.REGEN: preload("res://img/icons/statuses/regen.png"),
 	Status.SHIELD: preload("res://img/icons/statuses/shield.png"),
 	Status.FROZEN: preload("res://img/icons/statuses/cold.png"),
-	Status.GANGRENE: preload("res://img/icons/passives/shame.png"),
+	Status.GANGRENE: preload("res://img/icons/statuses/gangrene.png"),
 }
 
 const PASSIVE_ICONS: Dictionary = {

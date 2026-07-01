@@ -11,7 +11,7 @@ static func apply(effect: EffectEntry, source, targets: Array, card_info: Dictio
 		SignalManager.log_message.emit("Нет живых врагов для получения Силы!")
 		return
 	
-	var strength_per_enemy = 3
+	var strength_per_enemy = effect.value
 	var total_strength = enemy_count * strength_per_enemy
 	
 	var strength_status = DataManager.get_status_resource(DataManager.Status.STRENGTH)

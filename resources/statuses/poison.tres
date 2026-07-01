@@ -1,8 +1,13 @@
-[gd_resource type="Resource" script_class="StatusResource" load_steps=4 format=3 uid="uid://nspyatginler"]
+[gd_resource type="Resource" script_class="StatusResource" load_steps=5 format=3 uid="uid://nspyatginler"]
 
 [ext_resource type="Script" uid="uid://0mjn55jcxdti" path="res://resources/res_scripts/modifier_entry.gd" id="1_b4dch"]
 [ext_resource type="Script" uid="uid://cdpdi1bblp6st" path="res://resources/res_scripts/status_resource.gd" id="2_y784o"]
 [ext_resource type="Resource" uid="uid://t3b4jhx1u810" path="res://resources/effects/tick_damage_self.tres" id="3_y784o"]
+
+[sub_resource type="Resource" id="Resource_moyce"]
+script = ExtResource("1_b4dch")
+stat = 3
+metadata/_custom_type_script = "uid://0mjn55jcxdti"
 
 [resource]
 script = ExtResource("2_y784o")
@@ -10,6 +15,7 @@ name_key = "status_poison_name"
 description_key = "status_poison_desc"
 is_ticking = true
 ignore_block = true
-is_stacking = true
+max_stacks = 99
+modifiers = Array[ExtResource("1_b4dch")]([SubResource("Resource_moyce")])
 tick_effect = ExtResource("3_y784o")
 metadata/_custom_type_script = "uid://cdpdi1bblp6st"

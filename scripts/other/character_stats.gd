@@ -168,10 +168,10 @@ func take_damage(amount: int, ignore_block: bool = false, attacker: CharacterSta
 	if not ignore_block and has_status(DataManager.Status.SHIELD):
 		var shield_stacks = get_status_stacks(DataManager.Status.SHIELD)
 		if shield_stacks >= damage:
-			modify_status_stacks(DataManager.Status.SHIELD, damage)
+			modify_status_stacks(DataManager.Status.SHIELD, -damage)
 			damage = 0
 		else:
-			modify_status_stacks(DataManager.Status.SHIELD, shield_stacks)
+			modify_status_stacks(DataManager.Status.SHIELD, -shield_stacks)
 			damage -= shield_stacks
 	if self is EnemyInstance:
 		SoundManager.play(null, DataManager.get_sound(DataManager.SoundType.ENEMY_GET_DAMAGE))
@@ -236,7 +236,7 @@ func add_status(status: StatusResource, value: int, duration: int, caster: Chara
 	if not status:
 		return
 	
-	# Если цель заморожена — нельзя накладывать новые статусы
+	# Проверки (заморозка, denial, иммунитет)
 	if has_status(DataManager.Status.FROZEN):
 		SignalManager.log_message.emit("%s заморожен! Нельзя наложить статус." % get_display_name())
 		return
@@ -247,55 +247,59 @@ func add_status(status: StatusResource, value: int, duration: int, caster: Chara
 	if not StatusInteractionManager.can_apply(self, status.id):
 		return
 	
-	# Если накладываем Холод на замороженного — запрещено
 	if status.id == DataManager.Status.COLD and has_status(DataManager.Status.FROZEN):
 		SignalManager.log_message.emit("Цель заморожена! Нельзя наложить Холод.")
 		return
 	
 	var status_id = status.id
+	var stacks = value
+	var dur = duration
+	
+	# Проверяем наличие взаимодействия
+	if StatusInteractionManager.has_interaction(self, status_id):
+		# Есть взаимодействие — передаём управление в StatusInteractionManager
+		StatusInteractionManager.handle_interaction(self, status_id, stacks, dur, status, caster)
+	else:
+		# Нет взаимодействия — добавляем статус напрямую
+		_add_status_direct(status, stacks, dur, caster)
+
+
+func _add_status_direct(status: StatusResource, stacks: int, duration: int, caster: CharacterStats = null):
+	var status_id = status.id
 	var existing = active_statuses.get(status_id)
 	
 	if existing:
-		# Обновляем существующий статус
-		existing.stacks += value
+		existing.stacks += stacks
 		existing.duration = max(existing.duration, duration)
-		# Не меняем порядок — статус остаётся на своей позиции
 	else:
-		# Новый статус — добавляем в конец
 		active_statuses[status_id] = {
-			"stacks": value,
+			"stacks": stacks,
 			"duration": duration,
 			"resource": status,
 			"caster": caster if caster else self
 		}
 		status_application_order.append(status_id)
 		_apply_status_modifiers(status)
-		# Передаём duration для взаимодействий статусов
-		StatusInteractionManager.on_status_applied(self, status_id, value, duration)
 	
-	# Визуальный эффект для негативных статусов на враге
+	# Визуальные эффекты
 	if self is EnemyInstance and DataManager.is_negative_status(status_id):
 		var enemy_ui = get_node("EnemyUI") as EnemyUI
 		if enemy_ui:
 			enemy_ui.push_back()
 	
-	# Проверка на заморозку (только для COLD)
+	# Проверка на заморозку (для COLD)
 	if status_id == DataManager.Status.COLD:
 		var total_stacks = get_status_stacks(DataManager.Status.COLD)
 		if total_stacks >= DataManager.COLD_FREEZE_THRESHOLD:
 			_apply_freeze(caster)
-			return  # после заморозки останавливаем дальнейшую обработку
+			return
 	
-	# Снятие Холода при наложении BURN
-	if status_id == DataManager.Status.BURN:
-		if has_status(DataManager.Status.COLD):
-			remove_status(DataManager.Status.COLD)
-			SignalManager.log_message.emit("Жар растопил лёд! Холод снят.")
-	
-	SignalManager.status_added.emit(self, status_id, value, duration)
+	# Сигналы
+	SignalManager.status_added.emit(self, status_id, stacks, duration)
 	if self is EnemyInstance:
 		SignalManager.enemy_status_changed.emit(self)
-	SignalManager.log_message.emit("Наложен %s: %d стаков на %d ходов" % [status.get_localized_name(), value, duration])
+	SignalManager.log_message.emit("Наложен %s: %d стаков на %d ходов" % [status.get_localized_name(), stacks, duration])
+
 
 func remove_status(status_id: DataManager.Status):
 	if not active_statuses.has(status_id):
@@ -324,7 +328,7 @@ func modify_status_stacks(status_id: DataManager.Status, amount: int):
 	if not active_statuses.has(status_id):
 		return
 	var data = active_statuses[status_id]
-	data.stacks = max(0, data.stacks - amount)
+	data.stacks = max(0, data.stacks + amount)
 	if data.stacks == 0:
 		remove_status(status_id)
 
@@ -614,7 +618,7 @@ func _apply_freeze(caster: CharacterStats = null):
 				enemy_ui.apply_freeze_effect()
 		# Визуальный эффект удара для игрока
 		elif self is PenitentStats:
-			var portrait = BattleManager.get_player_portrait()
+			var portrait = GameTestManager.get_player_portrait()
 			if portrait:
 				portrait.apply_freeze_effect()
 		SignalManager.log_message.emit("%s заморожен!" % get_display_name())
@@ -640,13 +644,25 @@ func thaw():
 	# Восстанавливаем статусы
 	for status_id in _frozen_statuses.keys():
 		var data = _frozen_statuses[status_id]
-		active_statuses[status_id] = data
-		_apply_status_modifiers(data["resource"])
-		# Восстанавливаем порядок наложения
-		if status_id not in status_application_order:
-			status_application_order.append(status_id)
-		# Отправляем сигнал о восстановлении статуса
-		StatusInteractionManager.on_status_applied(self, status_id, data.stacks, data.duration)
+		var status_resource = data.get("resource")
+		
+		if status_resource:
+			# Восстанавливаем статус напрямую
+			active_statuses[status_id] = {
+				"stacks": data.stacks,
+				"duration": data.duration,
+				"resource": status_resource,
+				"caster": self
+			}
+			if status_id not in status_application_order:
+				status_application_order.append(status_id)
+			_apply_status_modifiers(status_resource)
+			
+			# Сигнал о восстановлении статуса
+			SignalManager.status_added.emit(self, status_id, data.stacks, data.duration)
+			if self is EnemyInstance:
+				SignalManager.enemy_status_changed.emit(self)
+			SignalManager.log_message.emit("Восстановлен %s: %d стаков на %d ходов" % [status_resource.get_localized_name(), data.stacks, data.duration])
 	
 	_frozen_statuses.clear()
 	SignalManager.log_message.emit("%s оттаял! Статусы восстановлены." % get_display_name())

@@ -17,6 +17,7 @@ metadata/_custom_type_script = "uid://cmra25r1r3ivt"
 script = ExtResource("1_4yjwn")
 category = 15
 target = 0
+value = 3
 custom_script = ExtResource("3_nscnv")
 metadata/_custom_type_script = "uid://cmra25r1r3ivt"
 

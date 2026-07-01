@@ -300,7 +300,7 @@ func _execute_modify_modifier(effect: EffectEntry, source, targets: Array) -> vo
 func _execute_draw_card(effect: EffectEntry, source) -> void:
 	var battle_deck = BattleManager.get_battle_deck()
 	if battle_deck:
-		battle_deck.draw_cards(effect.amount, false)
+		battle_deck.draw_cards(effect.amount, true)
 
 
 func _execute_gain_energy(effect: EffectEntry, source) -> void:
