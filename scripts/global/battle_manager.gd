@@ -183,8 +183,8 @@ func start_enemy_turn():
 func process_end_of_turn():
 	# Тик статусов игрока
 	# Если заморожен — длительность статусов не уменьшается
-	if player and player.has_method("process_end_of_turn"):
-		player.process_end_of_turn()
+	#if player and player.has_method("process_end_of_turn"):
+		#player.process_end_of_turn()
 	
 	# Тик статусов врагов
 	for enemy in enemies:
@@ -274,7 +274,8 @@ func get_current_state() -> DataManager.BattleState:
 func _on_battle_victory():
 	SignalManager.battle_victory.disconnect(_on_battle_victory)
 	SignalManager.battle_defeat.disconnect(_on_battle_defeat)
-	
+	if player:
+		player.clear_all_statuses()
 	if current_room_node and current_room_node.has_method("on_battle_victory"):
 		current_room_node.on_battle_victory()
 
@@ -282,7 +283,8 @@ func _on_battle_victory():
 func _on_battle_defeat():
 	SignalManager.battle_victory.disconnect(_on_battle_victory)
 	SignalManager.battle_defeat.disconnect(_on_battle_defeat)
-	
+	if player:
+		player.clear_all_statuses()
 	if current_room_node and current_room_node.has_method("on_battle_defeat"):
 		current_room_node.on_battle_defeat()
 

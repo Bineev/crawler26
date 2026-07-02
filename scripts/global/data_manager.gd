@@ -430,7 +430,7 @@ const BURN_STRENGTH_DURATION: int = 2
 const COLD_EFFECT_PERCENT_PER_STACK: float = 0.01
 const COLD_MIN_EFFECT_MULTIPLIER: float = 0.75
 #BUG
-const COLD_FREEZE_THRESHOLD: int = 4
+const COLD_FREEZE_THRESHOLD: int = 3
 const COLD_DEFAULT_DURATION: int = 5  # ← изменено с 3 на 5
 const FROZEN_DURATION: int = 1  # заморозка на 1 ход
 

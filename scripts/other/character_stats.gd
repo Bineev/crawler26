@@ -311,7 +311,6 @@ func remove_status(status_id: DataManager.Status):
 	status_application_order.erase(status_id)
 	
 	_remove_status_modifiers(status)
-	StatusInteractionManager.on_status_removed(self, status_id)
 	
 	SignalManager.status_removed.emit(self, status_id)
 	if self is EnemyInstance:
@@ -565,13 +564,18 @@ func process_start_of_turn():
 	
 	var statuses_to_remove = []
 	
-	for status_id in active_statuses.keys():
+	# Копируем ключи, чтобы избежать изменения словаря во время итерации
+	var status_keys = active_statuses.keys()
+	
+	for status_id in status_keys:
+		# Проверяем, существует ли статус (может быть удалён)
+		if not active_statuses.has(status_id):
+			continue
+		
 		var data = active_statuses[status_id]
 		var status = data["resource"]
 		
 		if status.is_ticking:
-			# turn_counter больше не нужен для Bleed
-			# Просто выполняем тик каждый ход
 			if status.tick_effect:
 				var tick_effect = status.tick_effect.duplicate_for_instance()
 				var caster = data.get("caster", null)
@@ -596,9 +600,12 @@ func process_start_of_turn():
 				_trigger_burn_explosion(data.stacks)
 				statuses_to_remove.append(status_id)
 	
+	# Удаляем статусы после итерации
 	for status_id in statuses_to_remove:
-		remove_status(status_id)
-	# Снимаем SHIELD в начале хода
+		if active_statuses.has(status_id):
+			remove_status(status_id)
+	
+	# Снимаем SHIELD в самом конце (после всех тиков)
 	if has_status(DataManager.Status.SHIELD):
 		remove_status(DataManager.Status.SHIELD)
 
@@ -670,3 +677,12 @@ func add_status_by_id(status_id: DataManager.Status, stacks: int, duration: int)
 		add_status(status_resource, stacks, duration, self)
 	else:
 		printerr("Status resource not found for id: ", status_id)
+
+
+func clear_all_statuses():
+	var statuses = active_statuses.keys()
+	for status_id in statuses:
+		remove_status(status_id)
+	
+	# Очищаем порядок наложения
+	status_application_order.clear()

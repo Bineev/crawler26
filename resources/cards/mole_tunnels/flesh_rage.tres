@@ -5,19 +5,19 @@
 [ext_resource type="Resource" uid="uid://b68cda611rabw" path="res://resources/statuses/bleed.tres" id="2_5rods"]
 [ext_resource type="Script" uid="uid://b0sj1pmsfay7x" path="res://scripts/effects/flesh_rage.gd" id="2_mghm6"]
 
+[sub_resource type="Resource" id="Resource_71rmg"]
+script = ExtResource("1_2x3em")
+category = 15
+target = 0
+custom_script = ExtResource("2_mghm6")
+metadata/_custom_type_script = "uid://cmra25r1r3ivt"
+
 [sub_resource type="Resource" id="Resource_5rods"]
 script = ExtResource("1_2x3em")
 category = 4
 target = 0
 status = ExtResource("2_5rods")
 duration = 2
-metadata/_custom_type_script = "uid://cmra25r1r3ivt"
-
-[sub_resource type="Resource" id="Resource_71rmg"]
-script = ExtResource("1_2x3em")
-category = 15
-target = 0
-custom_script = ExtResource("2_mghm6")
 metadata/_custom_type_script = "uid://cmra25r1r3ivt"
 
 [resource]
@@ -27,5 +27,5 @@ origin = 1
 name_key = "card_flesh_rage_name"
 description_key = "card_flesh_rage_desc"
 cost = 0
-effects = Array[ExtResource("1_2x3em")]([SubResource("Resource_5rods"), SubResource("Resource_71rmg")])
+effects = Array[ExtResource("1_2x3em")]([SubResource("Resource_71rmg"), SubResource("Resource_5rods")])
 metadata/_custom_type_script = "uid://badcs22cck6n5"

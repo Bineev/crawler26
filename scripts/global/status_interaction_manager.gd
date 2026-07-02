@@ -40,11 +40,6 @@ func can_apply(target, new_status: DataManager.Status) -> bool:
 ## ОБРАБОТКА СНЯТИЯ СТАТУСОВ
 ## ============================================================
 
-func on_status_removed(target, removed_status: DataManager.Status):
-	if removed_status == DataManager.Status.COLD:
-		if DataManager.Status.POISON in target.get_applied_statuses():
-			target.unfreeze_poison()
-
 
 # StatusInteractionManager.gd
 
