@@ -44,6 +44,7 @@ var status_application_order: Array = []  # порядок наложения с
 
 var active_passives: Array[PassiveResource] = []
 
+var _frozen_at_turn_start: bool = false
 ## ============================================================
 ## ИММУНИТЕТЫ
 ## ============================================================
@@ -447,8 +448,11 @@ func _process_passive_triggers(trigger: DataManager.PassiveTrigger, attacker = n
 func process_end_of_turn():
 	# Если заморожен — размораживаем и выходим (ничего не уменьшаем)
 	if has_status(DataManager.Status.FROZEN):
-		thaw()
-		return
+		if not self is PenitentStats or _frozen_at_turn_start:
+			thaw()
+			return
+		else:
+			return
 	# Убираем тик статусов (он теперь в process_start_of_turn)
 	# Оставляем только уменьшение длительности и удаление истекших статусов
 	var statuses_to_remove = []
@@ -644,7 +648,7 @@ func _apply_freeze(caster: CharacterStats = null):
 func thaw():
 	if not has_status(DataManager.Status.FROZEN):
 		return
-	
+	_frozen_at_turn_start = false
 	# Убираем визуальный эффект заморозки
 	if self is EnemyInstance:
 		var enemy_ui = get_node("EnemyUI") as EnemyUI

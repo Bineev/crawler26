@@ -510,6 +510,9 @@ const CRY_OF_DESPAIR_HEAL_TIER_2: int = 10
 const CRY_OF_DESPAIR_HEAL_TIER_3: int = 15
 
 
+
+const ENEMY_STEP_DELAY : float = 1.5
+
 ## ============================================================
 ## 3. РАЗМЕРЫ КАРТ
 ## ============================================================

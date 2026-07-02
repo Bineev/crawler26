@@ -77,10 +77,16 @@ func start_player_turn():
 	
 	current_state = DataManager.BattleState.PLAYER_TURN
 	
+	# Восстанавливаем энергию
+	if player and player.has_method("restore_energy"):
+		player.restore_energy()
+
 	# === ОБРАБОТКА ЗАМОРОЗКИ ===
 	var is_frozen = player and player.has_status(DataManager.Status.FROZEN)
 	
 	if is_frozen:
+		# Отмечаем, что игрок начал ход замороженным
+		player._frozen_at_turn_start = true
 		# Уменьшаем энергию на 2 (но не меньше 0)
 		var current_energy = player.get_energy()
 		player.set_energy(max(0, current_energy - 2))
@@ -155,14 +161,14 @@ func start_enemy_turn():
 	for enemy in enemies:
 		if enemy in frozen_enemies or not enemy.is_alive():
 			# Пауза для замороженных врагов (чтобы UI успел обновиться)
-			await get_tree().create_timer(0.5).timeout
+			await get_tree().create_timer(DataManager.ENEMY_STEP_DELAY).timeout
 			continue
 		
 		var intent = enemy.current_intent
 		if intent:
 			await enemy.execute_intent_with_animation(player)
 		
-		await get_tree().create_timer(0.5).timeout
+		await get_tree().create_timer(DataManager.ENEMY_STEP_DELAY).timeout
 		
 		if player and player.get_health() <= 0:
 			defeat()
