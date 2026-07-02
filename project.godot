@@ -50,7 +50,7 @@ options={
 
 [internationalization]
 
-locale/translations=PackedStringArray("res://localization/en.translation", "res://localization/ru.translation")
+locale/translations=PackedStringArray("res://localization/en.en.translation", "res://localization/ru.ru.translation")
 
 [rendering]
 

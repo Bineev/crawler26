@@ -684,9 +684,12 @@ func add_status_by_id(status_id: DataManager.Status, stacks: int, duration: int)
 
 
 func clear_all_statuses():
+	# Специальная обработка для FROZEN
+	if has_status(DataManager.Status.FROZEN):
+		_frozen_at_turn_start = false
+	
 	var statuses = active_statuses.keys()
 	for status_id in statuses:
 		remove_status(status_id)
 	
-	# Очищаем порядок наложения
 	status_application_order.clear()

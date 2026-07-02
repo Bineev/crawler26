@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="CardData" load_steps=6 format=3 uid="uid://dtjg00yokpith"]
+
+[ext_resource type="Script" uid="uid://cmra25r1r3ivt" path="res://resources/res_scripts/effect_entry.gd" id="1_tqqov"]
+[ext_resource type="Resource" uid="uid://b68cda611rabw" path="res://resources/statuses/bleed.tres" id="2_15x78"]
+[ext_resource type="Script" uid="uid://badcs22cck6n5" path="res://resources/res_scripts/card_data.gd" id="2_ryicc"]
+
+[sub_resource type="Resource" id="Resource_3lh3p"]
+script = ExtResource("1_tqqov")
+base_value = 4
+metadata/_custom_type_script = "uid://cmra25r1r3ivt"
+
+[sub_resource type="Resource" id="Resource_po20n"]
+script = ExtResource("1_tqqov")
+category = 4
+status = ExtResource("2_15x78")
+duration = 2
+metadata/_custom_type_script = "uid://cmra25r1r3ivt"
+
+[resource]
+script = ExtResource("2_ryicc")
+id = 27
+origin = 1
+name_key = "card_torn_wound_name"
+description_key = "card_torn_wound_desc"
+effects = Array[ExtResource("1_tqqov")]([SubResource("Resource_3lh3p"), SubResource("Resource_po20n")])
+metadata/_custom_type_script = "uid://badcs22cck6n5"

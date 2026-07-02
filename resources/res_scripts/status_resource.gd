@@ -82,7 +82,7 @@ func get_tick_value(stacks: int, caster: CharacterStats = null) -> int:
 		DataManager.Status.BLEED:
 			return stacks * DataManager.BLEED_BASE_DAMAGE_PER_STACK  # 3 за стак
 		DataManager.Status.POISON:
-			return DataManager.POISON_BASE_DAMAGE  # 5
+			return DataManager.POISON_BASE_DAMAGE_PER_STACK  # 5
 		DataManager.Status.BURN:
 			return stacks * DataManager.BURN_BASE_DAMAGE_PER_STACK  # 1 за стак
 		DataManager.Status.REGEN:

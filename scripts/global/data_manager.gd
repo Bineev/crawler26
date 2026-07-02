@@ -306,6 +306,7 @@ enum CardId {
 	MOLE_TOSS,             # Бросок слепыша
 	WORM_SPIRIT,           # Дух червя
 	FLESH_RAGE,            # Ярость плоти
+	TORN_WOUND,            # Рваная рана
 }
 
 ## Намерения врагов
@@ -511,7 +512,7 @@ const CRY_OF_DESPAIR_HEAL_TIER_3: int = 15
 
 
 
-const ENEMY_STEP_DELAY : float = 1.5
+const ENEMY_STEP_DELAY : float = 1
 
 ## ============================================================
 ## 3. РАЗМЕРЫ КАРТ
@@ -1082,6 +1083,7 @@ func load_all_cards():
 	_register_card(CardId.MOLE_TOSS, "res://resources/cards/mole_tunnels/mole_toss.tres")
 	_register_card(CardId.WORM_SPIRIT, "res://resources/cards/mole_tunnels/worm_spirit.tres")
 	_register_card(CardId.FLESH_RAGE, "res://resources/cards/mole_tunnels/flesh_rage.tres")
+	_register_card(CardId.TORN_WOUND, "res://resources/cards/mole_tunnels/torn_wound.tres")
 	
 	_cards_loaded = true
 
@@ -1110,6 +1112,7 @@ func get_starting_deck() -> Array[CardData]:
 	deck.append(get_card(CardId.MOLE_TOSS))
 	deck.append(get_card(CardId.WORM_SPIRIT))
 	deck.append(get_card(CardId.FLESH_RAGE))
+	deck.append(get_card(CardId.TORN_WOUND))
 
 	#deck.append(get_card(CardId.ATONEMENT_STRIKE))
 	#deck.append(get_card(CardId.ATONEMENT_STRIKE))
@@ -1181,7 +1184,7 @@ func load_card_illustrations():
 	_card_illustrations[CardId.MOLE_TOSS] = preload("res://img/cards/mole_tunnels/mole_toss.png")
 	_card_illustrations[CardId.WORM_SPIRIT] = preload("res://img/cards/mole_tunnels/worm_spirit.png")
 	_card_illustrations[CardId.FLESH_RAGE] = preload("res://img/cards/mole_tunnels/flesh_rage.png")
-
+	_card_illustrations[CardId.TORN_WOUND] = preload("res://img/cards/mole_tunnels/torn_wound.png")
 	
 	
 	

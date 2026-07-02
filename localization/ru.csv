@@ -1,6 +1,6 @@
 keys,ru
 card_atonement_strike_name,Удар расплаты
-card_atonement_strike_desc,"Наносит 8 урона.\nКонвертирует весь блок в Искупление."
+card_atonement_strike_desc,"Наносит 5 урона.\nДаёт 3 Искупления."
 
 card_sinful_strike_name,Греховный выпад
 card_sinful_strike_desc,"Наносит 10 урона.\nНакладывает Стыд на 2 хода."
@@ -50,38 +50,71 @@ card_tunnel_ambush_desc,"Следующая атака наносит двойн
 card_bloodletting_name,Кровопускание
 card_bloodletting_desc,"Снимает всё кровотечение.\nНаносит урон = снятые стаки × 2."
 
+card_blood_trail_name,Кровавый след
+card_blood_trail_desc,"Наносит 6 урона.\nЕсли у врага есть Кровотечение, наносит 10 урона."
+
+card_frozen_earth_name,Стылая земля
+card_frozen_earth_desc,"Даёт 10 блока.\nНакладывает 3 стака Холода.\nПри наличии Холода даёт ещё 4 блока."
+
+card_rodent_agility_name,Проворство грызуна
+card_rodent_agility_desc,"Добирает 2 карты.\nНакладывает на себя 1 стак Кровотечения на 2 хода."
+
+card_frozen_bite_name,Мерзлый укус
+card_frozen_bite_desc,"Наносит 5 урона.\nНакладывает на врага 5 стаков Холода."
+
+card_rotten_cut_name,Гнилой порез
+card_rotten_cut_desc,"Наносит 2 урона.\nУдваивает стаки Кровотечения на враге."
+
+card_beast_pulse_name,Пульс зверя
+card_beast_pulse_desc,"Накладывает пассивку Regrowth (5 зарядов).\nЕсли здоровье < 30, даёт 2 энергии."
+
+card_blood_thread_name,Кровавая нить
+card_blood_thread_desc,"Все враги получают 1 стак Кровотечения.\nДаёт 3 Силы за каждого врага."
+
+card_mole_toss_name,Бросок слепыша
+card_mole_toss_desc,"Наносит случайное число урона от 1 до 10."
+
+card_worm_spirit_name,Дух червя
+card_worm_spirit_desc,"Снимает все статусы и пассивки с героя.\nДаёт Регенерацию на 3 хода.\nБазовое лечение: 2, +1 за каждый снятый эффект."
+
+card_flesh_rage_name,Ярость плоти
+card_flesh_rage_desc,"Накладывает на себя 1 стак Кровотечения.\nЕсли есть Кровотечение — +1 энергия.\nЕсли нет — добор 1 карты."
+
+card_torn_wound_name,Рваная рана
+card_torn_wound_desc,"Наносит 4 урона.\nНакладывает на врага 1 стак Кровотечения."
+
 status_poison_name,Яд
-status_poison_desc,"Каждый ход получает %d урона за стек. Игнорирует броню."
+status_poison_desc,"Наносит 5 урона каждый ход. Игнорирует блок. Снижает лечение на 25%."
 
 status_bleed_name,Кровотечение
-status_bleed_desc,"Каждые %d хода получает %d урона за стек."
+status_bleed_desc,"Наносит 3 урона за каждый стак каждый ход."
 
 status_burn_name,Горение
-status_burn_desc,"Каждый ход получает %d урона за стек. При %d стаках взрывается."
+status_burn_desc,"Наносит 1 урона за каждый стак каждый ход. Взрывается при 25 стаках."
 
 status_cold_name,Холод
-status_cold_desc,"Снижает исходящий урон на %.0f%% за стек (макс 25%%)."
+status_cold_desc,"Снижает входящий урон на 2% за стак (макс 50%). При 25 стаках замораживает цель."
 
 status_weakness_name,Слабость
-status_weakness_desc,"Атаки наносят на 25%% меньше урона."
+status_weakness_desc,"Атаки наносят на 25% меньше урона."
 
 status_vulnerability_name,Уязвимость
-status_vulnerability_desc,"Получает на 50%% больше урона от всех источников."
+status_vulnerability_desc,"Получает на 50% больше урона от всех источников."
 
 status_strength_name,Сила
-status_strength_desc,"Увеличивает урон на %d за стек."
+status_strength_desc,"Увеличивает урон на 1 за стак."
 
 status_regen_name,Регенерация
-status_regen_desc,"Лечит %d HP в конце хода за каждый стек."
+status_regen_desc,"Лечит 1 HP за стак в конце хода."
 
 status_shield_name,Щит
-status_shield_desc,"Поглощает входящий урон. Сбрасывается в конце хода."
+status_shield_desc,"Поглощает входящий урон. Сбрасывается в начале хода."
 
-status_thorns_name,Шипы
-status_thorns_desc,"При получении урона наносит ответный урон."
+status_frozen_name,Заморозка
+status_frozen_desc,"Цель заморожена. Пропускает ход. Статусы приостановлены. Получает на 50% меньше урона."
 
-status_despair_name,Отчаяние
-status_despair_desc,"Снижает исходящий урон на 25%%."
+status_gangrene_name,Гангрена
+status_gangrene_desc,"В последний ход наносит весь урон разом."
 
 passive_regrowth_name,Оживление
 passive_regrowth_desc,"Каждый ход лечит на растущую величину."
@@ -99,7 +132,7 @@ passive_denial_name,Отрицание
 passive_denial_desc,"Блокирует негативные статусы."
 
 passive_shame_name,Стыд
-passive_shame_desc,"Увеличивает входящий урон на 25%% и удваивает получаемое Искупление."
+passive_shame_desc,"Увеличивает входящий урон на 25% и удваивает получаемое Искупление."
 
 enemy_mole_mutant_name,Слепыш-мутант
 enemy_mole_mutant_desc,"Жалкое слепое создание. Медленно регенерирует."
@@ -134,45 +167,3 @@ msg_not_enough_energy,Недостаточно энергии!
 msg_target_selection,Выберите цель
 msg_victory,Победа!
 msg_defeat,Поражение...
-
-card_blood_trail_name,Кровавый след
-card_blood_trail_desc,"Наносит 6 урона.\nЕсли у врага есть Кровотечение, наносит 10 урона."
-
-card_frozen_earth_name,Стылая земля
-card_frozen_earth_desc,"Даёт 10 блока.\nНакладывает 3 стака Холода.\nПри наличии Холода даёт ещё 4 блока."
-
-card_rodent_agility_name,Проворство грызуна
-card_rodent_agility_desc,"Добирает 2 карты.\nНакладывает на себя 1 стак Кровотечения на 2 хода."
-
-card_frozen_bite_name,Мерзлый укус
-card_frozen_bite_desc,"Наносит 5 урона.\nНакладывает на врага 5 стаков Холода."
-
-card_rotten_cut_name,Гнилой порез
-card_rotten_cut_desc,"Наносит 2 урона.\nУдваивает стаки Кровотечения на враге."
-
-card_beast_pulse_name,Пульс зверя
-card_beast_pulse_desc,"Накладывает пассивку Regrowth (5 зарядов).\nЕсли здоровье < 30, даёт 2 энергии."
-
-card_blood_thread_name,Кровавая нить
-card_blood_thread_desc,"Все враги получают 1 стак Кровотечения.\nДаёт 3 Силы за каждого врага."
-
-card_mole_toss_name,Бросок слепыша
-card_mole_toss_desc,"Наносит случайное число урона от 1 до 10."
-
-card_worm_spirit_name,Дух червя
-card_worm_spirit_desc,"Снимает все статусы и пассивки с героя.\nДаёт Регенерацию на 3 хода.\nБазовое лечение: 2, +1 за каждый снятый эффект."
-
-card_flesh_rage_name,Ярость плоти
-card_flesh_rage_desc,"Накладывает на себя 1 стак Кровотечения.\nЕсли есть Кровотечение — +1 энергия.\nЕсли нет — добор 1 карты."
-
-status_bleed_name,Кровотечение
-status_bleed_desc,"Наносит %d урона за каждый стак раз в 2 хода."
-
-status_cold_name,Холод
-status_cold_desc,"Снижает исходящий урон на %.0f%% за стек (макс 25%%)."
-
-status_regen_name,Регенерация
-status_regen_desc,"Лечит %d HP в конце хода за каждый стек."
-
-passive_regrowth_name,Оживление
-passive_regrowth_desc,"Каждый ход лечит на растущую величину."

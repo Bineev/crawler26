@@ -1,13 +1,24 @@
 [gd_resource type="Resource" script_class="CardData" load_steps=5 format=3 uid="uid://cexpaa0qfi31a"]
 
 [ext_resource type="Script" uid="uid://cmra25r1r3ivt" path="res://resources/res_scripts/effect_entry.gd" id="1_82f5t"]
-[ext_resource type="Resource" uid="uid://cp2qdni84sxcx" path="res://resources/effects/effect_atonement_strike.tres" id="2_ctdx5"]
 [ext_resource type="Script" uid="uid://badcs22cck6n5" path="res://resources/res_scripts/card_data.gd" id="2_s7f2j"]
-[ext_resource type="Resource" uid="uid://5k5n2oika8hp" path="res://resources/effects/effect_atonement_strike2.tres" id="3_4vhtc"]
+
+[sub_resource type="Resource" id="Resource_yx30b"]
+script = ExtResource("1_82f5t")
+base_value = 5
+metadata/_custom_type_script = "uid://cmra25r1r3ivt"
+
+[sub_resource type="Resource" id="Resource_2g6eq"]
+script = ExtResource("1_82f5t")
+category = 6
+target = 0
+target_stat = 6
+delta = 3
+metadata/_custom_type_script = "uid://cmra25r1r3ivt"
 
 [resource]
 script = ExtResource("2_s7f2j")
 name_key = "card_atonement_strike_name"
 description_key = "card_atonement_strike_desc"
-effects = Array[ExtResource("1_82f5t")]([ExtResource("2_ctdx5"), ExtResource("3_4vhtc")])
+effects = Array[ExtResource("1_82f5t")]([SubResource("Resource_yx30b"), SubResource("Resource_2g6eq")])
 metadata/_custom_type_script = "uid://badcs22cck6n5"
