@@ -112,7 +112,7 @@ func start_player_turn():
 	
 	# Тик статусов игрока (только если не заморожен)
 	if player:
-		player.process_start_of_turn()
+		await player.process_start_of_turn()
 	
 	# Выбираем намерения для всех врагов
 	for enemy in enemies:
@@ -140,42 +140,54 @@ func start_player_turn():
 func start_enemy_turn():
 	print("=== ENEMY TURN START ===")
 	
-	enemies = enemies.filter(func(e): return e != null and e.is_alive())
+	enemies = enemies.filter(func(e): return e != null and is_instance_valid(e) and e.is_alive())
 	print("Enemies alive: ", enemies.size())
 	
 	current_state = DataManager.BattleState.ENEMY_TURN
 	SignalManager.enemy_turn_started.emit()
 	SignalManager.turn_started.emit()
 	
-	var frozen_enemies = []
 	for enemy in enemies:
-		if enemy.is_alive() and enemy.has_status(DataManager.Status.FROZEN):
-			frozen_enemies.append(enemy)
-			# НЕ размораживаем здесь!
-			SignalManager.log_message.emit("%s заморожен и пропускает ход!" % enemy.get_display_name())
+		if not is_instance_valid(enemy) or not enemy.is_alive():
 			continue
 		
-		if enemy.is_alive():
-			enemy.process_start_of_turn()
-	
-	for enemy in enemies:
-		if enemy in frozen_enemies or not enemy.is_alive():
-			# Пауза для замороженных врагов (чтобы UI успел обновиться)
+		if enemy.has_status(DataManager.Status.FROZEN):
+			SignalManager.log_message.emit("%s заморожен и пропускает ход!" % enemy.get_display_name())
 			await get_tree().create_timer(DataManager.ENEMY_STEP_DELAY).timeout
 			continue
 		
+		# ШАГ 1: Начало хода врага (пассивки, статусы)
+		await enemy.process_start_of_turn()
+		
+		if not is_instance_valid(enemy) or not enemy.is_alive():
+			continue
+		
+		# ШАГ 2: Действие врага
 		var intent = enemy.current_intent
 		if intent:
 			await enemy.execute_intent_with_animation(player)
+		else:
+			await get_tree().create_timer(DataManager.ENEMY_STEP_DELAY).timeout
 		
-		await get_tree().create_timer(DataManager.ENEMY_STEP_DELAY).timeout
+		if not is_instance_valid(enemy) or not enemy.is_alive():
+			continue
+		
+		# ШАГ 3: Конец хода врага (уменьшение длительности статусов)
+		enemy.process_end_of_turn()
 		
 		if player and player.get_health() <= 0:
 			defeat()
 			return
+		
+		await get_tree().create_timer(DataManager.ENEMY_STEP_DELAY).timeout
 	
-	process_end_of_turn()
-	SignalManager.turn_ended.emit()
+	# 🆕 Только проверяем победу/поражение
+	check_defeat()
+	if current_state == DataManager.BattleState.VICTORY or current_state == DataManager.BattleState.DEFEAT:
+		return
+	
+	# Передаём ход игроку
+	start_player_turn()
 	
 	check_defeat()
 	if current_state == DataManager.BattleState.VICTORY or current_state == DataManager.BattleState.DEFEAT:

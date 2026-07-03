@@ -14,7 +14,7 @@ script = ExtResource("1_uiit3")
 category = 4
 status = ExtResource("2_4af3v")
 value = 5
-duration = 2
+duration = 5
 metadata/_custom_type_script = "uid://cmra25r1r3ivt"
 
 [resource]

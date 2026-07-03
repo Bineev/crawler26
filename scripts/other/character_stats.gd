@@ -332,6 +332,10 @@ func modify_status_stacks(status_id: DataManager.Status, amount: int):
 	if data.stacks == 0:
 		remove_status(status_id)
 
+	if self is EnemyInstance:
+		SignalManager.enemy_status_changed.emit(self)
+
+
 func _apply_status_modifiers(status: StatusResource):
 	for mod in status.modifiers:
 		match mod.change_type:
@@ -425,21 +429,76 @@ func remove_passive(passive: PassiveResource):
 
 func _process_passive_triggers(trigger: DataManager.PassiveTrigger, attacker = null):
 	for passive in active_passives:
+		var enemy : EnemyInstance = self as EnemyInstance
+		if enemy and not enemy.is_alive():
+			return
 		if passive.trigger == trigger and passive.is_active():
+			# Анимируем иконку пассивки у врага
+			if self is EnemyInstance:
+				var enemy_ui = get_node("EnemyUI") as EnemyUI
+				if enemy_ui:
+					var icon = enemy_ui.find_passive_icon(passive.id)
+					if icon:
+						icon.animate()
+			elif self is PenitentStats:
+				var portrait = GameTestManager.get_player_portrait()
+				if portrait:
+					var icon = portrait.find_passive_icon(passive.id)
+					if icon:
+						icon.animate()
+			
 			for effect in passive.effects:
 				var targets = []
+				var is_enemy = self is EnemyInstance
+				
 				match effect.target:
 					DataManager.EffectTarget.SELF:
 						targets = [self]
-					DataManager.EffectTarget.ANY:
-						if attacker:
-							targets = [attacker]
+					
+					DataManager.EffectTarget.ENEMY:
+						if is_enemy:
+							# Враг → атакует игрока
+							if attacker:
+								targets = [attacker]
 						else:
+							# Игрок → атакует врага
+							if attacker:
+								targets = [attacker]
+					
+					DataManager.EffectTarget.ALL_ENEMIES:
+						if is_enemy:
+							# Враг → атакует игрока
+							if attacker:
+								targets = [attacker]
+						else:
+							# Игрок → все враги
+							targets = BattleManager.get_enemies()
+					
+					DataManager.EffectTarget.ALL_ALLIES:
+						if is_enemy:
+							# Враг → все враги
+							targets = BattleManager.get_enemies()
+						else:
+							# Игрок → сам себя
 							targets = [self]
+					
+					DataManager.EffectTarget.ANY:
+						if is_enemy:
+							# Враг → все враги + атакующий (игрок)
+							targets = BattleManager.get_enemies()
+							if attacker and attacker not in targets:
+								targets.append(attacker)
+						else:
+							# Игрок → все враги + сам себя
+							targets = BattleManager.get_enemies()
+							targets.append(self)
+					
 					_:
 						targets = [self]
 				
 				EffectExecutor.execute(effect, self, targets, {}, passive)
+			
+			await Engine.get_main_loop().create_timer(DataManager.STATUS_TRIGGER_DELAY).timeout
 
 ## ============================================================
 ## КОНЕЦ ХОДА
@@ -448,15 +507,37 @@ func _process_passive_triggers(trigger: DataManager.PassiveTrigger, attacker = n
 func process_end_of_turn():
 	# Если заморожен — размораживаем и выходим (ничего не уменьшаем)
 	if has_status(DataManager.Status.FROZEN):
+		# Размораживаем ТОЛЬКО если:
+		# 1. Это не игрок (враг) → всегда размораживаем
+		# 2. ИЛИ это игрок и заморозка была в начале хода
 		if not self is PenitentStats or _frozen_at_turn_start:
 			thaw()
+			_frozen_at_turn_start = false
 			return
 		else:
+			# Игрок заморозил себя — не размораживаем, оставляем на следующий ход
 			return
-	# Убираем тик статусов (он теперь в process_start_of_turn)
-	# Оставляем только уменьшение длительности и удаление истекших статусов
-	var statuses_to_remove = []
+	# ✅ ШАГ 1: Сначала пассивки ON_TURN_END
+	_process_passive_triggers(DataManager.PassiveTrigger.ON_TURN_END)
 	
+	# 🆕 УМЕНЬШАЕМ ЗАРЯДЫ TURN_BASED ПАССИВОК С ТРИГГЕРОМ ON_TURN_END
+	var passives_to_remove = []
+	for passive in active_passives:
+		if passive.charge_type == DataManager.PassiveChargeType.TURN_BASED and passive.trigger == DataManager.PassiveTrigger.ON_TURN_END and passive.current_charges > 0:
+			passive.current_charges -= 1
+			if passive.current_charges <= 0:
+				passives_to_remove.append(passive)
+	
+	for passive in passives_to_remove:
+		remove_passive(passive)
+	
+	# 🆕 Эмитим сигнал для обновления UI
+	for passive in active_passives:
+		if passive.charge_type == DataManager.PassiveChargeType.TURN_BASED and passive.trigger == DataManager.PassiveTrigger.ON_TURN_END:
+			SignalManager.passive_changed.emit(self, passive.id)
+	
+	# ✅ ШАГ 3: Теперь обрабатываем статусы
+	var statuses_to_remove = []
 	for status_id in active_statuses.keys():
 		var data = active_statuses[status_id]
 		var status = data["resource"]
@@ -475,14 +556,6 @@ func process_end_of_turn():
 		remove_status(status_id)
 	
 	_update_immunity_timer()
-	
-	for passive in active_passives:
-		if passive.charge_type == DataManager.PassiveChargeType.TURN_BASED and passive.current_charges > 0:
-			passive.current_charges -= 1
-			if passive.current_charges <= 0:
-				remove_passive(passive)
-	
-	_process_passive_triggers(DataManager.PassiveTrigger.ON_TURN_END)
 
 ## ============================================================
 ## ВЗРЫВ ГОРЕНИЯ
@@ -566,13 +639,36 @@ func process_start_of_turn():
 	if has_status(DataManager.Status.FROZEN):
 		return
 	
-	var statuses_to_remove = []
+	# ✅ ШАГ 1: Сначала пассивки ON_TURN_START
+	await _process_passive_triggers(DataManager.PassiveTrigger.ON_TURN_START)
 	
-	# Копируем ключи, чтобы избежать изменения словаря во время итерации
+	# 🆕 УМЕНЬШАЕМ ЗАРЯДЫ TURN_BASED ПАССИВОК С ТРИГГЕРОМ ON_TURN_START
+	var passives_to_remove = []
+	for passive in active_passives:
+		if passive.charge_type == DataManager.PassiveChargeType.TURN_BASED and passive.trigger == DataManager.PassiveTrigger.ON_TURN_START and passive.current_charges > 0:
+			passive.current_charges -= 1
+			if passive.current_charges <= 0:
+				passives_to_remove.append(passive)
+	
+	for passive in passives_to_remove:
+		remove_passive(passive)
+	
+	# 🆕 Эмитим сигнал для обновления UI
+	for passive in active_passives:
+		if passive.charge_type == DataManager.PassiveChargeType.TURN_BASED and passive.trigger == DataManager.PassiveTrigger.ON_TURN_START:
+			SignalManager.passive_changed.emit(self, passive.id)
+	
+	for passive in passives_to_remove:
+		remove_passive(passive)
+	
+	# ✅ ШАГ 3: Теперь обрабатываем статусы
+	var statuses_to_remove = []
 	var status_keys = active_statuses.keys()
 	
 	for status_id in status_keys:
-		# Проверяем, существует ли статус (может быть удалён)
+		var enemy : EnemyInstance = self as EnemyInstance
+		if enemy and not enemy.is_alive():
+			return
 		if not active_statuses.has(status_id):
 			continue
 		
@@ -580,10 +676,24 @@ func process_start_of_turn():
 		var status = data["resource"]
 		
 		if status.is_ticking:
+			# 🆕 Анимируем иконку статуса у врага
+			if self is EnemyInstance:
+				var enemy_ui = get_node("EnemyUI") as EnemyUI
+				if enemy_ui:
+					var icon = enemy_ui.find_status_icon(status_id)
+					if icon:
+						icon.animate()
+			elif self is PenitentStats:
+				var portrait = GameTestManager.get_player_portrait()
+				if portrait:
+					var icon = portrait.find_status_icon(status_id)
+					if icon:
+						icon.animate()
 			if status.tick_effect:
 				var tick_effect = status.tick_effect.duplicate_for_instance()
 				var caster = data.get("caster", null)
-				
+				if not is_instance_valid(caster):
+					caster = null
 				var tick_value = status.get_tick_value(data.stacks, caster)
 				
 				match tick_effect.category:
@@ -598,7 +708,8 @@ func process_start_of_turn():
 					_:
 						tick_effect.base_value = tick_value
 				
-				EffectExecutor.execute(tick_effect, self, [self])
+				EffectExecutor.execute(tick_effect, caster, [self])
+				await Engine.get_main_loop().create_timer(DataManager.STATUS_TRIGGER_DELAY).timeout
 			
 			if status.id == DataManager.Status.BURN and data.stacks >= DataManager.BURN_THRESHOLD_STACKS:
 				_trigger_burn_explosion(data.stacks)

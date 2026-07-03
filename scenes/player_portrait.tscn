@@ -66,9 +66,12 @@ grow_vertical = 2
 custom_minimum_size = Vector2(0, 10)
 layout_mode = 2
 
-[node name="StatusContainer" type="HBoxContainer" parent="VBoxContainer"]
+[node name="StatusContainer" type="GridContainer" parent="VBoxContainer"]
 custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
+theme_override_constants/h_separation = 0
+theme_override_constants/v_separation = 2
+columns = 9
 
 [node name="Filler2" type="Control" parent="VBoxContainer"]
 custom_minimum_size = Vector2(0, 10)

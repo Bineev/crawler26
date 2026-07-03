@@ -72,11 +72,23 @@ vertical_alignment = 1
 [node name="BottomPanel" type="HBoxContainer" parent="EnemyUI/VBoxContainer"]
 layout_mode = 2
 
-[node name="StatusContainer" type="HBoxContainer" parent="EnemyUI/VBoxContainer/BottomPanel"]
+[node name="StatusContainer" type="GridContainer" parent="EnemyUI/VBoxContainer/BottomPanel"]
 layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/h_separation = 1
+theme_override_constants/v_separation = 1
+columns = 4
 
-[node name="PassiveContainer" type="HBoxContainer" parent="EnemyUI/VBoxContainer/BottomPanel"]
+[node name="Filler" type="Control" parent="EnemyUI/VBoxContainer/BottomPanel"]
 layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="PassiveContainer" type="GridContainer" parent="EnemyUI/VBoxContainer/BottomPanel"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/h_separation = 1
+theme_override_constants/v_separation = 1
+columns = 2
 
 [node name="ClickArea" type="Area2D" parent="EnemyUI"]
 

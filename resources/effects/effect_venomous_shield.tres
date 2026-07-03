@@ -6,7 +6,6 @@
 [resource]
 script = ExtResource("1_v1gpp")
 category = 4
-target = 4
 status = ExtResource("2_v55p7")
 duration = 2
 metadata/_custom_type_script = "uid://cmra25r1r3ivt"

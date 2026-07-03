@@ -9,8 +9,8 @@ class_name EnemyUI
 @onready var intents_container: HBoxContainer = $VBoxContainer/IntentsContainer
 @onready var health_bar: ProgressBar = $VBoxContainer/HealthBar
 @onready var health_label: Label = $VBoxContainer/HealthBar/HealthLabel
-@onready var status_container: HBoxContainer = $VBoxContainer/BottomPanel/StatusContainer
-@onready var passive_container: HBoxContainer = $VBoxContainer/BottomPanel/PassiveContainer
+@onready var status_container: GridContainer = $VBoxContainer/BottomPanel/StatusContainer
+@onready var passive_container: GridContainer = $VBoxContainer/BottomPanel/PassiveContainer
 @onready var living_container: Control = $VBoxContainer/SpriteContainer/LivingContainer
 @onready var click_area: Area2D = $ClickArea
 @onready var collision_shape: CollisionShape2D = $ClickArea/CollisionShape2D
@@ -18,6 +18,9 @@ class_name EnemyUI
 @onready var sprite_container: CenterContainer = $VBoxContainer/SpriteContainer
 @onready var highlight_sprite: TextureRect = $VBoxContainer/SpriteContainer/HighlightSprite
 
+
+const STATUS_ICON_SCENE = preload("res://scenes/status_icon.tscn")
+const PASSIVE_ICON_SCENE = preload("res://scenes/passive_icon.tscn")
 
 var enemy_instance: EnemyInstance = null
 var breath_tween: Tween = null
@@ -72,6 +75,7 @@ func setup(enemy: EnemyInstance):
 	SignalManager.enemy_status_changed.connect(_on_enemy_status_changed)
 	SignalManager.enemy_intent_changed.connect(_on_enemy_intent_changed)
 	SignalManager.passive_removed.connect(_on_passive_changed)  # ← проверь, что есть
+	SignalManager.passive_changed.connect(_on_passive_changed)  # 🆕
 	
 
 func _add_aura_effect():
@@ -312,14 +316,11 @@ func update_statuses():
 		return
 	
 	for status_data in enemy_instance.get_active_statuses_for_ui():
-		var tooltip = "%s: %d" % [status_data["name"], status_data["stacks"]]
-		if status_data.get("duration", 0) > 0:
-			tooltip += " (осталось: %d)" % status_data["duration"]
-		var icon = _create_icon(status_data["icon"], 32, tooltip)
-		DataManager.apply_shader_to_icon(icon, "res://shaders/highlight_enemy.gdshader", {'hover_intensity' : 1.0})
-		#DataManager.apply_shader_overlay(icon, "res://shaders/horror_shader.gdshader")
+		var icon = STATUS_ICON_SCENE.instantiate() as StatusIcon
 		status_container.add_child(icon)
-
+		icon.setup(status_data)
+		icon.setup(status_data, DataManager.COLOR_MOLE_TUNNELS_ART_BG_LIGHT2)  # тёмный для врагов
+		#DataManager.apply_shader_to_icon(icon.icon, "res://shaders/highlight_enemy.gdshader", {'hover_intensity' : 1.0})
 
 func update_passives():
 	if not passive_container:
@@ -332,11 +333,10 @@ func update_passives():
 		return
 	
 	for passive_data in enemy_instance.get_active_passives_for_ui():
-		var tooltip = "%s\n%s" % [passive_data["name"], passive_data["description"]]
-		var icon = _create_icon(passive_data["icon"], 32, tooltip)
-		DataManager.apply_shader_to_icon(icon, "res://shaders/highlight_enemy.gdshader", {'hover_intensity' : 1.0})
-		#DataManager.apply_shader_overlay(icon, "res://shaders/horror_shader.gdshader")
+		var icon = PASSIVE_ICON_SCENE.instantiate() as PassiveIcon
 		passive_container.add_child(icon)
+		icon.setup(passive_data, DataManager.COLOR_MOLE_TUNNELS_ART_BG_LIGHT2)  # тёмный для врагов)
+		#DataManager.apply_shader_to_icon(icon.icon, "res://shaders/highlight_enemy.gdshader", {'hover_intensity' : 1.0})
 
 
 func _create_icon(texture: Texture2D, size: int, tooltip: String) -> TextureRect:
@@ -378,6 +378,7 @@ func _exit_tree():
 	SignalManager.get_hit.disconnect(_on_get_hit)
 	SignalManager.enemy_health_changed.disconnect(_on_enemy_health_changed)
 	SignalManager.enemy_status_changed.disconnect(_on_enemy_status_changed)
+	SignalManager.passive_changed.disconnect(_on_passive_changed)  # 🆕
 
 
 func set_enemy_size():
@@ -877,3 +878,16 @@ func push_back():
 	await tween.finished
 	
 	_is_pushing = false
+
+
+func find_status_icon(status_id: int) -> StatusIcon:
+	for child in status_container.get_children():
+		if child is StatusIcon and child.status_id == status_id:
+			return child
+	return null
+
+func find_passive_icon(passive_id: int) -> PassiveIcon:
+	for child in passive_container.get_children():
+		if child is PassiveIcon and child.passive_id == passive_id:
+			return child
+	return null

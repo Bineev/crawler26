@@ -10,6 +10,6 @@ script = ExtResource("3_anw7l")
 id = 2
 name_key = "passive_wrath_name"
 description_key = "passive_wrath_desc"
-trigger = 6
+trigger = 5
 effects = Array[ExtResource("1_87o0r")]([ExtResource("2_anw7l")])
 metadata/_custom_type_script = "uid://br4ase11y58nd"

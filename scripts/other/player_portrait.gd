@@ -2,9 +2,12 @@
 extends Control
 class_name PlayerPortrait
 
+const STATUS_ICON_SCENE = preload("res://scenes/status_icon.tscn")
+const PASSIVE_ICON_SCENE = preload("res://scenes/passive_icon.tscn")
+
 var vbox: VBoxContainer = null
 var portrait_texture: TextureRect = null
-var status_container: HBoxContainer = null
+var status_container: GridContainer = null
 var health_bar: ProgressBar = null
 var health_label: Label = null
 var atonement_bar: ProgressBar = null
@@ -268,7 +271,6 @@ func _update_icons():
 	if not status_container:
 		return
 	
-	# Очищаем контейнер
 	for child in status_container.get_children():
 		child.queue_free()
 	
@@ -278,17 +280,37 @@ func _update_icons():
 	# Добавляем статусы
 	for status_id in player_stats.active_statuses.keys():
 		var status_data = player_stats.active_statuses[status_id]
-		var icon = DataManager.get_status_icon(status_id)
-		if icon:
-			var icon_rect = _create_icon(icon, "%s: %d" % [DataManager.get_status_name(status_id), status_data.stacks])
-			status_container.add_child(icon_rect)
+		var status_resource = status_data["resource"]
+		
+		var icon_data = {
+			"status_id": status_id,
+			"icon": DataManager.get_status_icon(status_id),
+			"stacks": status_data.stacks,
+			"duration": status_data.duration,
+			"name": DataManager.get_status_name(status_id)
+		}
+		
+		var icon = STATUS_ICON_SCENE.instantiate() as StatusIcon
+		status_container.add_child(icon)
+		icon.setup(icon_data, DataManager.COLOR_MOLE_TUNNELS_ART_BG_LIGHT, self)  # светлый для игрока
+		#DataManager.apply_shader_to_icon(icon.icon, "res://shaders/highlight_enemy.gdshader", {'hover_intensity' : 1.0})
+		DataManager.apply_shader_overlay(icon.icon, "res://shaders/horror_shader.gdshader", {})
 	
 	# Добавляем пассивки
 	for passive in player_stats.active_passives:
-		var icon = DataManager.get_passive_icon(passive.id)
-		if icon:
-			var icon_rect = _create_icon(icon, passive.get_localized_name())
-			status_container.add_child(icon_rect)
+		var icon_data = {
+			"passive_id": passive.id,
+			"icon": DataManager.get_passive_icon(passive.id),
+			"name": passive.get_localized_name(),
+			"description": passive.get_localized_description(),
+			"charges": passive.current_charges if passive.has_charges() else 0
+		}
+		
+		var icon = PASSIVE_ICON_SCENE.instantiate() as PassiveIcon
+		status_container.add_child(icon)
+		icon.setup(icon_data, DataManager.COLOR_MOLE_TUNNELS_ART_BG_LIGHT, self)  # светлый для игрока
+		#DataManager.apply_shader_to_icon(icon.icon, "res://shaders/highlight_enemy.gdshader", {'hover_intensity' : 1.0})
+		DataManager.apply_shader_overlay(icon.icon, "res://shaders/horror_shader.gdshader", {})
 
 
 func _create_icon(texture: Texture2D, tooltip: String) -> TextureRect:
@@ -506,3 +528,17 @@ func _on_death_animation_finished(death_material: ShaderMaterial, original_mater
 	
 	# Сигнал о смерти игрока
 	SignalManager.player_death_animation_finished.emit()
+
+
+func find_status_icon(status_id: int) -> StatusIcon:
+	for child in status_container.get_children():
+		if child is StatusIcon and child.status_id == status_id:
+			return child
+	return null
+
+
+func find_passive_icon(passive_id: int) -> PassiveIcon:
+	for child in status_container.get_children():
+		if child is PassiveIcon and child.passive_id == passive_id:
+			return child
+	return null

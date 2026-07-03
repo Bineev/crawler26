@@ -11,6 +11,6 @@ name_key = "passive_regrowth_name"
 description_key = "passive_regrowth_desc"
 charge_type = 1
 starting_charges = 10
-trigger = 6
+trigger = 5
 effects = Array[ExtResource("1_vkuvm")]([ExtResource("2_bip7e")])
 metadata/_custom_type_script = "uid://br4ase11y58nd"

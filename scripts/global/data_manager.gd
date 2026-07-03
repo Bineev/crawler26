@@ -431,7 +431,7 @@ const BURN_STRENGTH_DURATION: int = 2
 const COLD_EFFECT_PERCENT_PER_STACK: float = 0.01
 const COLD_MIN_EFFECT_MULTIPLIER: float = 0.75
 #BUG
-const COLD_FREEZE_THRESHOLD: int = 3
+const COLD_FREEZE_THRESHOLD: int = 25
 const COLD_DEFAULT_DURATION: int = 5  # ← изменено с 3 на 5
 const FROZEN_DURATION: int = 1  # заморозка на 1 ход
 
@@ -513,7 +513,7 @@ const CRY_OF_DESPAIR_HEAL_TIER_3: int = 15
 
 
 const ENEMY_STEP_DELAY : float = 1
-
+const STATUS_TRIGGER_DELAY : float = 1
 ## ============================================================
 ## 3. РАЗМЕРЫ КАРТ
 ## ============================================================
@@ -528,7 +528,7 @@ const CARD_ICON_SOURCE_SIZE: int = 64
 const CARD_SCALE_NORMAL: float = 1.0
 const CARD_SCALE_IN_HAND: float = 1
 const CARD_SCALE_HOVER: float = 1.2
-const CARD_HOVER_RAISE: int = 180  # высота подъёма при наведении
+const CARD_HOVER_RAISE: int = 130  # высота подъёма при наведении
 const CARD_HOVER_CENTER_FORCE: float = 0.02 # сила притяжения к центру (0-1)
 const CARD_HAND_WIDTH: int = int(CARD_BASE_WIDTH * CARD_SCALE_IN_HAND)
 const CARD_HAND_HEIGHT: int = int(CARD_BASE_HEIGHT * CARD_SCALE_IN_HAND)
@@ -633,14 +633,14 @@ const ROOM_WIDTH: int = 1024
 const ROOM_HEIGHT: int = 800
 const ROOM_CENTER_X: int = ROOM_WIDTH / 2  # 512
 const ROOM_CENTER_Y: int = ROOM_HEIGHT / 2  # 400
-const ROOM_POSITION: Vector2 = Vector2(448, -80)
+const ROOM_POSITION: Vector2 = Vector2(448, 0)
 const END_BUTTON_POSITION: Vector2 = Vector2(1600, 860)
 ## ============================================================
 ## РАЗМЕРЫ ВРАГОВ
 ## ============================================================
 
 const ENEMY_SPACING: int = 40
-const ENEMY_Y_OFFSET_FROM_BOTTOM: int = 150  # отступ от нижней границы
+const ENEMY_Y_OFFSET_FROM_BOTTOM: int = 200  # отступ от нижней границы
 
 
 const sound_delay: int = 50  # задержка между одинаковыми звуками в мс

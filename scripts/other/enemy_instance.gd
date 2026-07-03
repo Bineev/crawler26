@@ -210,11 +210,12 @@ func is_alive() -> bool:
 
 func get_active_statuses_for_ui() -> Array[Dictionary]:
 	var result: Array[Dictionary] = []
-	for status_id in active_statuses.keys():  # ← self.active_statuses
+	for status_id in active_statuses.keys():
 		var status_data = active_statuses[status_id]
 		var icon = DataManager.get_status_icon(status_id)
 		if icon:
 			result.append({
+				"status_id": status_id,  # ← добавляем
 				"icon": icon,
 				"stacks": status_data.stacks,
 				"duration": status_data.duration,
@@ -222,16 +223,17 @@ func get_active_statuses_for_ui() -> Array[Dictionary]:
 			})
 	return result
 
-
 func get_active_passives_for_ui() -> Array[Dictionary]:
 	var result: Array[Dictionary] = []
-	for passive in active_passives:  # ← self.active_passives
+	for passive in active_passives:
 		var icon = DataManager.get_passive_icon(passive.id)
 		if icon:
 			result.append({
+				"passive_id": passive.id,  # ← добавляем
 				"icon": icon,
 				"name": passive.get_localized_name(),
-				"description": passive.get_localized_description()
+				"description": passive.get_localized_description(),
+				"charges": passive.current_charges if passive.has_charges() else 0
 			})
 	return result
 

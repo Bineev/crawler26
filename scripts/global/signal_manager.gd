@@ -101,3 +101,5 @@ signal card_burned(card_data: CardData)
 signal frozen_applied(target: Node)
 
 signal player_death_animation_finished()
+
+signal passive_changed(target: Node, passive_id: int)

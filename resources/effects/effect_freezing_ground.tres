@@ -6,7 +6,6 @@
 [resource]
 script = ExtResource("1_di00n")
 category = 4
-target = 2
 status = ExtResource("2_sffj8")
 value = 5
 duration = 2
