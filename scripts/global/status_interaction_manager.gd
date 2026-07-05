@@ -44,18 +44,22 @@ func can_apply(target, new_status: DataManager.Status) -> bool:
 # StatusInteractionManager.gd
 
 func handle_interaction(target, new_status: DataManager.Status, stacks: int, duration: int, status_resource: StatusResource, caster: CharacterStats = null):
-	# 1. Контр-статусы (Burn ↔ Cold)
-	if new_status == DataManager.Status.BURN or new_status == DataManager.Status.COLD:
-		_handle_burn_cold(target, new_status, stacks, duration)
-		return
-	
-	# 2. Получаем последний статус
+	# 1. Получаем последний статус
 	var last_status = target._get_last_status(new_status)
+	
+	# 2. Проверяем контр-статусы (Burn ↔ Cold) — ТОЛЬКО если есть противоположный статус
+	if new_status == DataManager.Status.BURN or new_status == DataManager.Status.COLD:
+		var opposite = DataManager.Status.COLD if new_status == DataManager.Status.BURN else DataManager.Status.BURN
+		if target.has_status(opposite):
+			_handle_burn_cold(target, new_status, stacks, duration)
+			return
+	
+	# 3. Если нет последнего статуса — просто накладываем
 	if last_status == -1:
 		target._add_status_direct(status_resource, stacks, duration, caster)
 		return
 	
-	# 3. Обрабатываем взаимодействие по паре
+	# 4. Обрабатываем взаимодействие по паре
 	# Bleed + Poison → Мука (Bleed уже есть, Poison новый)
 	if last_status == DataManager.Status.BLEED and new_status == DataManager.Status.POISON:
 		_handle_bleed_poison_flour(target, stacks, duration)
@@ -69,14 +73,19 @@ func handle_interaction(target, new_status: DataManager.Status, stacks: int, dur
 	# Poison + Burn → Химический взрыв
 	if (last_status == DataManager.Status.POISON and new_status == DataManager.Status.BURN) or \
 	   (last_status == DataManager.Status.BURN and new_status == DataManager.Status.POISON):
-		_handle_poison_burn_explosion(target)
+		# Передаём стаки обоих статусов
+		_handle_poison_burn_explosion(target, last_status, new_status, stacks)
 		return
 	
 	# Bleed + Cold → Гангрена
 	if (last_status == DataManager.Status.BLEED and new_status == DataManager.Status.COLD) or \
 	   (last_status == DataManager.Status.COLD and new_status == DataManager.Status.BLEED):
-		_handle_bleed_cold_gangrene(target)
+		# Передаём стаки и длительности обоих статусов
+		_handle_bleed_cold_gangrene(target, new_status, stacks, duration)
 		return
+	
+	# 5. Если ни одно взаимодействие не подошло — просто накладываем
+	target._add_status_direct(status_resource, stacks, duration, caster)
 
 
 # ===== BURN + COLD (контр-статусы) =====
@@ -110,44 +119,64 @@ func _handle_burn_cold(target, new_status: DataManager.Status, stacks: int, dura
 
 
 # ===== POISON + BURN (Химический взрыв) =====
-func _handle_poison_burn_explosion(target):
-	var poison_stacks = target.get_status_stacks(DataManager.Status.POISON)
-	var poison_data = target.active_statuses.get(DataManager.Status.POISON)
-	var poison_duration = poison_data.duration if poison_data else 0
-	var damage = poison_stacks * poison_duration
+func _handle_poison_burn_explosion(target, status_a: DataManager.Status, status_b: DataManager.Status, new_stacks: int):
+	# Получаем стаки существующего статуса
+	var existing_stacks = target.get_status_stacks(status_a)
+	var poison_stacks = existing_stacks if status_a == DataManager.Status.POISON or status_b == DataManager.Status.POISON else target.get_status_stacks(DataManager.Status.POISON)
+	var poison_duration = target.active_statuses.get(DataManager.Status.POISON, {}).get("duration", 0)
 	
 	# Удаляем оба статуса
 	target.remove_status(DataManager.Status.POISON)
 	target.remove_status(DataManager.Status.BURN)
 	
-	# Наносим урон
+	var damage = poison_stacks * poison_duration
 	target.take_damage(damage, true)
 	SignalManager.log_message.emit("Химический взрыв! %d урона." % damage)
 
 
 # ===== BLEED + COLD (Гангрена) =====
-func _handle_bleed_cold_gangrene(target):
+func _handle_bleed_cold_gangrene(target, new_status: DataManager.Status, new_stacks: int, new_duration: int):
+	# Берём стаки и длительность BLEED
 	var bleed_stacks = target.get_status_stacks(DataManager.Status.BLEED)
-	var cold_stacks = target.get_status_stacks(DataManager.Status.COLD)
+	var bleed_duration = target.active_statuses.get(DataManager.Status.BLEED, {}).get("duration", 0)
 	
-	var bleed_data = target.active_statuses.get(DataManager.Status.BLEED)
-	var cold_data = target.active_statuses.get(DataManager.Status.COLD)
-	var bleed_duration = bleed_data.duration if bleed_data else 0
-	var cold_duration = cold_data.duration if cold_data else 0
+	# Берём стаки и длительность COLD
+	var cold_stacks = target.get_status_stacks(DataManager.Status.COLD)
+	var cold_duration = target.active_statuses.get(DataManager.Status.COLD, {}).get("duration", 0)
+	
+	# Если новый статус — BLEED, используем переданные значения
+	if new_status == DataManager.Status.BLEED:
+		bleed_stacks = new_stacks
+		bleed_duration = new_duration
+	
+	# Если новый статус — COLD, используем переданные значения
+	if new_status == DataManager.Status.COLD:
+		cold_stacks = new_stacks
+		cold_duration = new_duration
 	
 	var gangrene_stacks = bleed_stacks * cold_stacks * DataManager.GANGRENE_MULTIPLIER
 	var gangrene_duration = floor((bleed_duration + cold_duration) / DataManager.GANGRENE_DURATION_DIVIDER)
 	
-	# Удаляем оба статуса
 	target.remove_status(DataManager.Status.BLEED)
 	target.remove_status(DataManager.Status.COLD)
 	
-	# Создаём Гангрену
 	var gangrene_status = DataManager.get_status_resource(DataManager.Status.GANGRENE)
 	if gangrene_status:
-		target._add_status_direct(gangrene_status, gangrene_stacks, gangrene_duration, target)
+		# 🆕 Настраиваем статус перед наложением
+		var tick_effect = EffectEntry.new()
+		tick_effect.category = DataManager.EffectCategory.DAMAGE
+		tick_effect.base_value = gangrene_stacks  # урон = количество стаков
+		tick_effect.target = DataManager.EffectTarget.SELF
+		
+		# Копируем ресурс и переопределяем параметры
+		var status_copy = gangrene_status.duplicate_for_instance()
+		status_copy.is_ticking = true
+		status_copy.tick_interval = gangrene_duration  # тикнет один раз в конце длительности
+		status_copy.tick_effect = tick_effect
+		
+		# Накладываем настроенный статус
+		target._add_status_direct(status_copy, gangrene_stacks, gangrene_duration, target)
 		SignalManager.log_message.emit("Гангрена! %d стаков на %d ходов." % [gangrene_stacks, gangrene_duration])
-
 
 # ===== ВЗАИМОДЕЙСТВИЯ СТАТУСОВ =====
 
@@ -182,16 +211,7 @@ func _handle_poison_bleed_agony(target, stacks: int, duration: int):
 
 
 func has_interaction(target, new_status: DataManager.Status) -> bool:
-	# Если новый статус — Burn или Cold, всегда есть взаимодействие
-	if new_status == DataManager.Status.BURN or new_status == DataManager.Status.COLD:
-		return target.has_status(DataManager.Status.BURN if new_status == DataManager.Status.COLD else DataManager.Status.COLD)
-	
-	# Получаем последний статус
-	var last_status = target._get_last_status(new_status)
-	if last_status == -1:
-		return false
-	
-	# Проверяем известные пары взаимодействий
+	# Проверяем пары взаимодействий
 	var pairs = [
 		[DataManager.Status.BLEED, DataManager.Status.POISON],
 		[DataManager.Status.POISON, DataManager.Status.BLEED],
@@ -200,6 +220,17 @@ func has_interaction(target, new_status: DataManager.Status) -> bool:
 		[DataManager.Status.BLEED, DataManager.Status.COLD],
 		[DataManager.Status.COLD, DataManager.Status.BLEED],
 	]
+	
+	# Специальная проверка для Burn/Cold — они всегда взаимодействуют друг с другом
+	if new_status == DataManager.Status.BURN or new_status == DataManager.Status.COLD:
+		var opposite = DataManager.Status.COLD if new_status == DataManager.Status.BURN else DataManager.Status.BURN
+		if target.has_status(opposite):
+			return true
+	
+	# Получаем последний статус
+	var last_status = target._get_last_status(new_status)
+	if last_status == -1:
+		return false
 	
 	for pair in pairs:
 		if last_status == pair[0] and new_status == pair[1]:

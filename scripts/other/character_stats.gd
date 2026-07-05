@@ -233,7 +233,7 @@ func on_take_damage_gain_resource(amount: int):
 ## УПРАВЛЕНИЕ СТАТУСАМИ
 ## ============================================================
 
-func add_status(status: StatusResource, value: int, duration: int, caster: CharacterStats = null, passive_context: PassiveResource = null):
+func add_status(status: StatusResource, value: int, duration: int, caster: CharacterStats = null, passive_context: PassiveResource = null, from_passive: bool = false):
 	if not status:
 		return
 	
@@ -262,10 +262,10 @@ func add_status(status: StatusResource, value: int, duration: int, caster: Chara
 		StatusInteractionManager.handle_interaction(self, status_id, stacks, dur, status, caster)
 	else:
 		# Нет взаимодействия — добавляем статус напрямую
-		_add_status_direct(status, stacks, dur, caster)
+		_add_status_direct(status, stacks, dur, caster, from_passive)
 
 
-func _add_status_direct(status: StatusResource, stacks: int, duration: int, caster: CharacterStats = null):
+func _add_status_direct(status: StatusResource, stacks: int, duration: int, caster: CharacterStats = null, from_passive: bool = false):
 	var status_id = status.id
 	var existing = active_statuses.get(status_id)
 	
@@ -273,11 +273,19 @@ func _add_status_direct(status: StatusResource, stacks: int, duration: int, cast
 		existing.stacks += stacks
 		existing.duration = max(existing.duration, duration)
 	else:
+		# 🆕 Определяем, нужно ли пропустить первый тик
+		var skip_first = false
+		if not from_passive:
+			skip_first = (caster == self and BattleManager.is_player_turn() and self is PenitentStats) or \
+						 (caster == self and BattleManager.is_enemy_turn() and self is EnemyInstance)
+		
 		active_statuses[status_id] = {
 			"stacks": stacks,
 			"duration": duration,
 			"resource": status,
-			"caster": caster if caster else self
+			"caster": caster if caster else self,
+			"tick_counter": 0,  # 🆕 счётчик тиков
+			"skip_first_tick": skip_first  # 🆕 флаг
 		}
 		status_application_order.append(status_id)
 		_apply_status_modifiers(status)
@@ -299,6 +307,8 @@ func _add_status_direct(status: StatusResource, stacks: int, duration: int, cast
 	SignalManager.status_added.emit(self, status_id, stacks, duration)
 	if self is EnemyInstance:
 		SignalManager.enemy_status_changed.emit(self)
+	elif self is PenitentStats:
+		SignalManager.player_status_changed.emit(self)
 	SignalManager.log_message.emit("Наложен %s: %d стаков на %d ходов" % [status.get_localized_name(), stacks, duration])
 
 
@@ -316,6 +326,8 @@ func remove_status(status_id: DataManager.Status):
 	SignalManager.status_removed.emit(self, status_id)
 	if self is EnemyInstance:
 		SignalManager.enemy_status_changed.emit(self)
+	elif self is PenitentStats:
+		SignalManager.player_status_changed.emit(self)
 
 func has_status(status_id: DataManager.Status) -> bool:
 	return active_statuses.has(status_id)
@@ -334,6 +346,8 @@ func modify_status_stacks(status_id: DataManager.Status, amount: int):
 
 	if self is EnemyInstance:
 		SignalManager.enemy_status_changed.emit(self)
+	elif self is PenitentStats:
+		SignalManager.player_status_changed.emit(self)
 
 
 func _apply_status_modifiers(status: StatusResource):
@@ -407,6 +421,7 @@ func apply_passive(passive: PassiveResource, duration: int = -1):
 				modifiers[mod.stat] = modifiers.get(mod.stat, 0.0) + mod.value
 	
 	SignalManager.passive_added.emit(self, instance.id)
+	SignalManager.player_status_changed.emit(self)
 
 
 func remove_passive(passive: PassiveResource):
@@ -536,26 +551,11 @@ func process_end_of_turn():
 		if passive.charge_type == DataManager.PassiveChargeType.TURN_BASED and passive.trigger == DataManager.PassiveTrigger.ON_TURN_END:
 			SignalManager.passive_changed.emit(self, passive.id)
 	
-	# ✅ ШАГ 3: Теперь обрабатываем статусы
-	var statuses_to_remove = []
-	for status_id in active_statuses.keys():
-		var data = active_statuses[status_id]
-		var status = data["resource"]
-		
-		# SHIELD не уменьшается в конце хода (снимается в начале)
-		if status.id == DataManager.Status.SHIELD:
-			continue
-		
-		# Уменьшаем длительность
-		data.duration -= 1
-		
-		if data.duration <= 0:
-			statuses_to_remove.append(status_id)
-	
-	for status_id in statuses_to_remove:
-		remove_status(status_id)
-	
 	_update_immunity_timer()
+	if self is EnemyInstance:
+		SignalManager.enemy_status_changed.emit(self)
+	elif self is PenitentStats:
+		SignalManager.player_status_changed.emit(self)
 
 ## ============================================================
 ## ВЗРЫВ ГОРЕНИЯ
@@ -676,20 +676,31 @@ func process_start_of_turn():
 		var status = data["resource"]
 		
 		if status.is_ticking:
-			# 🆕 Анимируем иконку статуса у врага
-			if self is EnemyInstance:
-				var enemy_ui = get_node("EnemyUI") as EnemyUI
-				if enemy_ui:
-					var icon = enemy_ui.find_status_icon(status_id)
-					if icon:
-						icon.animate()
-			elif self is PenitentStats:
-				var portrait = GameTestManager.get_player_portrait()
-				if portrait:
-					var icon = portrait.find_status_icon(status_id)
-					if icon:
-						icon.animate()
-			if status.tick_effect:
+			# 🆕 Проверяем, настал ли момент для тика
+			var tick_counter = data.get("tick_counter", 0)
+			var tick_interval = status.tick_interval if status.tick_interval > 0 else 1
+			# Увеличиваем счётчик
+			tick_counter += 1
+			data["tick_counter"] = tick_counter
+			
+			# Проверяем, настал ли момент для тика
+			var should_tick = tick_counter >= tick_interval
+			if should_tick:
+				# Сбрасываем счётчик
+				data["tick_counter"] = 0
+				if self is EnemyInstance:
+					var enemy_ui = get_node("EnemyUI") as EnemyUI
+					if enemy_ui:
+						var icon = enemy_ui.find_status_icon(status_id)
+						if icon:
+							icon.animate()
+				elif self is PenitentStats:
+					var portrait = GameTestManager.get_player_portrait()
+					if portrait:
+						var icon = portrait.find_status_icon(status_id)
+						if icon:
+							icon.animate()
+			if status.tick_effect and should_tick:
 				var tick_effect = status.tick_effect.duplicate_for_instance()
 				var caster = data.get("caster", null)
 				if not is_instance_valid(caster):
@@ -714,15 +725,25 @@ func process_start_of_turn():
 			if status.id == DataManager.Status.BURN and data.stacks >= DataManager.BURN_THRESHOLD_STACKS:
 				_trigger_burn_explosion(data.stacks)
 				statuses_to_remove.append(status_id)
+			# 🆕 Уменьшаем длительность (но не для SHIELD)
+			if status.id != DataManager.Status.SHIELD:
+				data.duration -= 1
+			
+			if data.duration <= 0:
+				statuses_to_remove.append(status_id)
 	
 	# Удаляем статусы после итерации
 	for status_id in statuses_to_remove:
 		if active_statuses.has(status_id):
 			remove_status(status_id)
-	
 	# Снимаем SHIELD в самом конце (после всех тиков)
 	if has_status(DataManager.Status.SHIELD):
 		remove_status(DataManager.Status.SHIELD)
+		
+	if self is EnemyInstance:
+		SignalManager.enemy_status_changed.emit(self)
+	elif self is PenitentStats:
+		SignalManager.player_status_changed.emit(self)
 
 
 func trigger_poison_immediately():
@@ -775,16 +796,30 @@ func thaw():
 	SignalManager.log_message.emit("%s оттаял! Статусы возобновлены." % get_display_name())
 
 
-func _get_last_status(exclude_status: DataManager.Status = -1) -> int:
-	var order = status_application_order.duplicate()
-	if exclude_status != -1:
-		order.erase(exclude_status)
-	
-	if order.is_empty():
-		return -1
-	
-	return order[-1]
+#func _get_last_status(exclude_status: DataManager.Status = -1) -> int:
+	#var order = status_application_order.duplicate()
+	#if exclude_status != -1:
+		#order.erase(exclude_status)
+	#
+	#if order.is_empty():
+		#return -1
+	#
+	#return order[-1]
 
+
+func _get_last_status(new_status: DataManager.Status) -> int:
+	var order = status_application_order.duplicate()
+	
+	# Идём с конца массива (от последнего наложенного статуса)
+	for i in range(order.size() - 1, -1, -1):
+		var status_id = order[i]
+		
+		# Проверяем, может ли этот статус взаимодействовать с новым
+		if _can_interact(status_id, new_status):
+			return status_id
+	
+	# Если ни один статус не может взаимодействовать
+	return -1
 
 func add_status_by_id(status_id: DataManager.Status, stacks: int, duration: int):
 	var status_resource = DataManager.get_status_resource(status_id)
@@ -802,5 +837,29 @@ func clear_all_statuses():
 	var statuses = active_statuses.keys()
 	for status_id in statuses:
 		remove_status(status_id)
+	var passives = active_passives
+	for passive in passives:
+		remove_passive(passive)
 	
 	status_application_order.clear()
+
+
+func _can_interact(status_a: DataManager.Status, status_b: DataManager.Status) -> bool:
+	# Список всех возможных пар взаимодействий
+	var interaction_pairs = [
+		[DataManager.Status.BLEED, DataManager.Status.POISON],
+		[DataManager.Status.POISON, DataManager.Status.BLEED],
+		[DataManager.Status.POISON, DataManager.Status.BURN],
+		[DataManager.Status.BURN, DataManager.Status.POISON],
+		[DataManager.Status.BLEED, DataManager.Status.COLD],
+		[DataManager.Status.COLD, DataManager.Status.BLEED],
+		[DataManager.Status.BURN, DataManager.Status.COLD],
+		[DataManager.Status.COLD, DataManager.Status.BURN],
+	]
+	
+	for pair in interaction_pairs:
+		if (status_a == pair[0] and status_b == pair[1]) or \
+		   (status_a == pair[1] and status_b == pair[0]):
+			return true
+	
+	return false

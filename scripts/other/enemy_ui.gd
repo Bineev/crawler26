@@ -76,6 +76,7 @@ func setup(enemy: EnemyInstance):
 	SignalManager.enemy_intent_changed.connect(_on_enemy_intent_changed)
 	SignalManager.passive_removed.connect(_on_passive_changed)  # ← проверь, что есть
 	SignalManager.passive_changed.connect(_on_passive_changed)  # 🆕
+	SignalManager.passive_added.connect(_on_passive_changed)  # 🆕
 	
 
 func _add_aura_effect():
@@ -698,7 +699,7 @@ func play_delay(duration: float = 0.3):
 	await get_tree().create_timer(duration).timeout
 
 
-func _on_passive_changed(target: Node, passive_id: int):
+func _on_passive_changed(target: Node, passive_id: int = 999):
 	print("_on_passive_changed: target=", target, " passive_id=", passive_id, " enemy_instance=", enemy_instance)
 	if target == enemy_instance:
 		print("  Updating passives for enemy")

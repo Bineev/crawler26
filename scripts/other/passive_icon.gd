@@ -28,8 +28,8 @@ func setup(data: Dictionary, text_color: Color = DataManager.COLOR_PENITENT_ART_
 	icon.custom_minimum_size = Vector2(16, 16)
 	filler.custom_minimum_size = Vector2(5, 0)
 	if icon_owner is PlayerPortrait:
-		custom_minimum_size  = Vector2(32, 32)
-		icon.custom_minimum_size = Vector2(16, 16)
+		custom_minimum_size = Vector2(48, 48)
+		icon.custom_minimum_size = Vector2(32, 32)
 		filler.custom_minimum_size = Vector2(10, 0)
 	icon.expand_mode = TextureRect.EXPAND_FIT_WIDTH_PROPORTIONAL
 	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED

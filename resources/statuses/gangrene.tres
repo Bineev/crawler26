@@ -11,6 +11,7 @@ metadata/_custom_type_script = "uid://cmra25r1r3ivt"
 
 [resource]
 script = ExtResource("2_ctub7")
+id = 10
 name_key = "status_gangrene_name"
 description_key = "status_gangrene_desc"
 is_ticking = true

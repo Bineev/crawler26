@@ -103,3 +103,5 @@ signal frozen_applied(target: Node)
 signal player_death_animation_finished()
 
 signal passive_changed(target: Node, passive_id: int)
+
+signal player_status_changed(target : Node)

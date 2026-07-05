@@ -8,5 +8,6 @@ script = ExtResource("1_kwusl")
 category = 4
 target = 0
 status = ExtResource("2_l2onc")
+duration = 1
 grow_type = 1
 metadata/_custom_type_script = "uid://cmra25r1r3ivt"

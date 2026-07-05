@@ -54,16 +54,13 @@ func setup(stats: CharacterStats):
 	
 	SignalManager.health_changed.connect(_on_health_changed)
 	SignalManager.atonement_changed.connect(_on_atonement_changed)
-	SignalManager.status_added.connect(_on_icons_changed)
-	SignalManager.status_removed.connect(_on_icons_changed)
-	SignalManager.passive_added.connect(_on_icons_changed)
-	SignalManager.passive_removed.connect(_on_icons_changed)
+	SignalManager.player_status_changed.connect(_update_icons)
 	SignalManager.player_damage_dealt.connect(_on_player_damage_dealt)
 	SignalManager.player_heal_received.connect(_on_player_heal_received)
 	
 	_update_health()
 	_update_atonement()
-	_update_icons()
+	_update_icons(self)
 
 
 func _update_health():
@@ -98,7 +95,7 @@ func _update_atonement():
 	atonement_label.text = "%d/%d" % [current, max_atonement]
 
 
-func _update_statuses():
+func _update_statuses(target : Node):
 	for child in status_container.get_children():
 		child.queue_free()
 	
@@ -128,7 +125,7 @@ func _on_atonement_changed(current: int, max_atonement: int):
 
 func _on_status_changed(target: Node, status_id: int, stacks: int, duration: int):
 	if target == player_stats:
-		_update_statuses()
+		_update_statuses(self)
 
 
 func _setup_bars():
@@ -234,8 +231,7 @@ func show_floating_text(text: String, color: Color):
 func _exit_tree():
 	SignalManager.health_changed.disconnect(_on_health_changed)
 	SignalManager.atonement_changed.disconnect(_on_atonement_changed)
-	SignalManager.status_added.disconnect(_on_status_changed)
-	SignalManager.status_removed.disconnect(_on_status_changed)
+	SignalManager.player_status_changed.disconnect(_update_icons)
 	SignalManager.player_damage_dealt.disconnect(_on_player_damage_dealt)
 	SignalManager.player_heal_received.disconnect(_on_player_heal_received)
 
@@ -267,7 +263,7 @@ func _init_floating_positions():
 		var y = portrait_pos.y + portrait_size.y * (top_margin + t * (bottom_margin - top_margin))
 		floating_text_positions.append(Vector2(x, y))
 
-func _update_icons():
+func _update_icons(target : Node):
 	if not status_container:
 		return
 	
@@ -328,7 +324,7 @@ func _create_icon(texture: Texture2D, tooltip: String) -> TextureRect:
 
 func _on_icons_changed(target: Node, arg1 = null, arg2 = null, arg3 = null):
 	if target == player_stats:
-		_update_icons()
+		_update_icons(self)
 
 
 func _init_ice_texture():

@@ -16,5 +16,5 @@ static func apply(effect: EffectEntry, source, targets: Array, card_info: Dictio
 	
 	var strength_status = DataManager.get_status_resource(DataManager.Status.STRENGTH)
 	if strength_status:
-		source.add_status(strength_status, total_strength, 0, source)
+		source.add_status(strength_status, total_strength, effect.duration, source)
 		SignalManager.log_message.emit("Кровавые нити дают %d Силы (%d врагов × 3)" % [total_strength, enemy_count])
