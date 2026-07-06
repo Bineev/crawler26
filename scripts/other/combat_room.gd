@@ -149,12 +149,8 @@ func on_battle_victory():
 	
 	await get_tree().create_timer(0.2).timeout
 
-	# Анимация закрытия комнаты
-	await _close_room_animation()
-
-	GameTestManager.clear_ui()
-	FloorManager.process_next()
-	queue_free()
+	# 🆕 Показываем панель наград
+	show_rewards()
 
 
 func _on_battle_defeat():
@@ -172,3 +168,24 @@ func _on_battle_defeat():
 	GameTestManager.clear_ui()
 	
 	SignalManager.battle_defeat.emit()
+
+
+func show_rewards() -> void:
+	var reward_panel = preload("res://scenes/reward_panel.tscn").instantiate() as RewardPanel
+	var reward_types: Array[DataManager.RewardType] = []
+	
+	match combat_type:
+		DataManager.CombatType.NORMAL:
+			reward_types = [DataManager.RewardType.CARD_BIOM, DataManager.RewardType.GOLD]
+			reward_panel.gold_mod = 1
+		
+		DataManager.CombatType.ELITE:
+			reward_types = [DataManager.RewardType.ARTIFACT, DataManager.RewardType.GOLD]
+			reward_panel.gold_mod = 2
+		
+		DataManager.CombatType.BOSS:
+			reward_types = [DataManager.RewardType.ARTIFACT_ELITE, DataManager.RewardType.CARD_CHARACTER, DataManager.RewardType.GOLD]
+			reward_panel.gold_mod = 3
+	
+	reward_panel.reward_types = reward_types
+	SignalManager.show_reward.emit(reward_panel)

@@ -2,7 +2,7 @@
 extends Node
 
 var player_deck_data: DeckData = null
-
+var current_character: DataManager.CharacterClass = DataManager.CharacterClass.PENITENT
 var poison_damage_per_stack: int = DataManager.POISON_BASE_DAMAGE_PER_STACK
 var bleed_damage_per_stack: int = DataManager.BLEED_BASE_DAMAGE_PER_STACK
 var burn_damage_per_stack: int = DataManager.BURN_BASE_DAMAGE_PER_STACK
@@ -15,6 +15,8 @@ func _ready():
 func initialize_run():
 	player_deck_data = DeckData.new()
 	player_deck_data.master_cards = DataManager.get_starting_deck().duplicate()
+	DeckManager._load_cards_data()
+	DeckManager._init_unlocked_cards()
 	print("RunManager initialized with deck size: ", player_deck_data.master_cards.size())
 
 

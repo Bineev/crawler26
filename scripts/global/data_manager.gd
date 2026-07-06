@@ -189,6 +189,25 @@ enum ScaledCompare {
 	EQUAL,           # значение == порога
 }
 
+## Типы наград
+enum RewardType {
+	CARD_BIOM,
+	CARD_CHARACTER,
+	CARD_WITHOUT_CHOICE,
+	ARTIFACT,
+	ARTIFACT_WITHOUT_CHOICE,
+	ARTIFACT_ELITE,          # 🆕 элитный артефакт
+	POTION,                  # 🆕 зелье
+	TAKE_DAMAGE,
+	GET_HEAL,
+	ENERGY_BUFF,
+	DECK_SIZE_BUFF,
+	GOLD,
+	REMOVE_CARD,
+	UPGRADE_CARD,
+	ADD_PROPERTY_TO_CARD,
+}
+
 ## Тип цикла намерений
 enum IntentCycleType {
 	SEQUENTIAL,
@@ -357,6 +376,8 @@ enum CombatType {
 	LIMITED_TURNS,    # бой с ограниченным количеством ходов
 	BOSS,             # босс файт
 }
+
+
 
 ## Тип эвента
 enum EventType {
@@ -625,6 +646,8 @@ const BOSS_ADD_MINIONS_FROM_FLOOR: int = 3
 
 # Этаж появления элитных врагов Fungal Miner
 const ELITE_MINER_APPEARS_FROM_FLOOR: int = 3
+
+const REWARD_GOLD_DEFAULT : int = 10
 ## ============================================================
 ## РАЗМЕРЫ КОМНАТЫ
 ## ============================================================
@@ -1474,3 +1497,7 @@ func remove_shader_overlay(icon: TextureRect):
 ## Удаляет шейдер с иконки
 func remove_shader_from_icon(icon: TextureRect):
 	icon.material = null
+
+
+func get_all_cards() -> Dictionary:
+	return _cards

@@ -105,3 +105,7 @@ signal player_death_animation_finished()
 signal passive_changed(target: Node, passive_id: int)
 
 signal player_status_changed(target : Node)
+
+signal show_reward(reward_panel: Control)
+
+signal getting_all_rewards()

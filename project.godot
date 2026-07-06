@@ -28,6 +28,7 @@ BattleManager="*res://scripts/global/battle_manager.gd"
 EnemySelector="*res://scripts/global/enemy_selector.gd"
 FloorManager="*res://scripts/global/floor_manager.gd"
 RoomManager="*res://scripts/global/room_manager.gd"
+DeckManager="*res://scripts/global/deck_manager.gd"
 RunManager="*res://scripts/global/run_manager.gd"
 GameTestManager="*res://scripts/global/game_test_manager.gd"
 

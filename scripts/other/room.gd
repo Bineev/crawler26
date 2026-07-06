@@ -17,7 +17,7 @@ func _ready():
 	content = $Content
 	dark_overlay = $DarkOverlay
 	horror_overlay = $HorrorOverlay
-	
+	SignalManager.getting_all_rewards.connect(_on_getting_all_rewards)
 	
 	# Применяем отложенные данные
 	if _pending_background_texture and background:
@@ -268,3 +268,21 @@ func _enter_room_animation() -> void:
 	left_door.queue_free()
 	right_door.queue_free()
 	dark_overlay.queue_free()
+
+
+## Показывает панель наград
+## По умолчанию — ничего не делает, переопределяется в наследниках
+func show_rewards() -> void:
+	pass
+
+
+## Завершает работу комнаты и переходит к следующей
+func exit_room() -> void:
+	await _close_room_animation()
+	GameTestManager.clear_ui()
+	FloorManager.process_next()
+	queue_free()
+
+
+func _on_getting_all_rewards():
+	exit_room()

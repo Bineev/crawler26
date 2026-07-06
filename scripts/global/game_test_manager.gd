@@ -54,6 +54,7 @@ func start_test(world_node: Node):
 	SignalManager.battle_victory.connect(_on_battle_ended)
 	SignalManager.battle_defeat.connect(_on_battle_ended)
 	SignalManager.player_took_damage.connect(_on_player_took_damage)
+	SignalManager.show_reward.connect(_on_show_reward)
 	# Сбрасываем менеджеры
 	FloorManager.reset()
 	SoundManager.start_gameplay_playlist()
@@ -304,3 +305,17 @@ func _create_energy_display():
 
 func get_player_portrait() -> PlayerPortrait:
 	return player_portrait
+
+
+func _on_show_reward(reward_panel: RewardPanel):
+	add_reward_panel(reward_panel)
+
+func add_reward_panel(reward_panel: RewardPanel):
+	clear_ui()
+	if reward_panel and not reward_panel.is_inside_tree():
+		# Добавляем на верхний слой
+		var canvas_layer = CanvasLayer.new()
+		canvas_layer.layer = 200  # поверх всего
+		game_world.add_child(canvas_layer)
+		canvas_layer.add_child(reward_panel)
+		reward_panel.global_position = DataManager.ROOM_POSITION

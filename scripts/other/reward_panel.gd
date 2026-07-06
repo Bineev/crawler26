@@ -1,0 +1,178 @@
+extends Control
+class_name RewardPanel
+
+var reward_types: Array[DataManager.RewardType] = []
+var current_index: int = 0
+var is_animating: bool = false
+var gold_mod: int = 1  # множитель золота
+
+@onready var dark_overlay: ColorRect = $DarkOverlay
+@onready var center_container: CenterContainer = $CenterContainer
+@onready var after_dark_overlay: ColorRect = $AfterDarkOverlay
+
+func _ready():
+	# Начальное состояние: AfterDarkOverlay полностью прозрачный
+	after_dark_overlay.color.a = 0.0
+	await _animate_in()
+	show_rewards()
+
+func show_rewards():
+	current_index = 0
+	_show_current_reward()
+
+func _show_current_reward():
+	if current_index >= reward_types.size():
+		# Все награды показаны — затемняем и закрываем
+		_animate_final_out()
+		return
+	
+	# Затемняем между наградами
+	_animate_transition_in()
+
+func _animate_transition_in():
+	is_animating = true
+	# Затемняем AfterDarkOverlay
+	var tween = create_tween()
+	tween.tween_property(after_dark_overlay, "color:a", 0.8, 0.3)
+	await tween.finished
+	
+	# Показываем контент текущей награды
+	_create_current_reward()
+	
+	# Оттемняем
+	tween = create_tween()
+	tween.tween_property(after_dark_overlay, "color:a", 0.0, 0.3)
+	await tween.finished
+	is_animating = false
+
+func _create_current_reward():
+	var reward_type = reward_types[current_index]
+	
+	# Очищаем контейнер
+	for child in center_container.get_children():
+		child.queue_free()
+	
+	match reward_type:
+		DataManager.RewardType.CARD_BIOM:
+			_create_card_reward(DataManager.RewardType.CARD_BIOM)
+		DataManager.RewardType.CARD_CHARACTER:
+			_create_card_reward(DataManager.RewardType.CARD_CHARACTER)
+		DataManager.RewardType.CARD_WITHOUT_CHOICE:
+			_create_card_without_choice_reward()
+		DataManager.RewardType.ARTIFACT:
+			_create_artifact_reward()
+		DataManager.RewardType.ARTIFACT_WITHOUT_CHOICE:
+			_create_artifact_without_choice_reward()
+		DataManager.RewardType.ARTIFACT_ELITE:
+			_create_artifact_elite_reward()
+		DataManager.RewardType.POTION:
+			_create_potion_reward()
+		DataManager.RewardType.TAKE_DAMAGE:
+			_create_take_damage_reward()
+		DataManager.RewardType.GET_HEAL:
+			_create_heal_reward()
+		DataManager.RewardType.ENERGY_BUFF:
+			_create_energy_buff_reward()
+		DataManager.RewardType.DECK_SIZE_BUFF:
+			_create_deck_size_buff_reward()
+		DataManager.RewardType.GOLD:
+			_create_gold_reward()
+		DataManager.RewardType.REMOVE_CARD:
+			_create_remove_card_reward()
+		DataManager.RewardType.UPGRADE_CARD:
+			_create_upgrade_card_reward()
+		DataManager.RewardType.ADD_PROPERTY_TO_CARD:
+			_create_add_property_reward()
+		_:
+			pass
+
+
+func _create_card_reward(type: DataManager.RewardType) -> void:
+	var cards: Array[CardData] = []
+	var amount: int = 3  # количество карт на выбор
+	
+	match type:
+		DataManager.RewardType.CARD_BIOM:
+			var biome = FloorManager.current_biome
+			var floor = FloorManager.current_floor
+			var progress = FloorManager.current_path_progress
+			cards = DeckManager.get_cards_by_biome(biome, progress, floor, amount)
+		
+		DataManager.RewardType.CARD_CHARACTER:
+			var character = RunManager.current_character
+			var floor = FloorManager.current_floor
+			var progress = FloorManager.current_path_progress
+			cards = DeckManager.get_cards_by_character(character, progress, floor, amount)
+	
+	# TODO: создать UI для выбора карты из массива cards
+	pass
+
+func _create_card_without_choice_reward() -> void:
+	# TODO: создать UI для получения конкретной карты (без выбора)
+	pass
+
+func _create_artifact_reward() -> void:
+	# TODO: создать UI для выбора артефакта
+	pass
+
+func _create_artifact_without_choice_reward() -> void:
+	# TODO: создать UI для получения конкретного артефакта (без выбора)
+	pass
+
+func _create_artifact_elite_reward() -> void:
+	# TODO: создать UI для выбора элитного артефакта
+	pass
+
+func _create_potion_reward() -> void:
+	# TODO: создать UI для получения зелья
+	pass
+
+func _create_take_damage_reward() -> void:
+	# TODO: создать UI для получения урона (обычно за выбор)
+	pass
+
+func _create_heal_reward() -> void:
+	# TODO: создать UI для лечения
+	pass
+
+func _create_energy_buff_reward() -> void:
+	# TODO: создать UI для увеличения энергии
+	pass
+
+func _create_deck_size_buff_reward() -> void:
+	# TODO: создать UI для увеличения размера колоды
+	pass
+
+func _create_gold_reward() -> void:
+	# TODO: создать UI для получения золота
+	pass
+
+func _create_remove_card_reward() -> void:
+	# TODO: создать UI для удаления карты из колоды
+	pass
+
+func _create_upgrade_card_reward() -> void:
+	# TODO: создать UI для улучшения карты
+	pass
+
+func _create_add_property_reward() -> void:
+	# TODO: создать UI для добавления свойства к карте
+	pass
+
+func _on_reward_selected():
+	current_index += 1
+	_show_current_reward()
+
+func _animate_final_out():
+	# Затемняем и закрываем панель
+	var tween = create_tween()
+	tween.tween_property(dark_overlay, "color:a", 1.0, 0.5)
+	await tween.finished
+	queue_free()
+
+func _animate_in():
+	# Начальная анимация появления
+	dark_overlay.color.a = 0.0
+	var tween = create_tween()
+	tween.tween_property(dark_overlay, "color:a", 0.8, 0.5)
+	await tween.finished
