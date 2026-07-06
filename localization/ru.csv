@@ -167,3 +167,28 @@ msg_not_enough_energy,Недостаточно энергии!
 msg_target_selection,Выберите цель
 msg_victory,Победа!
 msg_defeat,Поражение...
+
+reward_card_biom_title,Выберите карту биома
+reward_card_character_title,Выберите карту персонажа
+reward_card_without_choice_title,Вы получили карту
+reward_artifact_title,Выберите артефакт
+reward_artifact_without_choice_title,Вы получили артефакт
+reward_artifact_elite_title,Выберите элитный артефакт
+reward_potion_title,Выберите зелье
+reward_take_damage_title,Получить урон
+reward_get_heal_title,Лечение
+reward_energy_buff_title,Увеличение энергии
+reward_deck_size_buff_title,Увеличение колоды
+reward_gold_title,Золото
+reward_remove_card_title,Удалить карту
+reward_upgrade_card_title,Улучшить карту
+reward_add_property_title,Добавить свойство
+reward_choose_card,Выбрать карту
+reward_take_card,Взять карту
+reward_choose_artifact,Выбрать артефакт
+reward_take_artifact,Взять артефакт
+reward_take_gold,Взять золото
+reward_take_heal,Лечиться
+reward_take_damage,Принять
+reward_choose,Выбрать
+reward_default_title,Выберите награду

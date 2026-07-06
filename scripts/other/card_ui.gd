@@ -859,3 +859,10 @@ func reset_highlight():
 	position = original_position
 	scale = original_scale
 	modulate = Color(1, 1, 1, 1)
+
+
+func set_reward_state() -> void:
+	state = DataManager.CardState.REWARD
+	# Отключаем взаимодействие
+	card_control.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	# Убираем анимации наведения и т.д.

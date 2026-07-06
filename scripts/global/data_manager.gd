@@ -17,6 +17,7 @@ enum CardState {
 	AIMING,
 	PLAYED,
 	BURNED,
+	REWARD,  # 🆕 состояние для карт в наградах
 }
 
 

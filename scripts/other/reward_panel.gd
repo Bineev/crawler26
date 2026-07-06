@@ -89,7 +89,7 @@ func _create_current_reward():
 
 func _create_card_reward(type: DataManager.RewardType) -> void:
 	var cards: Array[CardData] = []
-	var amount: int = 3  # количество карт на выбор
+	var amount: int = 3
 	
 	match type:
 		DataManager.RewardType.CARD_BIOM:
@@ -104,8 +104,12 @@ func _create_card_reward(type: DataManager.RewardType) -> void:
 			var progress = FloorManager.current_path_progress
 			cards = DeckManager.get_cards_by_character(character, progress, floor, amount)
 	
-	# TODO: создать UI для выбора карты из массива cards
-	pass
+	var content = preload("res://scenes/reward_content.tscn").instantiate() as RewardContent
+	center_container.add_child(content)
+	content.setup(type, cards)
+	
+	# Подписываемся на сигнал через SignalManager
+	SignalManager.reward_selected.connect(_on_reward_selected)
 
 func _create_card_without_choice_reward() -> void:
 	# TODO: создать UI для получения конкретной карты (без выбора)
@@ -159,7 +163,9 @@ func _create_add_property_reward() -> void:
 	# TODO: создать UI для добавления свойства к карте
 	pass
 
-func _on_reward_selected():
+func _on_reward_selected() -> void:
+	# Отписываемся, чтобы не было дублирования
+	SignalManager.reward_selected.disconnect(_on_reward_selected)
 	current_index += 1
 	_show_current_reward()
 
