@@ -148,8 +148,13 @@ func _create_deck_size_buff_reward() -> void:
 	pass
 
 func _create_gold_reward() -> void:
-	# TODO: создать UI для получения золота
-	pass
+	var gold_amount = DataManager.REWARD_GOLD_DEFAULT * gold_mod
+	
+	var content = preload("res://scenes/reward_content.tscn").instantiate() as RewardContent
+	content.gold_mod = gold_mod
+	center_container.add_child(content)
+	content.setup(DataManager.RewardType.GOLD, [gold_amount])
+	SignalManager.reward_selected.connect(_on_reward_selected)
 
 func _create_remove_card_reward() -> void:
 	# TODO: создать UI для удаления карты из колоды
@@ -170,10 +175,12 @@ func _on_reward_selected() -> void:
 	_show_current_reward()
 
 func _animate_final_out():
-	# Затемняем и закрываем панель
+	# Оттемняем и закрываем панель
 	var tween = create_tween()
-	tween.tween_property(dark_overlay, "color:a", 1.0, 0.5)
+	tween.tween_property(dark_overlay, "color:a", 0.0, 0.5)
 	await tween.finished
+	
+	SignalManager.getting_all_rewards.emit()
 	queue_free()
 
 func _animate_in():

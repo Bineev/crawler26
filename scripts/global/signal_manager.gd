@@ -122,3 +122,6 @@ signal deck_size_buff(amount: int)
 signal remove_card(card: CardData)
 signal upgrade_card(card: CardData)
 signal add_property_to_card(card: CardData)
+
+signal coins_changed(amount: int)
+signal bones_changed(amount: int)

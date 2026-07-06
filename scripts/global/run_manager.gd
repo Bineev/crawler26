@@ -8,6 +8,10 @@ var bleed_damage_per_stack: int = DataManager.BLEED_BASE_DAMAGE_PER_STACK
 var burn_damage_per_stack: int = DataManager.BURN_BASE_DAMAGE_PER_STACK
 var regen_heal_per_stack: int = DataManager.REGEN_HEAL_PER_STACK
 
+var coins: int = DataManager.STARTING_COINS
+var bones: int = DataManager.STARTING_BONES
+
+
 func _ready():
 	initialize_run()
 
@@ -58,3 +62,32 @@ func reset_status_values():
 	bleed_damage_per_stack = DataManager.BLEED_BASE_DAMAGE_PER_STACK
 	burn_damage_per_stack = DataManager.BURN_BASE_DAMAGE_PER_STACK
 	regen_heal_per_stack = DataManager.REGEN_HEAL_PER_STACK
+
+
+func add_coins(amount: int) -> void:
+	coins += amount
+	SignalManager.coins_changed.emit(coins)
+
+func add_bones(amount: int) -> void:
+	bones += amount
+	SignalManager.bones_changed.emit(bones)
+
+func get_coins() -> int:
+	return coins
+
+func get_bones() -> int:
+	return bones
+
+func spend_coins(amount: int) -> bool:
+	if coins >= amount:
+		coins -= amount
+		SignalManager.coins_changed.emit(coins)
+		return true
+	return false
+
+func spend_bones(amount: int) -> bool:
+	if bones >= amount:
+		bones -= amount
+		SignalManager.bones_changed.emit(bones)
+		return true
+	return false

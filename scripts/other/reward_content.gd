@@ -4,6 +4,7 @@ class_name RewardContent
 var reward_type: DataManager.RewardType
 var rewards: Array = []  # массив карт, артефактов и т.д.
 var selected_index: int = -1
+var gold_mod: int = 1  # множитель золота
 
 @onready var title_label: Label = $Title
 @onready var rewards_container: HBoxContainer = $HBoxContainer
@@ -51,7 +52,7 @@ func setup(type: DataManager.RewardType, items: Array) -> void:
 func _setup_title() -> void:
 	title_label.add_theme_font_override("font", DataManager.FONT_HEADERS)
 	title_label.add_theme_font_size_override("font_size", 32)
-	title_label.add_theme_color_override("font_color", DataManager.COLOR_FLESH_CAVES_ART_BG_DARK)
+	title_label.add_theme_color_override("font_color", DataManager.COLOR_MOLE_TUNNELS_ART_BG_LIGHT2)
 	title_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	title_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 
@@ -127,42 +128,53 @@ func _on_item_selected(index: int) -> void:
 	
 	# Блокируем все кнопки
 	for child in rewards_container.get_children():
-		var button = child.get_child(-1)
+		var button = child.get_child(-1) if child.get_child_count() > 0 else null
 		if button is Button:
 			button.disabled = true
 	
 	# Находим выбранный vbox
 	var selected_vbox = rewards_container.get_child(index)
 	
-	# 🆕 Исчезновение заголовка
+	# 1. Заголовок исчезает (быстро)
 	var tween_title = create_tween()
-	tween_title.tween_property(title_label, "modulate", Color(1, 1, 1, 0), 0.2)
+	tween_title.tween_property(title_label, "modulate", Color(1, 1, 1, 0), 0.15)
 	
-	# Анимируем выбранный элемент
-	var tween = create_tween()
-	tween.set_parallel(true)
-	tween.tween_property(selected_vbox, "scale", Vector2(1.2, 1.2), 0.2).set_ease(Tween.EASE_OUT)
-	
-	await get_tree().create_timer(0.3).timeout
-	
-	# Убираем все остальные элементы
+	# 2. Все VBox, кроме выбранного, исчезают (быстро)
 	for child in rewards_container.get_children():
 		if child != selected_vbox:
+			var tween = create_tween()
+			tween.tween_property(child, "modulate", Color(1, 1, 1, 0), 0.15)
+			await tween.finished
 			child.queue_free()
 	
-	# Убираем кнопку у выбранного
-	var button = selected_vbox.get_child(-1)
+	# 3. Убираем кнопку у выбранного
+	var button = selected_vbox.get_child(-1) if selected_vbox.get_child_count() > 0 else null
 	if button is Button:
 		button.queue_free()
 	
-	# Улетает вниз
-	var target_pos = selected_vbox.position + Vector2(0, 600)
-	tween = create_tween()
-	tween.set_parallel(true)
-	tween.tween_property(selected_vbox, "position", target_pos, 0.4).set_ease(Tween.EASE_IN)
-	tween.tween_property(selected_vbox, "modulate", Color(1, 1, 1, 0), 0.4)
+	# 4. Выбранный VBox увеличивается и поднимается вверх
+	var start_pos = selected_vbox.position
+	var hover_pos = Vector2(start_pos.x, start_pos.y - 50)
 	
-	await tween.finished
+	var tween_hover = create_tween()
+	tween_hover.set_parallel(true)
+	tween_hover.tween_property(selected_vbox, "scale", Vector2(1.2, 1.2), 0.15).set_ease(Tween.EASE_OUT)
+	tween_hover.tween_property(selected_vbox, "position", hover_pos, 0.2).set_ease(Tween.EASE_OUT)
+	
+	await get_tree().create_timer(0.5).timeout  # висит в воздухе 0.5 сек
+	
+	# 5. Улетает вниз и исчезает
+	var target_pos = Vector2(
+		rewards_container.size.x / 2 - selected_vbox.size.x / 2,
+		rewards_container.size.y + 100
+	)
+	var tween_fly = create_tween()
+	tween_fly.set_parallel(true)
+	tween_fly.tween_property(selected_vbox, "position", target_pos, 0.3).set_ease(Tween.EASE_IN)
+	tween_fly.tween_property(selected_vbox, "scale", Vector2(0.5, 0.5), 0.3).set_ease(Tween.EASE_IN)
+	tween_fly.tween_property(selected_vbox, "modulate", Color(1, 1, 1, 0), 0.3)
+	
+	await tween_fly.finished
 	selected_vbox.queue_free()
 	
 	_apply_reward(index)
@@ -241,8 +253,38 @@ func _setup_deck_size_buff_reward() -> void:
 	pass
 
 func _setup_gold_reward() -> void:
-	# TODO: создать UI для получения золота
-	pass
+	var gold_amount = rewards[0]
+	
+	var vbox = VBoxContainer.new()
+	vbox.alignment = BoxContainer.ALIGNMENT_CENTER
+	vbox.add_theme_constant_override("separation", 20)
+	
+	var hbox = HBoxContainer.new()
+	hbox.alignment = BoxContainer.ALIGNMENT_CENTER
+	hbox.add_theme_constant_override("separation", 15)
+	
+	var icon = TextureRect.new()
+	icon.texture = DataManager.get_currency_icon(DataManager.CurrencyType.COIN)
+	icon.custom_minimum_size = Vector2(64, 64)
+	icon.expand_mode = TextureRect.EXPAND_FIT_WIDTH_PROPORTIONAL
+	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	hbox.add_child(icon)
+	
+	var gold_label = Label.new()
+	gold_label.text = "+" + str(gold_amount)
+	gold_label.add_theme_font_override("font", DataManager.FONT_HEADERS)
+	gold_label.add_theme_font_size_override("font_size", 48)
+	gold_label.add_theme_color_override("font_color", DataManager.COLOR_MOLE_TUNNELS_ART_BG_LIGHT2)
+	gold_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	gold_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	hbox.add_child(gold_label)
+	
+	vbox.add_child(hbox)
+	
+	var button = _create_reward_button("reward_take_gold", 0)
+	vbox.add_child(button)
+	
+	rewards_container.add_child(vbox)
 
 func _setup_remove_card_reward() -> void:
 	# TODO: создать UI для удаления карты из колоды

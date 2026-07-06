@@ -41,6 +41,12 @@ enum FlatStat {
 	MAX_ATONEMENT
 }
 
+## Типы валют
+enum CurrencyType {
+	COIN,   # внутризабеговая валюта
+	BONE,   # мета-валюта вне забега
+}
+
 enum ModifierChangeType {
 	MULTIPLIER,   # умножение (1.25 = +25%)
 	PERCENT,      # процентное изменение (0.25 = +25%)
@@ -649,6 +655,10 @@ const BOSS_ADD_MINIONS_FROM_FLOOR: int = 3
 const ELITE_MINER_APPEARS_FROM_FLOOR: int = 3
 
 const REWARD_GOLD_DEFAULT : int = 10
+
+## Стартовое количество валют
+const STARTING_COINS: int = 0
+const STARTING_BONES: int = 0
 ## ============================================================
 ## РАЗМЕРЫ КОМНАТЫ
 ## ============================================================
@@ -1227,6 +1237,13 @@ func get_card_illustration(card_id: CardId) -> Texture2D:
 	return _card_illustrations.get(card_id, null)
 
 
+## Иконки валют
+const CURRENCY_ICONS: Dictionary = {
+	DataManager.CurrencyType.COIN: preload("res://img/icons/currency/coin.png"),
+	DataManager.CurrencyType.BONE: preload("res://img/icons/currency/bone.png"),
+}
+
+
 ## ============================================================
 ## ЦВЕТА КАРТ (КОНСТАНТЫ в HEX)
 ## ============================================================
@@ -1502,3 +1519,7 @@ func remove_shader_from_icon(icon: TextureRect):
 
 func get_all_cards() -> Dictionary:
 	return _cards
+
+
+func get_currency_icon(currency_type: CurrencyType) -> Texture2D:
+	return CURRENCY_ICONS.get(currency_type, null)
