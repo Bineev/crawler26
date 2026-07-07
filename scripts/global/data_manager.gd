@@ -1293,11 +1293,11 @@ const CURRENCY_ICONS: Dictionary = {
 
 ## Иконки артефактов
 const ARTIFACT_ICONS: Dictionary = {
-	#DataManager.ArtifactId.STRANGE_MUSHROOM: preload("res://img/artifacts/strange_mushroom.png"),
-	#DataManager.ArtifactId.HEROS_BROOCH: preload("res://img/artifacts/heros_brooch.png"),
-	#DataManager.ArtifactId.KINGS_ORDER: preload("res://img/artifacts/kings_order.png"),
-	#DataManager.ArtifactId.HEALERS_AMULET: preload("res://img/artifacts/healers_amulets.png"),
-	#DataManager.ArtifactId.ABYSS_DUST: preload("res://img/artifacts/abyss_dust.png"),
+	DataManager.ArtifactId.STRANGE_MUSHROOM: preload("res://img/icons/artifacts/strange_mushroom.png"),
+	DataManager.ArtifactId.HEROS_BROOCH: preload("res://img/icons/artifacts/heros_brooch.png"),
+	DataManager.ArtifactId.KINGS_ORDER: preload("res://img/icons/artifacts/kings_order.png"),
+	DataManager.ArtifactId.HEALERS_AMULET: preload("res://img/icons/artifacts/healers_amulet.png"),
+	DataManager.ArtifactId.ABYSS_DUST: preload("res://img/icons/artifacts/abyss_dust.png"),
 }
 
 
