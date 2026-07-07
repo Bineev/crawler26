@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="ArtifactResource" load_steps=5 format=3 uid="uid://b0bt55jqarug3"]
+
+[ext_resource type="Script" uid="uid://cmra25r1r3ivt" path="res://resources/res_scripts/effect_entry.gd" id="1_dxxlv"]
+[ext_resource type="Script" uid="uid://dxepc28vep34d" path="res://resources/res_scripts/artifact_resource.gd" id="2_7d4ml"]
+[ext_resource type="Script" uid="uid://ccycx2e8u4qlu" path="res://scripts/effects/kings_order_effect.gd" id="2_wmjom"]
+
+[sub_resource type="Resource" id="Resource_yndog"]
+script = ExtResource("1_dxxlv")
+category = 15
+target = 0
+custom_script = ExtResource("2_wmjom")
+metadata/_custom_type_script = "uid://cmra25r1r3ivt"
+
+[resource]
+script = ExtResource("2_7d4ml")
+id = 2
+triggers = Array[int]([5])
+name_key = "artifact_kings_order_name"
+description_key = "artifact_kings_order_desc"
+lore_key = "artifact_kings_order_lore"
+card_count_threshold = 5
+effects = Array[ExtResource("1_dxxlv")]([SubResource("Resource_yndog")])
+metadata/_custom_type_script = "uid://dxepc28vep34d"

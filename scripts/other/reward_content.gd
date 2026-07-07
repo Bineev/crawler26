@@ -221,8 +221,38 @@ func _setup_card_without_choice_reward() -> void:
 	pass
 
 func _setup_artifact_rewards() -> void:
-	# TODO: создать UI для выбора артефакта
-	pass
+	for artifact_data in rewards:
+		var vbox = VBoxContainer.new()
+		vbox.alignment = BoxContainer.ALIGNMENT_CENTER
+		vbox.add_theme_constant_override("separation", 10)
+		
+		# Обёртка для иконки артефакта
+		var wrapper = Control.new()
+		wrapper.custom_minimum_size = Vector2(80, 80)
+		
+		var icon = TextureRect.new()
+		icon.texture = artifact_data.get_icon()
+		icon.custom_minimum_size = Vector2(64, 64)
+		icon.expand_mode = TextureRect.EXPAND_FIT_WIDTH_PROPORTIONAL
+		icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		wrapper.add_child(icon)
+		
+		# Название
+		var name_label = Label.new()
+		name_label.text = artifact_data.get_localized_name()
+		name_label.add_theme_font_override("font", DataManager.FONT_MAIN)
+		name_label.add_theme_font_size_override("font_size", 14)
+		name_label.add_theme_color_override("font_color", DataManager.COLOR_PENITENT_ART_BG_DARK)
+		name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		
+		# Кнопка выбора
+		var button = _create_reward_button("reward_choose_artifact", rewards.find(artifact_data))
+		
+		vbox.add_child(wrapper)
+		vbox.add_child(name_label)
+		vbox.add_child(button)
+		
+		rewards_container.add_child(vbox)
 
 func _setup_artifact_without_choice_reward() -> void:
 	# TODO: создать UI для получения конкретного артефакта (без выбора)

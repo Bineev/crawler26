@@ -4,7 +4,9 @@ class_name PlayerPortrait
 
 const STATUS_ICON_SCENE = preload("res://scenes/status_icon.tscn")
 const PASSIVE_ICON_SCENE = preload("res://scenes/passive_icon.tscn")
+const ARTIFACT_ICON_SCENE = preload("res://scenes/artifact_icon.tscn")
 
+# Добавляем переменную для контейнера артефактов
 var vbox: VBoxContainer = null
 var portrait_texture: TextureRect = null
 var status_container: GridContainer = null
@@ -12,6 +14,8 @@ var health_bar: ProgressBar = null
 var health_label: Label = null
 var atonement_bar: ProgressBar = null
 var atonement_label: Label = null
+var artifact_container: GridContainer = null
+
 
 var player_stats: CharacterStats = null
 
@@ -44,8 +48,10 @@ func _ready() -> void:
 	health_label = $VBoxContainer/HealthBar/HealthLabel
 	atonement_bar = $VBoxContainer/AtonementBar
 	atonement_label = $VBoxContainer/AtonementBar/AtonementLabel
+	artifact_container = $VBoxContainer/ArtifactContainer
 	# Инициализируем позиции для всплывающих цифр
 	_init_floating_positions()
+
 
 func setup(stats: CharacterStats):
 	player_stats = stats
@@ -57,10 +63,15 @@ func setup(stats: CharacterStats):
 	SignalManager.player_status_changed.connect(_update_icons)
 	SignalManager.player_damage_dealt.connect(_on_player_damage_dealt)
 	SignalManager.player_heal_received.connect(_on_player_heal_received)
+	SignalManager.artifact_added.connect(_on_artifact_added)
+	SignalManager.artifact_removed.connect(_on_artifact_removed)
+	SignalManager.artifact_triggered.connect(_on_artifact_triggered)
 	
 	_update_health()
 	_update_atonement()
 	_update_icons(self)
+	# Обновляем отображение артефактов
+	_update_artifacts()
 
 
 func _update_health():
@@ -538,3 +549,30 @@ func find_passive_icon(passive_id: int) -> PassiveIcon:
 		if child is PassiveIcon and child.passive_id == passive_id:
 			return child
 	return null
+
+
+func _update_artifacts():
+	if not artifact_container:
+		return
+	
+	# Очищаем контейнер
+	for child in artifact_container.get_children():
+		child.queue_free()
+	
+	# Добавляем все артефакты из RunManager
+	for artifact in RunManager.artifacts:
+		var icon = ARTIFACT_ICON_SCENE.instantiate() as ArtifactIcon
+		icon.setup(artifact)
+		artifact_container.add_child(icon)
+
+func _on_artifact_added(artifact: ArtifactResource):
+	_update_artifacts()
+
+func _on_artifact_removed(artifact_id: DataManager.ArtifactId):
+	_update_artifacts()
+
+func _on_artifact_triggered(artifact: ArtifactResource):
+	# Обновляем счётчики для всех артефактов
+	for child in artifact_container.get_children():
+		if child is ArtifactIcon:
+			child.update_counter()

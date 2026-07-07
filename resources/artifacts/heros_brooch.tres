@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="ArtifactResource" load_steps=5 format=3 uid="uid://8foag34pgh87"]
+
+[ext_resource type="Script" uid="uid://cmra25r1r3ivt" path="res://resources/res_scripts/effect_entry.gd" id="1_lt60n"]
+[ext_resource type="Script" uid="uid://dxepc28vep34d" path="res://resources/res_scripts/artifact_resource.gd" id="2_blhpv"]
+[ext_resource type="Resource" uid="uid://ccjvicc00m1kp" path="res://resources/statuses/strength.tres" id="2_nin7s"]
+
+[sub_resource type="Resource" id="Resource_2rgva"]
+script = ExtResource("1_lt60n")
+category = 4
+target = 0
+status = ExtResource("2_nin7s")
+value = 3
+duration = 1
+metadata/_custom_type_script = "uid://cmra25r1r3ivt"
+
+[resource]
+script = ExtResource("2_blhpv")
+id = 1
+triggers = Array[int]([1])
+name_key = "artifact_heros_brooch_name"
+description_key = "artifact_heros_brooch_desc"
+lore_key = "artifact_heros_brooch_lore"
+trigger_count = 3
+effects = Array[ExtResource("1_lt60n")]([SubResource("Resource_2rgva")])
+metadata/_custom_type_script = "uid://dxepc28vep34d"

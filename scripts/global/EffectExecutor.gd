@@ -101,7 +101,13 @@ func _execute_damage(effect: EffectEntry, source, targets: Array) -> void:
 	if source and source.has_method("get_modifier"):
 		damage += source.get_modifier(DataManager.ModifierStat.DAMAGE_FLAT_BONUS)
 		damage *= source.get_modifier(DataManager.ModifierStat.DAMAGE_DEALT_PERCENT)
-	
+
+	# 🆕 Применяем множитель от артефакта
+	var multiplier = BattleManager.get_next_card_damage_multiplier()
+	if multiplier > 1.0:
+		damage = floor(damage * multiplier)
+		SignalManager.log_message.emit("Урон увеличен в %dx раз!" % multiplier)
+
 	for target in targets:
 		if target and target.has_method("take_damage"):
 			var final_damage = damage

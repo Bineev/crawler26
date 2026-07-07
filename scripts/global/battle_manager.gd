@@ -22,7 +22,7 @@ var current_room_node: Node = null  # ссылка на комнату для у
 var battle_deck: BattleDeck = null
 var hand_ui: HandUI = null
 
-
+var next_card_damage_multiplier: float = 1.0
 ## ============================================================
 ## ИНИЦИАЛИЗАЦИЯ БОЯ
 ## ============================================================
@@ -62,7 +62,10 @@ func start_battle(player_stats: CharacterStats, enemy_instances: Array, battle_d
 	#battle_deck.draw_initial_hand()
 	
 	# НЕ вызываем update_hand повторно! Карты уже отрисованы в draw_initial_hand
-	
+
+	# 🆕 Обрабатываем артефакты с триггером ON_START_FIGHT
+	RunManager.process_artifacts_on_start_fight()
+
 	SignalManager.battle_started.emit()
 	start_player_turn()
 
@@ -80,7 +83,10 @@ func start_player_turn():
 	# Восстанавливаем энергию
 	if player and player.has_method("restore_energy"):
 		player.restore_energy()
-
+		
+	# 🆕 Обрабатываем артефакты с триггером TURN_COUNT_START
+	RunManager.process_artifacts_on_turn_start()
+		
 	# === ОБРАБОТКА ЗАМОРОЗКИ ===
 	var is_frozen = player and player.has_status(DataManager.Status.FROZEN)
 	
@@ -345,7 +351,10 @@ func end_player_turn():
 	# Сбрасываем руку
 	if battle_deck:
 		battle_deck.discard_hand()
-	
+
+	# 🆕 Обрабатываем артефакты с триггером TURN_COUNT_END
+	RunManager.process_artifacts_on_turn_end()
+
 	SignalManager.turn_ended.emit()
 	start_enemy_turn()
 
@@ -413,3 +422,11 @@ func get_hand_ui() -> HandUI:
 func _on_player_death_animation_finished():
 	# Показываем экран поражения после анимации
 	defeat()
+
+func set_next_card_damage_multiplier(multiplier: float) -> void:
+	next_card_damage_multiplier = multiplier
+
+func get_next_card_damage_multiplier() -> float:
+	var multiplier = next_card_damage_multiplier
+	next_card_damage_multiplier = 1.0  # сбрасываем после получения
+	return multiplier

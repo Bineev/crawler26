@@ -125,3 +125,7 @@ signal add_property_to_card(card: CardData)
 
 signal coins_changed(amount: int)
 signal bones_changed(amount: int)
+
+signal artifact_added(artifact: ArtifactResource)
+signal artifact_removed(artifact_id: DataManager.ArtifactId)
+signal artifact_triggered(artifact: ArtifactResource)

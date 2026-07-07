@@ -367,7 +367,10 @@ func play_card(target = null):
 	
 	# Списываем энергию
 	player_stats.modify_flat(DataManager.FlatStat.ENERGY, -card_data.cost)
-	
+
+	# 🆕 Обрабатываем артефакты с триггером CARD_PLAYED_COUNTER
+	RunManager.process_artifacts_on_card_played(card_data)
+
 	# Сначала анимация улёта
 	if target and target is EnemyInstance:
 		await animate_to_target(target)  # ← await

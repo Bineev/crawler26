@@ -148,6 +148,11 @@ func add_block(amount: int):
 		add_status(shield_status, final_block, 1, self)  # на 1 ход
 
 func take_damage(amount: int, ignore_block: bool = false, attacker: CharacterStats = null):    # Проверка на заморозку (если заморожена — урон не проходит)
+	# Сохраняем состояние до применения урона
+	var health_before = get_health()
+	var max_health = get_max_health()
+	var percent_before = (float(health_before) / max_health) * 100.0
+	
 	var damage = amount
 	if damage > 0 and self is EnemyInstance:
 		var enemy_ui = get_node("EnemyUI") as EnemyUI
@@ -192,6 +197,14 @@ func take_damage(amount: int, ignore_block: bool = false, attacker: CharacterSta
 			SignalManager.player_took_damage.emit(damage)
 			#SignalManager.player_damage_dealt.emit(damage)
 		modify_flat(DataManager.FlatStat.HEALTH, -damage)
+		# Сохраняем состояние после применения урона
+		var health_after = get_health()
+		var percent_after = (float(health_after) / max_health) * 100.0
+		
+		# 🆕 Обрабатываем артефакты с триггером CONDITIONAL
+		if self is PenitentStats:
+			RunManager.process_health_dropped_below(health_before, health_after, percent_before, percent_after)
+			
 		on_take_damage_gain_resource(damage)
 		_process_passive_triggers(DataManager.PassiveTrigger.ON_TAKE_DAMAGE, attacker)  # ← передаём атакующего, а не урон
 		

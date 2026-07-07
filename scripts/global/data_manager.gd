@@ -149,6 +149,37 @@ enum ScaledResource {
 	BLEED_STACKS,
 }
 
+# ============================================================
+# АРТЕФАКТЫ
+# ============================================================
+
+## Грейд артефакта
+enum ArtifactGrade {
+	NORMAL,
+	ELITE,
+	COMBO,
+}
+
+## Тип срабатывания артефакта
+enum ArtifactTrigger {
+	ONE_TIME,              # срабатывает один раз и исчезает
+	TURN_COUNT_START,      # срабатывает через N ходов в начале
+	TURN_COUNT_END,        # срабатывает через N ходов в конце
+	ON_START_FIGHT,        # срабатывает в начале боя
+	HEALTH_DROPPED_BELOW , # срабатывает при выполнении условия
+	CARD_PLAYED_COUNTER,   # срабатывает при розыгрыше N-й карты
+	CUSTOM,                # кастомная логика
+}
+
+## ID артефактов
+enum ArtifactId {
+	STRANGE_MUSHROOM,      # ONE_TIME + ON_START_FIGHT
+	HEROS_BROOCH,          # TURN_COUNT_START
+	KINGS_ORDER,           # CARD_PLAYED_COUNTER
+	HEALERS_AMULET,        # CONDITIONAL
+	ABYSS_DUST,            # CUSTOM
+}
+
 ## ============================================================
 ## ЗВУКИ
 ## ============================================================
@@ -563,6 +594,22 @@ const CARD_HAND_HEIGHT: int = int(CARD_BASE_HEIGHT * CARD_SCALE_IN_HAND)
 const CARD_SPACING_IN_HAND: int = -60
 
 
+## Настройки артефактов (временные значения для тестов)
+const ARTIFACT_STRANGE_MUSHROOM_HP_BONUS: int = 10
+const ARTIFACT_STRANGE_MUSHROOM_POISON_DURATION: int = 2
+
+const ARTIFACT_HEROS_BROOCH_STRENGTH_STACKS: int = 3
+const ARTIFACT_HEROS_BROOCH_TURN_INTERVAL: int = 3
+
+const ARTIFACT_KINGS_ORDER_CARD_COUNT: int = 5
+const ARTIFACT_KINGS_ORDER_DAMAGE_MULTIPLIER: float = 2.0
+
+const ARTIFACT_HEALERS_AMULET_STATUS_THRESHOLD: int = 4
+const ARTIFACT_HEALERS_AMULET_HEAL_AMOUNT: int = 10
+
+const ARTIFACT_ABYSS_DUST_CARD_COST: int = 0
+
+
 ## ============================================================
 ## 4. РАЗМЕРЫ ЭКРАНА
 ## ============================================================
@@ -655,10 +702,11 @@ const BOSS_ADD_MINIONS_FROM_FLOOR: int = 3
 const ELITE_MINER_APPEARS_FROM_FLOOR: int = 3
 
 const REWARD_GOLD_DEFAULT : int = 10
-
+const REWARD_CHOICE_AMOUNT : int = 3
 ## Стартовое количество валют
 const STARTING_COINS: int = 0
 const STARTING_BONES: int = 0
+
 ## ============================================================
 ## РАЗМЕРЫ КОМНАТЫ
 ## ============================================================
@@ -1243,6 +1291,15 @@ const CURRENCY_ICONS: Dictionary = {
 	DataManager.CurrencyType.BONE: preload("res://img/icons/currency/bone.png"),
 }
 
+## Иконки артефактов
+const ARTIFACT_ICONS: Dictionary = {
+	#DataManager.ArtifactId.STRANGE_MUSHROOM: preload("res://img/artifacts/strange_mushroom.png"),
+	#DataManager.ArtifactId.HEROS_BROOCH: preload("res://img/artifacts/heros_brooch.png"),
+	#DataManager.ArtifactId.KINGS_ORDER: preload("res://img/artifacts/kings_order.png"),
+	#DataManager.ArtifactId.HEALERS_AMULET: preload("res://img/artifacts/healers_amulets.png"),
+	#DataManager.ArtifactId.ABYSS_DUST: preload("res://img/artifacts/abyss_dust.png"),
+}
+
 
 ## ============================================================
 ## ЦВЕТА КАРТ (КОНСТАНТЫ в HEX)
@@ -1523,3 +1580,98 @@ func get_all_cards() -> Dictionary:
 
 func get_currency_icon(currency_type: CurrencyType) -> Texture2D:
 	return CURRENCY_ICONS.get(currency_type, null)
+
+
+## Возвращает массив ID артефактов по грейду
+func get_artifacts_by_grade(grade: ArtifactGrade) -> Array[ArtifactId]:
+	var result: Array[ArtifactId] = []
+	
+	for artifact_id in ArtifactId.values():
+		match artifact_id:
+			ArtifactId.STRANGE_MUSHROOM, ArtifactId.HEROS_BROOCH:
+				if grade == ArtifactGrade.NORMAL:
+					result.append(artifact_id)
+			ArtifactId.KINGS_ORDER, ArtifactId.HEALERS_AMULET:
+				if grade == ArtifactGrade.ELITE:
+					result.append(artifact_id)
+			ArtifactId.ABYSS_DUST:
+				if grade == ArtifactGrade.COMBO:
+					result.append(artifact_id)
+	
+	return result
+
+
+func get_artifact_icon(artifact_id: ArtifactId) -> Texture2D:
+	return ARTIFACT_ICONS.get(artifact_id, null)
+
+
+func get_artifact_name(artifact_id: ArtifactId) -> String:
+	match artifact_id:
+		ArtifactId.STRANGE_MUSHROOM:
+			return tr("artifact_strange_mushroom_name")
+		ArtifactId.HEROS_BROOCH:
+			return tr("artifact_heros_brooch_name")
+		ArtifactId.KINGS_ORDER:
+			return tr("artifact_kings_order_name")
+		ArtifactId.HEALERS_AMULET:
+			return tr("artifact_healers_amulet_name")
+		ArtifactId.ABYSS_DUST:
+			return tr("artifact_abyss_dust_name")
+		_:
+			return tr("artifact_unknown_name")
+
+func get_artifact_description(artifact_id: ArtifactId) -> String:
+	match artifact_id:
+		ArtifactId.STRANGE_MUSHROOM:
+			return tr("artifact_strange_mushroom_desc") % [
+				ARTIFACT_STRANGE_MUSHROOM_HP_BONUS,
+				ARTIFACT_STRANGE_MUSHROOM_POISON_DURATION
+			]
+		ArtifactId.HEROS_BROOCH:
+			return tr("artifact_heros_brooch_desc") % [
+				ARTIFACT_HEROS_BROOCH_TURN_INTERVAL,
+				ARTIFACT_HEROS_BROOCH_STRENGTH_STACKS
+			]
+		ArtifactId.KINGS_ORDER:
+			return tr("artifact_kings_order_desc") % [
+				ARTIFACT_KINGS_ORDER_CARD_COUNT,
+				ARTIFACT_KINGS_ORDER_DAMAGE_MULTIPLIER
+			]
+		ArtifactId.HEALERS_AMULET:
+			return tr("artifact_healers_amulet_desc") % [
+				ARTIFACT_HEALERS_AMULET_STATUS_THRESHOLD,
+				ARTIFACT_HEALERS_AMULET_HEAL_AMOUNT
+			]
+		ArtifactId.ABYSS_DUST:
+			return tr("artifact_abyss_dust_desc") % ARTIFACT_ABYSS_DUST_CARD_COST
+		_:
+			return ""
+
+
+var _artifact_resources: Dictionary = {}  # ArtifactId -> ArtifactResource
+var _artifact_resources_loaded: bool = false
+
+func load_artifact_resources() -> void:
+	if _artifact_resources_loaded:
+		return
+	
+	_artifact_resources[ArtifactId.STRANGE_MUSHROOM] = load("res://resources/artifacts/strange_mushroom.tres")
+	_artifact_resources[ArtifactId.HEROS_BROOCH] = load("res://resources/artifacts/heros_brooch.tres")
+	_artifact_resources[ArtifactId.KINGS_ORDER] = load("res://resources/artifacts/kings_order.tres")
+	_artifact_resources[ArtifactId.HEALERS_AMULET] = load("res://resources/artifacts/healers_amulet.tres")
+	_artifact_resources[ArtifactId.ABYSS_DUST] = load("res://resources/artifacts/abyss_dust.tres")
+	
+	_artifact_resources_loaded = true
+
+func get_random_artifact_by_grade(grade: ArtifactGrade) -> ArtifactResource:
+	var ids = get_artifacts_by_grade(grade)
+	if ids.is_empty():
+		return null
+	var random_id = ids[randi() % ids.size()]
+	return get_artifact_resource(random_id)
+
+
+func get_artifact_resource(artifact_id: ArtifactId) -> ArtifactResource:
+	# TODO: загрузить ресурс по ID
+	# Пока заглушка
+	return null

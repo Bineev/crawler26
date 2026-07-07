@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="ArtifactResource" load_steps=4 format=3 uid="uid://ddtias0ohufj7"]
+
+[ext_resource type="Script" uid="uid://cmra25r1r3ivt" path="res://resources/res_scripts/effect_entry.gd" id="1_1cdnt"]
+[ext_resource type="Script" uid="uid://dxepc28vep34d" path="res://resources/res_scripts/artifact_resource.gd" id="2_76c3p"]
+
+[sub_resource type="Resource" id="Resource_1cdnt"]
+script = ExtResource("1_1cdnt")
+category = 2
+target = 0
+base_value = 30
+metadata/_custom_type_script = "uid://cmra25r1r3ivt"
+
+[resource]
+script = ExtResource("2_76c3p")
+id = 3
+grade = 1
+triggers = Array[int]([4])
+name_key = "artifact_healers_amulet_name"
+description_key = "artifact_healers_amulet_desc"
+lore_key = "artifact_healers_amulet_lore"
+is_one_time_conditional = true
+amount_check_conditional = 20
+is_amount_check_percent = true
+effects = Array[ExtResource("1_1cdnt")]([SubResource("Resource_1cdnt")])
+metadata/_custom_type_script = "uid://dxepc28vep34d"

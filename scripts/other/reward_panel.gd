@@ -89,7 +89,7 @@ func _create_current_reward():
 
 func _create_card_reward(type: DataManager.RewardType) -> void:
 	var cards: Array[CardData] = []
-	var amount: int = 3
+	var amount: int = DataManager.REWARD_CHOICE_AMOUNT
 	
 	match type:
 		DataManager.RewardType.CARD_BIOM:
@@ -116,8 +116,35 @@ func _create_card_without_choice_reward() -> void:
 	pass
 
 func _create_artifact_reward() -> void:
-	# TODO: создать UI для выбора артефакта
-	pass
+	var artifacts: Array[ArtifactResource] = []
+	var amount: int = 3  # количество артефактов на выбор
+	var grade: DataManager.ArtifactGrade = DataManager.ArtifactGrade.NORMAL
+	
+	# Определяем грейд в зависимости от типа награды
+	match reward_types[current_index]:
+		DataManager.RewardType.ARTIFACT:
+			grade = DataManager.ArtifactGrade.NORMAL
+		DataManager.RewardType.ARTIFACT_ELITE:
+			grade = DataManager.ArtifactGrade.ELITE
+		DataManager.RewardType.ARTIFACT_WITHOUT_CHOICE:
+			grade = DataManager.ArtifactGrade.NORMAL
+			amount = 1  # без выбора — даём один
+	
+	# Получаем артефакты
+	if amount == 1:
+		# Без выбора — просто один артефакт
+		var artifact = ArtifactManager.get_random_artifact(grade)
+		if artifact:
+			artifacts.append(artifact)
+	else:
+		# С выбором — несколько артефактов
+		artifacts = ArtifactManager.get_random_artifacts(grade, amount)
+	
+	# Создаём контент для артефактов
+	var content = preload("res://scenes/reward_content.tscn").instantiate() as RewardContent
+	center_container.add_child(content)
+	content.setup(DataManager.RewardType.ARTIFACT, artifacts)
+	SignalManager.reward_selected.connect(_on_reward_selected)
 
 func _create_artifact_without_choice_reward() -> void:
 	# TODO: создать UI для получения конкретного артефакта (без выбора)

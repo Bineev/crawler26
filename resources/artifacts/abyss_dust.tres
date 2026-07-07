@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="ArtifactResource" load_steps=3 format=3 uid="uid://cd1mvf2m6pamv"]
+
+[ext_resource type="Script" uid="uid://cmra25r1r3ivt" path="res://resources/res_scripts/effect_entry.gd" id="1_ds4k5"]
+[ext_resource type="Script" uid="uid://dxepc28vep34d" path="res://resources/res_scripts/artifact_resource.gd" id="2_d4x7k"]
+
+[resource]
+script = ExtResource("2_d4x7k")
+id = 4
+triggers = Array[int]([6])
+name_key = "artifact_abyss_dust_name"
+description_key = "artifact_abyss_dust_desc"
+lore_key = "artifact_abyss_dust_lore"
+metadata/_custom_type_script = "uid://dxepc28vep34d"
