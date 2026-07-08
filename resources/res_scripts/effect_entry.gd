@@ -6,6 +6,9 @@ class_name EffectEntry
 ## ОСНОВНЫЕ ПАРАМЕТРЫ
 ## ============================================================
 
+
+## Является ли урон прямым (от карты) или косвенным (от статусов, пассивок и т.д.)
+@export var is_direct_damage: bool = true
 ## Тип эффекта
 @export var category: DataManager.EffectCategory
 

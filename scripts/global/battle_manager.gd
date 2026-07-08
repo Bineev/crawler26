@@ -83,10 +83,7 @@ func start_player_turn():
 	# Восстанавливаем энергию
 	if player and player.has_method("restore_energy"):
 		player.restore_energy()
-		
-	# 🆕 Обрабатываем артефакты с триггером TURN_COUNT_START
-	RunManager.process_artifacts_on_turn_start()
-		
+
 	# === ОБРАБОТКА ЗАМОРОЗКИ ===
 	var is_frozen = player and player.has_status(DataManager.Status.FROZEN)
 	

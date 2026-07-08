@@ -4,5 +4,6 @@
 
 [resource]
 script = ExtResource("1_kkexd")
+is_direct_damage = false
 target = 0
 metadata/_custom_type_script = "uid://cmra25r1r3ivt"

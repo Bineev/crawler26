@@ -169,6 +169,27 @@ func _on_battle_defeat():
 	
 	SignalManager.battle_defeat.emit()
 
+#TODO uncomment after test
+#func show_rewards() -> void:
+	#var reward_panel = preload("res://scenes/reward_panel.tscn").instantiate() as RewardPanel
+	#var reward_types: Array[DataManager.RewardType] = []
+	#
+	#match combat_type:
+		#DataManager.CombatType.NORMAL:
+			#reward_types = [DataManager.RewardType.CARD_BIOM, DataManager.RewardType.GOLD]
+			#reward_panel.gold_mod = 1
+		#
+		#DataManager.CombatType.ELITE:
+			#reward_types = [DataManager.RewardType.ARTIFACT, DataManager.RewardType.GOLD]
+			#reward_panel.gold_mod = 2
+		#
+		#DataManager.CombatType.BOSS:
+			#reward_types = [DataManager.RewardType.ARTIFACT_ELITE, DataManager.RewardType.CARD_CHARACTER, DataManager.RewardType.GOLD]
+			#reward_panel.gold_mod = 3
+	#
+	#reward_panel.reward_types = reward_types
+	#SignalManager.show_reward.emit(reward_panel)
+
 
 func show_rewards() -> void:
 	var reward_panel = preload("res://scenes/reward_panel.tscn").instantiate() as RewardPanel
@@ -176,12 +197,13 @@ func show_rewards() -> void:
 	
 	match combat_type:
 		DataManager.CombatType.NORMAL:
-			reward_types = [DataManager.RewardType.CARD_BIOM, DataManager.RewardType.GOLD]
-			reward_panel.gold_mod = 1
-		
-		DataManager.CombatType.ELITE:
 			reward_types = [DataManager.RewardType.ARTIFACT, DataManager.RewardType.GOLD]
 			reward_panel.gold_mod = 2
+
+		
+		DataManager.CombatType.ELITE:
+			reward_types = [DataManager.RewardType.CARD_BIOM, DataManager.RewardType.GOLD]
+			reward_panel.gold_mod = 1
 		
 		DataManager.CombatType.BOSS:
 			reward_types = [DataManager.RewardType.ARTIFACT_ELITE, DataManager.RewardType.CARD_CHARACTER, DataManager.RewardType.GOLD]

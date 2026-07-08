@@ -756,6 +756,8 @@ func process_start_of_turn():
 	if self is EnemyInstance:
 		SignalManager.enemy_status_changed.emit(self)
 	elif self is PenitentStats:
+		# 🆕 Обрабатываем артефакты с триггером TURN_COUNT_START
+		RunManager.process_artifacts_on_turn_start()
 		SignalManager.player_status_changed.emit(self)
 
 

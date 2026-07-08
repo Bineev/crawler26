@@ -133,10 +133,12 @@ func get_artifacts_by_trigger(trigger: DataManager.ArtifactTrigger) -> Array[Art
 func increment_artifact_counter(artifact_id: DataManager.ArtifactId) -> void:
 	if artifact_counters.has(artifact_id):
 		artifact_counters[artifact_id] += 1
+		SignalManager.artifact_counter_changed.emit(artifact_id, artifact_counters[artifact_id])
 
 func reset_artifact_counter(artifact_id: DataManager.ArtifactId) -> void:
 	if artifact_counters.has(artifact_id):
 		artifact_counters[artifact_id] = 0
+		SignalManager.artifact_counter_changed.emit(artifact_id, artifact_counters[artifact_id])
 
 func get_artifact_counter(artifact_id: DataManager.ArtifactId) -> int:
 	return artifact_counters.get(artifact_id, 0)
@@ -214,17 +216,19 @@ func process_artifacts_on_turn_start() -> void:
 		if trigger_index == -1:
 			continue
 		
-		# Увеличиваем счётчик ходов для артефакта
-		var counter = get_artifact_counter(artifact.id)
-		counter += 1
+		# Увеличиваем счётчик
+		var counter = get_artifact_counter(artifact.id) + 1
 		artifact_counters[artifact.id] = counter
 		
-		# Проверяем, достигнут ли порог
-		if counter >= artifact.trigger_count:
-			# Сбрасываем счётчик
-			artifact_counters[artifact.id] = 0
-			
-			# Выполняем эффект
+		# Если превысили порог — сбрасываем до 1
+		if counter > artifact.trigger_count:
+			artifact_counters[artifact.id] = 1
+			counter = 1
+		
+		SignalManager.artifact_counter_changed.emit(artifact.id, counter)
+		
+		# Если достигли порога — срабатываем
+		if counter == artifact.trigger_count:
 			if trigger_index < artifact.effects.size():
 				var effect = artifact.effects[trigger_index]
 				EffectExecutor.execute(effect, player, [player])
@@ -247,7 +251,7 @@ func process_artifacts_on_turn_end() -> void:
 		var counter = get_artifact_counter(artifact.id)
 		counter += 1
 		artifact_counters[artifact.id] = counter
-		
+		SignalManager.artifact_counter_changed.emit(artifact.id, counter)
 		# Проверяем, достигнут ли порог
 		if counter >= artifact.trigger_count:
 			# Сбрасываем счётчик
@@ -272,17 +276,19 @@ func process_artifacts_on_card_played(card_data: CardData) -> void:
 		if trigger_index == -1:
 			continue
 		
-		# Увеличиваем счётчик сыгранных карт для артефакта
-		var counter = get_artifact_counter(artifact.id)
-		counter += 1
+		# Увеличиваем счётчик
+		var counter = get_artifact_counter(artifact.id) + 1
 		artifact_counters[artifact.id] = counter
 		
-		# Проверяем, достигнут ли порог
-		if counter >= artifact.card_count_threshold:
-			# Сбрасываем счётчик
+		# Если превысили порог — сбрасываем до 1
+		if counter > artifact.card_count_threshold:
 			artifact_counters[artifact.id] = 0
-			
-			# Выполняем эффект
+			counter = 0
+		
+		SignalManager.artifact_counter_changed.emit(artifact.id, counter)
+		
+		# Если достигли порога — срабатываем
+		if counter == artifact.card_count_threshold:
 			if trigger_index < artifact.effects.size():
 				var effect = artifact.effects[trigger_index]
 				EffectExecutor.execute(effect, player, [player])

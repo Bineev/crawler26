@@ -3,7 +3,7 @@ shader_type canvas_item;
 // Цвет обводки/свечения
 uniform vec4 line_color : source_color = vec4(0.7490, 0.6588, 0.4157, 1.0); // Золотистый по умолчанию
 // Толщина линии обводки
-uniform float line_thickness : hint_range(0.0, 10.0) = 1.0;
+uniform float line_thickness : hint_range(0.0, 10.0) = 3.0;
 // Скорость пульсации (0.0 — статично)
 uniform float pulse_speed : hint_range(0.0, 10.0) = 4.0;
 // Сила свечения при наведении

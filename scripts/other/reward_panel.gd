@@ -116,11 +116,9 @@ func _create_card_without_choice_reward() -> void:
 	pass
 
 func _create_artifact_reward() -> void:
-	var artifacts: Array[ArtifactResource] = []
-	var amount: int = 3  # количество артефактов на выбор
+	var amount: int = 3
 	var grade: DataManager.ArtifactGrade = DataManager.ArtifactGrade.NORMAL
 	
-	# Определяем грейд в зависимости от типа награды
 	match reward_types[current_index]:
 		DataManager.RewardType.ARTIFACT:
 			grade = DataManager.ArtifactGrade.NORMAL
@@ -128,22 +126,45 @@ func _create_artifact_reward() -> void:
 			grade = DataManager.ArtifactGrade.ELITE
 		DataManager.RewardType.ARTIFACT_WITHOUT_CHOICE:
 			grade = DataManager.ArtifactGrade.NORMAL
-			amount = 1  # без выбора — даём один
+			amount = 1
 	
-	# Получаем артефакты
+	# 🆕 Получаем ID артефактов, которые уже есть у игрока
+	var existing_ids: Array[DataManager.ArtifactId] = []
+	for artifact in RunManager.artifacts:
+		existing_ids.append(artifact.id)
+	
+	# Получаем все доступные артефакты по грейду
+	var all_available = ArtifactManager._get_available_artifacts_by_grade(grade)
+	
+	# 🆕 Фильтруем — убираем те, что уже есть
+	var filtered: Array[DataManager.ArtifactId] = []
+	for artifact_id in all_available:
+		if artifact_id not in existing_ids:
+			filtered.append(artifact_id)
+	
+	var selected_artifacts: Array[ArtifactResource] = []
+	
+	if filtered.is_empty():
+		# Если все артефакты уже получены — даём золото вместо артефакта
+		SignalManager.log_message.emit("Все артефакты этого грейда уже получены! Вы получаете золото.")
+		# TODO: выдать золото
+		return
+	
+	filtered.shuffle()
+	
 	if amount == 1:
-		# Без выбора — просто один артефакт
-		var artifact = ArtifactManager.get_random_artifact(grade)
-		if artifact:
-			artifacts.append(artifact)
+		var resource = DataManager.get_artifact_resource(filtered[0])
+		if resource:
+			selected_artifacts.append(resource)
 	else:
-		# С выбором — несколько артефактов
-		artifacts = ArtifactManager.get_random_artifacts(grade, amount)
+		for i in range(min(amount, filtered.size())):
+			var resource = DataManager.get_artifact_resource(filtered[i])
+			if resource:
+				selected_artifacts.append(resource)
 	
-	# Создаём контент для артефактов
 	var content = preload("res://scenes/reward_content.tscn").instantiate() as RewardContent
 	center_container.add_child(content)
-	content.setup(DataManager.RewardType.ARTIFACT, artifacts)
+	content.setup(DataManager.RewardType.ARTIFACT, selected_artifacts)
 	SignalManager.reward_selected.connect(_on_reward_selected)
 
 func _create_artifact_without_choice_reward() -> void:

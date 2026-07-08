@@ -3,15 +3,20 @@
 [ext_resource type="Script" uid="uid://d0ufeva7q5lxm" path="res://scripts/other/artifact_icon.gd" id="1_oeu5y"]
 
 [node name="ArtifactIcon" type="ColorRect"]
-offset_right = 40.0
-offset_bottom = 40.0
+size_flags_horizontal = 4
+size_flags_vertical = 4
 color = Color(0, 0, 0, 1)
 script = ExtResource("1_oeu5y")
 
 [node name="MarginContainer" type="MarginContainer" parent="."]
-layout_mode = 0
-offset_right = 40.0
-offset_bottom = 40.0
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = 7.0
+offset_bottom = 29.0
+grow_horizontal = 2
+grow_vertical = 2
 theme_override_constants/margin_left = 3
 theme_override_constants/margin_top = 3
 theme_override_constants/margin_right = 3
@@ -23,9 +28,12 @@ theme_override_constants/separation = 0
 
 [node name="TextureRect" type="TextureRect" parent="MarginContainer/VBoxContainer"]
 layout_mode = 2
+expand_mode = 3
+stretch_mode = 5
 
 [node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
 layout_mode = 2
+theme_override_constants/separation = 0
 
 [node name="CounterLabel" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer"]
 layout_mode = 2

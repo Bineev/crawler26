@@ -3,9 +3,14 @@ extends Resource
 class_name MoleTossEffect
 
 static func apply(effect: EffectEntry, source, targets: Array, card_info: Dictionary, passive_context: PassiveResource = null):
-	var max_damage = effect.base_value  # берём из эффекта
-	var damage = randi() % max_damage + 1  # от 1 до max_damage
+	var max_damage = effect.base_value
+	var damage = randi() % max_damage + 1
 	
-	for target in targets:
-		target.take_damage(damage, false, source)
-		SignalManager.log_message.emit("Бросок слепыша нанёс %d урона!" % damage)
+	# 🆕 Создаём эффект урона
+	var damage_effect = EffectEntry.new()
+	damage_effect.category = DataManager.EffectCategory.DAMAGE
+	damage_effect.target = DataManager.EffectTarget.ENEMY
+	damage_effect.base_value = damage
+	
+	# Выполняем через EffectExecutor
+	EffectExecutor.execute(damage_effect, source, targets, card_info, passive_context)

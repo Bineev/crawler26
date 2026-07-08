@@ -88,33 +88,42 @@ func execute(effect: EffectEntry, source: Node, targets: Array, card_info: Dicti
 ## ============================================================
 
 func _execute_damage(effect: EffectEntry, source, targets: Array) -> void:
-	var damage = effect.base_value
+	var base_damage = effect.base_value
 	
+	# Масштабирование от статов (всегда применяется)
 	if effect.stat_multiplier != null and effect.stat_divisor > 0:
 		if source and source.has_method("get_stat"):
 			var stat_value = source.get_stat(effect.stat_multiplier)
-			damage += stat_value / effect.stat_divisor
+			base_damage += stat_value / effect.stat_divisor
 	
-	if source and source.has_method("get_strength_bonus"):
-		damage += source.get_strength_bonus()
+	# 🆕 Применяем множитель от артефакта ТОЛЬКО для прямого урона
+	if effect.is_direct_damage:
+		var multiplier = BattleManager.get_next_card_damage_multiplier()
+		if multiplier > 1.0:
+			base_damage = floor(base_damage * multiplier)
+			SignalManager.log_message.emit("Урон увеличен в %dx раз!" % multiplier)
 	
-	if source and source.has_method("get_modifier"):
-		damage += source.get_modifier(DataManager.ModifierStat.DAMAGE_FLAT_BONUS)
-		damage *= source.get_modifier(DataManager.ModifierStat.DAMAGE_DEALT_PERCENT)
-
-	# 🆕 Применяем множитель от артефакта
-	var multiplier = BattleManager.get_next_card_damage_multiplier()
-	if multiplier > 1.0:
-		damage = floor(damage * multiplier)
-		SignalManager.log_message.emit("Урон увеличен в %dx раз!" % multiplier)
-
 	for target in targets:
-		if target and target.has_method("take_damage"):
-			var final_damage = damage
-			if target.has_method("get_modifier"):
-				final_damage *= target.get_modifier(DataManager.ModifierStat.DAMAGE_TAKEN_PERCENT)
-			# Передаём source как атакующего
-			target.take_damage(floor(final_damage), false, source)
+		if not target or not target.has_method("take_damage"):
+			continue
+		
+		var final_damage = base_damage
+		var is_self_damage = (source == target)
+		
+		# 🆕 Модификаторы источника применяются ТОЛЬКО если цель НЕ источник
+		if not is_self_damage:
+			if source and source.has_method("get_strength_bonus"):
+				final_damage += source.get_strength_bonus()
+			
+			if source and source.has_method("get_modifier"):
+				final_damage += source.get_modifier(DataManager.ModifierStat.DAMAGE_FLAT_BONUS)
+				final_damage *= source.get_modifier(DataManager.ModifierStat.DAMAGE_DEALT_PERCENT)
+		
+		# Модификаторы цели всегда применяются (если цель — враг)
+		if target.has_method("get_modifier"):
+			final_damage *= target.get_modifier(DataManager.ModifierStat.DAMAGE_TAKEN_PERCENT)
+		
+		target.take_damage(floor(final_damage), false, source)
 
 
 func _execute_block(effect: EffectEntry, source, targets: Array) -> void:

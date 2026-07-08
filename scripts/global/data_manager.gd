@@ -1584,20 +1584,14 @@ func get_currency_icon(currency_type: CurrencyType) -> Texture2D:
 
 ## Возвращает массив ID артефактов по грейду
 func get_artifacts_by_grade(grade: ArtifactGrade) -> Array[ArtifactId]:
+	if not _artifact_resources_loaded:
+		load_artifact_resources()
+	
 	var result: Array[ArtifactId] = []
-	
-	for artifact_id in ArtifactId.values():
-		match artifact_id:
-			ArtifactId.STRANGE_MUSHROOM, ArtifactId.HEROS_BROOCH:
-				if grade == ArtifactGrade.NORMAL:
-					result.append(artifact_id)
-			ArtifactId.KINGS_ORDER, ArtifactId.HEALERS_AMULET:
-				if grade == ArtifactGrade.ELITE:
-					result.append(artifact_id)
-			ArtifactId.ABYSS_DUST:
-				if grade == ArtifactGrade.COMBO:
-					result.append(artifact_id)
-	
+	for artifact_id in _artifact_resources.keys():
+		var resource = _artifact_resources[artifact_id]
+		if resource and resource.grade == grade:
+			result.append(artifact_id)
 	return result
 
 
@@ -1672,6 +1666,12 @@ func get_random_artifact_by_grade(grade: ArtifactGrade) -> ArtifactResource:
 
 
 func get_artifact_resource(artifact_id: ArtifactId) -> ArtifactResource:
-	# TODO: загрузить ресурс по ID
-	# Пока заглушка
-	return null
+	if not _artifact_resources_loaded:
+		load_artifact_resources()
+	return _artifact_resources.get(artifact_id, null)
+
+
+func get_all_artifact_ids() -> Array:
+	if not _artifact_resources_loaded:
+		load_artifact_resources()
+	return _artifact_resources.keys()

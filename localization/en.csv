@@ -183,9 +183,9 @@ reward_gold_title,Gold
 reward_remove_card_title,Remove a card
 reward_upgrade_card_title,Upgrade a card
 reward_add_property_title,Add property
-reward_choose_card,Choose card
-reward_take_card,Take card
-reward_choose_artifact,Choose artifact
+reward_choose_card,Choose
+reward_take_card,Take
+reward_choose_artifact,Choose
 reward_take_artifact,Take artifact
 reward_take_gold,Take gold
 reward_take_heal,Heal

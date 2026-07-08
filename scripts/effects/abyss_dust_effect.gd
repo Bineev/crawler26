@@ -13,8 +13,18 @@ static func apply(effect: EffectEntry, source, targets: Array, card_info: Dictio
 		SignalManager.log_message.emit("Колода пуста!")
 		return
 	
-	# Выбираем случайную карту из колоды
-	var random_card = master_cards[randi() % master_cards.size()]
+	# 🆕 Собираем карты, у которых стоимость > 0
+	var valid_cards: Array[CardData] = []
+	for card in master_cards:
+		if card.cost > 0:
+			valid_cards.append(card)
+	
+	if valid_cards.is_empty():
+		SignalManager.log_message.emit("Нет карт со стоимостью > 0! Пыль бездны не сработала.")
+		return
+	
+	# Выбираем случайную карту из отфильтрованного списка
+	var random_card = valid_cards[randi() % valid_cards.size()]
 	
 	# Устанавливаем стоимость в 0
 	random_card.cost = 0
