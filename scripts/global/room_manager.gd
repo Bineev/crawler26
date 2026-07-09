@@ -20,7 +20,7 @@ func create_room(room_node: RoomNode, floor_level: int, biome: DataManager.Biome
 		DataManager.RoomType.EVENT:
 			return _create_event_room(room_node, biome)
 		DataManager.RoomType.OBJECT:
-			return _create_object_room(room_node, biome)
+			return _create_object_room(room_node, floor_level, biome, room_index)
 	
 	return null
 
@@ -76,18 +76,16 @@ func _create_event_room(room_node: RoomNode, biome: DataManager.Biome) -> Room:
 	return room_instance
 
 
-func _create_object_room(room_node: RoomNode, biome: DataManager.Biome) -> Room:
-	print("  Creating object room")
+func _create_object_room(room_node: RoomNode, floor_level: int, biome: DataManager.Biome, room_index: int) -> Room:
+	var object_type = room_node.object_type  # нужно добавить поле в RoomNode
 	
-	var background_texture = DataManager.get_random_background(biome)
-	
-	var room_instance = room_scene.instantiate()
-	
-	if room_instance.has_method("setup"):
-		room_instance.setup({
-			"type": DataManager.RoomType.OBJECT,
-			"biome": biome,
-			"background": background_texture,  # ← передаём фон
-		})
-	
+	var room_instance = preload("res://scenes/object_room.tscn").instantiate() as ObjectRoom
+	room_instance.current_floor = floor_level
+	room_instance.current_biome = biome
+	room_instance.setup({
+		"type": DataManager.RoomType.OBJECT,
+		"object_type": object_type,
+		"biome": biome,
+		"background": DataManager.get_random_background(biome),
+	})
 	return room_instance

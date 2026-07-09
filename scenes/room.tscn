@@ -31,6 +31,7 @@ shader_parameter/light_radius = 0.3350000159125
 shader_parameter/flicker_speed = 2.000000095
 
 [node name="Room" type="Control"]
+custom_minimum_size = Vector2(1024, 800)
 layout_mode = 3
 anchors_preset = 0
 mouse_filter = 2

@@ -1,0 +1,7 @@
+[gd_scene load_steps=3 format=3 uid="uid://cqq5ev3a1h2ni"]
+
+[ext_resource type="PackedScene" uid="uid://dcst51dams5bp" path="res://scenes/room.tscn" id="1_tnggh"]
+[ext_resource type="Script" uid="uid://d13bs44ca8yka" path="res://scripts/other/object_room.gd" id="2_hylrf"]
+
+[node name="ObjectRoom" instance=ExtResource("1_tnggh")]
+script = ExtResource("2_hylrf")

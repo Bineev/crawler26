@@ -11,6 +11,8 @@ var room_type: DataManager.RoomType = DataManager.RoomType.COMBAT
 var _pending_background_texture: Texture2D = null
 var _pending_room_data: Dictionary = {}
 
+var current_floor: int = 1
+var current_biome: DataManager.Biome = DataManager.Biome.MOLE_TUNNELS
 
 func _ready():
 	background = $Background

@@ -6,8 +6,6 @@ var hand_ui : HandUI = null
 var combat_type: DataManager.CombatType = DataManager.CombatType.NORMAL
 var enemies: Array[EnemyInstance] = []
 var _pending_enemies: Array[EnemyResource] = []
-var current_floor: int = 1
-var current_biome: DataManager.Biome = DataManager.Biome.MOLE_TUNNELS
 # Загружаем сцену врага один раз
 const ENEMY_SCENE: PackedScene = preload("res://scenes/enemy.tscn")
 
