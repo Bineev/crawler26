@@ -5,6 +5,11 @@ class_name ObjectRoom
 var object_type: DataManager.ObjectType
 var room_object: RoomObject = null
 
+
+func _ready():
+	super._ready()
+
+
 func setup(room_data: Dictionary) -> void:
 	object_type = room_data.get("object_type", DataManager.ObjectType.CHEST)
 	super.setup(room_data)
@@ -14,6 +19,15 @@ func _init_content(room_data: Dictionary) -> void:
 	var object_scene = preload("res://scenes/room_object.tscn")
 	room_object = object_scene.instantiate() as RoomObject
 	content.add_child(room_object)
-	room_object.setup(object_type)
+	room_object.setup(object_type, current_biome)
+	# 🆕 Устанавливаем позицию
+	var room_center_x = DataManager.ROOM_CENTER_X
+	var room_height = DataManager.ROOM_HEIGHT
+	var y_offset_from_bottom = DataManager.ENEMY_Y_OFFSET_FROM_BOTTOM
+	
+	room_object.position = Vector2(
+		room_center_x - room_object.size.x / 2,
+		room_height - y_offset_from_bottom - room_object.size.y
+	)
 	SignalManager.log_message.emit("Object room initialized")
 	print("Object room initialized")

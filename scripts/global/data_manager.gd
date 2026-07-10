@@ -929,6 +929,28 @@ func get_passive_by_enum(passive: Passive) -> PassiveResource:
 	return get_passive_resource(passive)
 
 
+## Текстуры объектов по биомам и типам
+const OBJECT_TEXTURES: Dictionary = {
+	# Кротовые норы
+	DataManager.Biome.MOLE_TUNNELS: {
+		DataManager.ObjectType.CHEST: preload("res://img/objects/mole_tunnels/chest.png"),
+		DataManager.ObjectType.IDOL: preload("res://img/objects/mole_tunnels/idol.png"),
+		DataManager.ObjectType.TRAP: preload("res://img/objects/mole_tunnels/trap.png"),
+		DataManager.ObjectType.CAULDRON: preload("res://img/objects/mole_tunnels/cauldron.png"),
+		DataManager.ObjectType.TORTURE_RACK: preload("res://img/objects/mole_tunnels/torture_rack.png"),
+		DataManager.ObjectType.BONFIRE: preload("res://img/objects/mole_tunnels/bonfire.png"),
+	},
+	# Пещеры плоти (позже)
+	# DataManager.Biome.FLESH_CAVES: { ... },
+	# Костяной лабиринт (позже)
+	# DataManager.Biome.BONE_LABYRINTH: { ... },
+}
+
+func get_object_texture(object_type: DataManager.ObjectType, biome: DataManager.Biome) -> Texture2D:
+	var biome_dict = OBJECT_TEXTURES.get(biome, {})
+	return biome_dict.get(object_type, null)
+
+
 ## ============================================================
 ## 11. ДАННЫЕ ВРАГОВ ДЛЯ БИОМОВ
 ## ============================================================
