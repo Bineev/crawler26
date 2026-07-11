@@ -8,6 +8,7 @@ var _tween: Tween = null
 var highlight_material: ShaderMaterial = null
 var base_material: Material = null
 var _is_hovered: bool = false
+@onready var shadow_sprite: TextureRect = $EnemySpriteCopy
 
 
 func _ready() -> void:
@@ -19,15 +20,20 @@ func _ready() -> void:
 func setup(type: DataManager.ObjectType, biome: DataManager.Biome) -> void:
 	object_type = type
 	self.biome = biome
+
+	# 🆕 Получаем размер из DataManager
+	var obj_size = DataManager.get_object_size(object_type)
+	custom_minimum_size = obj_size
 	
 	# 🆕 Получаем текстуру из DataManager
 	var texture = DataManager.get_object_texture(object_type, biome)
 	if texture:
 		self.texture = texture
+		shadow_sprite.texture = texture
+		shadow_sprite.custom_minimum_size = obj_size
 	else:
 		# Текстура-заглушка, если не найдена
 		printerr("Object texture not found for type: ", object_type, " biome: ", biome)
-	custom_minimum_size = Vector2(196, 196)
 	# 🆕 Запускаем призывную анимацию
 	# 🆕 Настраиваем подсветку
 	_setup_highlight()
@@ -37,9 +43,6 @@ func interact() -> void:
 	match object_type:
 		DataManager.ObjectType.CHEST:
 			# TODO: открыть сундук → награда
-			pass
-		DataManager.ObjectType.SHOP:
-			# TODO: открыть магазин
 			pass
 		# ... остальные типы
 

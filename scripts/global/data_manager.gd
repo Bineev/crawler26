@@ -425,7 +425,7 @@ enum EventType {
 
 ## Тип объекта
 enum ObjectType {
-	SHOP,            # магазин
+	#SHOP,            # магазин
 	IDOL,            # идол (алтарь)
 	TRAP,            # ловушка
 	CHEST,           # сундук
@@ -1697,3 +1697,17 @@ func get_all_artifact_ids() -> Array:
 	if not _artifact_resources_loaded:
 		load_artifact_resources()
 	return _artifact_resources.keys()
+
+
+## Размеры объектов по типам
+const OBJECT_SIZES: Dictionary = {
+	DataManager.ObjectType.CHEST: Vector2(256, 256),
+	DataManager.ObjectType.IDOL: Vector2(256, 256),
+	DataManager.ObjectType.TRAP: Vector2(196, 196),
+	DataManager.ObjectType.CAULDRON: Vector2(360, 360),
+	DataManager.ObjectType.TORTURE_RACK: Vector2(360, 360),
+	DataManager.ObjectType.BONFIRE: Vector2(256, 256),
+}
+
+func get_object_size(object_type: DataManager.ObjectType) -> Vector2:
+	return OBJECT_SIZES.get(object_type, Vector2(196, 196))
