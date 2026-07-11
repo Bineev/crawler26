@@ -20,6 +20,16 @@ enum CardState {
 	REWARD,  # 🆕 состояние для карт в наградах
 }
 
+enum ActionType {
+	USE_KEY,
+	BREAK,
+	PRAY,
+	DRINK,
+	SEARCH,
+	REST,
+	# ... можно добавлять любые действия
+}
+
 
 enum BattleState {
 	IDLE,
@@ -573,6 +583,8 @@ const CRY_OF_DESPAIR_HEAL_TIER_3: int = 15
 
 const ENEMY_STEP_DELAY : float = 1
 const STATUS_TRIGGER_DELAY : float = 1
+
+const CHEST_BREAK_CHANCE: float = 0.5  # 50% шанс взлома
 ## ============================================================
 ## 3. РАЗМЕРЫ КАРТ
 ## ============================================================
@@ -703,6 +715,7 @@ const ELITE_MINER_APPEARS_FROM_FLOOR: int = 3
 
 const REWARD_GOLD_DEFAULT : int = 10
 const REWARD_CHOICE_AMOUNT : int = 3
+const REWARD_DAMAGE_DEFAULT: int = 5
 ## Стартовое количество валют
 const STARTING_COINS: int = 0
 const STARTING_BONES: int = 0

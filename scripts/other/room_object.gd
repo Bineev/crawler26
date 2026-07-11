@@ -8,6 +8,7 @@ var _tween: Tween = null
 var highlight_material: ShaderMaterial = null
 var base_material: Material = null
 var _is_hovered: bool = false
+var _is_interacting: bool = false  # 🆕 флаг, что объект уже взаимодействует
 @onready var shadow_sprite: TextureRect = $EnemySpriteCopy
 
 
@@ -15,6 +16,7 @@ func _ready() -> void:
 	# Подключаем сигналы мыши
 	mouse_entered.connect(_on_mouse_entered)
 	mouse_exited.connect(_on_mouse_exited)
+	SignalManager.hide_object.connect(_on_hide_object)
 
 
 func setup(type: DataManager.ObjectType, biome: DataManager.Biome) -> void:
@@ -38,13 +40,44 @@ func setup(type: DataManager.ObjectType, biome: DataManager.Biome) -> void:
 	# 🆕 Настраиваем подсветку
 	_setup_highlight()
 	_start_idle_animation()
+	# 🆕 Подключаем сигнал клика
+	gui_input.connect(_on_gui_input)
 
 func interact() -> void:
+	if _is_interacting:
+		return
+	
+	_is_interacting = true
+	
+	# 🆕 Отключаем интерактивность
+	mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_apply_highlight(false)
+	
+	# Останавливаем анимацию
+	if _tween:
+		_tween.kill()
+		_tween = null
+	
+	SignalManager.log_message.emit('Start interracting')
 	match object_type:
 		DataManager.ObjectType.CHEST:
-			# TODO: открыть сундук → награда
+			_interact_chest()
 			pass
-		# ... остальные типы
+		DataManager.ObjectType.IDOL:
+			# TODO: взаимодействие с идолом
+			pass
+		DataManager.ObjectType.TRAP:
+			# TODO: ловушка
+			pass
+		DataManager.ObjectType.CAULDRON:
+			# TODO: котёл
+			pass
+		DataManager.ObjectType.TORTURE_RACK:
+			# TODO: пыточный стол
+			pass
+		DataManager.ObjectType.BONFIRE:
+			# TODO: костёр
+			pass
 
 
 func _start_idle_animation() -> void:
@@ -78,10 +111,14 @@ func _exit_tree() -> void:
 
 
 func _on_mouse_entered() -> void:
+	if _is_interacting:
+		return
 	_is_hovered = true
 	_apply_highlight(true)
 
 func _on_mouse_exited() -> void:
+	if _is_interacting:
+		return
 	_is_hovered = false
 	_apply_highlight(false)
 
@@ -99,3 +136,40 @@ func _apply_highlight(enabled: bool) -> void:
 	else:
 		material = base_material
 		highlight_material.set_shader_parameter("hover_intensity", 0.0)
+
+
+func _on_gui_input(event: InputEvent) -> void:
+	if _is_interacting:
+		return
+	
+	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
+		interact()
+
+
+func _interact_chest() -> void:
+	var has_key = RunManager.get_keys() > 0
+	var actions: Array[DataManager.ActionType] = []
+	
+	if has_key:
+		actions.append(DataManager.ActionType.USE_KEY)
+	actions.append(DataManager.ActionType.BREAK)
+	
+	var action_choice = preload("res://scenes/action_choice.tscn").instantiate() as ActionChoice
+	# 🆕 Не вызываем setup здесь, только передаём данные
+	SignalManager.add_action_choice.emit(action_choice, "Выберите действие", actions)
+
+
+func _on_hide_object() -> void:
+	# Отключаем интерактивность
+	mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_apply_highlight(false)
+	
+	if _tween:
+		_tween.kill()
+		_tween = null
+	
+	# 🆕 Исчезаем с анимацией
+	var tween = create_tween()
+	tween.tween_property(self, "modulate", Color(1, 1, 1, 0), 0.3)
+	await tween.finished
+	queue_free()

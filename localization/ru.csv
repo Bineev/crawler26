@@ -1,160 +1,108 @@
 keys,ru
 card_atonement_strike_name,Удар расплаты
 card_atonement_strike_desc,"Наносит 5 урона.\nДаёт 3 Искупления."
-
 card_sinful_strike_name,Греховный выпад
 card_sinful_strike_desc,"Наносит 10 урона.\nНакладывает Стыд на 2 хода."
-
 card_penitent_revelation_name,Покаянное откровение
 card_penitent_revelation_desc,"Сожгите карту.\nДоберите карты в зависимости от Искупления: 10+ → 1, 20+ → 2, 30+ → 3."
-
 card_atonement_barrier_name,Искупительный барьер
 card_atonement_barrier_desc,"Получите 5 урона.\nПолучите блок в зависимости от Искупления: 10+ → 10, 20+ → 16, 30+ → 22."
-
 card_blood_sacrifice_name,Кровавая жертва
 card_blood_sacrifice_desc,"Получите 5 урона.\nПолучите 30 Искупления.\nИзлишек превращается в блок."
-
 card_price_of_despair_name,Цена отчаяния
 card_price_of_despair_desc,"Выберите цель.\nУдваивает негативные статусы на цели.\nЛечит от Искупления: 10+ → 6, 20+ → 11, 30+ → 15."
-
 card_scouring_flame_name,Очищающее пламя
 card_scouring_flame_desc,"За каждый негативный статус: 3 урона, снять статус, +5 Искупления."
-
 card_sin_of_vanity_name,Грех тщеславия
 card_sin_of_vanity_desc,"Наносит 4 урона.\n+2 за каждый негативный статус на вас и положительный на враге."
-
 card_thirst_for_punishment_name,Жажда кары
 card_thirst_for_punishment_desc,"Получите 5 урона.\nПолучите энергию от Искупления: 10+ → 1, 20+ → 2, 30+ → 3."
-
 card_shield_of_penance_name,Щит покаяния
 card_shield_of_penance_desc,"Даёт 5 блока.\n+5 блока если у вас 2+ негативных статуса."
-
 card_void_strike_name,Удар пустоты
 card_void_strike_desc,"Наносит 6 урона.\n+4 урона если Искупление = 0."
-
 card_cry_of_despair_name,Крик отчаяния
 card_cry_of_despair_desc,"Наносит 5 урона.\nЛечит от Искупления: 10+ → 5, 20+ → 10, 30+ → 15.\nСжигает всё Искупление."
-
 card_blind_fury_name,Слепая ярость
 card_blind_fury_desc,"Наносит 3 удара по 4 урона.\nЕсли есть кровотечение — все удары в одну цель."
-
 card_smell_of_blood_name,Запах крови
 card_smell_of_blood_desc,"Возьмите 1 карту за врага с кровотечением.\nИначе возьмите 2 карты и получите 3 урона."
-
 card_molerat_hide_name,Шкура кротокрыса
 card_molerat_hide_desc,"Даёт 10 блока.\nАтакующие получают кровотечение."
-
 card_tunnel_ambush_name,Туннельная засада
 card_tunnel_ambush_desc,"Следующая атака наносит двойной урон.\nПропустите следующий ход."
-
 card_bloodletting_name,Кровопускание
 card_bloodletting_desc,"Снимает всё кровотечение.\nНаносит урон = снятые стаки × 2."
-
 card_blood_trail_name,Кровавый след
 card_blood_trail_desc,"Наносит 6 урона.\nЕсли у врага есть Кровотечение, наносит 10 урона."
-
 card_frozen_earth_name,Стылая земля
 card_frozen_earth_desc,"Даёт 10 блока.\nНакладывает 3 стака Холода.\nПри наличии Холода даёт ещё 4 блока."
-
 card_rodent_agility_name,Проворство грызуна
 card_rodent_agility_desc,"Добирает 2 карты.\nНакладывает на себя 1 стак Кровотечения на 2 хода."
-
 card_frozen_bite_name,Мерзлый укус
 card_frozen_bite_desc,"Наносит 5 урона.\nНакладывает на врага 5 стаков Холода."
-
 card_rotten_cut_name,Гнилой порез
 card_rotten_cut_desc,"Наносит 2 урона.\nУдваивает стаки Кровотечения на враге."
-
 card_beast_pulse_name,Пульс зверя
 card_beast_pulse_desc,"Накладывает пассивку Regrowth (5 зарядов).\nЕсли здоровье < 30, даёт 2 энергии."
-
 card_blood_thread_name,Кровавая нить
 card_blood_thread_desc,"Все враги получают 1 стак Кровотечения.\nДаёт 3 Силы за каждого врага."
-
 card_mole_toss_name,Бросок слепыша
 card_mole_toss_desc,"Наносит случайное число урона от 1 до 10."
-
 card_worm_spirit_name,Дух червя
 card_worm_spirit_desc,"Снимает все статусы и пассивки с героя.\nДаёт Регенерацию на 3 хода.\nБазовое лечение: 2, +1 за каждый снятый эффект."
-
 card_flesh_rage_name,Ярость плоти
 card_flesh_rage_desc,"Накладывает на себя 1 стак Кровотечения.\nЕсли есть Кровотечение — +1 энергия.\nЕсли нет — добор 1 карты."
-
 card_torn_wound_name,Рваная рана
 card_torn_wound_desc,"Наносит 4 урона.\nНакладывает на врага 1 стак Кровотечения."
-
 status_poison_name,Яд
 status_poison_desc,"Наносит 5 урона каждый ход. Игнорирует блок. Снижает лечение на 25%."
-
 status_bleed_name,Кровотечение
 status_bleed_desc,"Наносит 3 урона за каждый стак каждый ход."
-
 status_burn_name,Горение
 status_burn_desc,"Наносит 1 урона за каждый стак каждый ход. Взрывается при 25 стаках."
-
 status_cold_name,Холод
 status_cold_desc,"Снижает входящий урон на 2% за стак (макс 50%). При 25 стаках замораживает цель."
-
 status_weakness_name,Слабость
 status_weakness_desc,"Атаки наносят на 25% меньше урона."
-
 status_vulnerability_name,Уязвимость
 status_vulnerability_desc,"Получает на 50% больше урона от всех источников."
-
 status_strength_name,Сила
 status_strength_desc,"Увеличивает урон на 1 за стак."
-
 status_regen_name,Регенерация
 status_regen_desc,"Лечит 1 HP за стак в конце хода."
-
 status_shield_name,Щит
 status_shield_desc,"Поглощает входящий урон. Сбрасывается в начале хода."
-
 status_frozen_name,Заморозка
 status_frozen_desc,"Цель заморожена. Пропускает ход. Статусы приостановлены. Получает на 50% меньше урона."
-
 status_gangrene_name,Гангрена
 status_gangrene_desc,"В последний ход наносит весь урон разом."
-
 passive_regrowth_name,Оживление
 passive_regrowth_desc,"Каждый ход лечит на растущую величину."
-
 passive_venomous_shield_name,Ядовитый щит
 passive_venomous_shield_desc,"При получении урона накладывает Яд на атакующего."
-
 passive_wrath_name,Злость
 passive_wrath_desc,"В конце каждого хода даёт +1 Силы."
-
 passive_freezing_ground_name,Стылая земля
 passive_freezing_ground_desc,"При получении атаки накладывает Лёд на атакующего."
-
 passive_denial_name,Отрицание
 passive_denial_desc,"Блокирует негативные статусы."
-
 passive_shame_name,Стыд
 passive_shame_desc,"Увеличивает входящий урон на 25% и удваивает получаемое Искупление."
-
 enemy_mole_mutant_name,Слепыш-мутант
 enemy_mole_mutant_desc,"Жалкое слепое создание. Медленно регенерирует."
-
 enemy_strong_mole_name,Крот-силач
 enemy_strong_mole_desc,"Коренастый крот с мощными когтями. Чередует атаку и защиту."
-
 enemy_rabid_rat_name,Бешеная крыса
 enemy_rabid_rat_desc,"Обезумевшая крыса, чьи укусы вызывают кровотечение."
-
 enemy_mole_fungus_name,Крот-гриб
 enemy_mole_fungus_desc,"Ужас, поражённый грибком. Становится сильнее с каждым ходом."
-
 enemy_many_headed_mole_name,Многоголовый слепыш
 enemy_many_headed_mole_desc,"Трёхголовый монстр. Его ледяное прикосновение замораживает землю."
-
 enemy_fungal_miner_name,Шахтёр-гриб
 enemy_fungal_miner_desc,"Шахтёр, поглощённый грибницей. Роет ходы и отравляет."
-
 enemy_rodent_mound_name,Гора грызунов
 enemy_rodent_mound_desc,"Огромная масса копошащихся крыс. Рой пожирает всё на своём пути."
-
 ui_attack,Атака
 ui_defend,Защита
 ui_heal,Лечение
@@ -162,12 +110,10 @@ ui_buff,Бафф
 ui_debuff,Дебафф
 ui_utility,Утилити
 ui_resource,Ресурс
-
 msg_not_enough_energy,Недостаточно энергии!
 msg_target_selection,Выберите цель
 msg_victory,Победа!
 msg_defeat,Поражение...
-
 reward_card_biom_title,Выберите карту биома
 reward_card_character_title,Выберите карту персонажа
 reward_card_without_choice_title,Вы получили карту
@@ -183,28 +129,31 @@ reward_gold_title,Золото
 reward_remove_card_title,Удалить карту
 reward_upgrade_card_title,Улучшить карту
 reward_add_property_title,Добавить свойство
-reward_choose_card,Выбрать
+reward_choose_card,Выбрать карту
 reward_take_card,Взять карту
-reward_choose_artifact,Выбрать
+reward_choose_artifact,Выбрать артефакт
 reward_take_artifact,Взять артефакт
 reward_take_gold,Взять золото
 reward_take_heal,Лечиться
 reward_take_damage,Принять
 reward_choose,Выбрать
 reward_default_title,Выберите награду
-
 artifact_strange_mushroom_name,Странный гриб
 artifact_strange_mushroom_desc,"+%d макс. HP, но каждый бой начинается с Ядом на %d хода"
+artifact_strange_mushroom_lore,"Странный гриб, найденный в глубинах. Он даёт силу, но требует платы."
 artifact_heros_brooch_name,Брошь героя
 artifact_heros_brooch_desc,"Каждый %d-й ход начинается с %d Силы"
+artifact_heros_brooch_lore,"Брошь старого героя. Она помнит множество битв и хранит частицу былой силы."
 artifact_kings_order_name,Приказ короля
 artifact_kings_order_desc,"Каждая %d-я сыгранная карта наносит %dx урона"
+artifact_kings_order_lore,"Древний указ короля, подписанный кровью. Его слова всё ещё имеют власть."
 artifact_healers_amulet_name,Амулет целителя
 artifact_healers_amulet_desc,"При получении %d+ негативных статусов восстанавливает %d HP"
+artifact_healers_amulet_lore,"Амулет, сотканный из света и молитв. Он чувствует боль и отвечает на неё теплом."
 artifact_abyss_dust_name,Пыль бездны
-artifact_abyss_dust_desc,Делает стоимость случайной карты в колоде равной %d
+artifact_abyss_dust_desc,"Делает стоимость случайной карты в колоде равной %d"
+artifact_abyss_dust_lore,"Горсть чёрной пыли, которая стирает саму память о цене. Всё имеет свою цену, но не в бездне."
 artifact_unknown_name,Неизвестный артефакт
-
 artifact_trigger_one_time,Срабатывает один раз
 artifact_trigger_turn_count_start,Каждые %d ходов (в начале)
 artifact_trigger_turn_count_end,Каждые %d ходов (в конце)
@@ -212,3 +161,11 @@ artifact_trigger_on_start_fight,Срабатывает в начале боя
 artifact_trigger_card_played_counter,Каждые %d сыгранных карт
 artifact_trigger_conditional,Срабатывает при условии
 artifact_trigger_custom,Особая логика
+action_use_key,Использовать ключ
+action_break,Взломать
+action_pray,Помолиться
+action_drink,Выпить
+action_search,Обыскать
+action_rest,Отдохнуть
+chest_reward_title,Вы нашли сокровища!
+chest_fail_title,Попытка не удалась...

@@ -5,6 +5,7 @@ var reward_types: Array[DataManager.RewardType] = []
 var current_index: int = 0
 var is_animating: bool = false
 var gold_mod: int = 1  # множитель золота
+var damage_mod: int = 1 # множитель урона
 
 @onready var dark_overlay: ColorRect = $DarkOverlay
 @onready var center_container: CenterContainer = $CenterContainer
@@ -15,6 +16,7 @@ func _ready():
 	after_dark_overlay.color.a = 0.0
 	await _animate_in()
 	show_rewards()
+
 
 func show_rewards():
 	current_index = 0
@@ -180,8 +182,13 @@ func _create_potion_reward() -> void:
 	pass
 
 func _create_take_damage_reward() -> void:
-	# TODO: создать UI для получения урона (обычно за выбор)
-	pass
+	var damage_amount = DataManager.REWARD_DAMAGE_DEFAULT * damage_mod
+	
+	var content = preload("res://scenes/reward_content.tscn").instantiate() as RewardContent
+	content.damage_mod = damage_mod
+	center_container.add_child(content)
+	content.setup(DataManager.RewardType.TAKE_DAMAGE, [damage_amount])
+	SignalManager.reward_selected.connect(_on_reward_selected)
 
 func _create_heal_reward() -> void:
 	# TODO: создать UI для лечения

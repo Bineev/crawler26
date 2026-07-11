@@ -1,0 +1,49 @@
+[gd_scene load_steps=3 format=3 uid="uid://c4tkemrv3pgin"]
+
+[ext_resource type="Script" uid="uid://cb7xjud02smys" path="res://scripts/other/action_choice.gd" id="1_iad5i"]
+[ext_resource type="LabelSettings" uid="uid://cho2cb5x0hrmf" path="res://styles/label_red_24.tres" id="2_akiov"]
+
+[node name="ActionChoice" type="Control"]
+custom_minimum_size = Vector2(1024, 800)
+layout_mode = 3
+anchors_preset = 0
+mouse_filter = 2
+script = ExtResource("1_iad5i")
+
+[node name="DarkOverlay" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0, 0, 0, 1)
+
+[node name="CenterContainer" type="CenterContainer" parent="DarkOverlay"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -20.0
+offset_right = 20.0
+offset_bottom = 20.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="DarkOverlay/CenterContainer"]
+layout_mode = 2
+theme_override_constants/separation = 30
+
+[node name="Title" type="Label" parent="DarkOverlay/CenterContainer/VBoxContainer"]
+layout_mode = 2
+label_settings = ExtResource("2_akiov")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ButtonsContainer" type="HBoxContainer" parent="DarkOverlay/CenterContainer/VBoxContainer"]
+layout_mode = 2
+alignment = 1

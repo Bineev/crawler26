@@ -5,6 +5,7 @@ var reward_type: DataManager.RewardType
 var rewards: Array = []  # массив карт, артефактов и т.д.
 var selected_index: int = -1
 var gold_mod: int = 1  # множитель золота
+var damage_mod: int = 1
 
 @onready var title_label: Label = $Title
 @onready var rewards_container: HBoxContainer = $HBoxContainer
@@ -197,7 +198,9 @@ func _apply_reward(index: int) -> void:
 		DataManager.RewardType.POTION:
 			SignalManager.add_potion.emit(selected_item)
 		DataManager.RewardType.TAKE_DAMAGE:
-			SignalManager.damage_player.emit(selected_item)
+			var player = BattleManager.get_player()
+			if player:
+				player.take_damage(selected_item)
 		DataManager.RewardType.GET_HEAL:
 			SignalManager.heal_player.emit(selected_item)
 		DataManager.RewardType.ENERGY_BUFF:
@@ -264,8 +267,38 @@ func _setup_potion_rewards() -> void:
 	pass
 
 func _setup_take_damage_reward() -> void:
-	# TODO: создать UI для получения урона
-	pass
+	var damage_amount = rewards[0]
+	
+	var vbox = VBoxContainer.new()
+	vbox.alignment = BoxContainer.ALIGNMENT_CENTER
+	vbox.add_theme_constant_override("separation", 20)
+	
+	var hbox = HBoxContainer.new()
+	hbox.alignment = BoxContainer.ALIGNMENT_CENTER
+	hbox.add_theme_constant_override("separation", 15)
+	
+	var icon = TextureRect.new()
+	icon.texture = preload("res://img/icons/intents/attack.png")  # TODO: добавить иконку урона
+	icon.custom_minimum_size = Vector2(64, 64)
+	icon.expand_mode = TextureRect.EXPAND_FIT_WIDTH_PROPORTIONAL
+	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	hbox.add_child(icon)
+	
+	var damage_label = Label.new()
+	damage_label.text = "-" + str(damage_amount)
+	damage_label.add_theme_font_override("font", DataManager.FONT_HEADERS)
+	damage_label.add_theme_font_size_override("font_size", 48)
+	damage_label.add_theme_color_override("font_color", DataManager.COLOR_FLESH_CAVES_ART_BG_DARK)
+	damage_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	damage_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	hbox.add_child(damage_label)
+	
+	vbox.add_child(hbox)
+	
+	var button = _create_reward_button("reward_take_damage", 0)
+	vbox.add_child(button)
+	
+	rewards_container.add_child(vbox)
 
 func _setup_heal_reward() -> void:
 	# TODO: создать UI для лечения

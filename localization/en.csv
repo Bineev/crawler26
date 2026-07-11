@@ -1,160 +1,108 @@
 keys,en
 card_atonement_strike_name,Atonement Strike
 card_atonement_strike_desc,"Deals 5 damage.\nGain 3 Atonement."
-
 card_sinful_strike_name,Sinful Strike
 card_sinful_strike_desc,"Deals 10 damage.\nApplies Shame for 2 turns."
-
 card_penitent_revelation_name,Penitent Revelation
 card_penitent_revelation_desc,"Sacrifice a card.\nDraw cards based on Atonement: 10+ → 1, 20+ → 2, 30+ → 3."
-
 card_atonement_barrier_name,Atonement Barrier
 card_atonement_barrier_desc,"Take 5 damage.\nGain Block based on Atonement: 10+ → 10, 20+ → 16, 30+ → 22."
-
 card_blood_sacrifice_name,Blood Sacrifice
 card_blood_sacrifice_desc,"Take 5 damage.\nGain 30 Atonement.\nExcess converts to Block."
-
 card_price_of_despair_name,Price of Despair
 card_price_of_despair_desc,"Choose a target.\nDouble negative statuses on target.\nHeal based on Atonement: 10+ → 6, 20+ → 11, 30+ → 15."
-
 card_scouring_flame_name,Scouring Flame
 card_scouring_flame_desc,"For each negative status: take 3 damage, remove status, gain 5 Atonement."
-
 card_sin_of_vanity_name,Sin of Vanity
 card_sin_of_vanity_desc,"Deal 4 damage.\n+2 per negative status on you and positive status on enemy."
-
 card_thirst_for_punishment_name,Thirst for Punishment
 card_thirst_for_punishment_desc,"Take 5 damage.\nGain energy based on Atonement: 10+ → 1, 20+ → 2, 30+ → 3."
-
 card_shield_of_penance_name,Shield of Penance
 card_shield_of_penance_desc,"Gain 5 Block.\n+5 Block if you have 2+ negative statuses."
-
 card_void_strike_name,Void Strike
 card_void_strike_desc,"Deal 6 damage.\n+4 damage if Atonement = 0."
-
 card_cry_of_despair_name,Cry of Despair
 card_cry_of_despair_desc,"Deal 5 damage.\nHeal based on Atonement: 10+ → 5, 20+ → 10, 30+ → 15.\nConsume all Atonement."
-
 card_blind_fury_name,Blind Fury
 card_blind_fury_desc,"Deal 3 hits of 4 damage.\nIf Bleeding exists, all hits target the same enemy."
-
 card_smell_of_blood_name,Smell of Blood
 card_smell_of_blood_desc,"Draw 1 card per enemy with Bleeding.\nOtherwise draw 2 cards and take 3 damage."
-
 card_molerat_hide_name,Molerat Hide
 card_molerat_hide_desc,"Gain 10 Block.\nAttackers receive Bleeding."
-
 card_tunnel_ambush_name,Tunnel Ambush
 card_tunnel_ambush_desc,"Next attack deals double damage.\nSkip your next turn."
-
 card_bloodletting_name,Bloodletting
 card_bloodletting_desc,"Remove all Bleeding.\nDeal damage equal to stacks × 2."
-
 card_blood_trail_name,Blood Trail
 card_blood_trail_desc,"Deals 6 damage.\nIf enemy has Bleed, deals 10 damage."
-
 card_frozen_earth_name,Frozen Earth
 card_frozen_earth_desc,"Gain 10 Block.\nApply 3 Cold to yourself.\nIf you have Cold, gain 4 additional Block."
-
 card_rodent_agility_name,Rodent Agility
 card_rodent_agility_desc,"Draw 2 cards.\nApply 1 Bleed to yourself for 2 turns."
-
 card_frozen_bite_name,Frozen Bite
 card_frozen_bite_desc,"Deals 5 damage.\nApplies 5 stacks of Cold to the enemy."
-
 card_rotten_cut_name,Rotten Cut
 card_rotten_cut_desc,"Deals 2 damage.\nDoubles Bleed stacks on the enemy."
-
 card_beast_pulse_name,Beast Pulse
 card_beast_pulse_desc,"Apply Regrowth passive (5 charges).\nIf health < 30, gain 2 energy."
-
 card_blood_thread_name,Blood Thread
 card_blood_thread_desc,"All enemies gain 1 Bleed.\nGain 3 Strength per enemy."
-
 card_mole_toss_name,Mole Toss
 card_mole_toss_desc,"Deals random damage from 1 to 10."
-
 card_worm_spirit_name,Worm Spirit
 card_worm_spirit_desc,"Removes all statuses and passives from the hero.\nGrants Regeneration for 3 turns.\nBase healing: 2, +1 per removed effect."
-
 card_flesh_rage_name,Flesh Rage
 card_flesh_rage_desc,"Apply 1 Bleed to yourself.\nIf you have Bleed — gain 1 energy.\nIf not — draw 1 card."
-
-card_torn_wound_name,Rotten Bite
+card_torn_wound_name,Torn Wound
 card_torn_wound_desc,"Deals 4 damage.\nApplies 1 stack of Bleed to the enemy."
-
 status_poison_name,Poison
 status_poison_desc,"Deals 5 damage each turn. Ignores Block. Reduces healing by 25%."
-
 status_bleed_name,Bleed
 status_bleed_desc,"Deals 3 damage per stack each turn."
-
 status_burn_name,Burn
 status_burn_desc,"Deals 1 damage per stack each turn. Explodes at 25 stacks."
-
 status_cold_name,Cold
 status_cold_desc,"Reduces incoming damage by 2%% per stack (max 50%%). At 25 stacks freezes the target."
-
 status_weakness_name,Weakness
 status_weakness_desc,"Attacks deal 25%% less damage."
-
 status_vulnerability_name,Vulnerability
 status_vulnerability_desc,"Takes 50%% more damage from all sources."
-
 status_strength_name,Strength
 status_strength_desc,"Increases damage by 1 per stack."
-
 status_regen_name,Regeneration
 status_regen_desc,"Heals 1 HP per stack at end of turn."
-
 status_shield_name,Shield
 status_shield_desc,"Absorbs incoming damage. Resets at start of turn."
-
 status_frozen_name,Frozen
 status_frozen_desc,"Frozen. Skips turn. Statuses are paused. Takes 50%% less damage."
-
 status_gangrene_name,Gangrene
 status_gangrene_desc,"Deals all damage at once on the last turn."
-
 passive_regrowth_name,Regrowth
 passive_regrowth_desc,"Heals increasing amount each turn."
-
 passive_venomous_shield_name,Venomous Shield
 passive_venomous_shield_desc,"Applies Poison to attacker when hit."
-
 passive_wrath_name,Wrath
 passive_wrath_desc,"Grants +1 Strength at end of each turn."
-
 passive_freezing_ground_name,Freezing Ground
 passive_freezing_ground_desc,"Applies Cold to attacker when hit."
-
 passive_denial_name,Denial
 passive_denial_desc,"Blocks negative statuses."
-
 passive_shame_name,Shame
 passive_shame_desc,"Increases incoming damage by 25% and doubles Atonement gained."
-
 enemy_mole_mutant_name,Mole Mutant
 enemy_mole_mutant_desc,"A pathetic blind creature. It regenerates slowly."
-
 enemy_strong_mole_name,Strong Mole
 enemy_strong_mole_desc,"A stout mole with powerful claws. Alternates attack and defense."
-
 enemy_rabid_rat_name,Rabid Rat
 enemy_rabid_rat_desc,"A frenzied rat that spreads bleeding wounds."
-
 enemy_mole_fungus_name,Mole Fungus
 enemy_mole_fungus_desc,"A mushroom-infested horror. Grows stronger each turn."
-
 enemy_many_headed_mole_name,Many-Headed Mole
 enemy_many_headed_mole_desc,"A three-headed abomination. Its icy touch freezes the ground."
-
 enemy_fungal_miner_name,Fungal Miner
 enemy_fungal_miner_desc,"A miner consumed by fungus. It digs and poisons."
-
 enemy_rodent_mound_name,Rodent Mound
 enemy_rodent_mound_desc,"A massive pile of writhing rodents. The swarm consumes all."
-
 ui_attack,Attack
 ui_defend,Defend
 ui_heal,Heal
@@ -162,12 +110,10 @@ ui_buff,Buff
 ui_debuff,Debuff
 ui_utility,Utility
 ui_resource,Resource
-
 msg_not_enough_energy,Not enough energy!
 msg_target_selection,Select target
 msg_victory,Victory!
 msg_defeat,Defeat...
-
 reward_card_biom_title,Choose a biome card
 reward_card_character_title,Choose a character card
 reward_card_without_choice_title,You received a card
@@ -183,28 +129,31 @@ reward_gold_title,Gold
 reward_remove_card_title,Remove a card
 reward_upgrade_card_title,Upgrade a card
 reward_add_property_title,Add property
-reward_choose_card,Choose
-reward_take_card,Take
-reward_choose_artifact,Choose
+reward_choose_card,Choose card
+reward_take_card,Take card
+reward_choose_artifact,Choose artifact
 reward_take_artifact,Take artifact
 reward_take_gold,Take gold
 reward_take_heal,Heal
 reward_take_damage,Accept
 reward_choose,Choose
 reward_default_title,Choose a reward
-
 artifact_strange_mushroom_name,Strange Mushroom
 artifact_strange_mushroom_desc,"+%d max HP, but start each fight with Poison for %d turns"
+artifact_strange_mushroom_lore,"A strange mushroom found in the depths. It grants power, but demands a price."
 artifact_heros_brooch_name,Hero's Brooch
 artifact_heros_brooch_desc,"Every %drd turn start with %d Strength"
+artifact_heros_brooch_lore,"The brooch of an old hero. It remembers many battles and holds a fragment of past strength."
 artifact_kings_order_name,King's Order
 artifact_kings_order_desc,"Every %dth card played deals %dx damage"
+artifact_kings_order_lore,"An ancient royal decree signed in blood. His words still hold power."
 artifact_healers_amulet_name,Healer's Amulet
 artifact_healers_amulet_desc,"When receiving %d+ negative statuses, heal %d HP"
+artifact_healers_amulet_lore,"An amulet woven from light and prayers. It feels pain and responds with warmth."
 artifact_abyss_dust_name,Abyss Dust
-artifact_abyss_dust_desc,Makes a random card in your deck cost %d
+artifact_abyss_dust_desc,"Makes a random card in your deck cost %d"
+artifact_abyss_dust_lore,"A handful of black dust that erases the very memory of cost. Everything has its price, but not in the abyss."
 artifact_unknown_name,Unknown Artifact
-
 artifact_trigger_one_time,Triggers once
 artifact_trigger_turn_count_start,Every %d turns (at start)
 artifact_trigger_turn_count_end,Every %d turns (at end)
@@ -212,3 +161,11 @@ artifact_trigger_on_start_fight,Triggers at fight start
 artifact_trigger_card_played_counter,Every %d cards played
 artifact_trigger_conditional,Triggers on condition
 artifact_trigger_custom,Special logic
+action_use_key,Use Key
+action_break,Break
+action_pray,Pray
+action_drink,Drink
+action_search,Search
+action_rest,Rest
+chest_reward_title,You found treasures!
+chest_fail_title,Attempt failed...

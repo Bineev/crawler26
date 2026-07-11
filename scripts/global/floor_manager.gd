@@ -114,20 +114,24 @@ func _generate_random_room(is_revealed: bool) -> RoomNode:
 	var combat_type: DataManager.CombatType = DataManager.CombatType.NORMAL
 	var object_type: DataManager.ObjectType = DataManager.ObjectType.CHEST
 	
-	if roll < 0.6:  # 60% бой
+	#if roll < 0.6:  # 60% бой
+	if roll < 0.0:  # 60% бой
 		room_type = DataManager.RoomType.COMBAT
 		var combat_roll = randf()
 		if combat_roll < 0.7:
 			combat_type = DataManager.CombatType.NORMAL
 		else:
 			combat_type = DataManager.CombatType.ELITE
-	elif roll < 0.8:  # 20% эвент
+	#elif roll < 0.8:  # 20% эвент
+	elif roll < 0.01:  # 20% эвент
 		room_type = DataManager.RoomType.EVENT
 	else:  # 20% объект
 		room_type = DataManager.RoomType.OBJECT
+		#TODO раскомментировать после теста
 		# 🆕 Выбираем случайный тип объекта
-		var object_types = DataManager.ObjectType.values()
-		object_type = object_types[randi() % object_types.size()]
+		#var object_types = DataManager.ObjectType.values()
+		#object_type = object_types[randi() % object_types.size()]
+		object_type = DataManager.ObjectType.CHEST
 	
 	room_node.setup({
 		"type": room_type,

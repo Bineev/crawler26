@@ -55,6 +55,7 @@ func start_test(world_node: Node):
 	SignalManager.battle_defeat.connect(_on_battle_ended)
 	SignalManager.player_took_damage.connect(_on_player_took_damage)
 	SignalManager.show_reward.connect(_on_show_reward)
+	SignalManager.add_action_choice.connect(_on_add_action_choice)
 	# Сбрасываем менеджеры
 	FloorManager.reset()
 	SoundManager.start_gameplay_playlist()
@@ -319,3 +320,22 @@ func add_reward_panel(reward_panel: RewardPanel):
 		game_world.add_child(canvas_layer)
 		canvas_layer.add_child(reward_panel)
 		reward_panel.global_position = DataManager.ROOM_POSITION
+
+
+func _on_add_action_choice(action_choice: Control, title: String, actions: Array[DataManager.ActionType]) -> void:
+	add_action_choice(action_choice, title, actions)
+
+
+func add_action_choice(action_choice: Control, title: String, actions: Array[DataManager.ActionType]) -> void:
+	if not action_choice:
+		return
+	
+	# Сначала добавляем в дерево
+	var canvas_layer = CanvasLayer.new()
+	canvas_layer.layer = 300
+	game_world.add_child(canvas_layer)
+	canvas_layer.add_child(action_choice)
+	action_choice.global_position = DataManager.ROOM_POSITION
+	
+	# 🆕 Теперь вызываем setup (после добавления в дерево)
+	action_choice.setup(title, actions)

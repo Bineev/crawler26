@@ -131,3 +131,9 @@ signal artifact_removed(artifact_id: DataManager.ArtifactId)
 signal artifact_triggered(artifact: ArtifactResource)
 
 signal artifact_counter_changed(artifact_id: DataManager.ArtifactId, counter: int)
+
+signal keys_changed(amount: int)
+
+signal add_action_choice(action_choice: Control, title: String, actions: Array[DataManager.ActionType])
+
+signal hide_object()

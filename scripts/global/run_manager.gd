@@ -17,6 +17,8 @@ var artifacts: Array[ArtifactResource] = []
 ## Счётчики для артефактов (например, для CARD_PLAYED_COUNTER)
 var artifact_counters: Dictionary = {}  # key: ArtifactId, value: int
 
+var keys: int = 0
+
 func _ready():
 	initialize_run()
 	SignalManager.add_artifact.connect(_on_add_artifact)
@@ -371,3 +373,17 @@ func process_health_dropped_below(health_before: int, health_after: int, percent
 	
 	for artifact in artifacts_to_remove:
 		remove_artifact(artifact.id)
+
+func add_keys(amount: int) -> void:
+	keys += amount
+	SignalManager.keys_changed.emit(keys)
+
+func use_key() -> bool:
+	if keys > 0:
+		keys -= 1
+		SignalManager.keys_changed.emit(keys)
+		return true
+	return false
+
+func get_keys() -> int:
+	return keys
