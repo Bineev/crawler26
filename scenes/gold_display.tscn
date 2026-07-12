@@ -1,0 +1,14 @@
+[gd_scene load_steps=2 format=3 uid="uid://dmmupsjg8k4wp"]
+
+[ext_resource type="Script" uid="uid://byaptqo0gcy0f" path="res://scripts/other/gold_display.gd" id="1_x0i8j"]
+
+[node name="GoldDisplay" type="HBoxContainer"]
+offset_right = 40.0
+offset_bottom = 40.0
+script = ExtResource("1_x0i8j")
+
+[node name="CoinsLabel" type="Label" parent="."]
+layout_mode = 2
+
+[node name="CoinsIcon" type="TextureRect" parent="."]
+layout_mode = 2

@@ -208,7 +208,7 @@ func _apply_reward(index: int) -> void:
 		DataManager.RewardType.DECK_SIZE_BUFF:
 			SignalManager.deck_size_buff.emit(selected_item)
 		DataManager.RewardType.GOLD:
-			SignalManager.add_gold.emit(selected_item)
+			SignalManager.add_coins.emit(selected_item)
 		DataManager.RewardType.REMOVE_CARD:
 			SignalManager.remove_card.emit(selected_item)
 		DataManager.RewardType.UPGRADE_CARD:

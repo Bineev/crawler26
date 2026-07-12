@@ -16,3 +16,4 @@ layout_mode = 2
 
 [node name="HBoxContainer" type="HBoxContainer" parent="."]
 layout_mode = 2
+alignment = 1

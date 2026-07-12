@@ -21,7 +21,7 @@ var energy_display: EnergyDisplay = null
 # Ссылка на RoomManager (будет доступен как автолоад)
 # RoomManager уже загружен как синглтон
 var is_ending_turn: bool = false
-
+var gold_display: GoldDisplay = null
 ## ============================================================
 ## ПУБЛИЧНЫЕ МЕТОДЫ
 ## ============================================================
@@ -62,6 +62,7 @@ func start_test(world_node: Node):
 	
 	_create_blood_screen()
 	_create_player_portrait()
+	_create_gold_display()
 	# Отключаем старые сигналы перед подключением
 	if FloorManager.room_selected.is_connected(_on_room_selected):
 		FloorManager.room_selected.disconnect(_on_room_selected)
@@ -159,7 +160,8 @@ func _on_room_selected(room_node: RoomNode):
 	
 	current_room_index += 1
 	
-	_create_battle_log()
+	if current_room_node.room_type == DataManager.RoomType.COMBAT:
+		_create_battle_log()
 
 
 func _on_floor_completed():
@@ -339,3 +341,9 @@ func add_action_choice(action_choice: Control, title: String, actions: Array[Dat
 	
 	# 🆕 Теперь вызываем setup (после добавления в дерево)
 	action_choice.setup(title, actions)
+
+
+func _create_gold_display() -> void:
+	gold_display = preload("res://scenes/gold_display.tscn").instantiate() as GoldDisplay
+	game_world.add_child(gold_display)
+	gold_display.global_position = DataManager.COINS_SCREEN_POSITION
