@@ -271,6 +271,9 @@ func _on_self_died(enemy: CharacterStats):
 
 
 func die():
+	# 🆕 Даём кости за убийство
+	_give_bones_on_death()
+	
 	if enemy_ui:
 		enemy_ui.die()
 	else:
@@ -324,3 +327,21 @@ func _get_targets_for_effect(effect: EffectEntry, target: CharacterStats) -> Arr
 			return [target] if target else []
 		_:
 			return [target] if target else []
+
+
+func _give_bones_on_death() -> void:
+	# Количество костей зависит от размера врага
+	var bones_amount = 0
+	match resource.size:
+		DataManager.EnemySize.WEAK:
+			bones_amount = DataManager.REWARD_BONES_DEFAULT
+		DataManager.EnemySize.NORMAL:
+			bones_amount = DataManager.REWARD_BONES_DEFAULT * 2
+		DataManager.EnemySize.ELITE:
+			bones_amount = DataManager.REWARD_BONES_DEFAULT * 3
+		DataManager.EnemySize.BOSS:
+			bones_amount = DataManager.REWARD_BONES_DEFAULT * 4
+	
+	if bones_amount > 0:
+		RunManager.add_bones(bones_amount)
+		SignalManager.log_message.emit("Получено %d костей" % bones_amount)

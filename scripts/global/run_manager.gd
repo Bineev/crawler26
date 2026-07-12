@@ -10,14 +10,12 @@ var regen_heal_per_stack: int = DataManager.REGEN_HEAL_PER_STACK
 
 var coins: int = DataManager.STARTING_COINS
 var bones: int = DataManager.STARTING_BONES
-
+var keys: int = DataManager.STARTING_KEYS
 ## Массив артефактов, которые есть у игрока в текущем забеге
 var artifacts: Array[ArtifactResource] = []
 
 ## Счётчики для артефактов (например, для CARD_PLAYED_COUNTER)
 var artifact_counters: Dictionary = {}  # key: ArtifactId, value: int
-
-var keys: int = 0
 
 func _ready():
 	initialize_run()
@@ -84,6 +82,14 @@ func add_bones(amount: int) -> void:
 	bones += amount
 	SignalManager.bones_changed.emit(bones)
 
+func spend_bones(amount: int) -> bool:
+	if bones >= amount:
+		bones -= amount
+		SignalManager.bones_changed.emit(bones)
+		return true
+	return false
+
+
 func get_coins() -> int:
 	return coins
 
@@ -94,13 +100,6 @@ func spend_coins(amount: int) -> bool:
 	if coins >= amount:
 		coins -= amount
 		SignalManager.coins_changed.emit(coins)
-		return true
-	return false
-
-func spend_bones(amount: int) -> bool:
-	if bones >= amount:
-		bones -= amount
-		SignalManager.bones_changed.emit(bones)
 		return true
 	return false
 

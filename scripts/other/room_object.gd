@@ -88,9 +88,9 @@ func _start_idle_animation() -> void:
 	_tween.set_loops()
 	
 	# Поднимаемся на 8 пикселей вверх
-	_tween.tween_property(self, "position", Vector2(0, -8), 1.2).as_relative().set_ease(Tween.EASE_IN_OUT)
+	_tween.tween_property(self, "position", Vector2(0, -2), 3).as_relative().set_ease(Tween.EASE_IN_OUT)
 	# Опускаемся обратно на 8 пикселей вниз
-	_tween.tween_property(self, "position", Vector2(0, 8), 1.2).as_relative().set_ease(Tween.EASE_IN_OUT)
+	_tween.tween_property(self, "position", Vector2(0, 2), 3).as_relative().set_ease(Tween.EASE_IN_OUT)
 
 
 func _setup_highlight() -> void:

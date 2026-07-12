@@ -9,8 +9,9 @@ func _ready():
 	coins_icon.custom_minimum_size = Vector2(32, 32)
 	coins_icon.expand_mode = TextureRect.EXPAND_FIT_WIDTH_PROPORTIONAL
 	coins_icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	DataManager.apply_shader_to_icon(coins_icon, "res://shaders/highlight_item.gdshader", {'hover_intensity' : 1.0})
 	
-	coins_label.custom_minimum_size = Vector2(30, 0)
+	coins_label.custom_minimum_size = Vector2(20, 0)
 	coins_label.add_theme_font_override("font", DataManager.FONT_HEADERS)
 	coins_label.add_theme_font_size_override("font_size", 24)
 	coins_label.add_theme_color_override("font_color", DataManager.COLOR_PENITENT_ART_BG_DARK)

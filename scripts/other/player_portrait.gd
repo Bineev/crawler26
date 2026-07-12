@@ -300,7 +300,7 @@ func _update_icons(target : Node):
 		var icon = STATUS_ICON_SCENE.instantiate() as StatusIcon
 		status_container.add_child(icon)
 		icon.setup(icon_data, DataManager.COLOR_MOLE_TUNNELS_ART_BG_LIGHT, self)  # светлый для игрока
-		#DataManager.apply_shader_to_icon(icon.icon, "res://shaders/highlight_enemy.gdshader", {'hover_intensity' : 1.0})
+		DataManager.apply_shader_to_icon(icon.icon, "res://shaders/highlight_item.gdshader", {'hover_intensity' : 1.0})
 		DataManager.apply_shader_overlay(icon.icon, "res://shaders/horror_shader.gdshader", {})
 	
 	# Добавляем пассивки
@@ -316,7 +316,7 @@ func _update_icons(target : Node):
 		var icon = PASSIVE_ICON_SCENE.instantiate() as PassiveIcon
 		status_container.add_child(icon)
 		icon.setup(icon_data, DataManager.COLOR_MOLE_TUNNELS_ART_BG_LIGHT, self)  # светлый для игрока
-		#DataManager.apply_shader_to_icon(icon.icon, "res://shaders/highlight_enemy.gdshader", {'hover_intensity' : 1.0})
+		DataManager.apply_shader_to_icon(icon.icon, "res://shaders/highlight_item.gdshader", {'hover_intensity' : 1.0})
 		DataManager.apply_shader_overlay(icon.icon, "res://shaders/horror_shader.gdshader", {})
 
 

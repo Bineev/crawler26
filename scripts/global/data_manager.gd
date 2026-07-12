@@ -683,6 +683,10 @@ const MAX_HAND_SIZE: int = 5
 
 
 const COINS_SCREEN_POSITION: Vector2 = Vector2(1520, 600)
+const KEYS_SCREEN_POSITION: Vector2 = Vector2(1620, 600)
+const BONES_SCREEN_POSITION: Vector2 = Vector2(1720, 600)
+
+const STARTING_KEYS: int = 1
 ## ============================================================
 ## НАСТРОЙКИ ПОДБОРА ВРАГОВ
 ## ============================================================
@@ -717,6 +721,7 @@ const BOSS_ADD_MINIONS_FROM_FLOOR: int = 3
 const ELITE_MINER_APPEARS_FROM_FLOOR: int = 3
 
 const REWARD_GOLD_DEFAULT : int = 10
+const REWARD_BONES_DEFAULT : int = 1
 const REWARD_CHOICE_AMOUNT : int = 3
 const REWARD_DAMAGE_DEFAULT: int = 5
 ## Стартовое количество валют

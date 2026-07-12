@@ -1,0 +1,14 @@
+[gd_scene load_steps=2 format=3 uid="uid://cyxqrq8dn4xw2"]
+
+[ext_resource type="Script" uid="uid://8q8qtkryd7mx" path="res://scripts/other/key_display.gd" id="1_qy7ty"]
+
+[node name="KeyDisplay" type="HBoxContainer"]
+offset_right = 40.0
+offset_bottom = 40.0
+script = ExtResource("1_qy7ty")
+
+[node name="KeyLabel" type="Label" parent="."]
+layout_mode = 2
+
+[node name="KeyIcon" type="TextureRect" parent="."]
+layout_mode = 2

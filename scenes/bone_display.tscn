@@ -1,0 +1,14 @@
+[gd_scene load_steps=2 format=3 uid="uid://dq15nws3bsxe0"]
+
+[ext_resource type="Script" uid="uid://cur20yl2uktpd" path="res://scripts/other/bone_display.gd" id="1_bhrfo"]
+
+[node name="BoneDisplay" type="HBoxContainer"]
+offset_right = 40.0
+offset_bottom = 40.0
+script = ExtResource("1_bhrfo")
+
+[node name="BoneLabel" type="Label" parent="."]
+layout_mode = 2
+
+[node name="BoneIcon" type="TextureRect" parent="."]
+layout_mode = 2

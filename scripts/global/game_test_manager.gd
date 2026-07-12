@@ -22,6 +22,8 @@ var energy_display: EnergyDisplay = null
 # RoomManager уже загружен как синглтон
 var is_ending_turn: bool = false
 var gold_display: GoldDisplay = null
+var key_display: KeyDisplay = null
+var bone_display: BoneDisplay = null
 ## ============================================================
 ## ПУБЛИЧНЫЕ МЕТОДЫ
 ## ============================================================
@@ -63,6 +65,8 @@ func start_test(world_node: Node):
 	_create_blood_screen()
 	_create_player_portrait()
 	_create_gold_display()
+	_create_key_display()
+	_create_bone_display()
 	# Отключаем старые сигналы перед подключением
 	if FloorManager.room_selected.is_connected(_on_room_selected):
 		FloorManager.room_selected.disconnect(_on_room_selected)
@@ -123,6 +127,8 @@ func after_combat_victory():
 # autoload/game_test_manager.gd
 
 func _on_room_selected(room_node: RoomNode):
+	# 🆕 Очищаем пустые CanvasLayer перед добавлением комнаты
+	_clean_empty_canvas_layers()
 	# Сбрасываем состояния
 	_reset_game_state()
 	
@@ -347,3 +353,31 @@ func _create_gold_display() -> void:
 	gold_display = preload("res://scenes/gold_display.tscn").instantiate() as GoldDisplay
 	game_world.add_child(gold_display)
 	gold_display.global_position = DataManager.COINS_SCREEN_POSITION
+
+
+func _create_key_display() -> void:
+	key_display = preload("res://scenes/key_display.tscn").instantiate() as KeyDisplay
+	game_world.add_child(key_display)
+	key_display.global_position = DataManager.KEYS_SCREEN_POSITION
+
+
+func _create_bone_display() -> void:
+	bone_display = preload("res://scenes/bone_display.tscn").instantiate() as BoneDisplay
+	game_world.add_child(bone_display)
+	bone_display.global_position = DataManager.BONES_SCREEN_POSITION
+
+
+func _clean_empty_canvas_layers() -> void:
+	if not game_world:
+		return
+	
+	for child in game_world.get_children():
+		if child is CanvasLayer:
+			# Проверяем, есть ли у CanvasLayer дочерние элементы
+			var has_children = false
+			for sub_child in child.get_children():
+				has_children = true
+				break
+			
+			if not has_children:
+				child.queue_free()

@@ -19,7 +19,7 @@ func _ready():
 func _setup_style():
 	add_theme_font_override("font", DataManager.FONT_HEADERS)
 	add_theme_font_size_override("font_size", 40)
-	add_theme_color_override("font_color", DataManager.COLOR_FLESH_CAVES_ART_BG_DARK)
+	add_theme_color_override("font_color", DataManager.COLOR_PENITENT_ART_BG_DARK)
 	horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	custom_minimum_size = Vector2(100, 40)
