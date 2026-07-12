@@ -169,3 +169,8 @@ action_search,Обыскать
 action_rest,Отдохнуть
 chest_reward_title,Вы нашли сокровища!
 chest_fail_title,Попытка не удалась...
+bonfire_title,Привал у костра
+bonfire_rest_result,Силы восстановлены!
+bonfire_pray_result,Боги благоволят вам!
+bonfire_sharp_result,Выберите карту для улучшения!
+action_sharp_weapon,Заточить оружие

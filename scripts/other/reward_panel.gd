@@ -6,6 +6,8 @@ var current_index: int = 0
 var is_animating: bool = false
 var gold_mod: int = 1  # множитель золота
 var damage_mod: int = 1 # множитель урона
+var heal_mod: int = 1
+var buff_duration: int = 0
 
 @onready var dark_overlay: ColorRect = $DarkOverlay
 @onready var center_container: CenterContainer = $CenterContainer
@@ -191,8 +193,13 @@ func _create_take_damage_reward() -> void:
 	SignalManager.reward_selected.connect(_on_reward_selected)
 
 func _create_heal_reward() -> void:
-	# TODO: создать UI для лечения
-	pass
+	var heal_amount = DataManager.REST_DEFAULT_HEAL * heal_mod
+	
+	var content = preload("res://scenes/reward_content.tscn").instantiate() as RewardContent
+	content.heal_mod = heal_mod
+	center_container.add_child(content)
+	content.setup(DataManager.RewardType.GET_HEAL, [heal_amount])
+	SignalManager.reward_selected.connect(_on_reward_selected)
 
 func _create_energy_buff_reward() -> void:
 	# TODO: создать UI для увеличения энергии

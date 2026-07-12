@@ -62,7 +62,6 @@ func interact() -> void:
 	match object_type:
 		DataManager.ObjectType.CHEST:
 			_interact_chest()
-			pass
 		DataManager.ObjectType.IDOL:
 			# TODO: взаимодействие с идолом
 			pass
@@ -76,8 +75,7 @@ func interact() -> void:
 			# TODO: пыточный стол
 			pass
 		DataManager.ObjectType.BONFIRE:
-			# TODO: костёр
-			pass
+			_interact_bonfire()
 
 
 func _start_idle_animation() -> void:
@@ -157,6 +155,17 @@ func _interact_chest() -> void:
 	var action_choice = preload("res://scenes/action_choice.tscn").instantiate() as ActionChoice
 	# 🆕 Не вызываем setup здесь, только передаём данные
 	SignalManager.add_action_choice.emit(action_choice, "Выберите действие", actions)
+
+
+func _interact_bonfire() -> void:
+	var actions: Array[DataManager.ActionType] = [
+		DataManager.ActionType.REST,
+		DataManager.ActionType.PRAY,
+		DataManager.ActionType.SHARP_WEAPON
+	]
+	
+	var action_choice = preload("res://scenes/action_choice.tscn").instantiate() as ActionChoice
+	SignalManager.add_action_choice.emit(action_choice, tr("bonfire_title"), actions)
 
 
 func _on_hide_object() -> void:

@@ -27,7 +27,8 @@ enum ActionType {
 	DRINK,
 	SEARCH,
 	REST,
-	# ... можно добавлять любые действия
+	MEDITATE,
+	SHARP_WEAPON
 }
 
 
@@ -728,6 +729,8 @@ const REWARD_DAMAGE_DEFAULT: int = 5
 const STARTING_COINS: int = 0
 const STARTING_BONES: int = 0
 
+const REST_DEFAULT_HEAL: int = 30
+const BONFIRE_ENERGY_BUFF_DURATION: int = 3  # количество боевых комнат
 ## ============================================================
 ## РАЗМЕРЫ КОМНАТЫ
 ## ============================================================

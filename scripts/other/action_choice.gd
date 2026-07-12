@@ -44,6 +44,8 @@ func _get_action_text(action: DataManager.ActionType) -> String:
 			return tr("action_search")
 		DataManager.ActionType.REST:
 			return tr("action_rest")
+		DataManager.ActionType.SHARP_WEAPON:
+			return tr("action_sharp_weapon")
 		_:
 			return ""
 
@@ -66,7 +68,8 @@ func _handle_choice(action: DataManager.ActionType) -> void:
 			_handle_search()
 		DataManager.ActionType.REST:
 			_handle_rest()
-	#_animate_out()
+		DataManager.ActionType.SHARP_WEAPON:
+			_handle_sharp_weapon()
 
 
 func _handle_use_key() -> void:
@@ -95,9 +98,35 @@ func _handle_break() -> void:
 		_create_rewards(false, DataManager.ActionType.BREAK)
 
 
+func _handle_rest() -> void:
+	await _show_result_label(tr("bonfire_rest_result"), Color(0.2, 0.8, 0.2))
+	
+	var reward_panel = preload("res://scenes/reward_panel.tscn").instantiate() as RewardPanel
+	reward_panel.reward_types = _generate_rewards(DataManager.ActionType.REST, true)
+	reward_panel.heal_mod = 1
+	SignalManager.hide_object.emit()
+	SignalManager.show_reward.emit(reward_panel)
+	queue_free()
+
 func _handle_pray() -> void:
-	# TODO: молитва
-	pass
+	await _show_result_label(tr("bonfire_pray_result"), Color(0.8, 0.8, 0.2))
+	
+	# TODO: добавить баф на 3 боевые комнаты (увеличение макс. энергии)
+	var reward_panel = preload("res://scenes/reward_panel.tscn").instantiate() as RewardPanel
+	reward_panel.reward_types = _generate_rewards(DataManager.ActionType.PRAY, true)
+	reward_panel.buff_duration = DataManager.BONFIRE_ENERGY_BUFF_DURATION
+	SignalManager.hide_object.emit()
+	SignalManager.show_reward.emit(reward_panel)
+	queue_free()
+
+func _handle_sharp_weapon() -> void:
+	await _show_result_label(tr("bonfire_sharp_result"), Color(0.8, 0.6, 0.2))
+	
+	var reward_panel = preload("res://scenes/reward_panel.tscn").instantiate() as RewardPanel
+	reward_panel.reward_types = _generate_rewards(DataManager.ActionType.SHARP_WEAPON, true)
+	SignalManager.hide_object.emit()
+	SignalManager.show_reward.emit(reward_panel)
+	queue_free()
 
 func _handle_drink() -> void:
 	# TODO: выпить
@@ -105,10 +134,6 @@ func _handle_drink() -> void:
 
 func _handle_search() -> void:
 	# TODO: обыскать
-	pass
-
-func _handle_rest() -> void:
-	# TODO: отдых
 	pass
 
 func _animate_in() -> void:
@@ -170,12 +195,13 @@ func _generate_rewards(action: DataManager.ActionType, success: bool) -> Array[D
 		DataManager.ActionType.PRAY:
 			# Молитва — лечение или благословение
 			if success:
-				rewards.append(DataManager.RewardType.GET_HEAL)
-				if randf() < 0.3:
-					rewards.append(DataManager.RewardType.ENERGY_BUFF)
-			else:
-				rewards.append(DataManager.RewardType.TAKE_DAMAGE)
-		
+				rewards.append(DataManager.RewardType.ENERGY_BUFF)
+				
+		DataManager.ActionType.SHARP_WEAPON:
+			# Молитва — лечение или благословение
+			if success:
+				rewards.append(DataManager.RewardType.UPGRADE_CARD)
+				
 		DataManager.ActionType.DRINK:
 			# Питьё — зелье или яд
 			if success:
@@ -200,10 +226,6 @@ func _generate_rewards(action: DataManager.ActionType, success: bool) -> Array[D
 			# Отдых — всегда лечение
 			if success:
 				rewards.append(DataManager.RewardType.GET_HEAL)
-				if randf() < 0.2:
-					rewards.append(DataManager.RewardType.ENERGY_BUFF)
-			else:
-				rewards.append(DataManager.RewardType.TAKE_DAMAGE)
 	
 	return rewards
 

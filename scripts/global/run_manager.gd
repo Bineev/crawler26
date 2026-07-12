@@ -148,28 +148,36 @@ func get_artifact_counter(artifact_id: DataManager.ArtifactId) -> int:
 
 
 func _process_one_time_trigger(artifact: ArtifactResource) -> void:
-	var trigger_index = artifact.triggers.find(DataManager.ArtifactTrigger.ONE_TIME)
-	if trigger_index == -1:
+	var indices_to_remove: Array[int] = []
+	
+	# Находим все индексы ONE_TIME триггеров
+	for i in range(artifact.triggers.size()):
+		if artifact.triggers[i] == DataManager.ArtifactTrigger.ONE_TIME:
+			indices_to_remove.append(i)
+	
+	if indices_to_remove.is_empty():
 		return
 	
-	# Проверяем, что есть эффект для этого триггера
-	if trigger_index < artifact.effects.size():
-		var effect = artifact.effects[trigger_index]
+	var player = BattleManager.get_player()
+	if not player:
+		return
+	
+	# Проходим по индексам в обратном порядке, чтобы не сбить индексы
+	for i in range(indices_to_remove.size() - 1, -1, -1):
+		var trigger_index = indices_to_remove[i]
 		
-		# Выполняем эффект (источник — игрок)
-		var player = BattleManager.get_player()
-		if player:
+		# Проверяем, что есть эффект для этого триггера
+		if trigger_index < artifact.effects.size():
+			var effect = artifact.effects[trigger_index]
 			EffectExecutor.execute(effect, player, [player])
-			SignalManager.log_message.emit("Артефакт активирован: %s" % artifact.get_localized_name())
-		
-		# 🆕 Удаляем триггер ONE_TIME из массива
-		artifact.triggers.remove_at(trigger_index)
-		
-		# 🆕 Удаляем соответствующий эффект
-		artifact.effects.remove_at(trigger_index)
-		
-		SignalManager.artifact_triggered.emit(artifact)
-		print("ONE_TIME эффект артефакта выполнен: ", artifact.get_localized_name())
+			SignalManager.log_message.emit("Артефакт активирован (ONE_TIME): %s" % artifact.get_localized_name())
+			
+			# Удаляем триггер и эффект
+			artifact.triggers.remove_at(trigger_index)
+			artifact.effects.remove_at(trigger_index)
+			
+			SignalManager.artifact_triggered.emit(artifact)
+			print("ONE_TIME эффект артефакта выполнен: ", artifact.get_localized_name())
 
 
 ## Обрабатывает артефакты с триггером ON_START_FIGHT

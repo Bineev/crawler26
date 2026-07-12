@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="ArtifactResource" load_steps=6 format=3 uid="uid://b2dxg58xjyg14"]
+[gd_resource type="Resource" script_class="ArtifactResource" load_steps=7 format=3 uid="uid://b2dxg58xjyg14"]
 
 [ext_resource type="Script" uid="uid://cmra25r1r3ivt" path="res://resources/res_scripts/effect_entry.gd" id="1_mkvwi"]
 [ext_resource type="Script" uid="uid://dxepc28vep34d" path="res://resources/res_scripts/artifact_resource.gd" id="2_ct6h5"]
@@ -20,11 +20,18 @@ status = ExtResource("2_uuumv")
 duration = 2
 metadata/_custom_type_script = "uid://cmra25r1r3ivt"
 
+[sub_resource type="Resource" id="Resource_ct6h5"]
+script = ExtResource("1_mkvwi")
+category = 2
+target = 0
+base_value = 10
+metadata/_custom_type_script = "uid://cmra25r1r3ivt"
+
 [resource]
 script = ExtResource("2_ct6h5")
-triggers = Array[int]([0, 3])
+triggers = Array[int]([0, 3, 0])
 name_key = "artifact_strange_mushroom_name"
 description_key = "artifact_strange_mushroom_desc"
 lore_key = "artifact_strange_mushroom_lore"
-effects = Array[ExtResource("1_mkvwi")]([SubResource("Resource_dddfx"), SubResource("Resource_kjp67")])
+effects = Array[ExtResource("1_mkvwi")]([SubResource("Resource_dddfx"), SubResource("Resource_kjp67"), SubResource("Resource_ct6h5")])
 metadata/_custom_type_script = "uid://dxepc28vep34d"

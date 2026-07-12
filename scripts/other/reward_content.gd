@@ -6,6 +6,8 @@ var rewards: Array = []  # массив карт, артефактов и т.д.
 var selected_index: int = -1
 var gold_mod: int = 1  # множитель золота
 var damage_mod: int = 1
+var heal_mod: int = 1
+var buff_duration: int = 0
 
 @onready var title_label: Label = $Title
 @onready var rewards_container: HBoxContainer = $HBoxContainer
@@ -202,7 +204,9 @@ func _apply_reward(index: int) -> void:
 			if player:
 				player.take_damage(selected_item)
 		DataManager.RewardType.GET_HEAL:
-			SignalManager.heal_player.emit(selected_item)
+			var player = BattleManager.get_player()
+			if player:
+				player.heal(selected_item)
 		DataManager.RewardType.ENERGY_BUFF:
 			SignalManager.energy_buff.emit(selected_item)
 		DataManager.RewardType.DECK_SIZE_BUFF:
@@ -301,8 +305,38 @@ func _setup_take_damage_reward() -> void:
 	rewards_container.add_child(vbox)
 
 func _setup_heal_reward() -> void:
-	# TODO: создать UI для лечения
-	pass
+	var heal_amount = rewards[0]
+	
+	var vbox = VBoxContainer.new()
+	vbox.alignment = BoxContainer.ALIGNMENT_CENTER
+	vbox.add_theme_constant_override("separation", 20)
+	
+	var hbox = HBoxContainer.new()
+	hbox.alignment = BoxContainer.ALIGNMENT_CENTER
+	hbox.add_theme_constant_override("separation", 15)
+	
+	var icon = TextureRect.new()
+	icon.texture = preload("res://img/icons/intents/heal.png")
+	icon.custom_minimum_size = Vector2(64, 64)
+	icon.expand_mode = TextureRect.EXPAND_FIT_WIDTH_PROPORTIONAL
+	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	hbox.add_child(icon)
+	
+	var heal_label = Label.new()
+	heal_label.text = "+" + str(heal_amount)
+	heal_label.add_theme_font_override("font", DataManager.FONT_HEADERS)
+	heal_label.add_theme_font_size_override("font_size", 48)
+	heal_label.add_theme_color_override("font_color", DataManager.COLOR_ROGUE_ART_BG_LIGHT)
+	heal_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	heal_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	hbox.add_child(heal_label)
+	
+	vbox.add_child(hbox)
+	
+	var button = _create_reward_button("reward_take_heal", 0)
+	vbox.add_child(button)
+	
+	rewards_container.add_child(vbox)
 
 func _setup_energy_buff_reward() -> void:
 	# TODO: создать UI для увеличения энергии

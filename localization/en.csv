@@ -169,3 +169,8 @@ action_search,Search
 action_rest,Rest
 chest_reward_title,You found treasures!
 chest_fail_title,Attempt failed...
+bonfire_title,Campfire rest
+bonfire_rest_result,Strength restored!
+bonfire_pray_result,The gods favor you!
+bonfire_sharp_result,Choose a card to upgrade!
+action_sharp_weapon,Sharpen weapon
