@@ -24,6 +24,9 @@ var is_ending_turn: bool = false
 var gold_display: GoldDisplay = null
 var key_display: KeyDisplay = null
 var bone_display: BoneDisplay = null
+var sub_viewport: SubViewport = null
+
+var hit_effect: HitEffect = null
 ## ============================================================
 ## ПУБЛИЧНЫЕ МЕТОДЫ
 ## ============================================================
@@ -55,7 +58,6 @@ func start_test(world_node: Node):
 	SignalManager.enemy_turn_started.connect(_on_enemy_turn_started)
 	SignalManager.battle_victory.connect(_on_battle_ended)
 	SignalManager.battle_defeat.connect(_on_battle_ended)
-	SignalManager.player_took_damage.connect(_on_player_took_damage)
 	SignalManager.show_reward.connect(_on_show_reward)
 	SignalManager.add_action_choice.connect(_on_add_action_choice)
 	# Сбрасываем менеджеры
@@ -168,6 +170,7 @@ func _on_room_selected(room_node: RoomNode):
 	
 	if current_room_node.room_type == DataManager.RoomType.COMBAT:
 		_create_battle_log()
+		#_create_hit_effect()
 
 
 func _on_floor_completed():
@@ -291,10 +294,10 @@ func _create_blood_screen():
 	canvas_layer.add_child(blood_screen)
 
 
-func _on_player_took_damage(damage: int):
-	if blood_screen:
-		var intensity = clamp(damage / 20.0, 0.1, 0.6)
-		blood_screen.flash(intensity)
+#func _on_player_took_damage(damage: int):
+	#if blood_screen:
+		#var intensity = clamp(damage / 20.0, 0.1, 0.6)
+		#blood_screen.flash(intensity)
 
 
 func _create_player_portrait():
