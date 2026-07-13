@@ -503,6 +503,9 @@ func _setup_upgrade_card_reward() -> void:
 	selected_card = null
 	
 	for card_data in master_cards:
+		# 🆕 Создаём копию для отображения (чтобы не менять оригинал)
+		var display_card = card_data.duplicate_for_instance()
+		display_card.upgrade_type = _get_upgrade_type_for_card(card_data)
 		# Обёртка для карты (кликабельная)
 		var card_wrapper = Control.new()
 		#card_wrapper.custom_minimum_size = Vector2(
@@ -512,7 +515,7 @@ func _setup_upgrade_card_reward() -> void:
 		card_wrapper.mouse_filter = Control.MOUSE_FILTER_STOP
 		
 		var card_ui = preload("res://scenes/card.tscn").instantiate() as CardUI
-		card_ui.card_data = card_data
+		card_ui.card_data = display_card
 		card_wrapper.add_child(card_ui)
 		
 		await get_tree().create_timer(0.03).timeout
@@ -523,7 +526,7 @@ func _setup_upgrade_card_reward() -> void:
 		card_ui.set_reward_state()
 		card_wrapper.custom_minimum_size = card_ui.get_actual_size()
 		# Клик по обёртке выбирает карту
-		card_wrapper.gui_input.connect(_on_card_wrapper_clicked.bind(card_data, card_wrapper, preview_container))
+		card_wrapper.gui_input.connect(_on_card_wrapper_clicked.bind(display_card, card_wrapper, preview_container))
 	
 	var confirm_button = Button.new()
 	confirm_button.text = tr("upgrade_card_confirm")
@@ -604,54 +607,117 @@ func _on_card_wrapper_clicked(event: InputEvent, card_data: CardData, wrapper: C
 
 func _apply_upgrade_to_card(card: CardData) -> void:
 	match card.upgrade_type:
-		DataManager.UpgradeType.COST_MINUS_1:
+		DataManager.UpgradeType.COST_MINUS:
 			if card.cost > 0:
 				card.cost -= 1
 		
-		DataManager.UpgradeType.DAMAGE_PLUS_2:
-			# Ищем первый эффект DAMAGE и увеличиваем base_value
-			for effect in card.effects:
-				if effect.category == DataManager.EffectCategory.DAMAGE:
-					effect.base_value += 2
-					break
-		
-		DataManager.UpgradeType.BLOCK_PLUS_3:
+		DataManager.UpgradeType.BLOCK_PLUS_PROC_50:
 			for effect in card.effects:
 				if effect.category == DataManager.EffectCategory.BLOCK:
-					effect.base_value += 3
+					effect.base_value = floor(effect.base_value * 1.5)
 					break
 		
-		DataManager.UpgradeType.HEAL_PLUS_2:
+		DataManager.UpgradeType.DAMAGE_PLUS_PROC_50:
+			for effect in card.effects:
+				if effect.category == DataManager.EffectCategory.DAMAGE:
+					effect.base_value = floor(effect.base_value * 1.5)
+					break
+		
+		DataManager.UpgradeType.HEAL_PLUS_PROC_50:
 			for effect in card.effects:
 				if effect.category == DataManager.EffectCategory.HEAL:
-					effect.base_value += 2
-					break
-		
-		DataManager.UpgradeType.ADD_STATUS_STACK:
-			for effect in card.effects:
-				if effect.category == DataManager.EffectCategory.APPLY_STATUS:
-					effect.value += 1
+					effect.base_value = floor(effect.base_value * 1.5)
 					break
 		
 		DataManager.UpgradeType.DRAW_PLUS_1:
-			for effect in card.effects:
-				if effect.category == DataManager.EffectCategory.DRAW_CARD:
-					effect.amount += 1
-					break
+			var new_effect = EffectEntry.new()
+			new_effect.category = DataManager.EffectCategory.DRAW_CARD
+			new_effect.target = DataManager.EffectTarget.SELF
+			new_effect.amount = 1
+			card.effects.append(new_effect)
 		
 		DataManager.UpgradeType.ENERGY_PLUS_1:
-			for effect in card.effects:
-				if effect.category == DataManager.EffectCategory.GAIN_ENERGY:
-					effect.amount += 1
-					break
+			var new_effect = EffectEntry.new()
+			new_effect.category = DataManager.EffectCategory.GAIN_ENERGY
+			new_effect.target = DataManager.EffectTarget.SELF
+			new_effect.amount = 1
+			card.effects.append(new_effect)
 		
-		DataManager.UpgradeType.REMOVE_CARD_TAG_BURN:
-			if card.has_tag(DataManager.CardTag.BURNS):
-				var tags = card.tags
-				tags.erase(DataManager.CardTag.BURNS)
-				card.tags = tags
-
-	# 🆕 Карта больше не может быть улучшена
+		DataManager.UpgradeType.CONDITIONAL_DAMAGE_PLUS_PROC_50:
+			for effect in card.effects:
+				if effect.category == DataManager.EffectCategory.CONDITIONAL and effect.true_effect:
+					if effect.true_effect.category == DataManager.EffectCategory.DAMAGE:
+						effect.true_effect.base_value = floor(effect.true_effect.base_value * 1.5)
+						break
+		
+		DataManager.UpgradeType.CONDITIONAL_BLOCK_PLUS_PROC_50:
+			for effect in card.effects:
+				if effect.category == DataManager.EffectCategory.CONDITIONAL and effect.true_effect:
+					if effect.true_effect.category == DataManager.EffectCategory.BLOCK:
+						effect.true_effect.base_value = floor(effect.true_effect.base_value * 1.5)
+						break
+		
+		DataManager.UpgradeType.CONDITIONAL_HEAL_PLUS_PROC_50:
+			for effect in card.effects:
+				if effect.category == DataManager.EffectCategory.CONDITIONAL and effect.true_effect:
+					if effect.true_effect.category == DataManager.EffectCategory.HEAL:
+						effect.true_effect.base_value = floor(effect.true_effect.base_value * 1.5)
+						break
+		
+		DataManager.UpgradeType.DELETE_NEGATIVE_STATUS:
+			var effects_to_remove: Array[int] = []
+			for i in range(card.effects.size()):
+				var effect = card.effects[i]
+				if effect.category == DataManager.EffectCategory.APPLY_STATUS:
+					if effect.target == DataManager.EffectTarget.SELF and effect.status:
+						if DataManager.is_negative_status(effect.status.id):
+							effects_to_remove.append(i)
+			for i in range(effects_to_remove.size() - 1, -1, -1):
+				card.effects.remove_at(effects_to_remove[i])
+		
+		DataManager.UpgradeType.ADD_DAMAGE_5:
+			var new_effect = EffectEntry.new()
+			new_effect.category = DataManager.EffectCategory.DAMAGE
+			new_effect.target = DataManager.EffectTarget.ENEMY
+			new_effect.base_value = 5
+			card.effects.append(new_effect)
+		
+		DataManager.UpgradeType.ADD_BLOCK_5:
+			var new_effect = EffectEntry.new()
+			new_effect.category = DataManager.EffectCategory.BLOCK
+			new_effect.target = DataManager.EffectTarget.SELF
+			new_effect.base_value = 5
+			card.effects.append(new_effect)
+		
+		DataManager.UpgradeType.ADD_HEAL_5:
+			var new_effect = EffectEntry.new()
+			new_effect.category = DataManager.EffectCategory.HEAL
+			new_effect.target = DataManager.EffectTarget.SELF
+			new_effect.base_value = 5
+			card.effects.append(new_effect)
+		
+		DataManager.UpgradeType.ADD_STRENGTH_3:
+			var new_effect = EffectEntry.new()
+			new_effect.category = DataManager.EffectCategory.APPLY_STATUS
+			new_effect.target = DataManager.EffectTarget.SELF
+			new_effect.status = DataManager.get_status_resource(DataManager.Status.STRENGTH)
+			new_effect.value = 3
+			new_effect.duration = 1
+			card.effects.append(new_effect)
+		
+		DataManager.UpgradeType.X_2_NEGATIVE_STATUS:
+			for effect in card.effects:
+				if effect.category == DataManager.EffectCategory.APPLY_STATUS:
+					if effect.target != DataManager.EffectTarget.SELF and effect.status:
+						if DataManager.is_negative_status(effect.status.id):
+							var status_resource = effect.status
+							if status_resource.is_stacking:
+								# Удваиваем стаки
+								effect.value *= 2
+							else:
+								# Удваиваем длительность
+								effect.duration *= 2
+	
 	card.is_can_upgrade = false
 
 
@@ -659,3 +725,79 @@ func _get_upgraded_card_copy(card: CardData) -> CardData:
 	var copy = card.duplicate_for_instance()
 	_apply_upgrade_to_card(copy)
 	return copy
+
+
+func _get_upgrade_type_for_card(card: CardData) -> DataManager.UpgradeType:
+	if not card.is_can_upgrade:
+		return card.upgrade_type
+	
+	var has_damage = false
+	var has_block = false
+	var has_heal = false
+	var has_conditional_damage = false
+	var has_conditional_block = false
+	var has_conditional_heal = false
+	var has_negative_self_status = false
+	var has_negative_enemy_status = false
+	var has_draw = false
+	var has_energy = false
+	
+	for effect in card.effects:
+		match effect.category:
+			DataManager.EffectCategory.DAMAGE:
+				has_damage = true
+			DataManager.EffectCategory.BLOCK:
+				has_block = true
+			DataManager.EffectCategory.HEAL:
+				has_heal = true
+			DataManager.EffectCategory.APPLY_STATUS:
+				if effect.target == DataManager.EffectTarget.SELF and effect.status and DataManager.is_negative_status(effect.status.id):
+					has_negative_self_status = true
+				if effect.target != DataManager.EffectTarget.SELF and effect.status and DataManager.is_negative_status(effect.status.id):
+					has_negative_enemy_status = true
+			DataManager.EffectCategory.DRAW_CARD:
+				has_draw = true
+			DataManager.EffectCategory.GAIN_ENERGY:
+				has_energy = true
+			DataManager.EffectCategory.CONDITIONAL:
+				# 🆕 Проверяем эффекты внутри CONDITIONAL
+				if effect.true_effect:
+					match effect.true_effect.category:
+						DataManager.EffectCategory.DAMAGE:
+							has_conditional_damage = true
+						DataManager.EffectCategory.BLOCK:
+							has_conditional_block = true
+						DataManager.EffectCategory.HEAL:
+							has_conditional_heal = true
+				if effect.false_effect:
+					match effect.false_effect.category:
+						DataManager.EffectCategory.DAMAGE:
+							has_conditional_damage = true
+						DataManager.EffectCategory.BLOCK:
+							has_conditional_block = true
+						DataManager.EffectCategory.HEAL:
+							has_conditional_heal = true
+	
+	# Приоритеты выбора (сначала прямые эффекты, потом conditional)
+	if has_damage:
+		return DataManager.UpgradeType.DAMAGE_PLUS_PROC_50
+	elif has_block:
+		return DataManager.UpgradeType.BLOCK_PLUS_PROC_50
+	elif has_heal:
+		return DataManager.UpgradeType.HEAL_PLUS_PROC_50
+	elif has_conditional_damage:
+		return DataManager.UpgradeType.CONDITIONAL_DAMAGE_PLUS_PROC_50
+	elif has_conditional_block:
+		return DataManager.UpgradeType.CONDITIONAL_BLOCK_PLUS_PROC_50
+	elif has_conditional_heal:
+		return DataManager.UpgradeType.CONDITIONAL_HEAL_PLUS_PROC_50
+	elif has_negative_enemy_status:
+		return DataManager.UpgradeType.X_2_NEGATIVE_STATUS
+	elif has_negative_self_status:
+		return DataManager.UpgradeType.DELETE_NEGATIVE_STATUS
+	elif has_draw:
+		return DataManager.UpgradeType.DRAW_PLUS_1
+	elif has_energy:
+		return DataManager.UpgradeType.ENERGY_PLUS_1
+	else:
+		return DataManager.UpgradeType.COST_MINUS

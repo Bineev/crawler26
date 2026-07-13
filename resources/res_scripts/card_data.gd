@@ -19,7 +19,7 @@ class_name CardData
 @export var biome: DataManager.Biome = DataManager.Biome.MOLE_TUNNELS
 
 ## Тип улучшения карты (по умолчанию COST_MINUS_1)
-@export var upgrade_type: DataManager.UpgradeType = DataManager.UpgradeType.COST_MINUS_1
+@export var upgrade_type: DataManager.UpgradeType = DataManager.UpgradeType.COST_MINUS
 
 ## Ключ локализации для названия
 @export var name_key: String = ""
@@ -188,6 +188,10 @@ func duplicate_for_instance() -> CardData:
 	copy.cost = cost
 	copy.overlay_type = overlay_type
 	copy.manual_card_types = manual_card_types.duplicate()
+	
+	# 🆕 Добавляем новые поля
+	copy.upgrade_type = upgrade_type
+	copy.is_can_upgrade = is_can_upgrade
 	
 	for effect in effects:
 		copy.effects.append(effect.duplicate_for_instance())

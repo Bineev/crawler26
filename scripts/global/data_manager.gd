@@ -65,14 +65,21 @@ enum ModifierChangeType {
 }
 
 enum UpgradeType {
-	COST_MINUS_1,           # стоимость -1 (мин 0)
-	DAMAGE_PLUS_2,          # урон +2 (для карт с DAMAGE)
-	BLOCK_PLUS_3,           # блок +3 (для карт с BLOCK)
-	HEAL_PLUS_2,            # лечение +2 (для карт с HEAL)
-	ADD_STATUS_STACK,       # +1 стак для статусных карт
-	DRAW_PLUS_1,            # +1 добор карты
-	ENERGY_PLUS_1,          # +1 энергия
-	REMOVE_CARD_TAG_BURN,   # убрать тег BURNS
+	COST_MINUS,
+	BLOCK_PLUS_PROC_50,
+	DAMAGE_PLUS_PROC_50,
+	HEAL_PLUS_PROC_50,
+	DRAW_PLUS_1,
+	ENERGY_PLUS_1,
+	CONDITIONAL_DAMAGE_PLUS_PROC_50,
+	CONDITIONAL_BLOCK_PLUS_PROC_50,
+	CONDITIONAL_HEAL_PLUS_PROC_50,
+	DELETE_NEGATIVE_STATUS,
+	ADD_DAMAGE_5,
+	ADD_BLOCK_5,
+	ADD_HEAL_5,
+	X_2_NEGATIVE_STATUS,
+	ADD_STRENGTH_3,  # 🆕
 }
 
 ## Модификаторы статов (проценты / множители)
