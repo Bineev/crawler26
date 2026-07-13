@@ -53,6 +53,8 @@ func start_battle(player_stats: CharacterStats, enemy_instances: Array, battle_d
 	self.current_room_node = room_node
 	self.battle_deck = battle_deck
 	
+	# 🆕 Уменьшаем счётчик баффа энергии (если активен)
+	RunManager.decrement_energy_buff()
 	# Инициализация врагов
 	for enemy in enemies:
 		if enemy.has_method("load_intents"):

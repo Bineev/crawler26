@@ -174,3 +174,20 @@ bonfire_rest_result,Силы восстановлены!
 bonfire_pray_result,Боги благоволят вам!
 bonfire_sharp_result,Выберите карту для улучшения!
 action_sharp_weapon,Заточить оружие
+gold_label,+%d
+heal_label,+%d Здоровья
+damage_label,-%d Здоровья
+energy_buff_label,+%d Энергии
+energy_buff_duration,Длительность: %d боевых комнат
+reward_take_buff,Принять бафф
+bonfire_title,Привал у костра
+bonfire_rest_result,Силы восстановлены!
+bonfire_pray_result,Боги благоволят вам!
+bonfire_sharp_result,Выберите карту для улучшения!
+action_sharp_weapon,Заточить оружие
+chest_reward_title,Вы нашли сокровища!
+chest_fail_title,Попытка не удалась...
+upgrade_card_title,Выберите %d карту(ы) для улучшения
+upgrade_card_select,Выбрать
+upgrade_card_deselect,Отменить
+upgrade_card_confirm,Улучшить

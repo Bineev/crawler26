@@ -64,6 +64,17 @@ enum ModifierChangeType {
 	FLAT_BONUS,   # флэт-бонус (+5)
 }
 
+enum UpgradeType {
+	COST_MINUS_1,           # стоимость -1 (мин 0)
+	DAMAGE_PLUS_2,          # урон +2 (для карт с DAMAGE)
+	BLOCK_PLUS_3,           # блок +3 (для карт с BLOCK)
+	HEAL_PLUS_2,            # лечение +2 (для карт с HEAL)
+	ADD_STATUS_STACK,       # +1 стак для статусных карт
+	DRAW_PLUS_1,            # +1 добор карты
+	ENERGY_PLUS_1,          # +1 энергия
+	REMOVE_CARD_TAG_BURN,   # убрать тег BURNS
+}
+
 ## Модификаторы статов (проценты / множители)
 enum ModifierStat {
 	DAMAGE_DEALT_PERCENT,      # +X% урона
@@ -725,6 +736,7 @@ const REWARD_GOLD_DEFAULT : int = 10
 const REWARD_BONES_DEFAULT : int = 1
 const REWARD_CHOICE_AMOUNT : int = 3
 const REWARD_DAMAGE_DEFAULT: int = 5
+const ENERGY_BUFF_REWARD_AMOUNT: int = 1
 ## Стартовое количество валют
 const STARTING_COINS: int = 0
 const STARTING_BONES: int = 0

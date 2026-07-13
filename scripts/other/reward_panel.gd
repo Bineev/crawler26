@@ -8,6 +8,7 @@ var gold_mod: int = 1  # множитель золота
 var damage_mod: int = 1 # множитель урона
 var heal_mod: int = 1
 var buff_duration: int = 0
+var upgrade_count: int = 1  # количество карт для улучшения
 
 @onready var dark_overlay: ColorRect = $DarkOverlay
 @onready var center_container: CenterContainer = $CenterContainer
@@ -202,8 +203,14 @@ func _create_heal_reward() -> void:
 	SignalManager.reward_selected.connect(_on_reward_selected)
 
 func _create_energy_buff_reward() -> void:
-	# TODO: создать UI для увеличения энергии
-	pass
+	var buff_amount = DataManager.ENERGY_BUFF_REWARD_AMOUNT  # увеличиваем максимальную энергию на 1
+	var duration = buff_duration if buff_duration > 0 else 3  # длительность в боях
+	
+	var content = preload("res://scenes/reward_content.tscn").instantiate() as RewardContent
+	content.buff_duration = duration
+	center_container.add_child(content)
+	content.setup(DataManager.RewardType.ENERGY_BUFF, [buff_amount])
+	SignalManager.reward_selected.connect(_on_reward_selected)
 
 func _create_deck_size_buff_reward() -> void:
 	# TODO: создать UI для увеличения размера колоды
@@ -223,8 +230,11 @@ func _create_remove_card_reward() -> void:
 	pass
 
 func _create_upgrade_card_reward() -> void:
-	# TODO: создать UI для улучшения карты
-	pass
+	var content = preload("res://scenes/reward_content.tscn").instantiate() as RewardContent
+	content.upgrade_count = upgrade_count
+	center_container.add_child(content)
+	content.setup(DataManager.RewardType.UPGRADE_CARD, [])
+	SignalManager.reward_selected.connect(_on_reward_selected)
 
 func _create_add_property_reward() -> void:
 	# TODO: создать UI для добавления свойства к карте

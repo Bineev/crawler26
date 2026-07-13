@@ -17,6 +17,13 @@ var artifacts: Array[ArtifactResource] = []
 ## Счётчики для артефактов (например, для CARD_PLAYED_COUNTER)
 var artifact_counters: Dictionary = {}  # key: ArtifactId, value: int
 
+## Структура: { "max_energy_buff": количество оставшихся боёв, "bonus_energy": сколько добавлено }
+var temp_buffs: Dictionary = {
+	"max_energy_buff": 0,
+	"bonus_energy": 0
+}
+
+
 func _ready():
 	initialize_run()
 	SignalManager.add_artifact.connect(_on_add_artifact)
@@ -396,3 +403,42 @@ func use_key() -> bool:
 
 func get_keys() -> int:
 	return keys
+
+
+func apply_energy_buff(bonus: int, duration: int) -> void:
+	temp_buffs["max_energy_buff"] = duration
+	temp_buffs["bonus_energy"] = bonus
+	
+	# Применяем бафф к игроку
+	var player = BattleManager.get_player()
+	if player:
+		var current_max = player.get_max_energy()
+		player.set_flat(DataManager.FlatStat.MAX_ENERGY, current_max + bonus)
+		player.restore_energy()
+		SignalManager.log_message.emit("Максимальная энергия увеличена на %d на %d боёв!" % [bonus, duration])
+
+
+func decrement_energy_buff() -> void:
+	if temp_buffs["max_energy_buff"] <= 0:
+		return
+	
+	temp_buffs["max_energy_buff"] -= 1
+	
+	if temp_buffs["max_energy_buff"] <= 0:
+		# Снимаем бафф
+		var player = BattleManager.get_player()
+		if player:
+			var current_max = player.get_max_energy()
+			var default_max = DataManager.MAX_ENERGY
+			player.set_flat(DataManager.FlatStat.MAX_ENERGY, default_max)
+			# Ограничиваем текущую энергию новым максимумом
+			if player.get_energy() > default_max:
+				player.set_energy(default_max)
+			SignalManager.log_message.emit("Бафф энергии закончился! Максимальная энергия восстановлена до %d" % default_max)
+		temp_buffs["bonus_energy"] = 0
+
+func get_energy_buff_remaining() -> int:
+	return temp_buffs["max_energy_buff"]
+
+func get_energy_bonus() -> int:
+	return temp_buffs["bonus_energy"]

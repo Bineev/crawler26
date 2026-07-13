@@ -636,6 +636,10 @@ func get_card_size() -> Vector2:
 	return Vector2(CARD_BASE_WIDTH, CARD_BASE_HEIGHT) * scale
 
 
+func get_actual_size() -> Vector2:
+	return card_control.custom_minimum_size * card_control.scale
+
+
 func set_hand_ui(hand_ui: HandUI):
 	hand_ui_ref = hand_ui
 

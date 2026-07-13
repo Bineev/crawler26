@@ -124,9 +124,10 @@ func _emit_flat_signal(stat: DataManager.FlatStat):
 			SignalManager.health_changed.emit(current, max_val)
 			if self is EnemyInstance:
 				SignalManager.enemy_health_changed.emit(self, current, max_val)
-		#DataManager.FlatStat.BLOCK:
-			#var current = get_flat(DataManager.FlatStat.BLOCK)
-			#SignalManager.block_changed.emit(current)
+		DataManager.FlatStat.MAX_ENERGY:  # 🆕
+			var current = get_flat(DataManager.FlatStat.ENERGY)
+			var max_val = get_flat(DataManager.FlatStat.MAX_ENERGY)
+			SignalManager.energy_changed.emit(current, max_val)
 		
 		DataManager.FlatStat.ATONEMENT:
 			var current = get_flat(DataManager.FlatStat.ATONEMENT)

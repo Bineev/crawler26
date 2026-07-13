@@ -18,6 +18,9 @@ class_name CardData
 ## Для карт биома
 @export var biome: DataManager.Biome = DataManager.Biome.MOLE_TUNNELS
 
+## Тип улучшения карты (по умолчанию COST_MINUS_1)
+@export var upgrade_type: DataManager.UpgradeType = DataManager.UpgradeType.COST_MINUS_1
+
 ## Ключ локализации для названия
 @export var name_key: String = ""
 
@@ -30,6 +33,8 @@ class_name CardData
 ## Теги карты
 @export var tags: Array[DataManager.CardTag] = []
 
+## Можно ли улучшить карту (если false — карта не появляется в выборе для улучшения)
+@export var is_can_upgrade: bool = true
 ## ============================================================
 ## ИГРОВЫЕ ПАРАМЕТРЫ
 ## ============================================================

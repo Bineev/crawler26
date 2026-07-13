@@ -76,11 +76,11 @@ func _handle_use_key() -> void:
 	var success = RunManager.use_key()
 	
 	if success:
-		await _show_result_label("СУНДУК ОТКРЫТ!", Color(0.2, 0.8, 0.2))
+		await _show_result_label("СУНДУК ОТКРЫТ!", DataManager.COLOR_HEAL_LOG)
 		SignalManager.log_message.emit("Ключ использован!")
 		_create_rewards(true, DataManager.ActionType.USE_KEY)
 	else:
-		await _show_result_label("НЕТ КЛЮЧЕЙ!", Color(0.8, 0.2, 0.2))
+		await _show_result_label("НЕТ КЛЮЧЕЙ!", DataManager.COLOR_PENITENT_ART_BG_DARK)
 		SignalManager.log_message.emit("Нет ключей!")
 		_create_rewards(false, DataManager.ActionType.USE_KEY)
 
@@ -89,17 +89,17 @@ func _handle_break() -> void:
 	var success = randf() < DataManager.CHEST_BREAK_CHANCE
 	
 	if success:
-		await _show_result_label("УСПЕХ!", Color(0.2, 0.8, 0.2))
+		await _show_result_label("УСПЕХ!", DataManager.COLOR_HEAL_LOG)
 		SignalManager.log_message.emit("Сундук взломан!")
 		_create_rewards(true, DataManager.ActionType.BREAK)
 	else:
-		await _show_result_label("НЕУДАЧА!", Color(0.8, 0.2, 0.2))
+		await _show_result_label("НЕУДАЧА!", DataManager.COLOR_PENITENT_ART_BG_DARK)
 		SignalManager.log_message.emit("Взлом не удался!")
 		_create_rewards(false, DataManager.ActionType.BREAK)
 
 
 func _handle_rest() -> void:
-	await _show_result_label(tr("bonfire_rest_result"), Color(0.2, 0.8, 0.2))
+	await _show_result_label(tr("bonfire_rest_result"), DataManager.COLOR_HEAL_LOG)
 	
 	var reward_panel = preload("res://scenes/reward_panel.tscn").instantiate() as RewardPanel
 	reward_panel.reward_types = _generate_rewards(DataManager.ActionType.REST, true)
@@ -109,7 +109,7 @@ func _handle_rest() -> void:
 	queue_free()
 
 func _handle_pray() -> void:
-	await _show_result_label(tr("bonfire_pray_result"), Color(0.8, 0.8, 0.2))
+	await _show_result_label(tr("bonfire_pray_result"), DataManager.COLOR_HEAL_LOG)
 	
 	# TODO: добавить баф на 3 боевые комнаты (увеличение макс. энергии)
 	var reward_panel = preload("res://scenes/reward_panel.tscn").instantiate() as RewardPanel
@@ -120,10 +120,11 @@ func _handle_pray() -> void:
 	queue_free()
 
 func _handle_sharp_weapon() -> void:
-	await _show_result_label(tr("bonfire_sharp_result"), Color(0.8, 0.6, 0.2))
+	await _show_result_label(tr("bonfire_sharp_result"), DataManager.COLOR_HEAL_LOG)
 	
 	var reward_panel = preload("res://scenes/reward_panel.tscn").instantiate() as RewardPanel
 	reward_panel.reward_types = _generate_rewards(DataManager.ActionType.SHARP_WEAPON, true)
+	reward_panel.upgrade_count = 1  # 🆕 или любое другое количество
 	SignalManager.hide_object.emit()
 	SignalManager.show_reward.emit(reward_panel)
 	queue_free()

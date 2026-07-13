@@ -330,7 +330,7 @@ func add_reward_panel(reward_panel: RewardPanel):
 		canvas_layer.layer = 200  # поверх всего
 		game_world.add_child(canvas_layer)
 		canvas_layer.add_child(reward_panel)
-		reward_panel.global_position = DataManager.ROOM_POSITION
+		#reward_panel.global_position = DataManager.ROOM_POSITION
 
 
 func _on_add_action_choice(action_choice: Control, title: String, actions: Array[DataManager.ActionType]) -> void:

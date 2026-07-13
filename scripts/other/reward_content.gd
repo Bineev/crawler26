@@ -8,6 +8,8 @@ var gold_mod: int = 1  # множитель золота
 var damage_mod: int = 1
 var heal_mod: int = 1
 var buff_duration: int = 0
+var upgrade_count: int = 1
+var selected_card: CardData = null
 
 @onready var title_label: Label = $Title
 @onready var rewards_container: HBoxContainer = $HBoxContainer
@@ -208,7 +210,11 @@ func _apply_reward(index: int) -> void:
 			if player:
 				player.heal(selected_item)
 		DataManager.RewardType.ENERGY_BUFF:
-			SignalManager.energy_buff.emit(selected_item)
+			var player = BattleManager.get_player()
+			if player:
+				var bonus = selected_item
+				var duration = buff_duration
+				RunManager.apply_energy_buff(bonus, duration)
 		DataManager.RewardType.DECK_SIZE_BUFF:
 			SignalManager.deck_size_buff.emit(selected_item)
 		DataManager.RewardType.GOLD:
@@ -289,7 +295,7 @@ func _setup_take_damage_reward() -> void:
 	hbox.add_child(icon)
 	
 	var damage_label = Label.new()
-	damage_label.text = "-" + str(damage_amount)
+	damage_label.text = tr("damage_label") % damage_amount
 	damage_label.add_theme_font_override("font", DataManager.FONT_HEADERS)
 	damage_label.add_theme_font_size_override("font_size", 48)
 	damage_label.add_theme_color_override("font_color", DataManager.COLOR_FLESH_CAVES_ART_BG_DARK)
@@ -323,7 +329,7 @@ func _setup_heal_reward() -> void:
 	hbox.add_child(icon)
 	
 	var heal_label = Label.new()
-	heal_label.text = "+" + str(heal_amount)
+	heal_label.text = tr("heal_label") % heal_amount
 	heal_label.add_theme_font_override("font", DataManager.FONT_HEADERS)
 	heal_label.add_theme_font_size_override("font_size", 48)
 	heal_label.add_theme_color_override("font_color", DataManager.COLOR_ROGUE_ART_BG_LIGHT)
@@ -339,8 +345,46 @@ func _setup_heal_reward() -> void:
 	rewards_container.add_child(vbox)
 
 func _setup_energy_buff_reward() -> void:
-	# TODO: создать UI для увеличения энергии
-	pass
+	var buff_amount = rewards[0]  # количество энергии (обычно 1)
+	
+	var vbox = VBoxContainer.new()
+	vbox.alignment = BoxContainer.ALIGNMENT_CENTER
+	vbox.add_theme_constant_override("separation", 20)
+	
+	var hbox = HBoxContainer.new()
+	hbox.alignment = BoxContainer.ALIGNMENT_CENTER
+	hbox.add_theme_constant_override("separation", 15)
+	
+	var icon = TextureRect.new()
+	icon.texture = preload("res://img/icons/card_types/buff.png")  # TODO: добавить иконку
+	icon.custom_minimum_size = Vector2(64, 64)
+	icon.expand_mode = TextureRect.EXPAND_FIT_WIDTH_PROPORTIONAL
+	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	hbox.add_child(icon)
+	
+	var buff_label = Label.new()
+	buff_label.text = tr("energy_buff_label") % buff_amount
+	buff_label.add_theme_font_override("font", DataManager.FONT_HEADERS)
+	buff_label.add_theme_font_size_override("font_size", 36)
+	buff_label.add_theme_color_override("font_color", DataManager.COLOR_MOLE_TUNNELS_ART_BG_LIGHT2)
+	buff_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	buff_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	hbox.add_child(buff_label)
+	
+	vbox.add_child(hbox)
+	
+	var duration_label = Label.new()
+	duration_label.text = tr("energy_buff_duration") % buff_duration
+	duration_label.add_theme_font_override("font", DataManager.FONT_MAIN)
+	duration_label.add_theme_font_size_override("font_size", 16)
+	duration_label.add_theme_color_override("font_color", DataManager.COLOR_MOLE_TUNNELS_ART_BG_LIGHT2)
+	duration_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	vbox.add_child(duration_label)
+	
+	var button = _create_reward_button("reward_take_buff", 0)
+	vbox.add_child(button)
+	
+	rewards_container.add_child(vbox)
 
 func _setup_deck_size_buff_reward() -> void:
 	# TODO: создать UI для увеличения размера колоды
@@ -365,7 +409,7 @@ func _setup_gold_reward() -> void:
 	hbox.add_child(icon)
 	
 	var gold_label = Label.new()
-	gold_label.text = "+" + str(gold_amount)
+	gold_label.text = tr("gold_label") % gold_amount
 	gold_label.add_theme_font_override("font", DataManager.FONT_HEADERS)
 	gold_label.add_theme_font_size_override("font_size", 48)
 	gold_label.add_theme_color_override("font_color", DataManager.COLOR_MOLE_TUNNELS_ART_BG_LIGHT2)
@@ -384,9 +428,6 @@ func _setup_remove_card_reward() -> void:
 	# TODO: создать UI для удаления карты из колоды
 	pass
 
-func _setup_upgrade_card_reward() -> void:
-	# TODO: создать UI для улучшения карты
-	pass
 
 func _setup_add_property_reward() -> void:
 	# TODO: создать UI для добавления свойства к карте
@@ -404,3 +445,217 @@ func _create_reward_button(text: String, index: int) -> Button:
 	button.custom_minimum_size = Vector2(150, 50)
 	
 	return button
+
+
+func _setup_upgrade_card_reward() -> void:
+	var master_cards_temp = RunManager.get_player_deck().master_cards
+	if master_cards_temp.is_empty():
+		SignalManager.log_message.emit("Колода пуста! Нечего улучшать.")
+		SignalManager.reward_selected.emit()
+		return
+	
+	# 🆕 Фильтруем карты, которые можно улучшить
+	var master_cards: Array[CardData] = []
+	for card in master_cards_temp:
+		if card.is_can_upgrade:
+			master_cards.append(card)
+	
+	if master_cards.is_empty():
+		SignalManager.log_message.emit("Нет карт, доступных для улучшения!")
+		SignalManager.reward_selected.emit()
+		return
+	
+	for child in rewards_container.get_children():
+		child.queue_free()
+	
+	var main_vbox = VBoxContainer.new()
+	main_vbox.alignment = BoxContainer.ALIGNMENT_CENTER
+
+	main_vbox.add_theme_constant_override("separation", 15)
+	rewards_container.add_child(main_vbox)
+	
+	# 🆕 Preview контейнер — размер с нормальную карту (масштаб 1.0)
+	var preview_container = CenterContainer.new()
+	preview_container.custom_minimum_size = Vector2(
+		DataManager.CARD_BASE_WIDTH,
+		DataManager.CARD_BASE_HEIGHT
+	)
+	preview_container.size = Vector2(
+		DataManager.CARD_BASE_WIDTH,
+		DataManager.CARD_BASE_HEIGHT
+	)
+	main_vbox.add_child(preview_container)
+	
+	# Grid контейнер с уменьшенными картами (0.5)
+	var scroll = ScrollContainer.new()
+	scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_AUTO
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	scroll.custom_minimum_size = Vector2(760, 400)
+	main_vbox.add_child(scroll)
+	var center_cont = CenterContainer.new()
+	var grid = GridContainer.new()
+	grid.columns = 5
+	grid.add_theme_constant_override("h_separation", 30)
+	grid.add_theme_constant_override("v_separation", 30)
+	scroll.add_child(center_cont)
+	center_cont.add_child(grid)
+	
+	selected_card = null
+	
+	for card_data in master_cards:
+		# Обёртка для карты (кликабельная)
+		var card_wrapper = Control.new()
+		#card_wrapper.custom_minimum_size = Vector2(
+			#DataManager.CARD_BASE_WIDTH * 0.6,
+			#DataManager.CARD_BASE_HEIGHT * 0.6
+		#)
+		card_wrapper.mouse_filter = Control.MOUSE_FILTER_STOP
+		
+		var card_ui = preload("res://scenes/card.tscn").instantiate() as CardUI
+		card_ui.card_data = card_data
+		card_wrapper.add_child(card_ui)
+		
+		await get_tree().create_timer(0.03).timeout
+		
+		grid.add_child(card_wrapper)
+		card_ui.display()
+		card_ui.card_control.scale = Vector2(0.5, 0.5)
+		card_ui.set_reward_state()
+		card_wrapper.custom_minimum_size = card_ui.get_actual_size()
+		# Клик по обёртке выбирает карту
+		card_wrapper.gui_input.connect(_on_card_wrapper_clicked.bind(card_data, card_wrapper, preview_container))
+	
+	var confirm_button = Button.new()
+	confirm_button.text = tr("upgrade_card_confirm")
+	confirm_button.add_theme_font_override("font", DataManager.FONT_HEADERS)
+	confirm_button.add_theme_font_size_override("font_size", 20)
+	confirm_button.custom_minimum_size = Vector2(200, 50)
+	confirm_button.modulate = Color(1, 1, 1, 0)
+	confirm_button.disabled = true
+	confirm_button.pressed.connect(_on_upgrade_confirm)
+	main_vbox.add_child(confirm_button)
+
+
+func _on_upgrade_card_selected(card_data: CardData, preview_container: Control) -> void:
+	for child in preview_container.get_children():
+		child.queue_free()
+	
+	var card_ui = preload("res://scenes/card.tscn").instantiate() as CardUI
+	card_ui.card_data = card_data
+	preview_container.add_child(card_ui)
+	
+	card_ui.display()
+	card_ui.scale = Vector2(1.0, 1.0)  # 🆕 нормальный размер
+	card_ui.set_reward_state()
+	
+	selected_card = card_data
+	
+	var confirm_button = preview_container.get_parent().get_child(preview_container.get_parent().get_child_count() - 1)
+	if confirm_button is Button:
+		confirm_button.modulate = Color(1, 1, 1, 1)
+		confirm_button.disabled = false
+
+
+func _on_upgrade_confirm() -> void:
+	if not selected_card:
+		return
+	
+	_apply_upgrade_to_card(selected_card)
+	SignalManager.log_message.emit("Карта улучшена: %s" % selected_card.get_localized_name())
+	SignalManager.reward_selected.emit()
+
+
+func _on_card_wrapper_clicked(event: InputEvent, card_data: CardData, wrapper: Control, preview_container: Control) -> void:
+	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
+		# Снимаем выделение со всех обёрток
+		for child in wrapper.get_parent().get_children():
+			if child is Control:
+				child.modulate = Color(1, 1, 1, 1)
+		
+		# Выделяем выбранную
+		wrapper.modulate = DataManager.COLOR_ATONEMENT_GLOW
+		
+		# Показываем в preview
+		for child in preview_container.get_children():
+			child.queue_free()
+
+		# 🆕 Показываем улучшенную версию карты
+		var upgraded_card = _get_upgraded_card_copy(card_data)
+		
+		var card_ui = preload("res://scenes/card.tscn").instantiate() as CardUI
+		card_ui.card_data = upgraded_card
+		var card_wrapper = Control.new()
+		card_wrapper.add_child(card_ui)
+		preview_container.add_child(card_wrapper)
+		card_ui.display()
+		card_ui.set_reward_state()
+		card_ui.card_control.scale = Vector2(0.8, 0.8)
+		card_wrapper.custom_minimum_size = card_ui.get_actual_size() * 1.3
+		
+		# 🆕 Сохраняем оригинальную карту для применения улучшения
+		selected_card = card_data
+		
+		# Показываем кнопку подтверждения
+		var confirm_button = preview_container.get_parent().get_child(preview_container.get_parent().get_child_count() - 1)
+		if confirm_button is Button:
+			confirm_button.modulate = Color(1, 1, 1, 1)
+			confirm_button.disabled = false
+
+
+func _apply_upgrade_to_card(card: CardData) -> void:
+	match card.upgrade_type:
+		DataManager.UpgradeType.COST_MINUS_1:
+			if card.cost > 0:
+				card.cost -= 1
+		
+		DataManager.UpgradeType.DAMAGE_PLUS_2:
+			# Ищем первый эффект DAMAGE и увеличиваем base_value
+			for effect in card.effects:
+				if effect.category == DataManager.EffectCategory.DAMAGE:
+					effect.base_value += 2
+					break
+		
+		DataManager.UpgradeType.BLOCK_PLUS_3:
+			for effect in card.effects:
+				if effect.category == DataManager.EffectCategory.BLOCK:
+					effect.base_value += 3
+					break
+		
+		DataManager.UpgradeType.HEAL_PLUS_2:
+			for effect in card.effects:
+				if effect.category == DataManager.EffectCategory.HEAL:
+					effect.base_value += 2
+					break
+		
+		DataManager.UpgradeType.ADD_STATUS_STACK:
+			for effect in card.effects:
+				if effect.category == DataManager.EffectCategory.APPLY_STATUS:
+					effect.value += 1
+					break
+		
+		DataManager.UpgradeType.DRAW_PLUS_1:
+			for effect in card.effects:
+				if effect.category == DataManager.EffectCategory.DRAW_CARD:
+					effect.amount += 1
+					break
+		
+		DataManager.UpgradeType.ENERGY_PLUS_1:
+			for effect in card.effects:
+				if effect.category == DataManager.EffectCategory.GAIN_ENERGY:
+					effect.amount += 1
+					break
+		
+		DataManager.UpgradeType.REMOVE_CARD_TAG_BURN:
+			if card.has_tag(DataManager.CardTag.BURNS):
+				var tags = card.tags
+				tags.erase(DataManager.CardTag.BURNS)
+				card.tags = tags
+
+	# 🆕 Карта больше не может быть улучшена
+	card.is_can_upgrade = false
+
+
+func _get_upgraded_card_copy(card: CardData) -> CardData:
+	var copy = card.duplicate_for_instance()
+	_apply_upgrade_to_card(copy)
+	return copy
