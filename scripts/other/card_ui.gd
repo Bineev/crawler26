@@ -121,7 +121,7 @@ func display():
 		)
 	
 	
-	description_label.text = card_data.get_localized_description()
+	description_label.text = card_data.generate_dynamic_description()
 	
 	var card_bg = $CardTemplate/CardBackground as TextureRect
 	if card_bg:

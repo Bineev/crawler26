@@ -9,6 +9,7 @@
 script = ExtResource("1_2x3em")
 category = 15
 target = 0
+custom_description = "custom_flesh_rage"
 custom_script = ExtResource("2_mghm6")
 metadata/_custom_type_script = "uid://cmra25r1r3ivt"
 

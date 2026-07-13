@@ -15,7 +15,8 @@ class_name EffectEntry
 ## Цель эффекта
 @export var target: DataManager.EffectTarget = DataManager.EffectTarget.ENEMY
 
-
+## Кастомное описание для CUSTOM эффектов
+@export var custom_description: String = ""
 ## ============================================================
 ## ДЛЯ DAMAGE / BLOCK / HEAL
 ## ============================================================
@@ -137,6 +138,10 @@ func duplicate_for_instance() -> EffectEntry:
 	copy.stat_multiplier = stat_multiplier
 	copy.stat_divisor = stat_divisor
 	copy.scaled_values = scaled_values.duplicate()
+	copy.scaled_thresholds = scaled_thresholds.duplicate()  # 🆕
+	copy.scaled_compare = scaled_compare  # 🆕
+	copy.scaled_resource = scaled_resource  # 🆕
+	copy.scaled_spend_resource = scaled_spend_resource  # 🆕
 	copy.scaled_type = scaled_type
 	copy.status = status
 	copy.value = value
@@ -152,11 +157,16 @@ func duplicate_for_instance() -> EffectEntry:
 	copy.from_stat = from_stat
 	copy.to_stat = to_stat
 	copy.conversion_ratio = conversion_ratio
+	copy.convert_from_status = convert_from_status  # 🆕
+	copy.convert_to_stat = convert_to_stat  # 🆕
+	copy.convert_conversion_ratio = convert_conversion_ratio  # 🆕
 	copy.condition_script = condition_script
 	copy.custom_script = custom_script
+	copy.custom_description = custom_description  # 🆕
 	copy.grow_type = grow_type
 	copy.grow_value = grow_value
 	copy.grow_target = grow_target
+	copy.is_direct_damage = is_direct_damage  # 🆕
 	
 	copy.current_value = current_value if uses_custom_values else value
 	copy.current_duration = current_duration if uses_custom_values else duration
