@@ -69,14 +69,14 @@ class_name ArtifactResource
 
 ## Возвращает локализованное название
 func get_localized_name() -> String:
-	if not name_key.is_empty():
-		return tr(name_key)
+	#if not name_key.is_empty():
+		#return tr(name_key)
 	return DataManager.get_artifact_name(id)
 
 ## Возвращает локализованное описание
 func get_localized_description() -> String:
-	if not description_key.is_empty():
-		return tr(description_key)
+	#if not description_key.is_empty():
+		#return tr(description_key)
 	return DataManager.get_artifact_description(id)
 
 ## Возвращает локализованное лор-описание

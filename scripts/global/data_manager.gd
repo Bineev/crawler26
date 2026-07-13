@@ -1687,6 +1687,10 @@ func get_artifact_description(artifact_id: ArtifactId) -> String:
 				ARTIFACT_STRANGE_MUSHROOM_POISON_DURATION
 			]
 		ArtifactId.HEROS_BROOCH:
+			var temp = tr("artifact_heros_brooch_desc") % [
+				ARTIFACT_HEROS_BROOCH_TURN_INTERVAL,
+				ARTIFACT_HEROS_BROOCH_STRENGTH_STACKS
+			]
 			return tr("artifact_heros_brooch_desc") % [
 				ARTIFACT_HEROS_BROOCH_TURN_INTERVAL,
 				ARTIFACT_HEROS_BROOCH_STRENGTH_STACKS
