@@ -138,3 +138,5 @@ signal keys_changed(amount: int)
 signal add_action_choice(action_choice: Control, title: String, actions: Array[DataManager.ActionType])
 
 signal hide_object()
+
+signal enemy_get_attack()

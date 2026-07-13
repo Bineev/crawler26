@@ -857,6 +857,8 @@ func push_back():
 	if _is_pushing or not enemy_sprite:
 		return
 	
+	SignalManager.enemy_get_attack.emit()
+	
 	_is_pushing = true
 	
 	var original_scale = scale
@@ -879,6 +881,8 @@ func push_back():
 	await tween.finished
 	
 	_is_pushing = false
+	
+	
 
 
 func find_status_icon(status_id: int) -> StatusIcon:
