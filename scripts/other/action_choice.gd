@@ -52,6 +52,10 @@ func _get_action_text(action: DataManager.ActionType) -> String:
 			return tr("action_give_blood")
 		DataManager.ActionType.LOOT_SHRINE:
 			return tr("action_loot_shrine")
+		DataManager.ActionType.TRANSFORM_CARD:
+			return tr("action_transform_card")
+		DataManager.ActionType.BREW_POTION:
+			return tr("action_brew_potion")
 		_:
 			return ""
 
@@ -82,6 +86,10 @@ func _handle_choice(action: DataManager.ActionType) -> void:
 			_handle_give_blood()
 		DataManager.ActionType.LOOT_SHRINE:
 			_handle_loot_shrine()
+		DataManager.ActionType.TRANSFORM_CARD:
+			_handle_transform_card()
+		DataManager.ActionType.BREW_POTION:
+			_handle_brew_potion()
 
 func _handle_use_key() -> void:
 	var success = RunManager.use_key()
@@ -376,16 +384,21 @@ func _handle_loot_shrine() -> void:
 	SignalManager.show_reward.emit(reward_panel)
 	queue_free()
 
-func _apply_biome_debuff() -> void:
-	var player = BattleManager.get_player()
-	if not player:
-		return
+func _handle_transform_card() -> void:
+	await _show_result_label(tr("cauldron_transform_title"), DataManager.COLOR_HEAL_LOG)
 	
-	var biome = FloorManager.current_biome
-	match biome:
-		DataManager.Biome.MOLE_TUNNELS:
-			var bleed_status = DataManager.get_status_resource(DataManager.Status.BLEED)
-			if bleed_status:
-				player.add_status(bleed_status, 2, 3, player)  # 2 стака на 3 хода
-				SignalManager.log_message.emit("Вы получили проклятие: Кровотечение на 3 боя!")
-		# TODO: другие биомы
+	var reward_panel = preload("res://scenes/reward_panel.tscn").instantiate() as RewardPanel
+	reward_panel.reward_types = [DataManager.RewardType.TRANSFORM_CARD]
+	SignalManager.hide_object.emit()
+	SignalManager.show_reward.emit(reward_panel)
+	queue_free()
+
+
+func _handle_brew_potion() -> void:
+	await _show_result_label(tr("cauldron_brew_result"), DataManager.COLOR_HEAL_LOG)
+	
+	var reward_panel = preload("res://scenes/reward_panel.tscn").instantiate() as RewardPanel
+	reward_panel.reward_types = [DataManager.RewardType.POTION]
+	SignalManager.hide_object.emit()
+	SignalManager.show_reward.emit(reward_panel)
+	queue_free()

@@ -252,3 +252,12 @@ upgrade_card_confirm,Улучшить
 "idol_blood_result","Вы отдали свою кровь идолу..."
 "idol_loot_success","Вы нашли ценные трофеи!"
 "idol_loot_fail","Святыня прокляла вас!"
+
+"cauldron_title","Котёл"
+"action_transform_card","Преобразовать карту"
+"action_brew_potion","Сварить зелье"
+"cauldron_transform_title","Выберите карту для преобразования"
+"cauldron_brew_result","Зелье сварено!"
+"transform_card_confirm","Преобразовать"
+"reward_transform_card_title","Преобразовать карту (осталось %d попыток)"
+"reward_transform_attempts_zero","Попыток больше нет"

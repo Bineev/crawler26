@@ -32,6 +32,8 @@ enum ActionType {
 	MAKE_OFFERING,      # 🆕
 	GIVE_BLOOD,         # 🆕
 	LOOT_SHRINE,        # 🆕
+	TRANSFORM_CARD,   # 🆕
+	BREW_POTION,      # 🆕
 }
 
 
@@ -276,6 +278,7 @@ enum RewardType {
 	REMOVE_CARD,
 	UPGRADE_CARD,
 	ADD_PROPERTY_TO_CARD,
+	TRANSFORM_CARD
 }
 
 ## Тип цикла намерений
@@ -1765,3 +1768,47 @@ const OBJECT_SIZES: Dictionary = {
 
 func get_object_size(object_type: DataManager.ObjectType) -> Vector2:
 	return OBJECT_SIZES.get(object_type, Vector2(196, 196))
+
+
+## Пул эффектов для преобразования карт
+const TRANSFORM_EFFECT_POOL: Dictionary = {
+	"DAMAGE": [DataManager.EffectCategory.DAMAGE],
+	"BLOCK": [DataManager.EffectCategory.BLOCK],
+	"HEAL": [DataManager.EffectCategory.HEAL],
+	"APPLY_STATUS": [DataManager.EffectCategory.APPLY_STATUS],
+	"DRAW_CARD": [DataManager.EffectCategory.DRAW_CARD],
+	"GAIN_ENERGY": [DataManager.EffectCategory.GAIN_ENERGY],
+}
+
+func get_random_effect_from_pool(categories: Array) -> EffectEntry:
+	var category = categories[randi() % categories.size()]
+	var effect = EffectEntry.new()
+	effect.category = category
+	effect.target = DataManager.EffectTarget.SELF
+	
+	match category:
+		DataManager.EffectCategory.DAMAGE:
+			effect.base_value = randi() % 3 + 2  # 2-4
+			effect.target = DataManager.EffectTarget.ENEMY
+		DataManager.EffectCategory.BLOCK:
+			effect.base_value = randi() % 4 + 3  # 3-6
+		DataManager.EffectCategory.HEAL:
+			effect.base_value = randi() % 3 + 2  # 2-4
+		DataManager.EffectCategory.APPLY_STATUS:
+			var statuses = [
+				DataManager.Status.POISON,
+				DataManager.Status.BLEED,
+				DataManager.Status.WEAKNESS,
+				DataManager.Status.VULNERABILITY,
+			]
+			var status_id = statuses[randi() % statuses.size()]
+			effect.status = DataManager.get_status_resource(status_id)
+			effect.value = randi() % 3 + 1  # 1-3
+			effect.duration = randi() % 3 + 2  # 2-4
+			effect.target = DataManager.EffectTarget.ENEMY
+		DataManager.EffectCategory.DRAW_CARD:
+			effect.amount = randi() % 2 + 1  # 1-2
+		DataManager.EffectCategory.GAIN_ENERGY:
+			effect.amount = 1
+	
+	return effect

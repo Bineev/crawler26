@@ -10,6 +10,10 @@ var heal_mod: int = 1
 var buff_duration: int = 0
 var upgrade_count: int = 1
 var selected_card: CardData = null
+var preview_container : CenterContainer = null
+var transform_attempts: int = 0
+var max_transform_attempts: int = 3
+var confirm_button : Button
 
 @onready var title_label: Label = $Title
 @onready var rewards_container: HBoxContainer = $HBoxContainer
@@ -51,7 +55,8 @@ func setup(type: DataManager.RewardType, items: Array) -> void:
 			_setup_upgrade_card_reward()
 		DataManager.RewardType.ADD_PROPERTY_TO_CARD:
 			_setup_add_property_reward()
-			
+		DataManager.RewardType.TRANSFORM_CARD:
+			_setup_transform_card_reward()
 
 
 func _setup_title() -> void:
@@ -122,6 +127,8 @@ func _get_title() -> String:
 			return tr("reward_upgrade_card_title")
 		DataManager.RewardType.ADD_PROPERTY_TO_CARD:
 			return tr("reward_add_property_title")
+		DataManager.RewardType.TRANSFORM_CARD:  # 🆕
+			return tr("reward_transform_card_title")
 		_:
 			return tr("reward_default_title")
 
@@ -531,6 +538,7 @@ func _setup_add_property_reward() -> void:
 func _create_reward_button(text: String, index: int) -> Button:
 	var button = Button.new()
 	button.text = tr(text)
+	# BUG
 	button.pressed.connect(_on_item_selected.bind(index))
 	
 	button.add_theme_font_override("font", DataManager.FONT_HEADERS)
@@ -894,3 +902,383 @@ func _get_upgrade_type_for_card(card: CardData) -> DataManager.UpgradeType:
 		return DataManager.UpgradeType.ENERGY_PLUS_1
 	else:
 		return DataManager.UpgradeType.COST_MINUS
+
+
+func _setup_transform_card_reward() -> void:
+	var master_cards = RunManager.get_player_deck().master_cards
+	if master_cards.is_empty():
+		SignalManager.log_message.emit("Колода пуста! Нечего преобразовывать.")
+		SignalManager.reward_selected.emit()
+		return
+	
+	var transformable_cards: Array[CardData] = []
+	for card in master_cards:
+		if card.is_can_upgrade:
+			transformable_cards.append(card)
+	
+	if transformable_cards.is_empty():
+		SignalManager.log_message.emit("Нет карт, доступных для преобразования!")
+		SignalManager.reward_selected.emit()
+		return
+	
+	for child in rewards_container.get_children():
+		child.queue_free()
+	
+	transform_attempts = 0
+	max_transform_attempts = 3
+	
+	# 🆕 Обновляем существующий title_label
+	_update_transform_title()
+	
+	var main_vbox = VBoxContainer.new()
+	main_vbox.alignment = BoxContainer.ALIGNMENT_CENTER
+	main_vbox.add_theme_constant_override("separation", 15)
+	rewards_container.add_child(main_vbox)
+	
+	# Preview контейнер
+	preview_container = CenterContainer.new()
+	preview_container.custom_minimum_size = Vector2(
+		DataManager.CARD_BASE_WIDTH,
+		DataManager.CARD_BASE_HEIGHT
+	)
+	preview_container.size = Vector2(
+		DataManager.CARD_BASE_WIDTH,
+		DataManager.CARD_BASE_HEIGHT
+	)
+	main_vbox.add_child(preview_container)
+	
+	# Grid контейнер
+	var scroll = ScrollContainer.new()
+	scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_AUTO
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	scroll.custom_minimum_size = Vector2(760, 400)
+	main_vbox.add_child(scroll)
+	var center_cont = CenterContainer.new()
+	var grid = GridContainer.new()
+	grid.columns = 5
+	grid.add_theme_constant_override("h_separation", 30)
+	grid.add_theme_constant_override("v_separation", 30)
+	scroll.add_child(center_cont)
+	center_cont.add_child(grid)
+	
+	selected_card = null
+	
+	for card_data in transformable_cards:
+		var display_card = card_data.duplicate_for_instance()
+		display_card.upgrade_type = _get_upgrade_type_for_card(card_data)
+		
+		var card_wrapper = Control.new()
+		card_wrapper.mouse_filter = Control.MOUSE_FILTER_STOP
+		
+		var card_ui = preload("res://scenes/card.tscn").instantiate() as CardUI
+		card_ui.card_data = display_card
+		card_wrapper.add_child(card_ui)
+		
+		await get_tree().create_timer(0.03).timeout
+		
+		grid.add_child(card_wrapper)
+		card_ui.display()
+		card_ui.card_control.scale = Vector2(0.5, 0.5)
+		card_ui.set_reward_state()
+		card_wrapper.custom_minimum_size = card_ui.get_actual_size()
+		
+		card_wrapper.gui_input.connect(_on_transform_card_selected.bind(card_data, card_wrapper))
+	
+	# Кнопка подтверждения (всегда видима)
+	confirm_button = Button.new()
+	confirm_button.text = tr("transform_card_confirm")
+	confirm_button.add_theme_font_override("font", DataManager.FONT_HEADERS)
+	confirm_button.add_theme_font_size_override("font_size", 20)
+	confirm_button.custom_minimum_size = Vector2(200, 50)
+	confirm_button.modulate = Color(1, 1, 1, 1)
+	confirm_button.disabled = true
+	confirm_button.pressed.connect(_on_transform_confirm_pressed)
+	main_vbox.add_child(confirm_button)
+
+func _get_transform_title() -> String:
+	var remaining = max_transform_attempts - transform_attempts
+	return tr("reward_transform_card_title") % remaining
+
+func _update_transform_title() -> void:
+	var remaining = max_transform_attempts - transform_attempts
+	if remaining == 0:
+		title_label.text = tr("reward_transform_attempts_zero")
+	else:
+		title_label.text = tr("reward_transform_card_title") % remaining
+
+
+func _on_transform_card_selected(event: InputEvent, card_data: CardData, wrapper: Control) -> void:
+	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
+		# Проверяем, не достигнут ли лимит попыток
+		if transform_attempts >= max_transform_attempts:
+			SignalManager.log_message.emit("Вы уже использовали все попытки преобразования!")
+			return
+		
+		# Проверяем, не кликнули ли по уже выбранной карте
+		if wrapper.modulate == DataManager.COLOR_ATONEMENT_GLOW:
+			return
+		
+		# Снимаем выделение со всех обёрток
+		for child in wrapper.get_parent().get_children():
+			if child is Control:
+				child.modulate = Color(1, 1, 1, 1)
+		
+		# Выделяем выбранную
+		wrapper.modulate = DataManager.COLOR_ATONEMENT_GLOW
+		
+		# Показываем в preview
+		for child in preview_container.get_children():
+			child.queue_free()
+		
+		var transformed_card = _get_transformed_card_copy(card_data)
+		
+		var card_ui = preload("res://scenes/card.tscn").instantiate() as CardUI
+		card_ui.card_data = transformed_card
+		var card_wrapper = Control.new()
+		card_wrapper.add_child(card_ui)
+		preview_container.add_child(card_wrapper)
+		card_ui.display()
+		card_ui.set_reward_state()
+		card_ui.card_control.scale = Vector2(0.8, 0.8)
+		card_wrapper.custom_minimum_size = card_ui.get_actual_size() * 1.3
+		
+		selected_card = card_data
+		
+		# Увеличиваем счётчик попыток
+		transform_attempts += 1
+		
+		# 🆕 Обновляем заголовок
+		_update_transform_title()
+		
+		# 🆕 Кнопка всегда видима, активируем её
+		var confirm_button = preview_container.get_parent().get_child(preview_container.get_parent().get_child_count() - 1)
+		if confirm_button is Button:
+			confirm_button.disabled = false
+		
+		await get_tree().create_timer(0.1).timeout
+		# Если достигнут лимит — автоматически подтверждаем
+		if transform_attempts >= max_transform_attempts:
+			SignalManager.log_message.emit("Достигнут лимит попыток! Преобразование выполняется автоматически.")
+			await _on_transform_confirm()
+
+func _get_transformed_card_copy(card: CardData) -> CardData:
+	var copy = card.duplicate_for_instance()
+	
+	if copy.effects.is_empty():
+		return copy
+	
+	# Определяем, какие эффекты есть у карты
+	var has_damage = false
+	var has_block = false
+	var has_heal = false
+	var has_other = false
+	
+	for effect in copy.effects:
+		match effect.category:
+			DataManager.EffectCategory.DAMAGE:
+				has_damage = true
+			DataManager.EffectCategory.BLOCK:
+				has_block = true
+			DataManager.EffectCategory.HEAL:
+				has_heal = true
+			DataManager.EffectCategory.CONDITIONAL:
+				if effect.true_effect:
+					match effect.true_effect.category:
+						DataManager.EffectCategory.DAMAGE:
+							has_damage = true
+						DataManager.EffectCategory.BLOCK:
+							has_block = true
+						DataManager.EffectCategory.HEAL:
+							has_heal = true
+			_:
+				has_other = true
+	
+	var effect_count = copy.effects.size()
+	
+	if effect_count == 1:
+		# Один эффект — добавляем новый случайный эффект
+		var new_effect: EffectEntry = null
+		
+		if has_damage:
+			var pool = [
+				DataManager.EffectCategory.APPLY_STATUS,
+				DataManager.EffectCategory.DRAW_CARD,
+				DataManager.EffectCategory.BLOCK,
+				DataManager.EffectCategory.APPLY_STATUS,
+			]
+			new_effect = DataManager.get_random_effect_from_pool(pool)
+		elif has_block:
+			var pool = [
+				DataManager.EffectCategory.GAIN_ENERGY,
+				DataManager.EffectCategory.DRAW_CARD,
+				DataManager.EffectCategory.HEAL,
+				DataManager.EffectCategory.APPLY_STATUS,
+			]
+			new_effect = DataManager.get_random_effect_from_pool(pool)
+		elif has_heal:
+			var pool = [
+				DataManager.EffectCategory.BLOCK,
+				DataManager.EffectCategory.DRAW_CARD,
+				DataManager.EffectCategory.GAIN_ENERGY,
+				DataManager.EffectCategory.APPLY_STATUS,
+			]
+			new_effect = DataManager.get_random_effect_from_pool(pool)
+		else:
+			var pool = [
+				DataManager.EffectCategory.DAMAGE,
+				DataManager.EffectCategory.BLOCK,
+				DataManager.EffectCategory.HEAL,
+				DataManager.EffectCategory.APPLY_STATUS,
+				DataManager.EffectCategory.DRAW_CARD,
+				DataManager.EffectCategory.GAIN_ENERGY,
+			]
+			new_effect = DataManager.get_random_effect_from_pool(pool)
+		
+		if new_effect:
+			copy.effects.append(new_effect)
+	
+	elif effect_count >= 2:
+		# Несколько эффектов — заменяем один из них
+		var effect_to_replace = -1
+		var new_effect: EffectEntry = null
+		
+		if has_damage:
+			# Ищем не-урон эффект
+			for i in range(copy.effects.size()):
+				var e = copy.effects[i]
+				if e.category != DataManager.EffectCategory.DAMAGE:
+					if not (e.category == DataManager.EffectCategory.CONDITIONAL and e.true_effect and e.true_effect.category == DataManager.EffectCategory.DAMAGE):
+						effect_to_replace = i
+						break
+			
+			var pool = [
+				DataManager.EffectCategory.APPLY_STATUS,
+				DataManager.EffectCategory.DRAW_CARD,
+				DataManager.EffectCategory.BLOCK,
+				DataManager.EffectCategory.APPLY_STATUS,
+			]
+			new_effect = DataManager.get_random_effect_from_pool(pool)
+		
+		elif has_block:
+			for i in range(copy.effects.size()):
+				var e = copy.effects[i]
+				if e.category != DataManager.EffectCategory.BLOCK:
+					if not (e.category == DataManager.EffectCategory.CONDITIONAL and e.true_effect and e.true_effect.category == DataManager.EffectCategory.BLOCK):
+						effect_to_replace = i
+						break
+			
+			var pool = [
+				DataManager.EffectCategory.GAIN_ENERGY,
+				DataManager.EffectCategory.DRAW_CARD,
+				DataManager.EffectCategory.HEAL,
+				DataManager.EffectCategory.APPLY_STATUS,
+			]
+			new_effect = DataManager.get_random_effect_from_pool(pool)
+		
+		elif has_heal:
+			for i in range(copy.effects.size()):
+				var e = copy.effects[i]
+				if e.category != DataManager.EffectCategory.HEAL:
+					if not (e.category == DataManager.EffectCategory.CONDITIONAL and e.true_effect and e.true_effect.category == DataManager.EffectCategory.HEAL):
+						effect_to_replace = i
+						break
+			
+			var pool = [
+				DataManager.EffectCategory.BLOCK,
+				DataManager.EffectCategory.DRAW_CARD,
+				DataManager.EffectCategory.GAIN_ENERGY,
+				DataManager.EffectCategory.APPLY_STATUS,
+			]
+			new_effect = DataManager.get_random_effect_from_pool(pool)
+		
+		else:
+			# Если нет явного типа — заменяем случайный эффект
+			effect_to_replace = randi() % copy.effects.size()
+			var pool = [
+				DataManager.EffectCategory.DAMAGE,
+				DataManager.EffectCategory.BLOCK,
+				DataManager.EffectCategory.HEAL,
+				DataManager.EffectCategory.APPLY_STATUS,
+				DataManager.EffectCategory.DRAW_CARD,
+				DataManager.EffectCategory.GAIN_ENERGY,
+			]
+			new_effect = DataManager.get_random_effect_from_pool(pool)
+		
+		if effect_to_replace != -1 and new_effect:
+			copy.effects[effect_to_replace] = new_effect
+	
+	return copy
+
+#func _on_transform_confirm() -> void:
+	#if not selected_card:
+		#return
+	#if confirm_button:
+		#confirm_button.disabled
+		#confirm_button.hide()
+	#await get_tree().create_timer(1).timeout
+	## Применяем преобразование к оригинальной карте
+	#var transformed = _get_transformed_card_copy(selected_card)
+	#
+	## Заменяем оригинальную карту в мастер-колоде
+	#var master_cards = RunManager.get_player_deck().master_cards
+	#var index = master_cards.find(selected_card)
+	#if index != -1:
+		#master_cards[index] = transformed
+	#
+	#SignalManager.log_message.emit("Карта преобразована: %s" % selected_card.get_localized_name())
+	#
+	## 🆕 Сбрасываем счётчик
+	#transform_attempts = 0
+	#
+	#SignalManager.reward_selected.emit()
+
+func _on_transform_confirm() -> void:
+	if not selected_card:
+		return
+	
+	var preview_card = preview_container.get_child(0) if preview_container.get_child_count() > 0 else null
+	if is_instance_valid(preview_card):
+		var tween = create_tween()
+		tween.set_parallel(true)
+		
+		# 1. Карта поднимается вверх (0.3 сек)
+		tween.tween_property(preview_card, "position", Vector2(0, -100), 0.3).as_relative().set_ease(Tween.EASE_OUT)
+		
+		# 2. Остальные элементы (заголовок, грид, кнопка) растворяются
+		var main_vbox = preview_card.get_parent().get_parent()  # VBoxContainer
+		if main_vbox:
+			for child in main_vbox.get_children():
+				if child != preview_card.get_parent():  # не трогаем preview_container
+					tween.tween_property(child, "modulate", Color(1, 1, 1, 0), 0.3)
+		
+		# Ждём подъёма
+		await get_tree().create_timer(0.4).timeout
+		
+		# 3. Карта резко улетает вниз и исчезает (0.5 сек)
+		tween = create_tween()
+		tween.set_parallel(true)
+		tween.tween_property(preview_card, "position", Vector2(0, 600), 0.5).as_relative().set_ease(Tween.EASE_IN)
+		tween.tween_property(preview_card, "modulate", Color(1, 1, 1, 0), 0.5)
+		
+		await tween.finished
+		
+		if is_instance_valid(preview_card):
+			preview_card.queue_free()
+	
+	# Применяем преобразование к оригинальной карте
+	var transformed = _get_transformed_card_copy(selected_card)
+	
+	var master_cards = RunManager.get_player_deck().master_cards
+	var index = master_cards.find(selected_card)
+	if index != -1:
+		master_cards[index] = transformed
+	
+	SignalManager.log_message.emit("Карта преобразована: %s" % selected_card.get_localized_name())
+	transform_attempts = 0
+	
+	SignalManager.reward_selected.emit()
+
+
+func _on_transform_confirm_pressed() -> void:
+	# Обёртка для вызова корутины из сигнала
+	await _on_transform_confirm()

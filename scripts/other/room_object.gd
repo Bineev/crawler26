@@ -68,8 +68,7 @@ func interact() -> void:
 			# TODO: ловушка
 			pass
 		DataManager.ObjectType.CAULDRON:
-			# TODO: котёл
-			pass
+			_interact_cauldron()
 		DataManager.ObjectType.TORTURE_RACK:
 			# TODO: пыточный стол
 			pass
@@ -195,3 +194,13 @@ func _on_hide_object() -> void:
 	tween.tween_property(self, "modulate", Color(1, 1, 1, 0), 0.3)
 	await tween.finished
 	queue_free()
+
+
+func _interact_cauldron() -> void:
+	var actions: Array[DataManager.ActionType] = [
+		DataManager.ActionType.TRANSFORM_CARD,
+		DataManager.ActionType.BREW_POTION
+	]
+	
+	var action_choice = preload("res://scenes/action_choice.tscn").instantiate() as ActionChoice
+	SignalManager.add_action_choice.emit(action_choice, tr("cauldron_title"), actions)

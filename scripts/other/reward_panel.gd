@@ -88,6 +88,8 @@ func _create_current_reward():
 			_create_upgrade_card_reward()
 		DataManager.RewardType.ADD_PROPERTY_TO_CARD:
 			_create_add_property_reward()
+		DataManager.RewardType.TRANSFORM_CARD:
+			_create_transform_card_reward()
 		_:
 			pass
 
@@ -296,3 +298,10 @@ func _animate_in():
 	var tween = create_tween()
 	tween.tween_property(dark_overlay, "color:a", 0.8, 0.5)
 	await tween.finished
+
+
+func _create_transform_card_reward() -> void:
+	var content = preload("res://scenes/reward_content.tscn").instantiate() as RewardContent
+	center_container.add_child(content)
+	content.setup(DataManager.RewardType.TRANSFORM_CARD, [])
+	SignalManager.reward_selected.connect(_on_reward_selected)
