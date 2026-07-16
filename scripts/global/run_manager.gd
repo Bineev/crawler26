@@ -13,10 +13,9 @@ var bones: int = DataManager.STARTING_BONES
 var keys: int = DataManager.STARTING_KEYS
 ## Массив артефактов, которые есть у игрока в текущем забеге
 var artifacts: Array[ArtifactResource] = []
-
 ## Счётчики для артефактов (например, для CARD_PLAYED_COUNTER)
 var artifact_counters: Dictionary = {}  # key: ArtifactId, value: int
-
+var potions: Array[PotionResource] = []
 ## Структура: { "max_energy_buff": количество оставшихся боёв, "bonus_energy": сколько добавлено }
 var temp_buffs: Dictionary = {
 	"max_energy_buff": 0,
@@ -466,3 +465,21 @@ func apply_idol_curse_to_player(player: CharacterStats) -> void:
 
 func get_idol_curse_remaining() -> int:
 	return idol_curse_remaining
+
+
+func add_potion(potion: PotionResource) -> bool:
+	if potions.size() >= DataManager.POTION_MAX_COUNT:
+		SignalManager.log_message.emit("Нет места для зелья!")
+		return false
+	var instance = potion.duplicate_for_instance()
+	potions.append(instance)
+	SignalManager.potion_added.emit(instance)
+	return true
+
+func remove_potion(index: int) -> void:
+	if index < potions.size():
+		potions.remove_at(index)
+		SignalManager.potion_removed.emit(index)
+
+func get_potions() -> Array[PotionResource]:
+	return potions

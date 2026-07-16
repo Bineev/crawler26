@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="PotionResource" load_steps=5 format=3 uid="uid://dno1dxhp7lp0"]
+
+[ext_resource type="Script" uid="uid://cmra25r1r3ivt" path="res://resources/res_scripts/effect_entry.gd" id="1_li8pp"]
+[ext_resource type="Script" uid="uid://cquabpng5kfbq" path="res://scripts/effects/cleanse_effect.gd" id="2_2fw03"]
+[ext_resource type="Script" uid="uid://ddnmhuucogct0" path="res://resources/res_scripts/potion_resource.gd" id="2_rmqxk"]
+
+[sub_resource type="Resource" id="Resource_tusqa"]
+script = ExtResource("1_li8pp")
+category = 15
+target = 0
+custom_description = "custom_cleanse"
+custom_script = ExtResource("2_2fw03")
+metadata/_custom_type_script = "uid://cmra25r1r3ivt"
+
+[resource]
+script = ExtResource("2_rmqxk")
+potion_type = 4
+name_key = "potion_cleanse_name"
+effects = Array[ExtResource("1_li8pp")]([SubResource("Resource_tusqa")])
+metadata/_custom_type_script = "uid://ddnmhuucogct0"

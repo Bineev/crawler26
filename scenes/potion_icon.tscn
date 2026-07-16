@@ -1,0 +1,13 @@
+[gd_scene load_steps=2 format=3 uid="uid://b858blwpgr8ed"]
+
+[ext_resource type="Script" uid="uid://p5nr5s1s8clj" path="res://scripts/other/potion_icon.gd" id="1_y5xxm"]
+
+[node name="PotionIcon" type="TextureRect"]
+offset_right = 40.0
+offset_bottom = 40.0
+script = ExtResource("1_y5xxm")
+
+[node name="UseButton" type="Button" parent="."]
+layout_mode = 0
+offset_right = 8.0
+offset_bottom = 8.0

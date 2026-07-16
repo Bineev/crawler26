@@ -18,6 +18,7 @@ var end_turn_button : EndTurnButton = null
 var player_portrait: PlayerPortrait = null
 var player : PenitentStats = null
 var energy_display: EnergyDisplay = null
+var potion_container: HBoxContainer = null
 # Ссылка на RoomManager (будет доступен как автолоад)
 # RoomManager уже загружен как синглтон
 var is_ending_turn: bool = false
@@ -69,6 +70,7 @@ func start_test(world_node: Node):
 	_create_gold_display()
 	_create_key_display()
 	_create_bone_display()
+	_create_potion_display()  # 🆕
 	# Отключаем старые сигналы перед подключением
 	if FloorManager.room_selected.is_connected(_on_room_selected):
 		FloorManager.room_selected.disconnect(_on_room_selected)

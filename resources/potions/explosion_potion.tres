@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="PotionResource" load_steps=4 format=3 uid="uid://bg2cnfx7iw6ot"]
+
+[ext_resource type="Script" uid="uid://cmra25r1r3ivt" path="res://resources/res_scripts/effect_entry.gd" id="1_88bkj"]
+[ext_resource type="Script" uid="uid://ddnmhuucogct0" path="res://resources/res_scripts/potion_resource.gd" id="2_0a3lh"]
+
+[sub_resource type="Resource" id="Resource_88bkj"]
+script = ExtResource("1_88bkj")
+target = 2
+base_value = 20
+metadata/_custom_type_script = "uid://cmra25r1r3ivt"
+
+[resource]
+script = ExtResource("2_0a3lh")
+potion_type = 3
+name_key = "potion_explosion_name"
+effects = Array[ExtResource("1_88bkj")]([SubResource("Resource_88bkj")])
+metadata/_custom_type_script = "uid://ddnmhuucogct0"

@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="PotionResource" load_steps=4 format=3 uid="uid://btd7stxilttf"]
+
+[ext_resource type="Script" uid="uid://cmra25r1r3ivt" path="res://resources/res_scripts/effect_entry.gd" id="1_g6vme"]
+[ext_resource type="Script" uid="uid://ddnmhuucogct0" path="res://resources/res_scripts/potion_resource.gd" id="2_6wegi"]
+
+[sub_resource type="Resource" id="Resource_g6vme"]
+script = ExtResource("1_g6vme")
+category = 1
+target = 0
+base_value = 20
+metadata/_custom_type_script = "uid://cmra25r1r3ivt"
+
+[resource]
+script = ExtResource("2_6wegi")
+potion_type = 7
+name_key = "potion_block_name"
+effects = Array[ExtResource("1_g6vme")]([SubResource("Resource_g6vme")])
+metadata/_custom_type_script = "uid://ddnmhuucogct0"

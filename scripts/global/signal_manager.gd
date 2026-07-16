@@ -140,3 +140,7 @@ signal add_action_choice(action_choice: Control, title: String, actions: Array[D
 signal hide_object()
 
 signal enemy_get_attack()
+
+signal potion_added(potion: PotionResource)
+signal potion_removed(index: int)
+signal potion_used(index: int)

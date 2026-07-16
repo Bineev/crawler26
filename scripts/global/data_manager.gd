@@ -97,6 +97,17 @@ enum ModifierStat {
 	DAMAGE_FLAT_BONUS,         # СИЛА (+X к урону)
 }
 
+enum PotionType {
+	HEAL,
+	ENERGY,
+	DRAW,         # 🆕
+	EXPLOSION,    # 🆕
+	STATUS_CLEANSE,
+	STRENGTH,
+	POISON,
+	BLOCK,
+}
+
 enum CardOrigin {
 	CHARACTER,  # карта персонажа
 	BIOME,      # карта биома
@@ -646,7 +657,7 @@ const ARTIFACT_HEALERS_AMULET_HEAL_AMOUNT: int = 10
 
 const ARTIFACT_ABYSS_DUST_CARD_COST: int = 0
 
-
+const POTION_MAX_COUNT: int = 5
 ## ============================================================
 ## 4. РАЗМЕРЫ ЭКРАНА
 ## ============================================================
@@ -1812,3 +1823,18 @@ func get_random_effect_from_pool(categories: Array) -> EffectEntry:
 			effect.amount = 1
 	
 	return effect
+
+
+const POTION_ICONS: Dictionary = {
+	#DataManager.PotionType.HEAL: preload("res://img/potions/heal_potion.png"),
+	#DataManager.PotionType.ENERGY: preload("res://img/potions/energy_potion.png"),
+	#DataManager.PotionType.DRAW: preload("res://img/potions/draw_potion.png"),
+	#DataManager.PotionType.EXPLOSION: preload("res://img/potions/explosion_potion.png"),
+	#DataManager.PotionType.STATUS_CLEANSE: preload("res://img/potions/status_cleanse_potion.png"),
+	#DataManager.PotionType.STRENGTH: preload("res://img/potions/strength_potion.png"),
+	#DataManager.PotionType.POISON: preload("res://img/potions/poison_potion.png"),
+	#DataManager.PotionType.BLOCK: preload("res://img/potions/block_potion.png"),
+}
+
+func get_potion_icon(potion_type: DataManager.PotionType) -> Texture2D:
+	return POTION_ICONS.get(potion_type, null)

@@ -261,3 +261,18 @@ upgrade_card_confirm,Upgrade
 "transform_card_confirm","Transform"
 "reward_transform_card_title","Transform card (%d attempts left)"
 "reward_transform_attempts_zero","All attempts used"
+
+"potion_use","Use"
+"potion_tooltip","Potion\nEffects:"
+"potion_effect_heal","Heal: %d HP"
+"potion_effect_status","%d %s"
+
+"potion_heal_name","Heal Potion"
+"potion_energy_name","Energy Potion"
+"potion_draw_name","Draw Potion"
+"potion_explosion_name","Explosion Potion"
+"potion_cleanse_name","Cleanse Potion"
+"potion_poison_name","Poison Potion"
+"potion_block_name","Block Potion"
+
+"custom_cleanse","Removes all statuses and passives."

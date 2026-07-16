@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="PotionResource" load_steps=5 format=3 uid="uid://1ct0tp8n5phu"]
+
+[ext_resource type="Script" uid="uid://cmra25r1r3ivt" path="res://resources/res_scripts/effect_entry.gd" id="1_to4pj"]
+[ext_resource type="Script" uid="uid://ddnmhuucogct0" path="res://resources/res_scripts/potion_resource.gd" id="2_mosnj"]
+[ext_resource type="Resource" uid="uid://nspyatginler" path="res://resources/statuses/poison.tres" id="2_n5mi4"]
+
+[sub_resource type="Resource" id="Resource_udk43"]
+script = ExtResource("1_to4pj")
+category = 4
+target = 2
+status = ExtResource("2_n5mi4")
+duration = 3
+metadata/_custom_type_script = "uid://cmra25r1r3ivt"
+
+[resource]
+script = ExtResource("2_mosnj")
+potion_type = 6
+name_key = "potion_poison_name"
+effects = Array[ExtResource("1_to4pj")]([SubResource("Resource_udk43")])
+metadata/_custom_type_script = "uid://ddnmhuucogct0"
