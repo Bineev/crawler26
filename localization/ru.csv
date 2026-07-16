@@ -239,3 +239,16 @@ upgrade_card_confirm,Улучшить
 "custom_mole_toss","Наносит случайный урон от 1 до 10."
 "custom_rotten_cut","Удваивает стак Кровотечение на цели."
 "custom_worm_spirit","Снимает все статусы и пассивки. Даёт 2 Регенерации + количество снятых эффектов на 3 ход."
+
+"idol_title","Древний идол"
+"action_make_offering","Сделать подношение"
+"action_give_blood","Отдать кровь"
+"action_loot_shrine","Разорить святыню"
+"action_sharp_weapon","Заточить оружие"
+
+"idol_offering_small","Боги приняли скромное подношение."
+"idol_offering_medium","Боги довольны вашей щедростью."
+"idol_offering_great","Боги в восторге от вашей жертвы!"
+"idol_blood_result","Вы отдали свою кровь идолу..."
+"idol_loot_success","Вы нашли ценные трофеи!"
+"idol_loot_fail","Святыня прокляла вас!"

@@ -46,6 +46,12 @@ func _get_action_text(action: DataManager.ActionType) -> String:
 			return tr("action_rest")
 		DataManager.ActionType.SHARP_WEAPON:
 			return tr("action_sharp_weapon")
+		DataManager.ActionType.MAKE_OFFERING:
+			return tr("action_make_offering")
+		DataManager.ActionType.GIVE_BLOOD:
+			return tr("action_give_blood")
+		DataManager.ActionType.LOOT_SHRINE:
+			return tr("action_loot_shrine")
 		_:
 			return ""
 
@@ -70,7 +76,12 @@ func _handle_choice(action: DataManager.ActionType) -> void:
 			_handle_rest()
 		DataManager.ActionType.SHARP_WEAPON:
 			_handle_sharp_weapon()
-
+		DataManager.ActionType.MAKE_OFFERING:
+			_handle_make_offering()
+		DataManager.ActionType.GIVE_BLOOD:
+			_handle_give_blood()
+		DataManager.ActionType.LOOT_SHRINE:
+			_handle_loot_shrine()
 
 func _handle_use_key() -> void:
 	var success = RunManager.use_key()
@@ -252,7 +263,7 @@ func _show_result_label(text: String, color: Color = Color.WHITE) -> void:
 	var label = Label.new()
 	label.text = text
 	label.add_theme_font_override("font", DataManager.FONT_HEADERS)
-	label.add_theme_font_size_override("font_size", 72)
+	label.add_theme_font_size_override("font_size", 60)
 	label.add_theme_color_override("font_color", color)
 	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
@@ -280,3 +291,101 @@ func _show_result_label(text: String, color: Color = Color.WHITE) -> void:
 	await tween.finished
 	
 	label.queue_free()
+
+
+func _handle_make_offering() -> void:
+	var bones = RunManager.get_bones()
+	var rewards: Array[DataManager.RewardType] = []
+	var gold_mod = 1
+	
+	if bones <= 10:
+		# 5-10 костей: кость * 3 золота
+		rewards.append(DataManager.RewardType.GOLD)
+		gold_mod = 3
+		await _show_result_label(tr("idol_offering_small"), DataManager.COLOR_HEAL_LOG)
+	elif bones <= 20:
+		# 11-20 костей: случайный артефакт + кость * 4 золота
+		rewards.append(DataManager.RewardType.ARTIFACT_WITHOUT_CHOICE)
+		rewards.append(DataManager.RewardType.GOLD)
+		gold_mod = 4
+		await _show_result_label(tr("idol_offering_medium"), DataManager.COLOR_HEAL_LOG)
+	else:
+		# 20+ костей: артефакт на выбор + кость * 5 золота + бафф на +1 размер руки
+		rewards.append(DataManager.RewardType.ARTIFACT)
+		rewards.append(DataManager.RewardType.GOLD)
+		rewards.append(DataManager.RewardType.DECK_SIZE_BUFF)
+		gold_mod = 5
+		await _show_result_label(tr("idol_offering_great"), DataManager.COLOR_HEAL_LOG)
+	
+	# Тратим все кости
+	RunManager.spend_bones(bones)
+	
+	var reward_panel = preload("res://scenes/reward_panel.tscn").instantiate() as RewardPanel
+	reward_panel.reward_types = rewards
+	reward_panel.gold_mod = gold_mod
+	SignalManager.hide_object.emit()
+	SignalManager.show_reward.emit(reward_panel)
+	queue_free()
+
+
+func _handle_give_blood() -> void:
+	await _show_result_label(tr("idol_blood_result"), DataManager.COLOR_PENITENT_ART_BG_DARK)
+	
+	var player = BattleManager.get_player()
+	var damage = DataManager.IDOL_DAMAGE
+	
+	if player:
+		var current_health = player.get_health()
+		if current_health - damage < 1:
+			damage = current_health - 1
+	
+	var reward_panel = preload("res://scenes/reward_panel.tscn").instantiate() as RewardPanel
+	reward_panel.reward_types = [DataManager.RewardType.TAKE_DAMAGE, DataManager.RewardType.CARD_CHARACTER]
+	reward_panel.damage_mod = damage  # передаём урон
+	SignalManager.hide_object.emit()
+	SignalManager.show_reward.emit(reward_panel)
+	queue_free()
+
+
+func _handle_loot_shrine() -> void:
+	var success = randf() < DataManager.IDOL_BREAK_CHANCE
+	var rewards: Array[DataManager.RewardType] = []
+	var gold_mod : int = 1
+	if success:
+		await _show_result_label(tr("idol_loot_success"), DataManager.COLOR_HEAL_LOG)
+		# Выбираем случайную награду из трёх
+		var options = [
+			DataManager.RewardType.CARD_WITHOUT_CHOICE,
+			DataManager.RewardType.POTION,
+			DataManager.RewardType.ARTIFACT_WITHOUT_CHOICE
+		]
+		rewards = [options[randi() % options.size()]]
+		rewards.append(DataManager.RewardType.GOLD)
+		gold_mod = 3
+	else:
+		await _show_result_label(tr("idol_loot_fail"), DataManager.COLOR_PENITENT_ART_BG_DARK)
+		rewards = [DataManager.RewardType.GOLD]
+		gold_mod = 2
+		# Дебафф через систему, как у Strange Mushroom
+		RunManager.apply_idol_curse(FloorManager.current_biome, 3)
+	
+	var reward_panel = preload("res://scenes/reward_panel.tscn").instantiate() as RewardPanel
+	reward_panel.reward_types = rewards
+	reward_panel.gold_mod = gold_mod
+	SignalManager.hide_object.emit()
+	SignalManager.show_reward.emit(reward_panel)
+	queue_free()
+
+func _apply_biome_debuff() -> void:
+	var player = BattleManager.get_player()
+	if not player:
+		return
+	
+	var biome = FloorManager.current_biome
+	match biome:
+		DataManager.Biome.MOLE_TUNNELS:
+			var bleed_status = DataManager.get_status_resource(DataManager.Status.BLEED)
+			if bleed_status:
+				player.add_status(bleed_status, 2, 3, player)  # 2 стака на 3 хода
+				SignalManager.log_message.emit("Вы получили проклятие: Кровотечение на 3 боя!")
+		# TODO: другие биомы

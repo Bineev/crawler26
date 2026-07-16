@@ -53,6 +53,10 @@ func start_battle(player_stats: CharacterStats, enemy_instances: Array, battle_d
 	self.current_room_node = room_node
 	self.battle_deck = battle_deck
 	
+	# 🆕 Применяем проклятие идола
+	var player = BattleManager.get_player()
+	if player:
+		RunManager.apply_idol_curse_to_player(player)
 	# 🆕 Уменьшаем счётчик баффа энергии (если активен)
 	RunManager.decrement_energy_buff()
 	# Инициализация врагов

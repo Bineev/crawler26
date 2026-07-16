@@ -63,8 +63,7 @@ func interact() -> void:
 		DataManager.ObjectType.CHEST:
 			_interact_chest()
 		DataManager.ObjectType.IDOL:
-			# TODO: взаимодействие с идолом
-			pass
+			_interact_idol()
 		DataManager.ObjectType.TRAP:
 			# TODO: ловушка
 			pass
@@ -166,6 +165,20 @@ func _interact_bonfire() -> void:
 	
 	var action_choice = preload("res://scenes/action_choice.tscn").instantiate() as ActionChoice
 	SignalManager.add_action_choice.emit(action_choice, tr("bonfire_title"), actions)
+
+
+func _interact_idol() -> void:
+	var actions: Array[DataManager.ActionType] = []
+	
+	# Проверяем, есть ли достаточно костей для подношения
+	if RunManager.get_bones() >= DataManager.MIN_BONES_FOR_IDOL:
+		actions.append(DataManager.ActionType.MAKE_OFFERING)
+	
+	actions.append(DataManager.ActionType.GIVE_BLOOD)
+	actions.append(DataManager.ActionType.LOOT_SHRINE)
+	
+	var action_choice = preload("res://scenes/action_choice.tscn").instantiate() as ActionChoice
+	SignalManager.add_action_choice.emit(action_choice, tr("idol_title"), actions)
 
 
 func _on_hide_object() -> void:

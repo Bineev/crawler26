@@ -239,3 +239,16 @@ upgrade_card_confirm,Upgrade
 "custom_mole_toss","Deals random damage from 1 to 10."
 "custom_rotten_cut","Doubles Bleed stacks on target."
 "custom_worm_spirit","Removes all statuses and passives. Grants Regeneration 2 + number of removed effects for 3 turn."
+
+"idol_title","Idol"
+"action_make_offering","Make Offering"
+"action_give_blood","Give Blood"
+"action_loot_shrine","Loot Shrine"
+"action_sharp_weapon","Sharpen weapon"
+
+"idol_offering_small","The gods accepted a modest offering."
+"idol_offering_medium","The gods are pleased with your generosity."
+"idol_offering_great","The gods are overjoyed by your sacrifice!"
+"idol_blood_result","You gave your blood to the idol..."
+"idol_loot_success","You found valuable trophies!"
+"idol_loot_fail","The shrine has cursed you!"

@@ -46,4 +46,5 @@ vertical_alignment = 1
 
 [node name="ButtonsContainer" type="HBoxContainer" parent="DarkOverlay/CenterContainer/VBoxContainer"]
 layout_mode = 2
+theme_override_constants/separation = 10
 alignment = 1

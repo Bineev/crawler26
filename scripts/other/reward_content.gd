@@ -66,12 +66,12 @@ func _setup_card_rewards() -> void:
 		var vbox = VBoxContainer.new()
 		vbox.alignment = BoxContainer.ALIGNMENT_CENTER
 		# 🆕 Добавляем отступы
-		vbox.add_theme_constant_override("separation", 40)
+		vbox.add_theme_constant_override("separation", 20)
 		# Обёртка для карты
 		var card_wrapper = Control.new()
 		card_wrapper.custom_minimum_size = Vector2(
-			DataManager.CARD_BASE_WIDTH * 1.2,
-			DataManager.CARD_BASE_HEIGHT * 1.2
+			DataManager.CARD_BASE_WIDTH * 1,
+			DataManager.CARD_BASE_HEIGHT * 1
 		)
 		
 		var card_ui = preload("res://scenes/card.tscn").instantiate() as CardUI
@@ -81,7 +81,8 @@ func _setup_card_rewards() -> void:
 		rewards_container.add_child(vbox)
 		
 		card_ui.display()
-		card_ui.set_hand_scale()
+		#card_ui.set_hand_scale()
+		card_ui.template.scale = Vector2(0.8, 0.8)
 		card_ui.set_reward_state()  # 🆕 устанавливаем состояние награды
 		
 		# Кнопка выбора
@@ -230,8 +231,32 @@ func _apply_reward(index: int) -> void:
 
 
 func _setup_card_without_choice_reward() -> void:
-	# TODO: создать UI для получения конкретной карты (без выбора)
-	pass
+	var card_data = rewards[0]  # одна карта
+	
+	var vbox = VBoxContainer.new()
+	vbox.alignment = BoxContainer.ALIGNMENT_CENTER
+	vbox.add_theme_constant_override("separation", 10)
+	
+	# Обёртка для карты
+	var card_wrapper = Control.new()
+	card_wrapper.custom_minimum_size = Vector2(
+		DataManager.CARD_BASE_WIDTH * 1,
+		DataManager.CARD_BASE_HEIGHT * 1
+	)
+	
+	var card_ui = preload("res://scenes/card.tscn").instantiate() as CardUI
+	card_ui.card_data = card_data
+	card_wrapper.add_child(card_ui)
+	vbox.add_child(card_wrapper)
+	rewards_container.add_child(vbox)
+	
+	card_ui.display()
+	card_ui.template.scale = Vector2(0.8, 0.8)
+	card_ui.set_reward_state()
+	
+	# Кнопка "Взять"
+	var button = _create_reward_button("reward_take_card", 0)
+	vbox.add_child(button)
 
 func _setup_artifact_rewards() -> void:
 	for artifact_data in rewards:
@@ -251,22 +276,49 @@ func _setup_artifact_rewards() -> void:
 		# 🆕 Теперь можно настраивать
 		artifact_icon.setup(artifact_data, self)
 		
-		# Название
-		var name_label = Label.new()
-		name_label.text = artifact_data.get_localized_name()
-		name_label.add_theme_font_override("font", DataManager.FONT_MAIN)
-		name_label.add_theme_font_size_override("font_size", 18)
-		name_label.add_theme_color_override("font_color", DataManager.COLOR_MOLE_TUNNELS_ART_BG_LIGHT2)
-		name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		vbox.add_child(name_label)
+		## Название
+		#var name_label = Label.new()
+		#name_label.text = artifact_data.get_localized_name()
+		#name_label.add_theme_font_override("font", DataManager.FONT_MAIN)
+		#name_label.add_theme_font_size_override("font_size", 18)
+		#name_label.add_theme_color_override("font_color", DataManager.COLOR_MOLE_TUNNELS_ART_BG_LIGHT2)
+		#name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		#vbox.add_child(name_label)
 		
 		# Кнопка выбора
 		var button = _create_reward_button("reward_choose_artifact", rewards.find(artifact_data))
 		vbox.add_child(button)
 
+
 func _setup_artifact_without_choice_reward() -> void:
-	# TODO: создать UI для получения конкретного артефакта (без выбора)
-	pass
+	var artifact_data = rewards[0]  # один артефакт
+	
+	var vbox = VBoxContainer.new()
+	vbox.alignment = BoxContainer.ALIGNMENT_CENTER
+	vbox.add_theme_constant_override("separation", 10)
+	
+	# Создаём ArtifactIcon
+	var artifact_icon = preload("res://scenes/artifact_icon.tscn").instantiate() as ArtifactIcon
+	artifact_icon.artifact_id = artifact_data.id
+	artifact_icon.artifact_resource = artifact_data
+	vbox.add_child(artifact_icon)
+	rewards_container.add_child(vbox)
+	
+	# Настраиваем иконку после добавления в дерево
+	artifact_icon.setup(artifact_data, self)
+	
+	## Название
+	#var name_label = Label.new()
+	#name_label.text = artifact_data.get_localized_name()
+	#name_label.add_theme_font_override("font", DataManager.FONT_MAIN)
+	#name_label.add_theme_font_size_override("font_size", 14)
+	#name_label.add_theme_color_override("font_color", DataManager.COLOR_PENITENT_ART_BG_DARK)
+	#name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	#vbox.add_child(name_label)
+	
+	# Кнопка "Взять"
+	var button = _create_reward_button("reward_take_artifact", 0)
+	vbox.add_child(button)
 
 func _setup_artifact_elite_rewards() -> void:
 	# TODO: создать UI для выбора элитного артефакта
@@ -297,8 +349,8 @@ func _setup_take_damage_reward() -> void:
 	var damage_label = Label.new()
 	damage_label.text = tr("damage_label") % damage_amount
 	damage_label.add_theme_font_override("font", DataManager.FONT_HEADERS)
-	damage_label.add_theme_font_size_override("font_size", 48)
-	damage_label.add_theme_color_override("font_color", DataManager.COLOR_FLESH_CAVES_ART_BG_DARK)
+	damage_label.add_theme_font_size_override("font_size", 32)
+	damage_label.add_theme_color_override("font_color", DataManager.COLOR_PENITENT_ART_BG_DARK)
 	damage_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	damage_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	hbox.add_child(damage_label)
@@ -387,8 +439,51 @@ func _setup_energy_buff_reward() -> void:
 	rewards_container.add_child(vbox)
 
 func _setup_deck_size_buff_reward() -> void:
-	# TODO: создать UI для увеличения размера колоды
-	pass
+	var buff_amount = rewards[0]
+	var duration_text = ""
+	if buff_duration == -1:
+		duration_text = tr("buff_permanent")
+	else:
+		duration_text = tr("buff_duration") % buff_duration
+	
+	var vbox = VBoxContainer.new()
+	vbox.alignment = BoxContainer.ALIGNMENT_CENTER
+	vbox.add_theme_constant_override("separation", 20)
+	
+	var hbox = HBoxContainer.new()
+	hbox.alignment = BoxContainer.ALIGNMENT_CENTER
+	hbox.add_theme_constant_override("separation", 15)
+	
+	var icon = TextureRect.new()
+	icon.texture = preload("res://img/icons/intents/buff.png")  # TODO: добавить иконку
+	icon.custom_minimum_size = Vector2(64, 64)
+	icon.expand_mode = TextureRect.EXPAND_FIT_WIDTH_PROPORTIONAL
+	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	hbox.add_child(icon)
+	
+	var buff_label = Label.new()
+	buff_label.text = tr("deck_size_buff_label") % buff_amount
+	buff_label.add_theme_font_override("font", DataManager.FONT_HEADERS)
+	buff_label.add_theme_font_size_override("font_size", 36)
+	buff_label.add_theme_color_override("font_color", DataManager.COLOR_PENITENT_ART_BG_DARK)
+	buff_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	buff_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	hbox.add_child(buff_label)
+	
+	vbox.add_child(hbox)
+	
+	var duration_label = Label.new()
+	duration_label.text = duration_text
+	duration_label.add_theme_font_override("font", DataManager.FONT_MAIN)
+	duration_label.add_theme_font_size_override("font_size", 16)
+	duration_label.add_theme_color_override("font_color", DataManager.COLOR_PENITENT_ART_BG_DARK)
+	duration_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	vbox.add_child(duration_label)
+	
+	var button = _create_reward_button("reward_take_buff", 0)
+	vbox.add_child(button)
+	
+	rewards_container.add_child(vbox)
 
 func _setup_gold_reward() -> void:
 	var gold_amount = rewards[0]
@@ -433,16 +528,14 @@ func _setup_add_property_reward() -> void:
 	# TODO: создать UI для добавления свойства к карте
 	pass
 
-
 func _create_reward_button(text: String, index: int) -> Button:
 	var button = Button.new()
 	button.text = tr(text)
 	button.pressed.connect(_on_item_selected.bind(index))
 	
-	# Настройка стиля как у кнопки "Конец хода"
-	button.add_theme_font_override("font", DataManager.FONT_MAIN)
+	button.add_theme_font_override("font", DataManager.FONT_HEADERS)
 	button.add_theme_font_size_override("font_size", 20)
-	button.custom_minimum_size = Vector2(150, 50)
+	button.custom_minimum_size = Vector2(100, 50)
 	
 	return button
 

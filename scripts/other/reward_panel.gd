@@ -1,7 +1,7 @@
 extends Control
 class_name RewardPanel
 
-var reward_types: Array[DataManager.RewardType] = []
+var reward_types: Array = []
 var current_index: int = 0
 var is_animating: bool = false
 var gold_mod: int = 1  # множитель золота
@@ -117,8 +117,18 @@ func _create_card_reward(type: DataManager.RewardType) -> void:
 	SignalManager.reward_selected.connect(_on_reward_selected)
 
 func _create_card_without_choice_reward() -> void:
-	# TODO: создать UI для получения конкретной карты (без выбора)
-	pass
+	# Получаем случайную карту
+	var cards = DeckManager.get_cards_by_biome(FloorManager.current_biome, FloorManager.current_path_progress, FloorManager.current_floor, 1)
+	if cards.is_empty():
+		SignalManager.log_message.emit("Нет доступных карт!")
+		SignalManager.reward_selected.emit()
+		return
+	
+	var content = preload("res://scenes/reward_content.tscn").instantiate() as RewardContent
+	center_container.add_child(content)
+	# Используем CARD_WITHOUT_CHOICE тип, передаём массив с одной картой
+	content.setup(DataManager.RewardType.CARD_WITHOUT_CHOICE, cards)
+	SignalManager.reward_selected.connect(_on_reward_selected)
 
 func _create_artifact_reward() -> void:
 	var amount: int = 3
@@ -173,8 +183,25 @@ func _create_artifact_reward() -> void:
 	SignalManager.reward_selected.connect(_on_reward_selected)
 
 func _create_artifact_without_choice_reward() -> void:
-	# TODO: создать UI для получения конкретного артефакта (без выбора)
-	pass
+	# Определяем грейд в зависимости от контекста
+	var grade = DataManager.ArtifactGrade.NORMAL
+	match reward_types[current_index]:
+		DataManager.RewardType.ARTIFACT_WITHOUT_CHOICE:
+			grade = DataManager.ArtifactGrade.NORMAL
+		DataManager.RewardType.ARTIFACT_ELITE:
+			grade = DataManager.ArtifactGrade.ELITE
+	
+	# Получаем случайный артефакт
+	var artifact = ArtifactManager.get_random_artifact(grade)
+	if not artifact:
+		SignalManager.log_message.emit("Нет доступных артефактов!")
+		SignalManager.reward_selected.emit()
+		return
+	
+	var content = preload("res://scenes/reward_content.tscn").instantiate() as RewardContent
+	center_container.add_child(content)
+	content.setup(DataManager.RewardType.ARTIFACT_WITHOUT_CHOICE, [artifact])
+	SignalManager.reward_selected.connect(_on_reward_selected)
 
 func _create_artifact_elite_reward() -> void:
 	# TODO: создать UI для выбора элитного артефакта
@@ -185,7 +212,9 @@ func _create_potion_reward() -> void:
 	pass
 
 func _create_take_damage_reward() -> void:
-	var damage_amount = DataManager.REWARD_DAMAGE_DEFAULT * damage_mod
+	var damage_amount = DataManager.REWARD_DAMAGE_DEFAULT
+	if damage_mod > 1:
+		damage_amount = damage_mod
 	
 	var content = preload("res://scenes/reward_content.tscn").instantiate() as RewardContent
 	content.damage_mod = damage_mod
@@ -213,8 +242,14 @@ func _create_energy_buff_reward() -> void:
 	SignalManager.reward_selected.connect(_on_reward_selected)
 
 func _create_deck_size_buff_reward() -> void:
-	# TODO: создать UI для увеличения размера колоды
-	pass
+	var buff_amount = 1  # +1 к размеру руки
+	var duration = buff_duration if buff_duration > 0 else -1  # -1 = до конца забега
+	
+	var content = preload("res://scenes/reward_content.tscn").instantiate() as RewardContent
+	content.buff_duration = duration
+	center_container.add_child(content)
+	content.setup(DataManager.RewardType.DECK_SIZE_BUFF, [buff_amount])
+	SignalManager.reward_selected.connect(_on_reward_selected)
 
 func _create_gold_reward() -> void:
 	var gold_amount = DataManager.REWARD_GOLD_DEFAULT * gold_mod

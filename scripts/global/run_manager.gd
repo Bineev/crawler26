@@ -22,7 +22,8 @@ var temp_buffs: Dictionary = {
 	"max_energy_buff": 0,
 	"bonus_energy": 0
 }
-
+var idol_curse_biome: DataManager.Biome = DataManager.Biome.MOLE_TUNNELS
+var idol_curse_remaining: int = 0  # сколько боёв осталось
 
 func _ready():
 	initialize_run()
@@ -442,3 +443,26 @@ func get_energy_buff_remaining() -> int:
 
 func get_energy_bonus() -> int:
 	return temp_buffs["bonus_energy"]
+
+
+func apply_idol_curse(biome: DataManager.Biome, duration: int) -> void:
+	idol_curse_biome = biome
+	idol_curse_remaining = duration
+	SignalManager.log_message.emit("На вас проклятие идола на %d боя!" % duration)
+
+func apply_idol_curse_to_player(player: CharacterStats) -> void:
+	if idol_curse_remaining <= 0:
+		return
+	
+	match idol_curse_biome:
+		DataManager.Biome.MOLE_TUNNELS:
+			var bleed_status = DataManager.get_status_resource(DataManager.Status.BLEED)
+			if bleed_status:
+				player.add_status(bleed_status, 2, 3, player)
+				SignalManager.log_message.emit("Проклятие идола: Кровотечение!")
+		# TODO: другие биомы
+	
+	idol_curse_remaining -= 1
+
+func get_idol_curse_remaining() -> int:
+	return idol_curse_remaining

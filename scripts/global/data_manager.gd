@@ -28,7 +28,10 @@ enum ActionType {
 	SEARCH,
 	REST,
 	MEDITATE,
-	SHARP_WEAPON
+	SHARP_WEAPON,
+	MAKE_OFFERING,      # 🆕
+	GIVE_BLOOD,         # 🆕
+	LOOT_SHRINE,        # 🆕
 }
 
 
@@ -704,6 +707,10 @@ const MAX_HAND_SIZE: int = 5
 const COINS_SCREEN_POSITION: Vector2 = Vector2(1520, 600)
 const KEYS_SCREEN_POSITION: Vector2 = Vector2(1620, 600)
 const BONES_SCREEN_POSITION: Vector2 = Vector2(1720, 600)
+
+const MIN_BONES_FOR_IDOL: int = 5
+const IDOL_DAMAGE: int = 15
+const IDOL_BREAK_CHANCE: float = 0.5
 
 const STARTING_KEYS: int = 1
 ## ============================================================
@@ -1749,7 +1756,7 @@ func get_all_artifact_ids() -> Array:
 ## Размеры объектов по типам
 const OBJECT_SIZES: Dictionary = {
 	DataManager.ObjectType.CHEST: Vector2(256, 256),
-	DataManager.ObjectType.IDOL: Vector2(256, 256),
+	DataManager.ObjectType.IDOL: Vector2(360, 360),
 	DataManager.ObjectType.TRAP: Vector2(196, 196),
 	DataManager.ObjectType.CAULDRON: Vector2(360, 360),
 	DataManager.ObjectType.TORTURE_RACK: Vector2(360, 360),
