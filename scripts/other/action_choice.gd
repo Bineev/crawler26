@@ -56,6 +56,10 @@ func _get_action_text(action: DataManager.ActionType) -> String:
 			return tr("action_transform_card")
 		DataManager.ActionType.BREW_POTION:
 			return tr("action_brew_potion")
+		DataManager.ActionType.DISARM_TRAP:
+			return tr("action_disarm_trap")
+		DataManager.ActionType.SEARCH_TRAP:
+			return tr("action_search_trap")
 		_:
 			return ""
 
@@ -90,6 +94,10 @@ func _handle_choice(action: DataManager.ActionType) -> void:
 			_handle_transform_card()
 		DataManager.ActionType.BREW_POTION:
 			_handle_brew_potion()
+		DataManager.ActionType.DISARM_TRAP:
+			_handle_disarm_trap()
+		DataManager.ActionType.SEARCH_TRAP:
+			_handle_search_trap()
 
 func _handle_use_key() -> void:
 	var success = RunManager.use_key()
@@ -399,6 +407,46 @@ func _handle_brew_potion() -> void:
 	
 	var reward_panel = preload("res://scenes/reward_panel.tscn").instantiate() as RewardPanel
 	reward_panel.reward_types = [DataManager.RewardType.POTION]
+	SignalManager.hide_object.emit()
+	SignalManager.show_reward.emit(reward_panel)
+	queue_free()
+
+
+func _handle_disarm_trap() -> void:
+	var success = randf() < DataManager.TRAP_NEUTRALIZE_CHANCE
+	var rewards: Array[DataManager.RewardType] = []
+	
+	if success:
+		await _show_result_label(tr("trap_disarm_success"), DataManager.COLOR_HEAL_LOG)
+		rewards = [DataManager.RewardType.GOLD]
+	else:
+		await _show_result_label(tr("trap_disarm_fail"), DataManager.COLOR_PENITENT_ART_BG_DARK)
+		rewards = [DataManager.RewardType.TAKE_DAMAGE]
+	
+	var reward_panel = preload("res://scenes/reward_panel.tscn").instantiate() as RewardPanel
+	reward_panel.reward_types = rewards
+	reward_panel.gold_mod = 1
+	reward_panel.damage_mod = DataManager.TRAP_NEUTRALIZE_DAMAGE
+	SignalManager.hide_object.emit()
+	SignalManager.show_reward.emit(reward_panel)
+	queue_free()
+
+
+func _handle_search_trap() -> void:
+	var success = randf() < DataManager.TRAP_SEARCH_CHANCE
+	var rewards: Array[DataManager.RewardType] = []
+	
+	if success:
+		await _show_result_label(tr("trap_search_success"), DataManager.COLOR_HEAL_LOG)
+		rewards = [DataManager.RewardType.GOLD, DataManager.RewardType.POTION]
+	else:
+		await _show_result_label(tr("trap_search_fail"), DataManager.COLOR_PENITENT_ART_BG_DARK)
+		rewards = [DataManager.RewardType.GOLD, DataManager.RewardType.TAKE_DAMAGE]
+	
+	var reward_panel = preload("res://scenes/reward_panel.tscn").instantiate() as RewardPanel
+	reward_panel.reward_types = rewards
+	reward_panel.gold_mod = 2 if success else 1
+	reward_panel.damage_mod = DataManager.TRAP_SEARCH_DAMAGE
 	SignalManager.hide_object.emit()
 	SignalManager.show_reward.emit(reward_panel)
 	queue_free()

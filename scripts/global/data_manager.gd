@@ -34,6 +34,8 @@ enum ActionType {
 	LOOT_SHRINE,        # 🆕
 	TRANSFORM_CARD,   # 🆕
 	BREW_POTION,      # 🆕
+	DISARM_TRAP,
+	SEARCH_TRAP,
 }
 
 
@@ -769,6 +771,11 @@ const ENERGY_BUFF_REWARD_AMOUNT: int = 1
 ## Стартовое количество валют
 const STARTING_COINS: int = 0
 const STARTING_BONES: int = 0
+
+const TRAP_NEUTRALIZE_CHANCE: float = 0.8  # 80% шанс
+const TRAP_SEARCH_CHANCE: float = 0.5      # 50% шанс
+const TRAP_NEUTRALIZE_DAMAGE: int = 5
+const TRAP_SEARCH_DAMAGE: int = 10
 
 const REST_DEFAULT_HEAL: int = 30
 const BONFIRE_ENERGY_BUFF_DURATION: int = 3  # количество боевых комнат

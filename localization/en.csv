@@ -282,3 +282,11 @@ upgrade_card_confirm,Upgrade
 "potion_discard","Discard"
 
 "potion_inventory_full","Inventory full"
+
+"trap_title","Trap"
+"action_disarm_trap","Disarm"
+"action_search_trap","Search"
+"trap_disarm_success","Trap disarmed!"
+"trap_disarm_fail","Trap triggered!"
+"trap_search_success","You found valuables!"
+"trap_search_fail","Trap triggered!"

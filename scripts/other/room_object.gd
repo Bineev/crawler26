@@ -65,8 +65,7 @@ func interact() -> void:
 		DataManager.ObjectType.IDOL:
 			_interact_idol()
 		DataManager.ObjectType.TRAP:
-			# TODO: ловушка
-			pass
+			_interact_trap()
 		DataManager.ObjectType.CAULDRON:
 			_interact_cauldron()
 		DataManager.ObjectType.TORTURE_RACK:
@@ -140,6 +139,16 @@ func _on_gui_input(event: InputEvent) -> void:
 	
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
 		interact()
+
+
+func _interact_trap() -> void:
+	var actions: Array[DataManager.ActionType] = [
+		DataManager.ActionType.DISARM_TRAP,
+		DataManager.ActionType.SEARCH_TRAP
+	]
+	
+	var action_choice = preload("res://scenes/action_choice.tscn").instantiate() as ActionChoice
+	SignalManager.add_action_choice.emit(action_choice, tr("trap_title"), actions)
 
 
 func _interact_chest() -> void:
