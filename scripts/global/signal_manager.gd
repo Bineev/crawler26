@@ -144,3 +144,7 @@ signal enemy_get_attack()
 signal potion_added(potion: PotionResource)
 signal potion_removed(index: int)
 signal potion_used(index: int)
+
+signal potion_deselect_all
+
+signal potion_discarded(potion_icon: PotionIcon)

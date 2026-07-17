@@ -5,9 +5,8 @@
 [node name="PotionIcon" type="TextureRect"]
 offset_right = 40.0
 offset_bottom = 40.0
+mouse_filter = 0
+mouse_default_cursor_shape = 2
 script = ExtResource("1_y5xxm")
 
-[node name="UseButton" type="Button" parent="."]
-layout_mode = 0
-offset_right = 8.0
-offset_bottom = 8.0
+[connection signal="mouse_entered" from="." to="." method="_on_mouse_entered"]

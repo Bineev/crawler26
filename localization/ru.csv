@@ -276,3 +276,8 @@ upgrade_card_confirm,Улучшить
 "potion_block_name","Зелье блока"
 
 "custom_cleanse","Снимает все статусы и пассивки."
+
+"reward_take_potion","Взять зелье"
+
+"potion_discard","Выбросить"
+"potion_inventory_full","Инвентарь полон"

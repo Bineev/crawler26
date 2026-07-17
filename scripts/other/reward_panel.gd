@@ -210,8 +210,18 @@ func _create_artifact_elite_reward() -> void:
 	pass
 
 func _create_potion_reward() -> void:
-	# TODO: создать UI для получения зелья
-	pass
+	# Получаем случайное зелье
+	var potion = DataManager.get_random_potions(1)[0]  # одно случайное зелье
+	
+	if not potion:
+		SignalManager.log_message.emit("Нет доступных зелий!")
+		SignalManager.reward_selected.emit()
+		return
+	
+	var content = preload("res://scenes/reward_content.tscn").instantiate() as RewardContent
+	center_container.add_child(content)
+	content.setup(DataManager.RewardType.POTION, [potion])
+	SignalManager.reward_selected.connect(_on_reward_selected)
 
 func _create_take_damage_reward() -> void:
 	var damage_amount = DataManager.REWARD_DAMAGE_DEFAULT

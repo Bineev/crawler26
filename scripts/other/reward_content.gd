@@ -332,8 +332,31 @@ func _setup_artifact_elite_rewards() -> void:
 	pass
 
 func _setup_potion_rewards() -> void:
-	# TODO: создать UI для получения зелья
-	pass
+	var potion_data = rewards[0]  # одно зелье
+	
+	var vbox = VBoxContainer.new()
+	vbox.alignment = BoxContainer.ALIGNMENT_CENTER
+	vbox.add_theme_constant_override("separation", 10)
+	
+	# Создаём PotionIcon в некликабельном состоянии
+	var potion_icon = preload("res://scenes/potion_icon.tscn").instantiate() as PotionIcon
+	potion_icon.setup(potion_data)
+	potion_icon.set_interactable(false)
+	vbox.add_child(potion_icon)
+	rewards_container.add_child(vbox)
+	
+	## Название
+	#var name_label = Label.new()
+	#name_label.text = potion_data.get_localized_name()
+	#name_label.add_theme_font_override("font", DataManager.FONT_MAIN)
+	#name_label.add_theme_font_size_override("font_size", 14)
+	#name_label.add_theme_color_override("font_color", DataManager.COLOR_PENITENT_ART_BG_DARK)
+	#name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	#vbox.add_child(name_label)
+	
+	# Кнопка "Взять"
+	var button = _create_reward_button("reward_take_potion", 0)
+	vbox.add_child(button)
 
 func _setup_take_damage_reward() -> void:
 	var damage_amount = rewards[0]

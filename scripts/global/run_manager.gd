@@ -30,6 +30,7 @@ func _ready():
 	SignalManager.add_card_to_deck.connect(add_card)
 	SignalManager.add_coins.connect(add_coins)
 	SignalManager.spend_coins.connect(spend_bones)
+	SignalManager.add_potion.connect(add_potion)
 
 
 func initialize_run():
@@ -37,6 +38,9 @@ func initialize_run():
 	player_deck_data.master_cards = DataManager.get_starting_deck().duplicate()
 	DeckManager._load_cards_data()
 	DeckManager._init_unlocked_cards()
+	# 🆕 Добавляем случайные зелья
+	for potion in DataManager.get_random_potions(5):
+		add_potion(potion)
 	print("RunManager initialized with deck size: ", player_deck_data.master_cards.size())
 
 
@@ -467,19 +471,22 @@ func get_idol_curse_remaining() -> int:
 	return idol_curse_remaining
 
 
-func add_potion(potion: PotionResource) -> bool:
-	if potions.size() >= DataManager.POTION_MAX_COUNT:
-		SignalManager.log_message.emit("Нет места для зелья!")
-		return false
+func add_potion(potion: PotionResource) -> void:
 	var instance = potion.duplicate_for_instance()
+	
+	# Если инвентарь полон — удаляем самое первое зелье
+	if potions.size() >= DataManager.POTION_MAX_COUNT:
+		remove_potion(0)
+	
 	potions.append(instance)
 	SignalManager.potion_added.emit(instance)
-	return true
+
 
 func remove_potion(index: int) -> void:
 	if index < potions.size():
 		potions.remove_at(index)
 		SignalManager.potion_removed.emit(index)
+
 
 func get_potions() -> Array[PotionResource]:
 	return potions

@@ -19,6 +19,8 @@ var player_portrait: PlayerPortrait = null
 var player : PenitentStats = null
 var energy_display: EnergyDisplay = null
 var potion_container: HBoxContainer = null
+var potion_full_label: Label = null
+var potion_icons: Array[PotionIcon] = []
 # Ссылка на RoomManager (будет доступен как автолоад)
 # RoomManager уже загружен как синглтон
 var is_ending_turn: bool = false
@@ -247,6 +249,11 @@ func clear_ui():
 	if battle_log:
 		battle_log.queue_free()
 		battle_log = null
+		
+	#if potion_container:
+		#potion_container.queue_free()
+		#potion_container = null
+	#potion_icons.clear()
 	
 	print("UI cleared")
 
@@ -313,7 +320,7 @@ func _create_player_portrait():
 func _create_energy_display():
 	var energy_scene = preload("res://scenes/energy_display.tscn")
 	energy_display = energy_scene.instantiate() as EnergyDisplay
-	energy_display.position = DataManager.END_BUTTON_POSITION + Vector2(10, -100)
+	energy_display.position = DataManager.END_BUTTON_POSITION + Vector2(10, +100)
 	game_world.add_child(energy_display)
 
 
@@ -386,3 +393,107 @@ func _clean_empty_canvas_layers() -> void:
 			
 			if not has_children:
 				child.queue_free()
+
+
+func _create_potion_display() -> void:
+	potion_container = HBoxContainer.new()
+	potion_container.global_position = DataManager.POTION_CONTAINER_POSITION
+	potion_container.add_theme_constant_override("separation", 10)
+	game_world.add_child(potion_container)
+	
+	# 🆕 Создаём надпись "Инвентарь полон"
+	potion_full_label = Label.new()
+	potion_full_label.text = tr("potion_inventory_full")
+	potion_full_label.add_theme_font_override("font", DataManager.FONT_MAIN)
+	potion_full_label.add_theme_font_size_override("font_size", 16)
+	potion_full_label.add_theme_color_override("font_color", DataManager.COLOR_MOLE_TUNNELS_ART_BG_LIGHT2)
+	potion_full_label.global_position = DataManager.POTION_CONTAINER_POSITION + Vector2(110, 90)
+	potion_full_label.visible = false
+	game_world.add_child(potion_full_label)
+	
+	SignalManager.potion_added.connect(_on_potion_added)
+	SignalManager.potion_removed.connect(_on_potion_removed)
+	SignalManager.potion_used.connect(_on_potion_used)
+	SignalManager.potion_discarded.connect(_on_potion_discarded)
+	SignalManager.potion_deselect_all.connect(_on_potion_deselect_all)
+	
+	for potion in RunManager.get_potions():
+		_add_potion_icon(potion)
+	
+	_update_full_label()
+
+
+func _add_potion_icon(potion: PotionResource) -> void:
+	var icon = preload("res://scenes/potion_icon.tscn").instantiate() as PotionIcon
+	icon.setup(potion)
+	#icon.gui_input.connect(_on_potion_icon_clicked.bind(icon))
+	potion_container.add_child(icon)
+	potion_icons.append(icon)
+
+func _on_potion_added(potion: PotionResource) -> void:
+	_add_potion_icon(potion)
+	_update_full_label()
+
+func _on_potion_removed(index: int) -> void:
+	if index < potion_icons.size():
+		var icon = potion_icons[index]
+		potion_icons.remove_at(index)
+		if is_instance_valid(icon):
+			icon.queue_free()
+	_update_full_label()
+
+func _on_potion_used(potion_icon: PotionIcon) -> void:
+	var index = potion_icons.find(potion_icon)
+	if index == -1:
+		return
+	
+	var player = BattleManager.get_player()
+	if not player:
+		return
+	
+	for effect in potion_icon.potion_data.effects:
+		var targets: Array = []
+		
+		match effect.target:
+			DataManager.EffectTarget.SELF:
+				targets = [player]
+			DataManager.EffectTarget.ENEMY:
+				# Выбираем первого врага (или цель, если есть система выбора)
+				var enemies = BattleManager.get_enemies()
+				if not enemies.is_empty():
+					targets = [enemies[0]]
+			DataManager.EffectTarget.ALL_ENEMIES:
+				targets = BattleManager.get_enemies()
+			DataManager.EffectTarget.ALL_ALLIES:
+				targets = [player]
+			DataManager.EffectTarget.ANY:
+				var enemies = BattleManager.get_enemies()
+				targets = enemies + [player]
+		
+		if not targets.is_empty():
+			EffectExecutor.execute(effect, player, targets)
+	
+	RunManager.remove_potion(index)
+
+
+func _on_potion_deselect_all() -> void:
+	for icon in potion_icons:
+		icon.deselect()
+
+
+func get_current_room() -> Room:
+	return current_room_node
+
+
+func _on_potion_discarded(potion_icon: PotionIcon) -> void:
+	var index = potion_icons.find(potion_icon)
+	if index == -1:
+		return
+	
+	RunManager.remove_potion(index)
+	SignalManager.log_message.emit("Зелье выброшено!")
+
+
+func _update_full_label() -> void:
+	if potion_full_label:
+		potion_full_label.visible = RunManager.get_potions().size() >= DataManager.POTION_MAX_COUNT

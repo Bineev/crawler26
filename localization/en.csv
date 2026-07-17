@@ -276,3 +276,9 @@ upgrade_card_confirm,Upgrade
 "potion_block_name","Block Potion"
 
 "custom_cleanse","Removes all statuses and passives."
+
+"reward_take_potion","Take potion"
+
+"potion_discard","Discard"
+
+"potion_inventory_full","Inventory full"
