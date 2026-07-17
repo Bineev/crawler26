@@ -8,6 +8,7 @@ var gold_mod: int = 1  # множитель золота
 var damage_mod: int = 1
 var heal_mod: int = 1
 var buff_duration: int = 0
+var energy_buff_amount : int = 1
 var upgrade_count: int = 1
 var selected_card: CardData = null
 var preview_container : CenterContainer = null
@@ -57,6 +58,8 @@ func setup(type: DataManager.RewardType, items: Array) -> void:
 			_setup_add_property_reward()
 		DataManager.RewardType.TRANSFORM_CARD:
 			_setup_transform_card_reward()
+		DataManager.RewardType.LOST_MAX_HP:
+			_setup_lost_max_hp_reward()
 
 
 func _setup_title() -> void:
@@ -233,7 +236,16 @@ func _apply_reward(index: int) -> void:
 			SignalManager.upgrade_card.emit(selected_item)
 		DataManager.RewardType.ADD_PROPERTY_TO_CARD:
 			SignalManager.add_property_to_card.emit(selected_item)
-	
+		DataManager.RewardType.LOST_MAX_HP:
+			var player = BattleManager.get_player()
+			if player:
+				var current_max = player.get_max_health()
+				var new_max = max(1, current_max - selected_item)
+				player.set_flat(DataManager.FlatStat.MAX_HEALTH, new_max)
+				if player.get_health() > new_max:
+					player.set_flat(DataManager.FlatStat.HEALTH, new_max)
+				SignalManager.log_message.emit("Максимальное здоровье уменьшено на %d!" % selected_item)
+				
 	SignalManager.reward_selected.emit()
 
 
@@ -427,7 +439,13 @@ func _setup_heal_reward() -> void:
 	rewards_container.add_child(vbox)
 
 func _setup_energy_buff_reward() -> void:
-	var buff_amount = rewards[0]  # количество энергии (обычно 1)
+	var buff_amount = rewards[0]
+	var duration_text = ""
+	
+	if buff_duration == -1:
+		duration_text = tr("energy_buff_permanent")
+	else:
+		duration_text = tr("energy_buff_duration") % buff_duration
 	
 	var vbox = VBoxContainer.new()
 	vbox.alignment = BoxContainer.ALIGNMENT_CENTER
@@ -456,7 +474,7 @@ func _setup_energy_buff_reward() -> void:
 	vbox.add_child(hbox)
 	
 	var duration_label = Label.new()
-	duration_label.text = tr("energy_buff_duration") % buff_duration
+	duration_label.text = duration_text 
 	duration_label.add_theme_font_override("font", DataManager.FONT_MAIN)
 	duration_label.add_theme_font_size_override("font_size", 16)
 	duration_label.add_theme_color_override("font_color", DataManager.COLOR_MOLE_TUNNELS_ART_BG_LIGHT2)
@@ -1305,3 +1323,38 @@ func _on_transform_confirm() -> void:
 func _on_transform_confirm_pressed() -> void:
 	# Обёртка для вызова корутины из сигнала
 	await _on_transform_confirm()
+
+
+func _setup_lost_max_hp_reward() -> void:
+	var lost_amount = rewards[0]
+	
+	var vbox = VBoxContainer.new()
+	vbox.alignment = BoxContainer.ALIGNMENT_CENTER
+	vbox.add_theme_constant_override("separation", 20)
+	
+	var hbox = HBoxContainer.new()
+	hbox.alignment = BoxContainer.ALIGNMENT_CENTER
+	hbox.add_theme_constant_override("separation", 15)
+	
+	var icon = TextureRect.new()
+	icon.texture = preload("res://img/icons/card_types/debuff.png")  # или другая иконка
+	icon.custom_minimum_size = Vector2(64, 64)
+	icon.expand_mode = TextureRect.EXPAND_FIT_WIDTH_PROPORTIONAL
+	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	hbox.add_child(icon)
+	
+	var label = Label.new()
+	label.text = tr("lost_max_hp_label") % lost_amount
+	label.add_theme_font_override("font", DataManager.FONT_HEADERS)
+	label.add_theme_font_size_override("font_size", 36)
+	label.add_theme_color_override("font_color", DataManager.COLOR_PENITENT_ART_BG_DARK)
+	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	hbox.add_child(label)
+	
+	vbox.add_child(hbox)
+	
+	var button = _create_reward_button("reward_accept", 0)
+	vbox.add_child(button)
+	
+	rewards_container.add_child(vbox)

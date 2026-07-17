@@ -36,6 +36,8 @@ enum ActionType {
 	BREW_POTION,      # 🆕
 	DISARM_TRAP,
 	SEARCH_TRAP,
+	LOSE_FLESH,
+	CRAFT,
 }
 
 
@@ -291,7 +293,8 @@ enum RewardType {
 	REMOVE_CARD,
 	UPGRADE_CARD,
 	ADD_PROPERTY_TO_CARD,
-	TRANSFORM_CARD
+	TRANSFORM_CARD,
+	LOST_MAX_HP,  # 🆕
 }
 
 ## Тип цикла намерений
@@ -728,6 +731,8 @@ const POTION_CONTAINER_POSITION: Vector2 = Vector2(1520, 700)
 const MIN_BONES_FOR_IDOL: int = 5
 const IDOL_DAMAGE: int = 15
 const IDOL_BREAK_CHANCE: float = 0.5
+
+const RACK_MAX_HP_LOST: int = 5
 
 const STARTING_KEYS: int = 1
 ## ============================================================

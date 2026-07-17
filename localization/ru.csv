@@ -178,7 +178,8 @@ gold_label,+%d
 heal_label,+%d Здоровья
 damage_label,-%d Здоровья
 energy_buff_label,+%d Энергии
-energy_buff_duration,Длительность: %d боевых комнат
+energy_buff_duration,"Длительность: %d боевых комнат"
+energy_buff_permanent,"Длительность: вечно"
 reward_take_buff,Принять бафф
 bonfire_title,Привал у костра
 bonfire_rest_result,Силы восстановлены!
@@ -289,3 +290,12 @@ upgrade_card_confirm,Улучшить
 "trap_disarm_fail","Ловушка сработала!"
 "trap_search_success","Вы нашли ценности!"
 "trap_search_fail","Ловушка сработала!"
+
+"torture_rack_title","Пыточный стол"
+"action_lose_flesh","Потерять плоть"
+"action_craft","Мастерить"
+"rack_lose_flesh_result","Вы потеряли часть себя..."
+"rack_craft_success","Вы создали артефакт!"
+"rack_craft_fail","Создание не удалось!"
+"lost_max_hp_label","- %d макс. HP"
+"reward_accept","Принять"

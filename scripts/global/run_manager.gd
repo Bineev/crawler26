@@ -410,21 +410,27 @@ func get_keys() -> int:
 
 
 func apply_energy_buff(bonus: int, duration: int) -> void:
-	temp_buffs["max_energy_buff"] = duration
+	# Если duration == -1 — перманентный бафф (храним как 999)
+	var actual_duration = 999 if duration == -1 else duration
+	
+	temp_buffs["max_energy_buff"] = actual_duration
 	temp_buffs["bonus_energy"] = bonus
 	
-	# Применяем бафф к игроку
 	var player = BattleManager.get_player()
 	if player:
 		var current_max = player.get_max_energy()
 		player.set_flat(DataManager.FlatStat.MAX_ENERGY, current_max + bonus)
 		player.restore_energy()
-		SignalManager.log_message.emit("Максимальная энергия увеличена на %d на %d боёв!" % [bonus, duration])
+		
+		if duration == -1:
+			SignalManager.log_message.emit("Максимальная энергия увеличена на %d навсегда!" % bonus)
+		else:
+			SignalManager.log_message.emit("Максимальная энергия увеличена на %d на %d боёв!" % [bonus, duration])
 
 
 func decrement_energy_buff() -> void:
-	if temp_buffs["max_energy_buff"] <= 0:
-		return
+	if temp_buffs["max_energy_buff"] <= 0 or temp_buffs["max_energy_buff"] == 999:
+		return  # 999 — перманентный, не уменьшаем
 	
 	temp_buffs["max_energy_buff"] -= 1
 	
@@ -435,7 +441,6 @@ func decrement_energy_buff() -> void:
 			var current_max = player.get_max_energy()
 			var default_max = DataManager.MAX_ENERGY
 			player.set_flat(DataManager.FlatStat.MAX_ENERGY, default_max)
-			# Ограничиваем текущую энергию новым максимумом
 			if player.get_energy() > default_max:
 				player.set_energy(default_max)
 			SignalManager.log_message.emit("Бафф энергии закончился! Максимальная энергия восстановлена до %d" % default_max)

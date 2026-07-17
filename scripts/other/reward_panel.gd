@@ -90,6 +90,8 @@ func _create_current_reward():
 			_create_add_property_reward()
 		DataManager.RewardType.TRANSFORM_CARD:
 			_create_transform_card_reward()
+		DataManager.RewardType.LOST_MAX_HP:
+			_create_lost_max_hp_reward()
 		_:
 			pass
 
@@ -244,11 +246,12 @@ func _create_heal_reward() -> void:
 	SignalManager.reward_selected.connect(_on_reward_selected)
 
 func _create_energy_buff_reward() -> void:
-	var buff_amount = DataManager.ENERGY_BUFF_REWARD_AMOUNT  # увеличиваем максимальную энергию на 1
-	var duration = buff_duration if buff_duration > 0 else 3  # длительность в боях
+	var buff_amount = DataManager.ENERGY_BUFF_REWARD_AMOUNT
+	var duration = buff_duration  # уже передан извне
 	
 	var content = preload("res://scenes/reward_content.tscn").instantiate() as RewardContent
 	content.buff_duration = duration
+	content.energy_buff_amount = buff_amount
 	center_container.add_child(content)
 	content.setup(DataManager.RewardType.ENERGY_BUFF, [buff_amount])
 	SignalManager.reward_selected.connect(_on_reward_selected)
@@ -314,4 +317,14 @@ func _create_transform_card_reward() -> void:
 	var content = preload("res://scenes/reward_content.tscn").instantiate() as RewardContent
 	center_container.add_child(content)
 	content.setup(DataManager.RewardType.TRANSFORM_CARD, [])
+	SignalManager.reward_selected.connect(_on_reward_selected)
+
+
+func _create_lost_max_hp_reward() -> void:
+	var lost_amount = DataManager.RACK_MAX_HP_LOST * damage_mod
+	
+	var content = preload("res://scenes/reward_content.tscn").instantiate() as RewardContent
+	content.damage_mod = damage_mod
+	center_container.add_child(content)
+	content.setup(DataManager.RewardType.LOST_MAX_HP, [lost_amount])
 	SignalManager.reward_selected.connect(_on_reward_selected)

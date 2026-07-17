@@ -178,7 +178,8 @@ gold_label,+%d
 heal_label,+%d HP
 damage_label,-%d HP
 energy_buff_label,+%d Energy
-energy_buff_duration,Duration: %d combat rooms
+energy_buff_duration,"Duration: %d combat rooms"
+energy_buff_permanent,"Duration: eternally"
 reward_take_buff,Accept buff
 bonfire_title,Campfire rest
 bonfire_rest_result,Strength restored!
@@ -290,3 +291,12 @@ upgrade_card_confirm,Upgrade
 "trap_disarm_fail","Trap triggered!"
 "trap_search_success","You found valuables!"
 "trap_search_fail","Trap triggered!"
+
+"torture_rack_title","Torture Rack"
+"action_lose_flesh","Lose Flesh"
+"action_craft","Craft"
+"rack_lose_flesh_result","You lost a part of yourself..."
+"rack_craft_success","You crafted an artifact!"
+"rack_craft_fail","Crafting failed!"
+"lost_max_hp_label","- %d max HP"
+"reward_accept","Accept"

@@ -60,6 +60,10 @@ func _get_action_text(action: DataManager.ActionType) -> String:
 			return tr("action_disarm_trap")
 		DataManager.ActionType.SEARCH_TRAP:
 			return tr("action_search_trap")
+		DataManager.ActionType.LOSE_FLESH:
+			return tr("action_lose_flesh")
+		DataManager.ActionType.CRAFT:
+			return tr("action_craft")
 		_:
 			return ""
 
@@ -98,6 +102,10 @@ func _handle_choice(action: DataManager.ActionType) -> void:
 			_handle_disarm_trap()
 		DataManager.ActionType.SEARCH_TRAP:
 			_handle_search_trap()
+		DataManager.ActionType.LOSE_FLESH:
+			_handle_lose_flesh()
+		DataManager.ActionType.CRAFT:
+			_handle_craft()
 
 func _handle_use_key() -> void:
 	var success = RunManager.use_key()
@@ -447,6 +455,42 @@ func _handle_search_trap() -> void:
 	reward_panel.reward_types = rewards
 	reward_panel.gold_mod = 2 if success else 1
 	reward_panel.damage_mod = DataManager.TRAP_SEARCH_DAMAGE
+	SignalManager.hide_object.emit()
+	SignalManager.show_reward.emit(reward_panel)
+	queue_free()
+
+
+func _handle_lose_flesh() -> void:
+	await _show_result_label(tr("rack_lose_flesh_result"), DataManager.COLOR_FLESH_CAVES_ART_BG_DARK)
+	
+	var reward_panel = preload("res://scenes/reward_panel.tscn").instantiate() as RewardPanel
+	# Сначала урон, потом бафф
+	reward_panel.reward_types = [
+		DataManager.RewardType.LOST_MAX_HP,
+		DataManager.RewardType.ENERGY_BUFF
+	]
+	reward_panel.damage_mod = DataManager.RACK_MAX_HP_LOST
+	reward_panel.buff_duration = -1  # перманентный бафф (до конца забега)
+	
+	SignalManager.hide_object.emit()
+	SignalManager.show_reward.emit(reward_panel)
+	queue_free()
+
+
+func _handle_craft() -> void:
+	var success = randf() < 0.5  # 50% шанс
+	var rewards: Array[DataManager.RewardType] = []
+	
+	if success:
+		await _show_result_label(tr("rack_craft_success"), DataManager.COLOR_HEAL_LOG)
+		rewards = [DataManager.RewardType.ARTIFACT_WITHOUT_CHOICE]
+	else:
+		await _show_result_label(tr("rack_craft_fail"), DataManager.COLOR_FLESH_CAVES_ART_BG_DARK)
+		rewards = [DataManager.RewardType.TAKE_DAMAGE]
+	
+	var reward_panel = preload("res://scenes/reward_panel.tscn").instantiate() as RewardPanel
+	reward_panel.reward_types = rewards
+	reward_panel.damage_mod = 5  # базовый урон при неудаче
 	SignalManager.hide_object.emit()
 	SignalManager.show_reward.emit(reward_panel)
 	queue_free()

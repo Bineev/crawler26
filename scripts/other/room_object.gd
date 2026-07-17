@@ -69,8 +69,7 @@ func interact() -> void:
 		DataManager.ObjectType.CAULDRON:
 			_interact_cauldron()
 		DataManager.ObjectType.TORTURE_RACK:
-			# TODO: пыточный стол
-			pass
+			_interact_torture_rack()
 		DataManager.ObjectType.BONFIRE:
 			_interact_bonfire()
 
@@ -213,3 +212,13 @@ func _interact_cauldron() -> void:
 	
 	var action_choice = preload("res://scenes/action_choice.tscn").instantiate() as ActionChoice
 	SignalManager.add_action_choice.emit(action_choice, tr("cauldron_title"), actions)
+
+
+func _interact_torture_rack() -> void:
+	var actions: Array[DataManager.ActionType] = [
+		DataManager.ActionType.LOSE_FLESH,
+		DataManager.ActionType.CRAFT
+	]
+	
+	var action_choice = preload("res://scenes/action_choice.tscn").instantiate() as ActionChoice
+	SignalManager.add_action_choice.emit(action_choice, tr("torture_rack_title"), actions)
