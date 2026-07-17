@@ -20,14 +20,19 @@ func _init_content(room_data: Dictionary) -> void:
 	room_object = object_scene.instantiate() as RoomObject
 	content.add_child(room_object)
 	room_object.setup(object_type, current_biome)
-	# 🆕 Устанавливаем позицию
-	var room_center_x = DataManager.ROOM_CENTER_X
-	var room_height = DataManager.ROOM_HEIGHT
-	var y_offset_from_bottom = DataManager.ENEMY_Y_OFFSET_FROM_BOTTOM
-	
-	room_object.position = Vector2(
-		room_center_x - room_object.size.x / 2,
-		room_height - y_offset_from_bottom - room_object.size.y
-	)
+	if object_type == DataManager.ObjectType.SHOP:
+		# Магазин занимает всю комнату
+		room_object.position = Vector2.ZERO
+		room_object.custom_minimum_size = Vector2(DataManager.ROOM_WIDTH, DataManager.ROOM_HEIGHT)
+	else:
+		# 🆕 Устанавливаем позицию
+		var room_center_x = DataManager.ROOM_CENTER_X
+		var room_height = DataManager.ROOM_HEIGHT
+		var y_offset_from_bottom = DataManager.ENEMY_Y_OFFSET_FROM_BOTTOM
+		
+		room_object.position = Vector2(
+			room_center_x - room_object.size.x / 2,
+			room_height - y_offset_from_bottom - room_object.size.y
+		)
 	SignalManager.log_message.emit("Object room initialized")
 	print("Object room initialized")

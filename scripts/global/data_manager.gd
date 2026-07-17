@@ -476,7 +476,7 @@ enum EventType {
 
 ## Тип объекта
 enum ObjectType {
-	#SHOP,            # магазин
+	SHOP,            # магазин
 	IDOL,            # идол (алтарь)
 	TRAP,            # ловушка
 	CHEST,           # сундук
@@ -1016,6 +1016,7 @@ const OBJECT_TEXTURES: Dictionary = {
 		DataManager.ObjectType.CAULDRON: preload("res://img/objects/mole_tunnels/cauldron.png"),
 		DataManager.ObjectType.TORTURE_RACK: preload("res://img/objects/mole_tunnels/torture_rack.png"),
 		DataManager.ObjectType.BONFIRE: preload("res://img/objects/mole_tunnels/bonfire.png"),
+		DataManager.ObjectType.SHOP: preload("res://img/objects/mole_tunnels/shop2.png"),
 	},
 	# Пещеры плоти (позже)
 	# DataManager.Biome.FLESH_CAVES: { ... },
@@ -1788,6 +1789,7 @@ const OBJECT_SIZES: Dictionary = {
 	DataManager.ObjectType.CAULDRON: Vector2(360, 360),
 	DataManager.ObjectType.TORTURE_RACK: Vector2(360, 360),
 	DataManager.ObjectType.BONFIRE: Vector2(256, 256),
+	DataManager.ObjectType.SHOP: Vector2(1024, 800)
 }
 
 func get_object_size(object_type: DataManager.ObjectType) -> Vector2:

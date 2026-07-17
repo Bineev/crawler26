@@ -9,6 +9,7 @@ var highlight_material: ShaderMaterial = null
 var base_material: Material = null
 var _is_hovered: bool = false
 var _is_interacting: bool = false  # 🆕 флаг, что объект уже взаимодействует
+var is_shop: bool = false
 @onready var shadow_sprite: TextureRect = $EnemySpriteCopy
 
 
@@ -26,9 +27,23 @@ func setup(type: DataManager.ObjectType, biome: DataManager.Biome) -> void:
 	# 🆕 Получаем размер из DataManager
 	var obj_size = DataManager.get_object_size(object_type)
 	custom_minimum_size = obj_size
-	
+	is_shop = (type == DataManager.ObjectType.SHOP)
 	# 🆕 Получаем текстуру из DataManager
 	var texture = DataManager.get_object_texture(object_type, biome)
+	if is_shop:
+		# Магазин — отдельная логика позиционирования и текстуры
+		if texture:
+			self.texture = texture
+			#BUG
+			expand_mode = TextureRect.EXPAND_FIT_WIDTH
+			stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+			set_anchors_preset(Control.PRESET_TOP_LEFT)
+		
+		# Отключаем клики и подсветку
+		mouse_filter = Control.MOUSE_FILTER_IGNORE
+		await get_tree().create_timer(1).timeout
+		interact()
+		return
 	if texture:
 		self.texture = texture
 		shadow_sprite.texture = texture
@@ -72,6 +87,8 @@ func interact() -> void:
 			_interact_torture_rack()
 		DataManager.ObjectType.BONFIRE:
 			_interact_bonfire()
+		DataManager.ObjectType.SHOP:
+			_interact_shop()
 
 
 func _start_idle_animation() -> void:
@@ -222,3 +239,7 @@ func _interact_torture_rack() -> void:
 	
 	var action_choice = preload("res://scenes/action_choice.tscn").instantiate() as ActionChoice
 	SignalManager.add_action_choice.emit(action_choice, tr("torture_rack_title"), actions)
+
+
+func _interact_shop() -> void:
+	print("shop ready")

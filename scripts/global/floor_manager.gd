@@ -131,7 +131,7 @@ func _generate_random_room(is_revealed: bool) -> RoomNode:
 		# 🆕 Выбираем случайный тип объекта
 		#var object_types = DataManager.ObjectType.values()
 		#object_type = object_types[randi() % object_types.size()]
-		object_type = DataManager.ObjectType.TORTURE_RACK
+		object_type = DataManager.ObjectType.SHOP
 	
 	room_node.setup({
 		"type": room_type,
