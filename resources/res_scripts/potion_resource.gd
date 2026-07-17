@@ -5,6 +5,9 @@ class_name PotionResource
 ## Тип зелья
 @export var potion_type: DataManager.PotionType
 
+## Грейд стоимости в магазине
+@export var cost_grade: DataManager.CostGrade = DataManager.CostGrade.NORMAL
+
 ## Ключ локализации для названия
 @export var name_key: String = ""
 
@@ -290,3 +293,7 @@ func _fix_russian_endings(desc: String) -> String:
 			desc = desc.replace(pattern, replacements[pattern])
 	
 	return desc
+
+
+func get_cost_grade() -> DataManager.CostGrade:
+	return cost_grade

@@ -64,6 +64,10 @@ func _get_action_text(action: DataManager.ActionType) -> String:
 			return tr("action_lose_flesh")
 		DataManager.ActionType.CRAFT:
 			return tr("action_craft")
+		DataManager.ActionType.TRADE:
+			return tr("action_trade")
+		DataManager.ActionType.ROB:
+			return tr("action_rob")
 		_:
 			return ""
 
@@ -106,6 +110,10 @@ func _handle_choice(action: DataManager.ActionType) -> void:
 			_handle_lose_flesh()
 		DataManager.ActionType.CRAFT:
 			_handle_craft()
+		DataManager.ActionType.TRADE:
+			_handle_trade()
+		DataManager.ActionType.ROB:
+			_handle_rob()
 
 func _handle_use_key() -> void:
 	var success = RunManager.use_key()
@@ -494,3 +502,81 @@ func _handle_craft() -> void:
 	SignalManager.hide_object.emit()
 	SignalManager.show_reward.emit(reward_panel)
 	queue_free()
+
+
+func _handle_trade() -> void:
+	await _show_result_label(tr("shop_trade_title"), DataManager.COLOR_HEAL_LOG)
+	
+	# Формируем товары
+	var items = _generate_shop_items()
+	
+	var reward_panel = preload("res://scenes/reward_panel.tscn").instantiate() as RewardPanel
+	reward_panel.reward_types = [DataManager.RewardType.TRADE]
+	reward_panel.shop_items = items  # нужно добавить поле в RewardPanel
+	SignalManager.hide_object.emit()
+	SignalManager.show_reward.emit(reward_panel)
+	queue_free()
+
+func _generate_shop_items() -> Array[Dictionary]:
+	var items: Array[Dictionary] = []
+	
+	# 2-4 карты
+	var card_count = randi() % 3 + 2  # 2-4
+	var cards = DeckManager.get_cards_by_biome(FloorManager.current_biome, FloorManager.current_path_progress, FloorManager.current_floor, 10)
+	cards.shuffle()
+	for i in range(min(card_count, cards.size())):
+		var card = cards[i]
+		items.append({
+			"type": "card",
+			"data": card,
+			"cost_grade": _random_cost_grade(),
+		})
+	
+	# 1-2 артефакта
+	var artifact_count = randi() % 2 + 1  # 1-2
+	var artifacts = ArtifactManager.get_random_artifacts(DataManager.ArtifactGrade.NORMAL, 5)
+	for i in range(min(artifact_count, artifacts.size())):
+		var artifact = artifacts[i]
+		items.append({
+			"type": "artifact",
+			"data": artifact,
+			"cost_grade": _random_cost_grade(),
+		})
+	
+	# 2-4 зелья
+	var potion_count = randi() % 3 + 2  # 2-4
+	var potions = DataManager.get_random_potions(10)
+	for i in range(min(potion_count, potions.size())):
+		var potion = potions[i]
+		items.append({
+			"type": "potion",
+			"data": potion,
+			"cost_grade": _random_cost_grade(),
+		})
+	
+	return items
+
+func _random_cost_grade() -> DataManager.CostGrade:
+	var weights = [
+		5,  # FREE (редко)
+		10, # VERY_CHEAP
+		20, # CHEAP
+		30, # NORMAL
+		20, # EXPENSIVE
+		10, # VERY_EXPENSIVE
+		5,  # ELITE
+	]
+	var total = 0
+	for w in weights:
+		total += w
+	var roll = randi() % total
+	var cumulative = 0
+	for i in range(weights.size()):
+		cumulative += weights[i]
+		if roll < cumulative:
+			return i as DataManager.CostGrade
+	return DataManager.CostGrade.NORMAL
+
+
+func _handle_rob():
+	pass

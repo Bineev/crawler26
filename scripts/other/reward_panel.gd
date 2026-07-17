@@ -9,6 +9,7 @@ var damage_mod: int = 1 # множитель урона
 var heal_mod: int = 1
 var buff_duration: int = 0
 var upgrade_count: int = 1  # количество карт для улучшения
+var shop_items: Array[Dictionary] = []
 
 @onready var dark_overlay: ColorRect = $DarkOverlay
 @onready var center_container: CenterContainer = $CenterContainer
@@ -92,6 +93,8 @@ func _create_current_reward():
 			_create_transform_card_reward()
 		DataManager.RewardType.LOST_MAX_HP:
 			_create_lost_max_hp_reward()
+		DataManager.RewardType.TRADE:
+			_create_trade_reward()
 		_:
 			pass
 
@@ -327,4 +330,12 @@ func _create_lost_max_hp_reward() -> void:
 	content.damage_mod = damage_mod
 	center_container.add_child(content)
 	content.setup(DataManager.RewardType.LOST_MAX_HP, [lost_amount])
+	SignalManager.reward_selected.connect(_on_reward_selected)
+
+
+func _create_trade_reward() -> void:
+	var content = preload("res://scenes/reward_content.tscn").instantiate() as RewardContent
+	content.shop_items = shop_items
+	center_container.add_child(content)
+	content.setup(DataManager.RewardType.TRADE, [])
 	SignalManager.reward_selected.connect(_on_reward_selected)

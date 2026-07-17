@@ -8,7 +8,7 @@ var bleed_damage_per_stack: int = DataManager.BLEED_BASE_DAMAGE_PER_STACK
 var burn_damage_per_stack: int = DataManager.BURN_BASE_DAMAGE_PER_STACK
 var regen_heal_per_stack: int = DataManager.REGEN_HEAL_PER_STACK
 
-var coins: int = DataManager.STARTING_COINS
+var coins: int = DataManager.STARTING_COINS + 200
 var bones: int = DataManager.STARTING_BONES
 var keys: int = DataManager.STARTING_KEYS
 ## Массив артефактов, которые есть у игрока в текущем забеге
@@ -39,7 +39,7 @@ func initialize_run():
 	DeckManager._load_cards_data()
 	DeckManager._init_unlocked_cards()
 	# 🆕 Добавляем случайные зелья
-	for potion in DataManager.get_random_potions(5):
+	for potion in DataManager.get_random_potions(1):
 		add_potion(potion)
 	print("RunManager initialized with deck size: ", player_deck_data.master_cards.size())
 

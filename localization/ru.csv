@@ -299,3 +299,10 @@ upgrade_card_confirm,Улучшить
 "rack_craft_fail","Создание не удалось!"
 "lost_max_hp_label","- %d макс. HP"
 "reward_accept","Принять"
+
+"shop_title","Магазин"
+"action_trade","Торговать"
+"action_rob","Ограбить"
+"shop_trade_title","Добро пожаловать в магазин!"
+"shop_leave","Покинуть"
+"shop_trade_welcome","Выберите товар"

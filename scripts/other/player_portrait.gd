@@ -563,7 +563,7 @@ func _update_artifacts():
 	for artifact in RunManager.artifacts:
 		var icon = ARTIFACT_ICON_SCENE.instantiate() as ArtifactIcon
 		artifact_container.add_child(icon)
-		icon.setup(artifact)
+		icon.setup(artifact, false)
 
 
 func _on_artifact_added(artifact: ArtifactResource):

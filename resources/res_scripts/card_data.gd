@@ -9,6 +9,9 @@ class_name CardData
 ## Уникальный ID карты
 @export var id: DataManager.CardId
 
+## Грейд стоимости в магазине
+@export var cost_grade: DataManager.CostGrade = DataManager.CostGrade.NORMAL
+
 ## Происхождение карты (персонаж или биом)
 @export var origin: DataManager.CardOrigin = DataManager.CardOrigin.CHARACTER
 
@@ -465,3 +468,7 @@ func _fix_russian_endings(desc: String) -> String:
 			desc = desc.replace(pattern, replacements[pattern])
 	
 	return desc
+
+
+func get_cost_grade() -> DataManager.CostGrade:
+	return cost_grade

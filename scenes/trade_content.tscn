@@ -1,0 +1,25 @@
+[gd_scene load_steps=2 format=3 uid="uid://i08fdr715jll"]
+
+[ext_resource type="Script" uid="uid://2foqqw7rorw2" path="res://scripts/other/trade_content.gd" id="1_7swrq"]
+
+[node name="TradeContent" type="VBoxContainer"]
+offset_right = 40.0
+offset_bottom = 40.0
+theme_override_constants/separation = 20
+alignment = 1
+script = ExtResource("1_7swrq")
+
+[node name="CardsContainer" type="HBoxContainer" parent="."]
+layout_mode = 2
+theme_override_constants/separation = 10
+alignment = 1
+
+[node name="ArtifactsContainer" type="HBoxContainer" parent="."]
+layout_mode = 2
+theme_override_constants/separation = 10
+alignment = 1
+
+[node name="PotionsContainer" type="HBoxContainer" parent="."]
+layout_mode = 2
+theme_override_constants/separation = 10
+alignment = 1

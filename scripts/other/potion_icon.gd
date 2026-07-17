@@ -114,10 +114,12 @@ func _on_enemy_turn_started() -> void:
 
 func _on_battle_started() -> void:
 	is_in_combat = true
+	set_interactable(true)  # или false, зависит от логики
 	_update_button_text()
 
 func _on_battle_ended() -> void:
 	is_in_combat = false
+	set_interactable(true)  # 🆕 делаем интерактивными после боя
 	if is_selected:
 		deselect()
 	_update_button_text()

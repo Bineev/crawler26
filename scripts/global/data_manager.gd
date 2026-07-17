@@ -38,6 +38,8 @@ enum ActionType {
 	SEARCH_TRAP,
 	LOSE_FLESH,
 	CRAFT,
+	TRADE,
+	ROB,
 }
 
 
@@ -295,6 +297,7 @@ enum RewardType {
 	ADD_PROPERTY_TO_CARD,
 	TRANSFORM_CARD,
 	LOST_MAX_HP,  # 🆕
+	TRADE,
 }
 
 ## Тип цикла намерений
@@ -376,6 +379,16 @@ enum CardType {
 	HEAL,
 	RESOURCE,
 	UTILITY,
+}
+
+enum CostGrade {
+	FREE,          # 0
+	VERY_CHEAP,    # 1
+	CHEAP,         # 2
+	NORMAL,        # 3
+	EXPENSIVE,     # 4
+	VERY_EXPENSIVE,# 5
+	ELITE,         # 6
 }
 
 ## Теги карт
@@ -784,6 +797,8 @@ const TRAP_SEARCH_DAMAGE: int = 10
 
 const REST_DEFAULT_HEAL: int = 30
 const BONFIRE_ENERGY_BUFF_DURATION: int = 3  # количество боевых комнат
+
+const DEFAULT_ITEM_COST: int = 10
 ## ============================================================
 ## РАЗМЕРЫ КОМНАТЫ
 ## ============================================================

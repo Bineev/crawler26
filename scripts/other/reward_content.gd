@@ -15,6 +15,7 @@ var preview_container : CenterContainer = null
 var transform_attempts: int = 0
 var max_transform_attempts: int = 3
 var confirm_button : Button
+var shop_items: Array[Dictionary] = []
 
 @onready var title_label: Label = $Title
 @onready var rewards_container: HBoxContainer = $HBoxContainer
@@ -60,6 +61,8 @@ func setup(type: DataManager.RewardType, items: Array) -> void:
 			_setup_transform_card_reward()
 		DataManager.RewardType.LOST_MAX_HP:
 			_setup_lost_max_hp_reward()
+		DataManager.RewardType.TRADE:
+			_setup_trade_reward()
 
 
 func _setup_title() -> void:
@@ -293,7 +296,7 @@ func _setup_artifact_rewards() -> void:
 		rewards_container.add_child(vbox)
 		
 		# 🆕 Теперь можно настраивать
-		artifact_icon.setup(artifact_data, self)
+		artifact_icon.setup(artifact_data, true)
 		
 		## Название
 		#var name_label = Label.new()
@@ -324,7 +327,7 @@ func _setup_artifact_without_choice_reward() -> void:
 	rewards_container.add_child(vbox)
 	
 	# Настраиваем иконку после добавления в дерево
-	artifact_icon.setup(artifact_data, self)
+	artifact_icon.setup(artifact_data, true)
 	
 	## Название
 	#var name_label = Label.new()
@@ -1358,3 +1361,23 @@ func _setup_lost_max_hp_reward() -> void:
 	vbox.add_child(button)
 	
 	rewards_container.add_child(vbox)
+
+
+func _setup_trade_reward() -> void:
+	var trade_content = preload("res://scenes/trade_content.tscn").instantiate() as TradeContent
+	rewards_container.add_child(trade_content)
+	trade_content.setup(shop_items)
+	
+	# Создаём кнопку "Покинуть"
+	var leave_button = Button.new()
+	leave_button.text = tr("shop_leave")
+	leave_button.add_theme_font_override("font", DataManager.FONT_HEADERS)
+	leave_button.add_theme_font_size_override("font_size", 20)
+	leave_button.custom_minimum_size = Vector2(200, 50)
+	leave_button.pressed.connect(_on_trade_leave_pressed)
+	
+	# Добавляем под TradeContent
+	trade_content.add_child(leave_button)
+
+func _on_trade_leave_pressed() -> void:
+	SignalManager.reward_selected.emit()

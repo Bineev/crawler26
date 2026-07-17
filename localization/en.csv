@@ -300,3 +300,10 @@ upgrade_card_confirm,Upgrade
 "rack_craft_fail","Crafting failed!"
 "lost_max_hp_label","- %d max HP"
 "reward_accept","Accept"
+
+"shop_title","Shop"
+"action_trade","Trade"
+"action_rob","Rob"
+"shop_trade_title","Welcome to the shop!"
+"shop_leave","Leave"
+"shop_trade_welcome","Select an item"

@@ -9,6 +9,9 @@ class_name ArtifactResource
 ## ID артефакта
 @export var id: DataManager.ArtifactId
 
+## Грейд стоимости в магазине
+@export var cost_grade: DataManager.CostGrade = DataManager.CostGrade.EXPENSIVE
+
 ## Грейд артефакта
 @export var grade: DataManager.ArtifactGrade = DataManager.ArtifactGrade.NORMAL
 
@@ -113,3 +116,7 @@ func duplicate_for_instance() -> ArtifactResource:
 		copy.effects.append(effect.duplicate_for_instance())
 	
 	return copy
+
+
+func get_cost_grade() -> DataManager.CostGrade:
+	return cost_grade

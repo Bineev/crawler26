@@ -41,7 +41,7 @@ func setup(type: DataManager.ObjectType, biome: DataManager.Biome) -> void:
 		
 		# Отключаем клики и подсветку
 		mouse_filter = Control.MOUSE_FILTER_IGNORE
-		await get_tree().create_timer(1).timeout
+		await get_tree().create_timer(2).timeout
 		interact()
 		return
 	if texture:
@@ -242,4 +242,10 @@ func _interact_torture_rack() -> void:
 
 
 func _interact_shop() -> void:
-	print("shop ready")
+	var actions: Array[DataManager.ActionType] = [
+		DataManager.ActionType.TRADE,
+		DataManager.ActionType.ROB
+	]
+	
+	var action_choice = preload("res://scenes/action_choice.tscn").instantiate() as ActionChoice
+	SignalManager.add_action_choice.emit(action_choice, tr("shop_title"), actions)

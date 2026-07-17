@@ -23,14 +23,14 @@ func _setup_label():
 	counter_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	counter_label.visible = false
 
-func setup(artifact: ArtifactResource, icon_owner = null) -> void:
+func setup(artifact: ArtifactResource, is_in_reward: bool) -> void:
 	artifact_id = artifact.id
 	artifact_resource = artifact
 	icon.texture = artifact.get_icon()
 	custom_minimum_size  = Vector2(64, 64)
 	icon.custom_minimum_size = Vector2(48, 48)
 	filler.custom_minimum_size = Vector2(5, 0)
-	if icon_owner is RewardContent:
+	if is_in_reward:
 		custom_minimum_size = Vector2(128, 128)
 		icon.custom_minimum_size = Vector2(96, 96)
 		text_container.hide()
