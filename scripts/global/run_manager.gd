@@ -23,6 +23,7 @@ var temp_buffs: Dictionary = {
 }
 var idol_curse_biome: DataManager.Biome = DataManager.Biome.MOLE_TUNNELS
 var idol_curse_remaining: int = 0  # сколько боёв осталось
+var is_robber: bool = false
 
 func _ready():
 	initialize_run()
@@ -495,3 +496,11 @@ func remove_potion(index: int) -> void:
 
 func get_potions() -> Array[PotionResource]:
 	return potions
+
+
+func set_robber(value: bool) -> void:
+	is_robber = value
+
+
+func get_robber() -> bool:
+	return is_robber

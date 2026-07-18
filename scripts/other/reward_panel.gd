@@ -95,6 +95,8 @@ func _create_current_reward():
 			_create_lost_max_hp_reward()
 		DataManager.RewardType.TRADE:
 			_create_trade_reward()
+		DataManager.RewardType.GET_BATTLE:
+			_create_battle_reward()
 		_:
 			pass
 
@@ -339,3 +341,21 @@ func _create_trade_reward() -> void:
 	center_container.add_child(content)
 	content.setup(DataManager.RewardType.TRADE, [])
 	SignalManager.reward_selected.connect(_on_reward_selected)
+
+
+func _create_battle_reward() -> void:
+	# Создаём RoomNode для элитного боя
+	var room_node = RoomNode.new()
+	room_node.setup({
+		"type": DataManager.RoomType.COMBAT,
+		"combat_type": DataManager.CombatType.ELITE,
+		"is_revealed": true
+	})
+	var current_room = GameTestManager.get_current_room()
+	# Вызываем загрузку комнаты через GameTestManager
+	GameTestManager._on_room_selected(room_node, false)
+
+	if current_room:
+		current_room.queue_free()
+	# Закрываем панель наград
+	queue_free()

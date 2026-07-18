@@ -260,12 +260,15 @@ func _create_intent_item(effect: EffectEntry) -> Control:
 	DataManager.apply_shader_overlay(icon, "res://shaders/card3_shader.gdshader")
 	
 	var value_label = Label.new()
-	value_label.add_theme_font_size_override("font_size", 16)
+	value_label.add_theme_font_size_override("font_size", 20)
+	value_label.add_theme_font_override("font", DataManager.FONT_HEADERS)
+	value_label.add_theme_color_override("font_color", DataManager.COLOR_MOLE_TUNNELS_ART_BG_LIGHT)
 	value_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	
 	# Формируем текст и иконку
 	var tooltip_text = ""
 	
+	#TODO
 	match effect.category:
 		DataManager.EffectCategory.DAMAGE:
 			icon.texture = DataManager.get_intent_icon(DataManager.IntentType.ATTACK)
@@ -285,23 +288,23 @@ func _create_intent_item(effect: EffectEntry) -> Control:
 			tooltip_text = "Враг собирается лечиться"
 		DataManager.EffectCategory.APPLY_STATUS:
 			icon.texture = DataManager.get_intent_icon(DataManager.IntentType.DEBUFF)
-			if effect.status:
-				value_label.text = "%d %s" % [effect.value, effect.status.get_localized_name()]
+			#if effect.status:
+				#value_label.text = "%d %s" % [effect.value, effect.status.get_localized_name()]
 			tooltip_text = "Враг собирается наложить дебафф"
 		DataManager.EffectCategory.APPLY_PASSIVE:
 			icon.texture = DataManager.get_intent_icon(DataManager.IntentType.BUFF)
-			if effect.passive:
-				value_label.text = effect.passive.get_localized_name()
+			#if effect.passive:
+				#value_label.text = effect.passive.get_localized_name()
 			tooltip_text = "Враг собирается усилить себя"
 		_:
 			icon.texture = DataManager.get_intent_icon(DataManager.IntentType.UNKNOWN)
-			value_label.text = "?"
+			#value_label.text = "?"
 			tooltip_text = "Неизвестное намерение"
 	
 	container.tooltip_text = tooltip_text
 	
-	container.add_child(icon)
 	container.add_child(value_label)
+	container.add_child(icon)
 	
 	return container
 

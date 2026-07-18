@@ -307,6 +307,7 @@ enum RewardType {
 	TRANSFORM_CARD,
 	LOST_MAX_HP,  # 🆕
 	TRADE,
+	GET_BATTLE
 }
 
 ## Тип цикла намерений
@@ -807,7 +808,7 @@ const TRAP_SEARCH_DAMAGE: int = 10
 const REST_DEFAULT_HEAL: int = 30
 const BONFIRE_ENERGY_BUFF_DURATION: int = 3  # количество боевых комнат
 
-const DEFAULT_ITEM_COST: int = 10
+const DEFAULT_ITEM_COST: int = 17
 ## ============================================================
 ## РАЗМЕРЫ КОМНАТЫ
 ## ============================================================

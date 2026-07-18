@@ -1,7 +1,7 @@
 # autoload/floor_manager.gd
 extends Node
 
-signal room_selected(room_node: RoomNode)
+signal room_selected(room_node: RoomNode, should_increment_room_index: bool)
 signal floor_completed()
 
 ## ============================================================
@@ -126,11 +126,18 @@ func _generate_random_room(is_revealed: bool) -> RoomNode:
 	elif roll < 0.01:  # 20% эвент
 		room_type = DataManager.RoomType.EVENT
 	else:  # 20% объект
-		room_type = DataManager.RoomType.OBJECT
 		#TODO раскомментировать после теста
-		# 🆕 Выбираем случайный тип объекта
+		## Генерируем объектную комнату
+		#room_type = DataManager.RoomType.OBJECT
 		#var object_types = DataManager.ObjectType.values()
 		#object_type = object_types[randi() % object_types.size()]
+		#
+		## 🆕 Если выпал SHOP и игрок — грабитель, заменяем на ELITE бой
+		#if object_type == DataManager.ObjectType.SHOP and RunManager.is_robber:
+			#room_type = DataManager.RoomType.COMBAT
+			#combat_type = DataManager.CombatType.ELITE
+			#object_type = DataManager.ObjectType.CHEST  # значение по умолчанию
+		room_type = DataManager.RoomType.OBJECT
 		object_type = DataManager.ObjectType.SHOP
 	
 	room_node.setup({
@@ -200,7 +207,7 @@ func _load_current_room():
 	var room = all_rooms[current_path_progress]
 	room.is_visited = true
 	print("=== LOADING ROOM ", current_path_progress, ": ", _get_room_type_string(room.room_type, room.combat_type), " ===")
-	room_selected.emit(room)
+	room_selected.emit(room, true)
 
 
 func _start_boss_fight():
@@ -214,7 +221,7 @@ func _start_boss_fight():
 		"is_revealed": true
 	})
 	all_rooms.append(boss_room)
-	room_selected.emit(boss_room)
+	room_selected.emit(boss_room, true)
 
 
 ## ============================================================

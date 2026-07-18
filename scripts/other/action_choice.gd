@@ -179,7 +179,7 @@ func _handle_search() -> void:
 func _animate_in() -> void:
 	dark_overlay.color.a = 0.0
 	var tween = create_tween()
-	await tween.tween_property(dark_overlay, "color:a",0.8, 1)
+	await tween.tween_property(dark_overlay, "color:a",0.9, 1)
 
 func _animate_out() -> void:
 	var tween = create_tween()
@@ -574,5 +574,15 @@ func _random_cost_grade() -> DataManager.CostGrade:
 	return DataManager.CostGrade.NORMAL
 
 
-func _handle_rob():
-	pass
+func _handle_rob() -> void:
+	await _show_result_label(tr("shop_rob_result"), DataManager.COLOR_PENITENT_ART_BG_DARK)
+	
+	# Устанавливаем флаг грабителя
+	RunManager.set_robber(true)
+	SignalManager.log_message.emit("Вероломство будет наказано!")
+	
+	var reward_panel = preload("res://scenes/reward_panel.tscn").instantiate() as RewardPanel
+	reward_panel.reward_types = [DataManager.RewardType.GET_BATTLE]
+	SignalManager.hide_object.emit()
+	SignalManager.show_reward.emit(reward_panel)
+	queue_free()

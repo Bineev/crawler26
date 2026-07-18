@@ -132,7 +132,7 @@ func after_combat_victory():
 
 # autoload/game_test_manager.gd
 
-func _on_room_selected(room_node: RoomNode):
+func _on_room_selected(room_node: RoomNode, should_increment_room_index: bool = true):
 	# 🆕 Очищаем пустые CanvasLayer перед добавлением комнаты
 	_clean_empty_canvas_layers()
 	# Сбрасываем состояния
@@ -170,7 +170,9 @@ func _on_room_selected(room_node: RoomNode):
 		game_world.add_child(current_room_node)
 		current_room_node.position = DataManager.ROOM_POSITION
 	
-	current_room_index += 1
+	# 🆕 Увеличиваем индекс только если нужно
+	if should_increment_room_index:
+		current_room_index += 1
 	
 	if current_room_node.room_type == DataManager.RoomType.COMBAT:
 		_create_battle_log()
