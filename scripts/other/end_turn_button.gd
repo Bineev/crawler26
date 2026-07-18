@@ -5,9 +5,8 @@ class_name EndTurnButton
 var is_ending_turn: bool = false
 
 func _ready():
-	text = "КОНЕЦ ХОДА"
-	add_theme_font_override("font", DataManager.FONT_HEADERS)
-	add_theme_font_size_override("font_size", 20)
+	text = tr("end_turn_button_label")
+	DataManager.apply_button_style(self, DataManager.ButtonType.PRIMARY)
 	
 	pressed.connect(_on_pressed)
 

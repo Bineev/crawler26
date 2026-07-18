@@ -306,3 +306,6 @@ upgrade_card_confirm,Улучшить
 "shop_trade_title","Добро пожаловать в магазин!"
 "shop_leave","Покинуть"
 "shop_trade_welcome","Выберите товар"
+
+"end_turn_button_label", "Завершить ход"
+"button_path_go", "В путь"

@@ -580,14 +580,9 @@ func _setup_add_property_reward() -> void:
 	pass
 
 func _create_reward_button(text: String, index: int) -> Button:
-	var button = Button.new()
-	button.text = tr(text)
+	var button = DataManager.create_button(tr(text), DataManager.ButtonType.PRIMARY)
 	# BUG
 	button.pressed.connect(_on_item_selected.bind(index))
-	
-	button.add_theme_font_override("font", DataManager.FONT_HEADERS)
-	button.add_theme_font_size_override("font_size", 20)
-	button.custom_minimum_size = Vector2(100, 50)
 	
 	return button
 
@@ -673,11 +668,7 @@ func _setup_upgrade_card_reward() -> void:
 		# Клик по обёртке выбирает карту
 		card_wrapper.gui_input.connect(_on_card_wrapper_clicked.bind(display_card, card_wrapper, preview_container))
 	
-	var confirm_button = Button.new()
-	confirm_button.text = tr("upgrade_card_confirm")
-	confirm_button.add_theme_font_override("font", DataManager.FONT_HEADERS)
-	confirm_button.add_theme_font_size_override("font_size", 20)
-	confirm_button.custom_minimum_size = Vector2(200, 50)
+	var confirm_button = DataManager.create_button(tr("upgrade_card_confirm"), DataManager.ButtonType.PRIMARY)
 	confirm_button.modulate = Color(1, 1, 1, 0)
 	confirm_button.disabled = true
 	confirm_button.pressed.connect(_on_upgrade_confirm)
@@ -1029,11 +1020,7 @@ func _setup_transform_card_reward() -> void:
 		card_wrapper.gui_input.connect(_on_transform_card_selected.bind(card_data, card_wrapper))
 	
 	# Кнопка подтверждения (всегда видима)
-	confirm_button = Button.new()
-	confirm_button.text = tr("transform_card_confirm")
-	confirm_button.add_theme_font_override("font", DataManager.FONT_HEADERS)
-	confirm_button.add_theme_font_size_override("font_size", 20)
-	confirm_button.custom_minimum_size = Vector2(200, 50)
+	confirm_button = DataManager.create_button(tr("transform_card_confirm"), DataManager.ButtonType.PRIMARY)
 	confirm_button.modulate = Color(1, 1, 1, 1)
 	confirm_button.disabled = true
 	confirm_button.pressed.connect(_on_transform_confirm_pressed)
@@ -1369,11 +1356,7 @@ func _setup_trade_reward() -> void:
 	trade_content.setup(shop_items)
 	
 	# Создаём кнопку "Покинуть"
-	var leave_button = Button.new()
-	leave_button.text = tr("shop_leave")
-	leave_button.add_theme_font_override("font", DataManager.FONT_HEADERS)
-	leave_button.add_theme_font_size_override("font_size", 20)
-	leave_button.custom_minimum_size = Vector2(200, 50)
+	var leave_button = DataManager.create_button(tr("shop_leave"), DataManager.ButtonType.PRIMARY)
 	leave_button.pressed.connect(_on_trade_leave_pressed)
 	
 	# Добавляем под TradeContent

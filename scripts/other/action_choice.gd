@@ -20,13 +20,9 @@ func setup(title: String, actions_array: Array[DataManager.ActionType], context:
 
 func _create_buttons() -> void:
 	for action in actions:
-		var button = Button.new()
-		button.text = _get_action_text(action)
+		var button = DataManager.create_button(_get_action_text(action), DataManager.ButtonType.PRIMARY)
 		button.pressed.connect(_on_button_pressed.bind(action))
-		
-		button.add_theme_font_override("font", DataManager.FONT_HEADERS)
-		button.add_theme_font_size_override("font_size", 20)
-		button.custom_minimum_size = Vector2(150, 50)
+	
 		
 		buttons_container.add_child(button)
 

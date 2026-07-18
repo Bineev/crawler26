@@ -3,7 +3,6 @@
 [ext_resource type="Script" uid="uid://cu84m5581u5h7" path="res://scripts/other/end_turn_button.gd" id="1_tql3q"]
 
 [node name="EndTurnButton" type="Button"]
-custom_minimum_size = Vector2(200, 60)
 offset_right = 8.0
 offset_bottom = 8.0
 focus_mode = 0

@@ -10,6 +10,15 @@ extends Node
 ## СОСТОЯНИЯ КАРТ
 ## ============================================================
 
+enum ButtonType {
+	DEFAULT,
+	PRIMARY,
+	SECONDARY,
+	DANGER,
+	SUCCESS,
+}
+
+
 enum CardState {
 	IDLE,
 	HOVERED,
@@ -1447,6 +1456,7 @@ const COLOR_BONE_LABYRINTH_ART_BG_LIGHT: Color = Color("BFB8A6")   # светл�
 const COLOR_DAMAGE_LOG: Color = Color(1, 0.3, 0.2)
 const COLOR_HEAL_LOG: Color = Color(0.4, 0.8, 0.3)
 
+const COLOR_GRAY_NEAR_BLACK: Color = Color("1A1510")   # почти чёрный серый
 ## ============================================================
 ## ЦВЕТА ИСКУПЛЕНИЯ (ATONEMENT)
 ## ============================================================
@@ -1475,6 +1485,40 @@ const COLOR_MOLE_TUNNELS_CARD_BG: Color = Color("e6d6b3")    # бежево-ко
 const COLOR_FLESH_CAVES_CARD_BG: Color = Color("e6c4c4")     # светло-красный
 const COLOR_BONE_LABYRINTH_CARD_BG: Color = Color("e6e0d6")  # светло-серый
 ## ============================================================
+# === НОВЫЕ ЦВЕТА ДЛЯ UI ===
+
+# Серые (от светлого к тёмному)
+const COLOR_GRAY_LIGHTEST: Color = Color("E8E6E3")      # очень светлый серый
+const COLOR_GRAY_LIGHT: Color = Color("C4C0BA")        # светлый серый
+const COLOR_GRAY_MID: Color = Color("8A8580")          # средний серый
+const COLOR_GRAY_DARK: Color = Color("4A4540")         # тёмный серый
+const COLOR_GRAY_DARKEST: Color = Color("2A2520")      # очень тёмный серый
+
+# Дополнительные тёмные (для фонов)
+const COLOR_DARK_RED: Color = Color("4A1A1A")           # тёмно-красный
+const COLOR_DARK_BROWN: Color = Color("3A2A1A")         # тёмно-коричневый
+const COLOR_DARK_GREEN: Color = Color("1A2A1A")         # тёмно-зелёный
+const COLOR_DARK_BLUE: Color = Color("1A1A3A")          # тёмно-синий
+const COLOR_DARK_PURPLE: Color = Color("2A1A3A")        # тёмно-фиолетовый
+
+# Дополнительные светлые (для акцентов)
+const COLOR_LIGHT_RED: Color = Color("D4A0A0")          # светло-красный
+const COLOR_LIGHT_BROWN: Color = Color("D4C0A0")        # светло-коричневый
+const COLOR_LIGHT_GREEN: Color = Color("A0D4A0")        # светло-зелёный
+const COLOR_LIGHT_BLUE: Color = Color("A0A0D4")         # светло-синий
+const COLOR_LIGHT_PURPLE: Color = Color("C0A0D4")       # светло-фиолетовый
+
+# Акцентные цвета
+const COLOR_ACCENT_GOLD: Color = Color("D4B040")        # золотой
+const COLOR_ACCENT_COPPER: Color = Color("B08030")      # медный
+const COLOR_ACCENT_BRONZE: Color = Color("8A6A2A")      # бронзовый
+const COLOR_ACCENT_SILVER: Color = Color("C0C0C0")      # серебряный
+const COLOR_ACCENT_IRON: Color = Color("6A6A6A")        # железный
+
+# Цвета для состояний кнопок
+const COLOR_BUTTON_DISABLED_BG: Color = Color("404040")      # фон отключённой кнопки
+const COLOR_BUTTON_DISABLED_BORDER: Color = Color("606060")  # обводка отключённой кнопки
+const COLOR_BUTTON_DISABLED_TEXT: Color = Color("808080")    # текст отключённой кнопки
 ## МЕТОДЫ ПОЛУЧЕНИЯ ЦВЕТОВ
 ## ============================================================
 
@@ -1907,3 +1951,148 @@ func get_random_potions(count: int) -> Array[PotionResource]:
 		result.append(potion_list[i])
 	
 	return result
+
+
+func create_button(text: String, button_type: ButtonType = ButtonType.DEFAULT, icon: Texture2D = null) -> Button:
+	var button = Button.new()
+	button.text = text
+	if icon:
+		button.icon = icon
+		button.icon_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+		button.add_theme_constant_override("icon_max_width", 32)
+	
+	# Настройка шрифта
+	button.add_theme_font_override("font", FONT_HEADERS)
+	button.add_theme_font_size_override("font_size", 20)
+	
+	# Настройка отступов
+	button.add_theme_constant_override("h_separation", 8)
+	button.focus_mode = Control.FOCUS_NONE
+	
+	# Настройка стилей
+	var normal_style = _get_button_style(button_type, false)
+	var hover_style = _get_button_style(button_type, true, true)
+	var pressed_style = _get_button_style(button_type, true, false)
+	var disabled_style = _get_button_style(button_type, false, false, true)
+	
+	button.add_theme_stylebox_override("normal", normal_style)
+	button.add_theme_stylebox_override("hover", hover_style)
+	button.add_theme_stylebox_override("pressed", pressed_style)
+	button.add_theme_stylebox_override("disabled", disabled_style)
+	
+	# Цвета текста
+	var normal_color = COLOR_MOLE_TUNNELS_ART_BG_LIGHT
+	var hover_color = COLOR_MOLE_TUNNELS_ART_BG_LIGHT
+	var pressed_color = COLOR_MOLE_TUNNELS_ART_BG_LIGHT
+	var disabled_color = COLOR_BONE_LABYRINTH_ART_BG_DARK
+	
+	button.add_theme_color_override("font_color", normal_color)
+	button.add_theme_color_override("font_hover_color", hover_color)
+	button.add_theme_color_override("font_pressed_color", pressed_color)
+	button.add_theme_color_override("font_disabled_color", disabled_color)
+	
+	# Минимальный размер
+	button.custom_minimum_size = Vector2(80, 30)
+	
+	return button
+
+func _get_button_style(button_type: ButtonType, is_active: bool, is_hover: bool = false, is_disabled: bool = false) -> StyleBoxFlat:
+	var style = StyleBoxFlat.new()
+	
+	# --- ФОН ---
+	if is_disabled:
+		style.bg_color = COLOR_BUTTON_DISABLED_BG
+	elif is_active:
+		style.bg_color = COLOR_GRAY_NEAR_BLACK
+	else:
+		# В зависимости от типа кнопки выбираем фон
+		match button_type:
+			ButtonType.PRIMARY:
+				style.bg_color = Color.BLACK
+			ButtonType.SECONDARY:
+				style.bg_color = COLOR_GRAY_DARK
+			ButtonType.DANGER:
+				style.bg_color = COLOR_DARK_RED
+			ButtonType.SUCCESS:
+				style.bg_color = COLOR_DARK_GREEN
+			_:
+				style.bg_color = COLOR_GRAY_DARK
+	
+	# --- ОБВОДКА ---
+	var border_color: Color
+	if is_disabled:
+		border_color = COLOR_BUTTON_DISABLED_BORDER
+	elif is_active:
+		border_color = COLOR_MOLE_TUNNELS_ART_BG_LIGHT
+	else:
+		match button_type:
+			ButtonType.PRIMARY:
+				border_color = COLOR_MOLE_TUNNELS_ART_BG_LIGHT
+			ButtonType.SECONDARY:
+				border_color = COLOR_GRAY_LIGHT
+			ButtonType.DANGER:
+				border_color = COLOR_FLESH_CAVES_ART_BG_LIGHT
+			ButtonType.SUCCESS:
+				border_color = COLOR_LIGHT_GREEN
+			_:
+				border_color = COLOR_MOLE_TUNNELS_ART_BG_LIGHT2
+	
+	style.border_width_bottom = 2
+	style.border_width_top = 2
+	style.border_width_left = 2
+	style.border_width_right = 2
+	style.border_color = border_color
+	
+	# --- СКРУГЛЕНИЕ ---
+	style.corner_radius_top_left = 4
+	style.corner_radius_top_right = 4
+	style.corner_radius_bottom_left = 4
+	style.corner_radius_bottom_right = 4
+	
+	# --- ОТСТУПЫ ---
+	style.content_margin_left = 30
+	style.content_margin_right = 30
+	style.content_margin_top = 15
+	style.content_margin_bottom = 15
+	
+	return style
+
+
+func apply_button_style(button: Button, button_type: ButtonType = ButtonType.DEFAULT, icon: Texture2D = null) -> void:
+	if icon:
+		button.icon = icon
+		button.icon_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+		button.add_theme_constant_override("icon_max_width", 32)
+	
+	# Настройка шрифта
+	button.add_theme_font_override("font", FONT_HEADERS)
+	button.add_theme_font_size_override("font_size", 20)
+	
+	# Настройка отступов
+	button.add_theme_constant_override("h_separation", 8)
+	button.focus_mode = Control.FOCUS_NONE
+	
+	# Настройка стилей
+	var normal_style = _get_button_style(button_type, false)
+	var hover_style = _get_button_style(button_type, true, true)
+	var pressed_style = _get_button_style(button_type, true, false)
+	var disabled_style = _get_button_style(button_type, false, false, true)
+	
+	button.add_theme_stylebox_override("normal", normal_style)
+	button.add_theme_stylebox_override("hover", hover_style)
+	button.add_theme_stylebox_override("pressed", pressed_style)
+	button.add_theme_stylebox_override("disabled", disabled_style)
+	
+	# Цвета текста
+	var normal_color = COLOR_MOLE_TUNNELS_ART_BG_LIGHT
+	var hover_color = COLOR_MOLE_TUNNELS_ART_BG_LIGHT
+	var pressed_color = COLOR_MOLE_TUNNELS_ART_BG_LIGHT
+	var disabled_color = COLOR_BONE_LABYRINTH_ART_BG_DARK
+	
+	button.add_theme_color_override("font_color", normal_color)
+	button.add_theme_color_override("font_hover_color", hover_color)
+	button.add_theme_color_override("font_pressed_color", pressed_color)
+	button.add_theme_color_override("font_disabled_color", disabled_color)
+	
+	# Минимальный размер
+	button.custom_minimum_size = Vector2(80, 30)

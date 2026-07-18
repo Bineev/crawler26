@@ -9,12 +9,12 @@ func setup(paths: Array[Array]):
 	var buttons_container = $VBoxContainer/ButtonsContainer
 	var title = $VBoxContainer/Title
 	buttons_container.add_theme_constant_override("separation", 40)
-	title.add_theme_color_override("font_color", DataManager.COLOR_FLESH_CAVES_ART_BG_DARK)
+	title.add_theme_color_override("font_color", DataManager.COLOR_PENITENT_ART_BG_DARK)
 	
 	for i in range(paths.size()):
 		var path_container = VBoxContainer.new()
 		path_container.alignment = 1
-		path_container.add_theme_constant_override("separation", 10)
+		path_container.add_theme_constant_override("separation", 20)
 		
 		# Сначала показываем комнаты сверху вниз (начиная с последней)
 		var room_count = paths[i].size()
@@ -55,16 +55,8 @@ func setup(paths: Array[Array]):
 				path_container.add_child(arrow)
 		
 		# Кнопка выбора пути
-		var select_button = Button.new()
-		select_button.text = "ВПЕРЕД"
+		var select_button = DataManager.create_button(tr("button_path_go"), DataManager.ButtonType.PRIMARY)
 		select_button.pressed.connect(_on_path_selected.bind(i))
-		
-		# Применяем стиль как у кнопки "Конец хода"
-		select_button.add_theme_font_override("font", DataManager.FONT_HEADERS)
-		select_button.add_theme_font_size_override("font_size", 20)
-		#select_button.add_theme_color_override("font_color", Color(DataManager.COLOR_PENITENT_ART_BG_DARK))
-		#select_button.add_theme_color_override("font_hover_color", Color(DataManager.COLOR_PENITENT_ART_BG_DARK))
-		select_button.custom_minimum_size = Vector2(200, 60)
 		path_container.add_child(select_button)
 		
 		buttons_container.add_child(path_container)

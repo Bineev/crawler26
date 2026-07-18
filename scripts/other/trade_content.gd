@@ -47,13 +47,13 @@ func _add_card_item(item: Dictionary) -> void:
 	card_ui.card_control.scale = Vector2(0.7, 0.7)
 	card_ui.set_reward_state()
 	card_container.custom_minimum_size = card_ui.get_actual_size() * 1.2
-	
-	var buy_button = Button.new()
+
+	# Получаем иконку монеты и уменьшаем её
+	var coin_icon = DataManager.get_currency_icon(DataManager.CurrencyType.COIN)
+
 	var price = _get_price(item)
-	buy_button.text = str(price)
-	buy_button.add_theme_font_override("font", DataManager.FONT_MAIN)
-	buy_button.add_theme_font_size_override("font_size", 16)
-	buy_button.custom_minimum_size = Vector2(100, 30)
+	var buy_button = DataManager.create_button(str(price), DataManager.ButtonType.PRIMARY, coin_icon)
+	buy_button.add_theme_constant_override("icon_max_width", 32)
 	buy_button.pressed.connect(_on_buy_pressed.bind(item, container))
 	buy_button.set_meta("price", price)
 	container.add_child(buy_button)
@@ -76,12 +76,11 @@ func _add_artifact_item(item: Dictionary) -> void:
 	artifact_icon.setup(item["data"], true)
 	artifact_icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	
-	var buy_button = Button.new()
+	# Получаем иконку монеты и уменьшаем её
+	var coin_icon = DataManager.get_currency_icon(DataManager.CurrencyType.COIN)
+
 	var price = _get_price(item)
-	buy_button.text = str(price)
-	buy_button.add_theme_font_override("font", DataManager.FONT_MAIN)
-	buy_button.add_theme_font_size_override("font_size", 16)
-	buy_button.custom_minimum_size = Vector2(100, 30)
+	var buy_button = DataManager.create_button(str(price), DataManager.ButtonType.PRIMARY, coin_icon)
 	buy_button.pressed.connect(_on_buy_pressed.bind(item, container))
 	buy_button.set_meta("price", price)
 	container.add_child(buy_button)
@@ -104,12 +103,11 @@ func _add_potion_item(item: Dictionary) -> void:
 	potion_icon.setup(item["data"])
 	potion_icon.set_interactable(false)
 	
-	var buy_button = Button.new()
+	# Получаем иконку монеты и уменьшаем её
+	var coin_icon = DataManager.get_currency_icon(DataManager.CurrencyType.COIN)
+
 	var price = _get_price(item)
-	buy_button.text = str(price)
-	buy_button.add_theme_font_override("font", DataManager.FONT_MAIN)
-	buy_button.add_theme_font_size_override("font_size", 16)
-	buy_button.custom_minimum_size = Vector2(100, 30)
+	var buy_button = DataManager.create_button(str(price), DataManager.ButtonType.PRIMARY, coin_icon)
 	buy_button.pressed.connect(_on_buy_pressed.bind(item, container))
 	buy_button.set_meta("price", price)
 	container.add_child(buy_button)

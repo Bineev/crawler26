@@ -307,3 +307,6 @@ upgrade_card_confirm,Upgrade
 "shop_trade_title","Welcome to the shop!"
 "shop_leave","Leave"
 "shop_trade_welcome","Select an item"
+
+"end_turn_button_label", "End turn"
+"button_path_go", "Go"
