@@ -8,15 +8,10 @@ var is_interactable: bool = true
 var is_in_combat: bool = false
 
 func _ready():
-	use_button = Button.new()
-	use_button.text = tr("potion_use")
+	use_button = DataManager.create_button(tr("potion_use"), DataManager.ButtonType.PRIMARY, null, true)
 	use_button.modulate = Color(1, 1, 1, 0)  # 🆕 прозрачный
 	use_button.disabled = true
 	use_button.pressed.connect(_on_use_pressed)
-	
-	use_button.add_theme_font_override("font", DataManager.FONT_HEADERS)
-	use_button.add_theme_font_size_override("font_size", 16)
-	use_button.custom_minimum_size = Vector2(80, 30)
 	
 	add_child(use_button)
 
@@ -29,11 +24,7 @@ func _ready():
 	SignalManager.battle_victory.connect(_on_battle_ended)
 	SignalManager.battle_defeat.connect(_on_battle_ended)
 
-	# Позиционируем кнопку под зельем
-	use_button.position = Vector2(
-		(size.x - use_button.size.x) / 2,
-		size.y + 5
-	)
+
 
 func setup(potion: PotionResource) -> void:
 	potion_data = potion
@@ -57,6 +48,11 @@ func setup(potion: PotionResource) -> void:
 	if not desc.is_empty():
 		tooltip += "\n" + desc
 	tooltip_text = tooltip
+	# Позиционируем кнопку под зельем
+	use_button.position = Vector2(
+		(size.x - use_button.size.x) / 2,
+		size.y + 10
+	)
 
 func select() -> void:
 	is_selected = true
@@ -130,3 +126,15 @@ func _update_button_text() -> void:
 			use_button.text = tr("potion_use")
 		else:
 			use_button.text = tr("potion_discard")
+
+
+func update_state() -> void:
+	is_in_combat = BattleManager.is_battle_active()
+	if is_in_combat:
+		if BattleManager.is_player_turn():
+			set_interactable(true)
+		else:
+			set_interactable(false)
+	else:
+		set_interactable(true)
+	_update_button_text()

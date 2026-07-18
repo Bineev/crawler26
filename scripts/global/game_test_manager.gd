@@ -425,10 +425,12 @@ func _create_potion_display() -> void:
 
 func _add_potion_icon(potion: PotionResource) -> void:
 	var icon = preload("res://scenes/potion_icon.tscn").instantiate() as PotionIcon
-	icon.setup(potion)
 	#icon.gui_input.connect(_on_potion_icon_clicked.bind(icon))
 	potion_container.add_child(icon)
+	icon.setup(potion)
 	potion_icons.append(icon)
+	icon.update_state()
+	
 
 func _on_potion_added(potion: PotionResource) -> void:
 	_add_potion_icon(potion)

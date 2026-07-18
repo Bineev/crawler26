@@ -1953,7 +1953,7 @@ func get_random_potions(count: int) -> Array[PotionResource]:
 	return result
 
 
-func create_button(text: String, button_type: ButtonType = ButtonType.DEFAULT, icon: Texture2D = null) -> Button:
+func create_button(text: String, button_type: ButtonType = ButtonType.DEFAULT, icon: Texture2D = null, is_potion: bool = false) -> Button:
 	var button = Button.new()
 	button.text = text
 	if icon:
@@ -1969,11 +1969,12 @@ func create_button(text: String, button_type: ButtonType = ButtonType.DEFAULT, i
 	button.add_theme_constant_override("h_separation", 8)
 	button.focus_mode = Control.FOCUS_NONE
 	
+
 	# Настройка стилей
-	var normal_style = _get_button_style(button_type, false)
-	var hover_style = _get_button_style(button_type, true, true)
-	var pressed_style = _get_button_style(button_type, true, false)
-	var disabled_style = _get_button_style(button_type, false, false, true)
+	var normal_style = _get_button_style(button_type, false, false, false, is_potion)
+	var hover_style = _get_button_style(button_type, true, true, false, is_potion)
+	var pressed_style = _get_button_style(button_type, true, false, false, is_potion)
+	var disabled_style = _get_button_style(button_type, false, false, true, is_potion)
 	
 	button.add_theme_stylebox_override("normal", normal_style)
 	button.add_theme_stylebox_override("hover", hover_style)
@@ -1991,12 +1992,12 @@ func create_button(text: String, button_type: ButtonType = ButtonType.DEFAULT, i
 	button.add_theme_color_override("font_pressed_color", pressed_color)
 	button.add_theme_color_override("font_disabled_color", disabled_color)
 	
-	# Минимальный размер
-	button.custom_minimum_size = Vector2(80, 30)
+	if is_potion:
+		button.add_theme_font_size_override("font_size", 14)
 	
 	return button
 
-func _get_button_style(button_type: ButtonType, is_active: bool, is_hover: bool = false, is_disabled: bool = false) -> StyleBoxFlat:
+func _get_button_style(button_type: ButtonType, is_active: bool, is_hover: bool = false, is_disabled: bool = false, is_potion: bool = false) -> StyleBoxFlat:
 	var style = StyleBoxFlat.new()
 	
 	# --- ФОН ---
@@ -2055,10 +2056,17 @@ func _get_button_style(button_type: ButtonType, is_active: bool, is_hover: bool 
 	style.content_margin_top = 15
 	style.content_margin_bottom = 15
 	
+	if is_potion:
+		# --- ОТСТУПЫ ---
+		style.content_margin_left = 10
+		style.content_margin_right = 10
+		style.content_margin_top = 5
+		style.content_margin_bottom = 5
+	
 	return style
 
 
-func apply_button_style(button: Button, button_type: ButtonType = ButtonType.DEFAULT, icon: Texture2D = null) -> void:
+func apply_button_style(button: Button, button_type: ButtonType = ButtonType.DEFAULT, icon: Texture2D = null, is_potion: bool = false) -> void:
 	if icon:
 		button.icon = icon
 		button.icon_alignment = HORIZONTAL_ALIGNMENT_RIGHT
@@ -2073,10 +2081,10 @@ func apply_button_style(button: Button, button_type: ButtonType = ButtonType.DEF
 	button.focus_mode = Control.FOCUS_NONE
 	
 	# Настройка стилей
-	var normal_style = _get_button_style(button_type, false)
-	var hover_style = _get_button_style(button_type, true, true)
-	var pressed_style = _get_button_style(button_type, true, false)
-	var disabled_style = _get_button_style(button_type, false, false, true)
+	var normal_style = _get_button_style(button_type, false, false, false, is_potion)
+	var hover_style = _get_button_style(button_type, true, true, false, is_potion)
+	var pressed_style = _get_button_style(button_type, true, false, false, is_potion)
+	var disabled_style = _get_button_style(button_type, false, false, true, is_potion)
 	
 	button.add_theme_stylebox_override("normal", normal_style)
 	button.add_theme_stylebox_override("hover", hover_style)
@@ -2094,5 +2102,5 @@ func apply_button_style(button: Button, button_type: ButtonType = ButtonType.DEF
 	button.add_theme_color_override("font_pressed_color", pressed_color)
 	button.add_theme_color_override("font_disabled_color", disabled_color)
 	
-	# Минимальный размер
-	button.custom_minimum_size = Vector2(80, 30)
+	if is_potion:
+		button.add_theme_font_size_override("font_size", 14)
