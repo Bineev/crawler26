@@ -485,6 +485,7 @@ enum RoomType {
 enum CombatType {
 	NORMAL,           # обычный бой
 	ELITE,            # элитный бой
+	ELITE_AFTER_ROB,  # бой после ограбления
 	LIMITED_TURNS,    # бой с ограниченным количеством ходов
 	BOSS,             # босс файт
 }

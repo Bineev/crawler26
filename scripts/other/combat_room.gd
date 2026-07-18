@@ -196,12 +196,15 @@ func show_rewards() -> void:
 	match combat_type:
 		DataManager.CombatType.NORMAL:
 			reward_types = [DataManager.RewardType.ARTIFACT, DataManager.RewardType.GOLD]
-			reward_panel.gold_mod = 2
+			reward_panel.gold_mod = 1
 
-		
 		DataManager.CombatType.ELITE:
 			reward_types = [DataManager.RewardType.CARD_BIOM, DataManager.RewardType.GOLD]
-			reward_panel.gold_mod = 1
+			reward_panel.gold_mod = 2
+		
+		DataManager.CombatType.ELITE_AFTER_ROB:
+			reward_types = [DataManager.RewardType.CARD_WITHOUT_CHOICE, DataManager.RewardType.GOLD, DataManager.RewardType.POTION]
+			reward_panel.gold_mod = 5
 		
 		DataManager.CombatType.BOSS:
 			reward_types = [DataManager.RewardType.ARTIFACT_ELITE, DataManager.RewardType.CARD_CHARACTER, DataManager.RewardType.GOLD]

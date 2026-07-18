@@ -355,10 +355,10 @@ func _setup_potion_rewards() -> void:
 	
 	# Создаём PotionIcon в некликабельном состоянии
 	var potion_icon = preload("res://scenes/potion_icon.tscn").instantiate() as PotionIcon
-	potion_icon.setup(potion_data)
-	potion_icon.set_interactable(false)
 	vbox.add_child(potion_icon)
 	rewards_container.add_child(vbox)
+	potion_icon.setup(potion_data)
+	potion_icon.set_interactable(false)
 	
 	## Название
 	#var name_label = Label.new()

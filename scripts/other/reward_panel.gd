@@ -348,9 +348,10 @@ func _create_battle_reward() -> void:
 	var room_node = RoomNode.new()
 	room_node.setup({
 		"type": DataManager.RoomType.COMBAT,
-		"combat_type": DataManager.CombatType.ELITE,
+		"combat_type": DataManager.CombatType.ELITE_AFTER_ROB,  # 🆕
 		"is_revealed": true
 	})
+	
 	var current_room = GameTestManager.get_current_room()
 	# Вызываем загрузку комнаты через GameTestManager
 	GameTestManager._on_room_selected(room_node, false)

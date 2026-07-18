@@ -18,6 +18,8 @@ static func select_enemies(combat_type: DataManager.CombatType, biome: DataManag
 			enemies = _select_boss_enemies(biome, floor_level)
 		DataManager.CombatType.LIMITED_TURNS:
 			enemies = _select_limited_enemies(biome, floor_level, difficulty_factor)
+		DataManager.CombatType.ELITE_AFTER_ROB:
+			enemies = _select_elite_enemies_after_rob(biome, floor_level, difficulty_factor)
 	
 	return enemies
 
@@ -177,5 +179,50 @@ static func _select_limited_enemies(biome: DataManager.Biome, floor_level: int, 
 	
 	if enemies.size() > 1:
 		enemies = enemies.slice(0, 1)
+	
+	return enemies
+
+
+static func _select_elite_enemies_after_rob(biome: DataManager.Biome, floor_level: int, difficulty: float) -> Array[EnemyResource]:
+	var enemies: Array[EnemyResource] = []
+	
+	if biome == DataManager.Biome.MOLE_TUNNELS:
+		# Пул врагов — только сильные
+		var elite_pool = [
+			DataManager.MoleEnemy.MANY_HEADED_MOLE,
+			DataManager.MoleEnemy.FUNGAL_MINER,
+		]
+		
+		# Добавляем STRONG_MOLE как поддержку
+		var support_pool = [
+			DataManager.MoleEnemy.STRONG_MOLE,
+			DataManager.MoleEnemy.MOLE_FUNGUS,
+		]
+		
+		# Количество врагов: 2-3, всегда сложный состав
+		var count = 2
+		if difficulty >= 0.5:
+			count = 3
+		
+		# Первый враг — всегда элитный
+		var elite_id = elite_pool[randi() % elite_pool.size()]
+		enemies.append(DataManager.get_enemy_resource(elite_id))
+		
+		# Остальные — поддержка
+		for i in range(count - 1):
+			var support_id = support_pool[randi() % support_pool.size()]
+			enemies.append(DataManager.get_enemy_resource(support_id))
+		
+		# На высоких этажах — два элитных
+		if floor_level >= 4 and difficulty >= 0.7:
+			var second_elite = elite_pool[randi() % elite_pool.size()]
+			# Заменяем одного из поддержки на элитного
+			if enemies.size() > 1:
+				enemies[1] = DataManager.get_enemy_resource(second_elite)
+		
+		# На высоких этажах — дополнительный враг
+		if floor_level >= 6 and difficulty >= 0.8:
+			var extra = support_pool[randi() % support_pool.size()]
+			enemies.append(DataManager.get_enemy_resource(extra))
 	
 	return enemies
