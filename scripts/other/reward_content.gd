@@ -133,8 +133,14 @@ func _get_title() -> String:
 			return tr("reward_upgrade_card_title")
 		DataManager.RewardType.ADD_PROPERTY_TO_CARD:
 			return tr("reward_add_property_title")
-		DataManager.RewardType.TRANSFORM_CARD:  # 🆕
+		DataManager.RewardType.TRANSFORM_CARD:
 			return tr("reward_transform_card_title")
+		DataManager.RewardType.TRADE:  # 🆕
+			return tr("reward_trade_title")
+		DataManager.RewardType.LOST_MAX_HP:  # 🆕
+			return tr("reward_lost_max_hp_title")
+		DataManager.RewardType.GET_BATTLE:  # 🆕
+			return tr("reward_get_battle_title")
 		_:
 			return tr("reward_default_title")
 

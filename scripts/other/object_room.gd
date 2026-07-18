@@ -19,8 +19,7 @@ func _init_content(room_data: Dictionary) -> void:
 	var object_scene = preload("res://scenes/room_object.tscn")
 	room_object = object_scene.instantiate() as RoomObject
 	content.add_child(room_object)
-	room_object.setup(object_type, current_biome)
-	if object_type == DataManager.ObjectType.SHOP:
+	if object_type == DataManager.ObjectType.SHOP or object_type == DataManager.ObjectType.EVENT:
 		# Магазин занимает всю комнату
 		room_object.position = Vector2.ZERO
 		room_object.custom_minimum_size = Vector2(DataManager.ROOM_WIDTH, DataManager.ROOM_HEIGHT)
@@ -34,5 +33,6 @@ func _init_content(room_data: Dictionary) -> void:
 			room_center_x - room_object.size.x / 2,
 			room_height - y_offset_from_bottom - room_object.size.y
 		)
+	room_object.setup(object_type, current_biome)
 	SignalManager.log_message.emit("Object room initialized")
 	print("Object room initialized")

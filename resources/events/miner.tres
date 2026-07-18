@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="EventResource" load_steps=2 format=3 uid="uid://ygyt5qyyce8"]
+
+[ext_resource type="Script" uid="uid://ew2p1pg1vq1x" path="res://resources/res_scripts/event_resource.gd" id="1_w86yy"]
+
+[resource]
+script = ExtResource("1_w86yy")
+name_key = "event_miner_name"
+narrative_key = "event_miner_narrative"
+first_action_success_rewards = Array[int]([11])
+first_action_failure_rewards = Array[int]([7, 11])
+first_action_success_key = "event_miner_search_success"
+first_action_failure_key = "event_miner_search_fail"
+first_success_gold_mod = 2
+second_action_success_rewards = Array[int]([19])
+second_action_failure_rewards = Array[int]([18])
+second_action_success_key = "event_miner_help_success"
+second_action_failure_key = "event_miner_help_fail"
+metadata/_custom_type_script = "uid://ew2p1pg1vq1x"

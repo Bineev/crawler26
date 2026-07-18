@@ -3,7 +3,7 @@ extends Resource
 class_name EnemyResource
 
 ## ID врага (из енама MoleEnemy)
-@export var enemy_id: DataManager.MoleEnemy = DataManager.MoleEnemy.MOLE_MUTANT
+@export var enemy_id: DataManager.EnemyId
 
 ## ID биома
 @export var biome: DataManager.Biome = DataManager.Biome.MOLE_TUNNELS

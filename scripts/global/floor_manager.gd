@@ -138,7 +138,7 @@ func _generate_random_room(is_revealed: bool) -> RoomNode:
 			#combat_type = DataManager.CombatType.ELITE
 			#object_type = DataManager.ObjectType.CHEST  # значение по умолчанию
 		room_type = DataManager.RoomType.OBJECT
-		object_type = DataManager.ObjectType.SHOP
+		object_type = DataManager.ObjectType.EVENT
 	
 	room_node.setup({
 		"type": room_type,

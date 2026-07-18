@@ -49,8 +49,24 @@ enum ActionType {
 	CRAFT,
 	TRADE,
 	ROB,
+	EVENT_MINER_SEARCH,   # 🆕
+	EVENT_MINER_HELP,     # 🆕
 }
 
+enum EnemyId {
+	# Кротовые норы
+	MOLE_MUTANT,
+	STRONG_MOLE,
+	RABID_RAT,
+	MOLE_FUNGUS,
+	MANY_HEADED_MOLE,
+	FUNGAL_MINER,
+	RODENT_MOUND,
+	# Пещеры плоти (позже)
+	# FLESH_...
+	# Костяной лабиринт (позже)
+	# BONE_...
+}
 
 enum BattleState {
 	IDLE,
@@ -307,7 +323,10 @@ enum RewardType {
 	TRANSFORM_CARD,
 	LOST_MAX_HP,  # 🆕
 	TRADE,
-	GET_BATTLE
+	GET_BATTLE,
+	CONCRETE_ARTIFACT,
+	CONCRETE_CARD,
+	GET_CONCRETE_BATTLE,  # 🆕 бой с конкретным типом врага
 }
 
 ## Тип цикла намерений
@@ -474,6 +493,7 @@ enum MoleEnemy {
 	RODENT_MOUND,       # Гора грызунов (босс)
 }
 
+
 ## Тип комнаты
 enum RoomType {
 	COMBAT,      # бой
@@ -494,12 +514,12 @@ enum CombatType {
 
 ## Тип эвента
 enum EventType {
-	NARRATIVE,       # чистый нарратив (диалог, выбор)
-	# при необходимости можно расширять
+	MINER,
 }
 
 ## Тип объекта
 enum ObjectType {
+	EVENT,           # 
 	SHOP,            # магазин
 	IDOL,            # идол (алтарь)
 	TRAP,            # ловушка
@@ -759,6 +779,8 @@ const IDOL_BREAK_CHANCE: float = 0.5
 const RACK_MAX_HP_LOST: int = 5
 
 const STARTING_KEYS: int = 1
+
+const EVENT_TEXTURE_SIZE: Vector2 = Vector2(640, 640)
 ## ============================================================
 ## НАСТРОЙКИ ПОДБОРА ВРАГОВ
 ## ============================================================
@@ -1230,7 +1252,7 @@ func get_enemy_resource_name(enemy: MoleEnemy) -> String:
 		_:
 			return "Unknown"
 
-func get_enemy_resource(enemy: MoleEnemy) -> EnemyResource:
+func get_enemy_resource(enemy: EnemyId) -> EnemyResource:
 	if not _enemy_resources_loaded:
 		load_enemy_resources()
 	
@@ -1850,7 +1872,8 @@ const OBJECT_SIZES: Dictionary = {
 	DataManager.ObjectType.CAULDRON: Vector2(360, 360),
 	DataManager.ObjectType.TORTURE_RACK: Vector2(360, 360),
 	DataManager.ObjectType.BONFIRE: Vector2(256, 256),
-	DataManager.ObjectType.SHOP: Vector2(1024, 800)
+	DataManager.ObjectType.SHOP: Vector2(1024, 800),
+	DataManager.ObjectType.EVENT: Vector2(1024, 800),
 }
 
 func get_object_size(object_type: DataManager.ObjectType) -> Vector2:
@@ -2106,3 +2129,68 @@ func apply_button_style(button: Button, button_type: ButtonType = ButtonType.DEF
 	
 	if is_potion:
 		button.add_theme_font_size_override("font_size", 14)
+
+
+const EVENT_TEXTURES: Dictionary = {
+	DataManager.Biome.MOLE_TUNNELS: {
+		#DataManager.EventType.VILLAGE: preload("res://img/events/mole_tunnels/village.png"),
+		#DataManager.EventType.MERCHANT: preload("res://img/events/mole_tunnels/merchant.png"),
+		#DataManager.EventType.RUINS: preload("res://img/events/mole_tunnels/ruins.png"),
+		#DataManager.EventType.ALTAR: preload("res://img/events/mole_tunnels/altar.png"),
+		#DataManager.EventType.TREASURE_MAP: preload("res://img/events/mole_tunnels/treasure_map.png"),
+	},
+	# ... другие биомы
+}
+
+func get_event_texture(event_type: DataManager.EventType, biome: DataManager.Biome) -> Texture2D:
+	var biome_dict = EVENT_TEXTURES.get(biome, {})
+	return biome_dict.get(event_type, null)
+
+
+var _event_resources: Dictionary = {}  # biome -> Array[EventResource]
+var _event_resources_loaded: bool = false
+
+func load_event_resources() -> void:
+	if _event_resources_loaded:
+		return
+	
+	# TODO: загружать события для каждого биома
+	# Пока заглушка
+	_event_resources[DataManager.Biome.MOLE_TUNNELS] = [
+		#load("res://resources/events/mole_tunnels/village.tres"),
+		#load("res://resources/events/mole_tunnels/merchant.tres"),
+		# ... другие события
+	]
+	
+	_event_resources_loaded = true
+
+func get_event_for_biome(biome: DataManager.Biome) -> EventResource:
+	if not _event_resources_loaded:
+		load_event_resources()
+	
+	var events = _event_resources.get(biome, [])
+	if events.is_empty():
+		return null
+	
+	# Берём первый и переставляем в конец (циклический пул)
+	var event = events.pop_front()
+	events.append(event)
+	return event
+
+
+func get_enemies_for_biome(biome: DataManager.Biome) -> Array[DataManager.EnemyId]:
+	match biome:
+		DataManager.Biome.MOLE_TUNNELS:
+			return [
+				DataManager.EnemyId.MOLE_MUTANT,
+				DataManager.EnemyId.STRONG_MOLE,
+				DataManager.EnemyId.RABID_RAT,
+				DataManager.EnemyId.MOLE_FUNGUS,
+				DataManager.EnemyId.MANY_HEADED_MOLE,
+				DataManager.EnemyId.FUNGAL_MINER,
+				DataManager.EnemyId.RODENT_MOUND,
+			]
+		# DataManager.Biome.FLESH_CAVES:
+			# return [...]
+		_:
+			return []

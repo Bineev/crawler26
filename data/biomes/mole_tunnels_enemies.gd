@@ -10,7 +10,7 @@ class_name MoleTunnelsEnemies
 
 const INTENTS = {
 	# Слепыш-мутант
-	DataManager.MoleEnemy.MOLE_MUTANT: {
+	DataManager.EnemyId.MOLE_MUTANT: {
 		"cycle_type": DataManager.IntentCycleType.SEQUENTIAL,
 		"intents": [
 			[ { "category": DataManager.EffectCategory.DAMAGE, "target": DataManager.EffectTarget.ENEMY, "base_value": 5 } ],
@@ -19,7 +19,7 @@ const INTENTS = {
 	},
 	
 	# Крот-силач
-	DataManager.MoleEnemy.STRONG_MOLE: {
+	DataManager.EnemyId.STRONG_MOLE: {
 		"cycle_type": DataManager.IntentCycleType.SEQUENTIAL,
 		"intents": [
 			[ { "category": DataManager.EffectCategory.DAMAGE, "target": DataManager.EffectTarget.ENEMY, "base_value": 8 }, { "category": DataManager.EffectCategory.BLOCK, "target": DataManager.EffectTarget.SELF, "base_value": 10 } ],
@@ -28,7 +28,7 @@ const INTENTS = {
 	},
 	
 	# Бешеная крыса
-	DataManager.MoleEnemy.RABID_RAT: {
+	DataManager.EnemyId.RABID_RAT: {
 		"cycle_type": DataManager.IntentCycleType.SEQUENTIAL,
 		"intents": [
 			[ { "category": DataManager.EffectCategory.DAMAGE, "target": DataManager.EffectTarget.ENEMY, "base_value": 10 } ],
@@ -37,7 +37,7 @@ const INTENTS = {
 	},
 	
 	# Крот-гриб
-	DataManager.MoleEnemy.MOLE_FUNGUS: {
+	DataManager.EnemyId.MOLE_FUNGUS: {
 		"cycle_type": DataManager.IntentCycleType.SEQUENTIAL,
 		"intents": [
 			[ { "category": DataManager.EffectCategory.DAMAGE, "target": DataManager.EffectTarget.ENEMY, "base_value": 8 } ],
@@ -47,7 +47,7 @@ const INTENTS = {
 	},
 	
 	# Многоголовый слепыш
-	DataManager.MoleEnemy.MANY_HEADED_MOLE: {
+	DataManager.EnemyId.MANY_HEADED_MOLE: {
 		"cycle_type": DataManager.IntentCycleType.SEQUENTIAL,
 		"intents": [
 			[ { "category": DataManager.EffectCategory.DAMAGE, "target": DataManager.EffectTarget.ENEMY, "base_value": 6 }, { "category": DataManager.EffectCategory.BLOCK, "target": DataManager.EffectTarget.SELF, "base_value": 8 } ],
@@ -57,7 +57,7 @@ const INTENTS = {
 	},
 	
 	# Шахтёр-гриб
-	DataManager.MoleEnemy.FUNGAL_MINER: {
+	DataManager.EnemyId.FUNGAL_MINER: {
 		"cycle_type": DataManager.IntentCycleType.SEQUENTIAL,
 		"intents": [
 			[ { "category": DataManager.EffectCategory.DAMAGE, "target": DataManager.EffectTarget.ENEMY, "base_value": 7 } ],
@@ -67,7 +67,7 @@ const INTENTS = {
 	},
 	
 	# Гора грызунов (босс)
-	DataManager.MoleEnemy.RODENT_MOUND: {
+	DataManager.EnemyId.RODENT_MOUND: {
 		"cycle_type": DataManager.IntentCycleType.SEQUENTIAL,
 		"intents": [
 			[ { "category": DataManager.EffectCategory.DAMAGE, "target": DataManager.EffectTarget.ENEMY, "base_value": 12 } ],

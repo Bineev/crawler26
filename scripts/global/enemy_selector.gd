@@ -34,16 +34,16 @@ static func _select_normal_enemies(biome: DataManager.Biome, floor_level: int, d
 	
 	if biome == DataManager.Biome.MOLE_TUNNELS:
 		var weak_enemies = [
-			DataManager.MoleEnemy.MOLE_MUTANT,
-			DataManager.MoleEnemy.RABID_RAT,
+			DataManager.EnemyId.MOLE_MUTANT,
+			DataManager.EnemyId.RABID_RAT,
 		]
 		var normal_enemies = [
-			DataManager.MoleEnemy.STRONG_MOLE,
-			DataManager.MoleEnemy.MOLE_FUNGUS,
+			DataManager.EnemyId.STRONG_MOLE,
+			DataManager.EnemyId.MOLE_FUNGUS,
 		]
 		var elite_enemies = [
-			DataManager.MoleEnemy.MANY_HEADED_MOLE,
-			DataManager.MoleEnemy.FUNGAL_MINER,
+			DataManager.EnemyId.MANY_HEADED_MOLE,
+			DataManager.EnemyId.FUNGAL_MINER,
 		]
 		
 		# Количество врагов: от 1 до 3 в зависимости от difficulty
@@ -138,12 +138,12 @@ static func _select_elite_enemies(biome: DataManager.Biome, floor_level: int, di
 	
 	if biome == DataManager.Biome.MOLE_TUNNELS:
 		var elite_enemies = [
-			DataManager.MoleEnemy.MOLE_FUNGUS,
-			DataManager.MoleEnemy.MANY_HEADED_MOLE,
+			DataManager.EnemyId.MOLE_FUNGUS,
+			DataManager.EnemyId.MANY_HEADED_MOLE,
 		]
 		
 		if floor_level >= DataManager.ELITE_MINER_APPEARS_FROM_FLOOR:
-			elite_enemies.append(DataManager.MoleEnemy.FUNGAL_MINER)
+			elite_enemies.append(DataManager.EnemyId.FUNGAL_MINER)
 		
 		if difficulty < DataManager.ELITE_DIFFICULTY_EARLY:
 			var elite_id = elite_enemies[randi() % elite_enemies.size()]
@@ -152,7 +152,7 @@ static func _select_elite_enemies(biome: DataManager.Biome, floor_level: int, di
 		elif difficulty < DataManager.ELITE_DIFFICULTY_LATE:
 			var elite_id = elite_enemies[randi() % elite_enemies.size()]
 			enemies.append(DataManager.get_enemy_resource(elite_id))
-			enemies.append(DataManager.get_enemy_resource(DataManager.MoleEnemy.MOLE_MUTANT))
+			enemies.append(DataManager.get_enemy_resource(DataManager.EnemyId.MOLE_MUTANT))
 		
 		else:
 			for i in range(DataManager.ELITE_ENEMY_COUNT_LATE):
@@ -166,10 +166,10 @@ static func _select_boss_enemies(biome: DataManager.Biome, floor_level: int) -> 
 	var enemies: Array[EnemyResource] = []
 	
 	if biome == DataManager.Biome.MOLE_TUNNELS:
-		enemies.append(DataManager.get_enemy_resource(DataManager.MoleEnemy.RODENT_MOUND))
+		enemies.append(DataManager.get_enemy_resource(DataManager.EnemyId.RODENT_MOUND))
 		
 		if floor_level >= DataManager.BOSS_ADD_MINIONS_FROM_FLOOR:
-			enemies.append(DataManager.get_enemy_resource(DataManager.MoleEnemy.MOLE_MUTANT))
+			enemies.append(DataManager.get_enemy_resource(DataManager.EnemyId.MOLE_MUTANT))
 	
 	return enemies
 
@@ -189,14 +189,14 @@ static func _select_elite_enemies_after_rob(biome: DataManager.Biome, floor_leve
 	if biome == DataManager.Biome.MOLE_TUNNELS:
 		# Пул врагов — только сильные
 		var elite_pool = [
-			DataManager.MoleEnemy.MANY_HEADED_MOLE,
-			DataManager.MoleEnemy.FUNGAL_MINER,
+			DataManager.EnemyId.MANY_HEADED_MOLE,
+			DataManager.EnemyId.FUNGAL_MINER,
 		]
 		
 		# Добавляем STRONG_MOLE как поддержку
 		var support_pool = [
-			DataManager.MoleEnemy.STRONG_MOLE,
-			DataManager.MoleEnemy.MOLE_FUNGUS,
+			DataManager.EnemyId.STRONG_MOLE,
+			DataManager.EnemyId.MOLE_FUNGUS,
 		]
 		
 		# Количество врагов: 2-3, всегда сложный состав
