@@ -1,7 +1,7 @@
 # autoload/floor_manager.gd
 extends Node
 
-signal room_selected(room_node: RoomNode, should_increment_room_index: bool)
+signal room_selected(room_node: RoomNode, should_increment_room_index: bool, enemies_ids: Array[DataManager.EnemyId])
 signal floor_completed()
 
 ## ============================================================

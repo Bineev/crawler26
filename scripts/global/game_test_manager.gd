@@ -132,7 +132,7 @@ func after_combat_victory():
 
 # autoload/game_test_manager.gd
 
-func _on_room_selected(room_node: RoomNode, should_increment_room_index: bool = true):
+func _on_room_selected(room_node: RoomNode, should_increment_room_index: bool = true, enemies_ids: Array[DataManager.EnemyId] = []):
 	# 🆕 Очищаем пустые CanvasLayer перед добавлением комнаты
 	_clean_empty_canvas_layers()
 	# Сбрасываем состояния
@@ -151,7 +151,8 @@ func _on_room_selected(room_node: RoomNode, should_increment_room_index: bool = 
 		current_floor,
 		current_biome,
 		current_room_index,
-		hand_ui
+		hand_ui,
+		enemies_ids
 	)
 	
 	if not room_instance:

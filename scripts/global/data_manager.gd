@@ -508,6 +508,7 @@ enum CombatType {
 	ELITE_AFTER_ROB,  # бой после ограбления
 	LIMITED_TURNS,    # бой с ограниченным количеством ходов
 	BOSS,             # босс файт
+	CONCRETE_COMBAT
 }
 
 
@@ -780,7 +781,8 @@ const RACK_MAX_HP_LOST: int = 5
 
 const STARTING_KEYS: int = 1
 
-const EVENT_TEXTURE_SIZE: Vector2 = Vector2(640, 640)
+const EVENT_TEXTURE_SIZE: Vector2 = Vector2(600, 600)
+const EVENT_LABEL_SIZE: Vector2 = Vector2(600, 0)
 ## ============================================================
 ## НАСТРОЙКИ ПОДБОРА ВРАГОВ
 ## ============================================================
@@ -830,6 +832,8 @@ const TRAP_SEARCH_DAMAGE: int = 10
 
 const REST_DEFAULT_HEAL: int = 30
 const BONFIRE_ENERGY_BUFF_DURATION: int = 3  # количество боевых комнат
+
+const EVENT_SUCCESS_CHANCE : float = 0.6
 
 const DEFAULT_ITEM_COST: int = 17
 ## ============================================================
@@ -1176,13 +1180,13 @@ var _enemy_sprites: Dictionary = {}  # "biome_enemy" -> Texture2D
 
 func load_enemy_sprites():
 	# Кротовые норы (Mole Tunnels)
-	_register_enemy_sprite(DataManager.Biome.MOLE_TUNNELS, DataManager.MoleEnemy.MOLE_MUTANT, "res://img/enemies/mole_tunnels/mole_mutant.png")
-	_register_enemy_sprite(DataManager.Biome.MOLE_TUNNELS, DataManager.MoleEnemy.STRONG_MOLE, "res://img/enemies/mole_tunnels/strong_mole.png")
-	_register_enemy_sprite(DataManager.Biome.MOLE_TUNNELS, DataManager.MoleEnemy.RABID_RAT, "res://img/enemies/mole_tunnels/rabid_rat.png")
-	_register_enemy_sprite(DataManager.Biome.MOLE_TUNNELS, DataManager.MoleEnemy.MOLE_FUNGUS, "res://img/enemies/mole_tunnels/mole_fungus.png")
-	_register_enemy_sprite(DataManager.Biome.MOLE_TUNNELS, DataManager.MoleEnemy.MANY_HEADED_MOLE, "res://img/enemies/mole_tunnels/many_headed_mole.png")
-	_register_enemy_sprite(DataManager.Biome.MOLE_TUNNELS, DataManager.MoleEnemy.FUNGAL_MINER, "res://img/enemies/mole_tunnels/fungal_miner.png")
-	_register_enemy_sprite(DataManager.Biome.MOLE_TUNNELS, DataManager.MoleEnemy.RODENT_MOUND, "res://img/enemies/mole_tunnels/rodent_mound.png")
+	_register_enemy_sprite(DataManager.Biome.MOLE_TUNNELS, DataManager.EnemyId.MOLE_MUTANT, "res://img/enemies/mole_tunnels/mole_mutant.png")
+	_register_enemy_sprite(DataManager.Biome.MOLE_TUNNELS, DataManager.EnemyId.STRONG_MOLE, "res://img/enemies/mole_tunnels/strong_mole.png")
+	_register_enemy_sprite(DataManager.Biome.MOLE_TUNNELS, DataManager.EnemyId.RABID_RAT, "res://img/enemies/mole_tunnels/rabid_rat.png")
+	_register_enemy_sprite(DataManager.Biome.MOLE_TUNNELS, DataManager.EnemyId.MOLE_FUNGUS, "res://img/enemies/mole_tunnels/mole_fungus.png")
+	_register_enemy_sprite(DataManager.Biome.MOLE_TUNNELS, DataManager.EnemyId.MANY_HEADED_MOLE, "res://img/enemies/mole_tunnels/many_headed_mole.png")
+	_register_enemy_sprite(DataManager.Biome.MOLE_TUNNELS, DataManager.EnemyId.FUNGAL_MINER, "res://img/enemies/mole_tunnels/fungal_miner.png")
+	_register_enemy_sprite(DataManager.Biome.MOLE_TUNNELS, DataManager.EnemyId.RODENT_MOUND, "res://img/enemies/mole_tunnels/rodent_mound.png")
 
 func _register_enemy_sprite(biome: DataManager.Biome, enemy_id, path: String):
 	var key = str(biome) + "_" + str(enemy_id)
@@ -1220,34 +1224,34 @@ func load_enemy_resources():
 		return
 	
 	# Кротовые норы
-	_enemy_resources[MoleEnemy.MOLE_MUTANT] = load("res://resources/enemies/mole_tunnels/mole_mutant.tres")
-	_enemy_resources[MoleEnemy.STRONG_MOLE] = load("res://resources/enemies/mole_tunnels/strong_mole.tres")
-	_enemy_resources[MoleEnemy.RABID_RAT] = load("res://resources/enemies/mole_tunnels/rabid_rat.tres")
-	_enemy_resources[MoleEnemy.MOLE_FUNGUS] = load("res://resources/enemies/mole_tunnels/mole_fungus.tres")
-	_enemy_resources[MoleEnemy.MANY_HEADED_MOLE] = load("res://resources/enemies/mole_tunnels/many_headed_mole.tres")
-	_enemy_resources[MoleEnemy.FUNGAL_MINER] = load("res://resources/enemies/mole_tunnels/fungal_miner.tres")
-	_enemy_resources[MoleEnemy.RODENT_MOUND] = load("res://resources/enemies/mole_tunnels/rodent_mound.tres")
+	_enemy_resources[EnemyId.MOLE_MUTANT] = load("res://resources/enemies/mole_tunnels/mole_mutant.tres")
+	_enemy_resources[EnemyId.STRONG_MOLE] = load("res://resources/enemies/mole_tunnels/strong_mole.tres")
+	_enemy_resources[EnemyId.RABID_RAT] = load("res://resources/enemies/mole_tunnels/rabid_rat.tres")
+	_enemy_resources[EnemyId.MOLE_FUNGUS] = load("res://resources/enemies/mole_tunnels/mole_fungus.tres")
+	_enemy_resources[EnemyId.MANY_HEADED_MOLE] = load("res://resources/enemies/mole_tunnels/many_headed_mole.tres")
+	_enemy_resources[EnemyId.FUNGAL_MINER] = load("res://resources/enemies/mole_tunnels/fungal_miner.tres")
+	_enemy_resources[EnemyId.RODENT_MOUND] = load("res://resources/enemies/mole_tunnels/rodent_mound.tres")
 	
 	_enemy_resources_loaded = true
 
 
 # DataManager.gd
 
-func get_enemy_resource_name(enemy: MoleEnemy) -> String:
+func get_enemy_resource_name(enemy: EnemyId) -> String:
 	match enemy:
-		MoleEnemy.MOLE_MUTANT:
+		EnemyId.MOLE_MUTANT:
 			return "Mole Mutant"
-		MoleEnemy.STRONG_MOLE:
+		EnemyId.STRONG_MOLE:
 			return "Strong Mole"
-		MoleEnemy.RABID_RAT:
+		EnemyId.RABID_RAT:
 			return "Rabid Rat"
-		MoleEnemy.MOLE_FUNGUS:
+		EnemyId.MOLE_FUNGUS:
 			return "Mole Fungus"
-		MoleEnemy.MANY_HEADED_MOLE:
+		EnemyId.MANY_HEADED_MOLE:
 			return "Many-Headed Mole"
-		MoleEnemy.FUNGAL_MINER:
+		EnemyId.FUNGAL_MINER:
 			return "Fungal Miner"
-		MoleEnemy.RODENT_MOUND:
+		EnemyId.RODENT_MOUND:
 			return "Rodent Mound"
 		_:
 			return "Unknown"
@@ -2133,11 +2137,7 @@ func apply_button_style(button: Button, button_type: ButtonType = ButtonType.DEF
 
 const EVENT_TEXTURES: Dictionary = {
 	DataManager.Biome.MOLE_TUNNELS: {
-		#DataManager.EventType.VILLAGE: preload("res://img/events/mole_tunnels/village.png"),
-		#DataManager.EventType.MERCHANT: preload("res://img/events/mole_tunnels/merchant.png"),
-		#DataManager.EventType.RUINS: preload("res://img/events/mole_tunnels/ruins.png"),
-		#DataManager.EventType.ALTAR: preload("res://img/events/mole_tunnels/altar.png"),
-		#DataManager.EventType.TREASURE_MAP: preload("res://img/events/mole_tunnels/treasure_map.png"),
+		DataManager.EventType.MINER: preload("res://img/events/mole_tunnels/miner.png"),
 	},
 	# ... другие биомы
 }
@@ -2157,7 +2157,7 @@ func load_event_resources() -> void:
 	# TODO: загружать события для каждого биома
 	# Пока заглушка
 	_event_resources[DataManager.Biome.MOLE_TUNNELS] = [
-		#load("res://resources/events/mole_tunnels/village.tres"),
+		load("res://resources/events/mole_tunnels/miner.tres"),
 		#load("res://resources/events/mole_tunnels/merchant.tres"),
 		# ... другие события
 	]

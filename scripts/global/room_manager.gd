@@ -13,10 +13,10 @@ var combat_room_scene: PackedScene = preload("res://scenes/combat_room.tscn")
 ## ПУБЛИЧНЫЕ МЕТОДЫ
 ## ============================================================
 
-func create_room(room_node: RoomNode, floor_level: int, biome: DataManager.Biome, room_index: int = 0, hand_ui: HandUI = null) -> Room:
+func create_room(room_node: RoomNode, floor_level: int, biome: DataManager.Biome, room_index: int = 0, hand_ui: HandUI = null, enemy_ids: Array[DataManager.EnemyId] = []) -> Room:
 	match room_node.room_type:
 		DataManager.RoomType.COMBAT:
-			return _create_combat_room(room_node, floor_level, biome, room_index, hand_ui)
+			return _create_combat_room(room_node, floor_level, biome, room_index, hand_ui, enemy_ids)
 		DataManager.RoomType.EVENT:
 			return _create_event_room(room_node, biome)
 		DataManager.RoomType.OBJECT:
@@ -29,14 +29,23 @@ func create_room(room_node: RoomNode, floor_level: int, biome: DataManager.Biome
 ## ПРИВАТНЫЕ МЕТОДЫ
 ## ============================================================
 
-func _create_combat_room(room_node: RoomNode, floor_level: int, biome: DataManager.Biome, room_index: int, hand_ui: HandUI) -> Room:
-	# Подбираем врагов
-	var enemies = EnemySelector.select_enemies(
-		room_node.combat_type,
-		biome,
-		floor_level,
-		room_index
-	)
+func _create_combat_room(room_node: RoomNode, floor_level: int, biome: DataManager.Biome, room_index: int, hand_ui: HandUI, enemy_ids: Array[DataManager.EnemyId] = []) -> Room:
+	var enemies: Array[EnemyResource] = []
+	
+	if not enemy_ids.is_empty():
+		# Если передан конкретный список врагов — используем его
+		for enemy_id in enemy_ids:
+			var enemy_resource = DataManager.get_enemy_resource(enemy_id)
+			if enemy_resource:
+				enemies.append(enemy_resource)
+	else:
+		# Иначе — стандартный подбор
+		enemies = EnemySelector.select_enemies(
+			room_node.combat_type,
+			biome,
+			floor_level,
+			room_index
+		)
 	
 	print("  Creating combat room with ", enemies.size(), " enemies")
 	for enemy in enemies:

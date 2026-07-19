@@ -9,6 +9,6 @@ enemy_id = 2
 size = 0
 name_key = "enemy_rabid_rat_name"
 description_key = "enemy_rabid_rat_desc"
-base_max_health = 25
+base_max_health = 1
 base_strength = 10
 metadata/_custom_type_script = "uid://beudtcsu45bk7"

@@ -20,6 +20,7 @@ class_name EventResource
 @export var first_success_buff_duration: int = 3
 @export var first_success_upgrade_count: int = 1
 @export var first_success_choice_count: int = 3
+@export var first_success_buff_amount: int = 1
 
 # Параметры для наград первого действия (неудача)
 @export var first_failure_gold_mod: int = 1
@@ -28,6 +29,7 @@ class_name EventResource
 @export var first_failure_buff_duration: int = 3
 @export var first_failure_upgrade_count: int = 1
 @export var first_failure_choice_count: int = 3
+@export var first_failure_buff_amount: int = 1
 
 # === ВТОРОЕ ДЕЙСТВИЕ ===
 @export var second_action: DataManager.ActionType = DataManager.ActionType.EVENT_MINER_HELP
@@ -43,6 +45,7 @@ class_name EventResource
 @export var second_success_buff_duration: int = 3
 @export var second_success_upgrade_count: int = 1
 @export var second_success_choice_count: int = 3
+@export var second_success_buff_amount: int = 1
 
 # Параметры для наград второго действия (неудача)
 @export var second_failure_gold_mod: int = 1
@@ -51,6 +54,7 @@ class_name EventResource
 @export var second_failure_buff_duration: int = 3
 @export var second_failure_upgrade_count: int = 1
 @export var second_failure_choice_count: int = 3
+@export var second_failure_buff_amount: int = 1
 
 # === КОНКРЕТНЫЕ РЕСУРСЫ И ТИПЫ ВРАГОВ ===
 
@@ -71,21 +75,20 @@ class_name EventResource
 @export var second_failure_concrete_card_id: DataManager.CardId = DataManager.CardId.ATONEMENT_STRIKE
 
 func get_localized_name() -> String:
-	if not name_key.is_empty():
-		return tr(name_key)
-	return ""
+	return tr(name_key)
 
 func get_localized_narrative() -> String:
-	if not narrative_key.is_empty():
-		return tr(narrative_key)
-	return ""
+	return tr(narrative_key)
 
 func get_actions() -> Array[DataManager.ActionType]:
 	var result: Array[DataManager.ActionType] = []
-	if first_action != DataManager.ActionType.EVENT_MINER_SEARCH:
+	
+	if first_action:
 		result.append(first_action)
-	if second_action != DataManager.ActionType.EVENT_MINER_HELP:
+	
+	if second_action:
 		result.append(second_action)
+	
 	return result
 
 func get_action_rewards(action: DataManager.ActionType, success: bool) -> Array[DataManager.RewardType]:

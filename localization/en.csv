@@ -312,3 +312,12 @@ upgrade_card_confirm,Upgrade
 "button_path_go", "Go"
 
 "shop_rob_result","Treachery will be punished!"
+
+"event_miner_name","Flooded Mine"
+"event_miner_narrative","You stumbled upon a mushroom-covered miner in a flooded mine. His face shows apathy and longing - it's hard to tell if he's even alive."
+"event_miner_action_search","Search the body"
+"event_miner_action_help","Help the poor soul"
+"event_miner_search_success","Coming closer, you see that the poor man has long been dead. Searching the body, you find something useful."
+"event_miner_search_fail","You find a few coins, but as you pull your hand out of his pocket, the madman bites your hand."
+"event_miner_help_success","You apply a potion to the moss-covered mouth of the poor man. He doesn't seem able to move, but you notice tears forming in his eyes. A moment later, he falls asleep forever."
+"event_miner_help_fail","You approach and see that the man is literally rooted to the cave. You try to cut the growths holding his body. The miner lets out a groan, breaks free from his bonds, and lunges at you."

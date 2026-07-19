@@ -9,6 +9,11 @@ var damage_mod: int = 1 # множитель урона
 var heal_mod: int = 1
 var buff_duration: int = 0
 var upgrade_count: int = 1  # количество карт для улучшения
+var choice_count: int = 3
+var buff_amount: int = 1
+var concrete_artifact_id: DataManager.ArtifactId
+var concrete_card_id: DataManager.CardId
+var concrete_enemy: DataManager.EnemyId
 var shop_items: Array[Dictionary] = []
 
 @onready var dark_overlay: ColorRect = $DarkOverlay
@@ -54,7 +59,6 @@ func _animate_transition_in():
 func _create_current_reward():
 	var reward_type = reward_types[current_index]
 	
-	# Очищаем контейнер
 	for child in center_container.get_children():
 		child.queue_free()
 	
@@ -63,12 +67,12 @@ func _create_current_reward():
 			_create_card_reward(DataManager.RewardType.CARD_BIOM)
 		DataManager.RewardType.CARD_CHARACTER:
 			_create_card_reward(DataManager.RewardType.CARD_CHARACTER)
-		DataManager.RewardType.CARD_WITHOUT_CHOICE:
-			_create_card_without_choice_reward()
+		DataManager.RewardType.CARD_WITHOUT_CHOICE, DataManager.RewardType.CONCRETE_CARD:
+			_create_card_without_choice_reward(reward_type)
 		DataManager.RewardType.ARTIFACT:
 			_create_artifact_reward()
-		DataManager.RewardType.ARTIFACT_WITHOUT_CHOICE:
-			_create_artifact_without_choice_reward()
+		DataManager.RewardType.ARTIFACT_WITHOUT_CHOICE, DataManager.RewardType.CONCRETE_ARTIFACT:
+			_create_artifact_without_choice_reward(reward_type)
 		DataManager.RewardType.ARTIFACT_ELITE:
 			_create_artifact_elite_reward()
 		DataManager.RewardType.POTION:
@@ -95,8 +99,8 @@ func _create_current_reward():
 			_create_lost_max_hp_reward()
 		DataManager.RewardType.TRADE:
 			_create_trade_reward()
-		DataManager.RewardType.GET_BATTLE:
-			_create_battle_reward()
+		DataManager.RewardType.GET_BATTLE, DataManager.RewardType.GET_CONCRETE_BATTLE:
+			_create_battle_reward(reward_type)
 		_:
 			pass
 
@@ -125,9 +129,16 @@ func _create_card_reward(type: DataManager.RewardType) -> void:
 	# Подписываемся на сигнал через SignalManager
 	SignalManager.reward_selected.connect(_on_reward_selected)
 
-func _create_card_without_choice_reward() -> void:
-	# Получаем случайную карту
-	var cards = DeckManager.get_cards_by_biome(FloorManager.current_biome, FloorManager.current_path_progress, FloorManager.current_floor, 1)
+func _create_card_without_choice_reward(type: DataManager.RewardType = DataManager.RewardType.CARD_WITHOUT_CHOICE) -> void:
+	var cards: Array[CardData] = []
+	
+	if type == DataManager.RewardType.CONCRETE_CARD:
+		var card = DataManager.get_card(concrete_card_id)
+		if card:
+			cards.append(card)
+	else:
+		cards = DeckManager.get_cards_by_biome(FloorManager.current_biome, FloorManager.current_path_progress, FloorManager.current_floor, 1)
+	
 	if cards.is_empty():
 		SignalManager.log_message.emit("Нет доступных карт!")
 		SignalManager.reward_selected.emit()
@@ -191,25 +202,26 @@ func _create_artifact_reward() -> void:
 	content.setup(DataManager.RewardType.ARTIFACT, selected_artifacts)
 	SignalManager.reward_selected.connect(_on_reward_selected)
 
-func _create_artifact_without_choice_reward() -> void:
-	# Определяем грейд в зависимости от контекста
-	var grade = DataManager.ArtifactGrade.NORMAL
-	match reward_types[current_index]:
-		DataManager.RewardType.ARTIFACT_WITHOUT_CHOICE:
-			grade = DataManager.ArtifactGrade.NORMAL
-		DataManager.RewardType.ARTIFACT_ELITE:
-			grade = DataManager.ArtifactGrade.ELITE
+func _create_artifact_without_choice_reward(type: DataManager.RewardType = DataManager.RewardType.ARTIFACT_WITHOUT_CHOICE) -> void:
+	var artifacts: Array[ArtifactResource] = []
 	
-	# Получаем случайный артефакт
-	var artifact = ArtifactManager.get_random_artifact(grade)
-	if not artifact:
+	if type == DataManager.RewardType.CONCRETE_ARTIFACT:
+		var artifact = DataManager.get_artifact_resource(concrete_artifact_id)
+		if artifact:
+			artifacts.append(artifact)
+	else:
+		var random_artifact = ArtifactManager.get_random_artifact(DataManager.ArtifactGrade.NORMAL)
+		if random_artifact:
+			artifacts.append(random_artifact)
+	
+	if artifacts.is_empty():
 		SignalManager.log_message.emit("Нет доступных артефактов!")
 		SignalManager.reward_selected.emit()
 		return
 	
 	var content = preload("res://scenes/reward_content.tscn").instantiate() as RewardContent
 	center_container.add_child(content)
-	content.setup(DataManager.RewardType.ARTIFACT_WITHOUT_CHOICE, [artifact])
+	content.setup(type, artifacts)
 	SignalManager.reward_selected.connect(_on_reward_selected)
 
 func _create_artifact_elite_reward() -> void:
@@ -343,20 +355,26 @@ func _create_trade_reward() -> void:
 	SignalManager.reward_selected.connect(_on_reward_selected)
 
 
-func _create_battle_reward() -> void:
-	# Создаём RoomNode для элитного боя
+func _create_battle_reward(type: DataManager.RewardType = DataManager.RewardType.GET_BATTLE) -> void:
 	var room_node = RoomNode.new()
-	room_node.setup({
-		"type": DataManager.RoomType.COMBAT,
-		"combat_type": DataManager.CombatType.ELITE_AFTER_ROB,  # 🆕
-		"is_revealed": true
-	})
-	
 	var current_room = GameTestManager.get_current_room()
-	# Вызываем загрузку комнаты через GameTestManager
-	GameTestManager._on_room_selected(room_node, false)
-
+	if type == DataManager.RewardType.GET_CONCRETE_BATTLE:
+		room_node.setup({
+			"type": DataManager.RoomType.COMBAT,
+			"combat_type": DataManager.CombatType.CONCRETE_COMBAT,
+			"is_revealed": true
+		})
+		# Передаём массив с конкретным врагом
+		GameTestManager._on_room_selected(room_node, false, [concrete_enemy])
+	else:
+		room_node.setup({
+			"type": DataManager.RoomType.COMBAT,
+			"combat_type": DataManager.CombatType.ELITE_AFTER_ROB,
+			"is_revealed": true
+		})
+		GameTestManager._on_room_selected(room_node, false)
+	
 	if current_room:
 		current_room.queue_free()
-	# Закрываем панель наград
+	
 	queue_free()

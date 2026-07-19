@@ -54,38 +54,38 @@ func get_localized_description() -> String:
 
 func _get_default_name() -> String:
 	match enemy_id:
-		DataManager.MoleEnemy.MOLE_MUTANT:
+		DataManager.EnemyId.MOLE_MUTANT:
 			return "Mole Mutant"
-		DataManager.MoleEnemy.STRONG_MOLE:
+		DataManager.EnemyId.STRONG_MOLE:
 			return "Strong Mole"
-		DataManager.MoleEnemy.RABID_RAT:
+		DataManager.EnemyId.RABID_RAT:
 			return "Rabid Rat"
-		DataManager.MoleEnemy.MOLE_FUNGUS:
+		DataManager.EnemyId.MOLE_FUNGUS:
 			return "Mole Fungus"
-		DataManager.MoleEnemy.MANY_HEADED_MOLE:
+		DataManager.EnemyId.MANY_HEADED_MOLE:
 			return "Many-Headed Mole"
-		DataManager.MoleEnemy.FUNGAL_MINER:
+		DataManager.EnemyId.FUNGAL_MINER:
 			return "Fungal Miner"
-		DataManager.MoleEnemy.RODENT_MOUND:
+		DataManager.EnemyId.RODENT_MOUND:
 			return "Rodent Mound"
 		_:
 			return "Unknown Enemy"
 
 func _get_default_description() -> String:
 	match enemy_id:
-		DataManager.MoleEnemy.MOLE_MUTANT:
+		DataManager.EnemyId.MOLE_MUTANT:
 			return "A pathetic blind creature. It regenerates slowly."
-		DataManager.MoleEnemy.STRONG_MOLE:
+		DataManager.EnemyId.STRONG_MOLE:
 			return "A stout mole with powerful claws. It alternates between attack and defense."
-		DataManager.MoleEnemy.RABID_RAT:
+		DataManager.EnemyId.RABID_RAT:
 			return "A frenzied rat that spreads bleeding wounds."
-		DataManager.MoleEnemy.MOLE_FUNGUS:
+		DataManager.EnemyId.MOLE_FUNGUS:
 			return "A mushroom-infested horror. It grows stronger each turn."
-		DataManager.MoleEnemy.MANY_HEADED_MOLE:
+		DataManager.EnemyId.MANY_HEADED_MOLE:
 			return "A three-headed abomination. Its icy touch freezes the ground."
-		DataManager.MoleEnemy.FUNGAL_MINER:
+		DataManager.EnemyId.FUNGAL_MINER:
 			return "A miner consumed by fungus. It digs and poisons."
-		DataManager.MoleEnemy.RODENT_MOUND:
+		DataManager.EnemyId.RODENT_MOUND:
 			return "A massive pile of writhing rodents. The swarm consumes all."
 		_:
 			return ""

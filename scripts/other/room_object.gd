@@ -9,6 +9,7 @@ var event_data: EventResource = null
 var highlight_material: ShaderMaterial = null
 var base_material: Material = null
 var narrative_label: Label = null
+var event_texture_rect : TextureRect
 var _is_hovered: bool = false
 var _is_interacting: bool = false  # 🆕 флаг, что объект уже взаимодействует
 var is_shop: bool = false
@@ -77,40 +78,42 @@ func setup(type: DataManager.ObjectType, biome: DataManager.Biome) -> void:
 			
 			# 🆕 Добавляем VBoxContainer
 			var vbox = VBoxContainer.new()
-			vbox.alignment = BoxContainer.ALIGNMENT_CENTER
+			vbox.alignment = BoxContainer.ALIGNMENT_BEGIN
 			vbox.add_theme_constant_override("separation", 20)
 			margin_container.add_child(vbox)
 			
 			# 🆕 Добавляем TextureRect с картинкой события
-			var event_texture_rect = TextureRect.new()
+			event_texture_rect = TextureRect.new()
 			event_texture_rect.custom_minimum_size = DataManager.EVENT_TEXTURE_SIZE
 			event_texture_rect.size = DataManager.EVENT_TEXTURE_SIZE
 			event_texture_rect.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 			event_texture_rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 			event_texture_rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			event_texture_rect.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 			
 			var event_texture = DataManager.get_event_texture(event_resource.event_type, biome)
 			if event_texture:
 				event_texture_rect.texture = event_texture
 			
 			vbox.add_child(event_texture_rect)
-
+			await get_tree().create_timer(1.5).timeout
 			# 🆕 Создаём и сохраняем Label для нарратива
 			narrative_label = Label.new()
 			narrative_label.add_theme_font_override("font", DataManager.FONT_HEADERS)
-			narrative_label.add_theme_font_size_override("font_size", 24)
-			narrative_label.add_theme_color_override("font_color", DataManager.COLOR_MOLE_TUNNELS_ART_BG_LIGHT2)
-			narrative_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+			narrative_label.add_theme_font_size_override("font_size", 22)
+			narrative_label.add_theme_color_override("font_color", DataManager.COLOR_MOLE_TUNNELS_ART_BG_LIGHT)
+			narrative_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
 			narrative_label.autowrap_mode = TextServer.AUTOWRAP_WORD
-			narrative_label.custom_minimum_size = Vector2(800, 0)
+			narrative_label.custom_minimum_size = DataManager.EVENT_LABEL_SIZE
+			narrative_label.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 			vbox.add_child(narrative_label)
 
 		# Отключаем клики
 		mouse_filter = Control.MOUSE_FILTER_IGNORE
 		
 		# Запускаем печать нарратива
-		await print_narrative()
-		
+		await print_narrative(event_data.get_localized_narrative())
+		await get_tree().create_timer(1.5).timeout
 		# После печати вызываем interact()
 		interact()
 		return
@@ -324,27 +327,33 @@ func _interact_shop() -> void:
 
 
 func _interact_event() -> void:
-	# TODO: показать выбор действий и обработать результат
-	SignalManager.log_message.emit("Событие!")
-	# Пока просто завершаем
-	queue_free()
+	var actions: Array[DataManager.ActionType] = event_data.get_actions()
+	
+	var action_choice = preload("res://scenes/action_choice.tscn").instantiate() as ActionChoice
+	action_choice.event_data = event_data  # 🆕 передаём данные события
+	action_choice.room_object = self  # 🆕 передаём ссылку на RoomObject
+	SignalManager.add_action_choice.emit(action_choice, event_data.get_localized_name(), actions)
 
 
-func print_narrative() -> void:
-	if not event_data or not narrative_label:
+func print_narrative(text: String) -> void:
+	if not narrative_label:
 		return
 	
-	var narrative_text = event_data.get_localized_narrative()
-	if narrative_text.is_empty():
+	if text.is_empty():
 		return
 	
-	# Очищаем label
+	# Очищаем label и делаем его прозрачным
 	narrative_label.text = ""
+	narrative_label.modulate = Color(1, 1, 1, 0)
 	
-	# Печатаем по символам
-	var char_delay: float = 0.03  # 30ms между символами
+	# Разбиваем текст на слова
+	var words = text.split(" ", false)
+	var word_delay: float = 0.12
 	
-	for i in range(narrative_text.length()):
-		narrative_label.text += narrative_text[i]
-		# Ждём между символами
-		await get_tree().create_timer(char_delay).timeout
+	# Сразу запускаем анимацию появления лейбла
+	var fade_tween = create_tween()
+	fade_tween.tween_property(narrative_label, "modulate", Color(1, 1, 1, 1), words.size() * word_delay + 0.2)
+	
+	for word in words:
+		narrative_label.text += word + " "
+		await get_tree().create_timer(word_delay).timeout

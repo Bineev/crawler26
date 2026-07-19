@@ -4,6 +4,8 @@ class_name ActionChoice
 var actions: Array[DataManager.ActionType] = []
 var action_data: Dictionary = {}  # дополнительные данные для действий
 var context_object: Node = null  # 🆕 ссылка на объект, вызвавший действие
+var event_data: EventResource = null
+var room_object: RoomObject = null
 
 @onready var dark_overlay: ColorRect = $DarkOverlay
 @onready var title_label: Label = $DarkOverlay/CenterContainer/VBoxContainer/Title
@@ -64,6 +66,10 @@ func _get_action_text(action: DataManager.ActionType) -> String:
 			return tr("action_trade")
 		DataManager.ActionType.ROB:
 			return tr("action_rob")
+		DataManager.ActionType.EVENT_MINER_SEARCH:  # 🆕
+			return tr("event_miner_action_search")
+		DataManager.ActionType.EVENT_MINER_HELP:    # 🆕
+			return tr("event_miner_action_help")
 		_:
 			return ""
 
@@ -110,6 +116,12 @@ func _handle_choice(action: DataManager.ActionType) -> void:
 			_handle_trade()
 		DataManager.ActionType.ROB:
 			_handle_rob()
+	# 🆕 Если действие не найдено в match — проверяем, является ли оно событийным
+	var stri = DataManager.ActionType.keys()[action]
+	if stri.begins_with("EVENT_"):
+		_handle_event(action)
+	else:
+		printerr("Unknown action: ", action)
 
 func _handle_use_key() -> void:
 	var success = RunManager.use_key()
@@ -586,3 +598,164 @@ func _handle_rob() -> void:
 	SignalManager.hide_object.emit()
 	SignalManager.show_reward.emit(reward_panel)
 	queue_free()
+
+
+func _handle_event(action: DataManager.ActionType) -> void:
+	var is_first = (action == event_data.first_action)
+	var is_second = (action == event_data.second_action)
+	
+	if not is_first and not is_second:
+		SignalManager.log_message.emit("Ошибка: действие не найдено в событии!")
+		return
+
+	# 🆕 Успех или неудача (50% шанс)
+	var success = randf() < DataManager.EVENT_SUCCESS_CHANCE
+	# 🆕 Получаем ключ результата
+	var result_key = ""
+	if is_first:
+		result_key = event_data.first_action_success_key if success else event_data.first_action_failure_key
+	elif is_second:
+		result_key = event_data.second_action_success_key if success else event_data.second_action_failure_key
+	
+	# 🆕 Оттеняемся (затемнение исчезает)
+	_animate_out()
+	
+	# 🆕 Показываем текст результата
+	if room_object and not result_key.is_empty():
+		await room_object.print_narrative(tr(result_key))
+	# 🆕 Ждём 1.5 секунды
+	await get_tree().create_timer(1.5).timeout
+	
+	# 🆕 Парсим награды (заглушка)
+	var rewards: Array[DataManager.RewardType] = []
+	if is_first:
+		rewards = event_data.first_action_success_rewards if success else event_data.first_action_failure_rewards
+	elif is_second:
+		rewards = event_data.second_action_success_rewards if success else event_data.second_action_failure_rewards
+
+	var reward_panel = preload("res://scenes/reward_panel.tscn").instantiate() as RewardPanel
+	reward_panel.reward_types = rewards
+	
+	# Проходим по наградам и устанавливаем параметры
+	for reward in rewards:
+		match reward:
+			DataManager.RewardType.CARD_BIOM:
+				if is_first:
+					reward_panel.choice_count = event_data.first_success_choice_count if success else event_data.first_failure_choice_count
+				elif is_second:
+					reward_panel.choice_count = event_data.second_success_choice_count if success else event_data.second_failure_choice_count
+			DataManager.RewardType.CARD_CHARACTER:
+				if is_first:
+					reward_panel.choice_count = event_data.first_success_choice_count if success else event_data.first_failure_choice_count
+				elif is_second:
+					reward_panel.choice_count = event_data.second_success_choice_count if success else event_data.second_failure_choice_count
+			DataManager.RewardType.CARD_WITHOUT_CHOICE:
+				pass
+			DataManager.RewardType.ARTIFACT:
+				if is_first:
+					reward_panel.choice_count = event_data.first_success_choice_count if success else event_data.first_failure_choice_count
+				elif is_second:
+					reward_panel.choice_count = event_data.second_success_choice_count if success else event_data.second_failure_choice_count
+			DataManager.RewardType.ARTIFACT_WITHOUT_CHOICE:
+				pass
+			DataManager.RewardType.ARTIFACT_ELITE:
+				if is_first:
+					reward_panel.choice_count = event_data.first_success_choice_count if success else event_data.first_failure_choice_count
+				elif is_second:
+					reward_panel.choice_count = event_data.second_success_choice_count if success else event_data.second_failure_choice_count
+			DataManager.RewardType.POTION:
+				pass
+			DataManager.RewardType.TAKE_DAMAGE:
+				if is_first:
+					reward_panel.damage_mod = event_data.first_success_damage_mod if success else event_data.first_failure_damage_mod
+				elif is_second:
+					reward_panel.damage_mod = event_data.second_success_damage_mod if success else event_data.second_failure_damage_mod
+			DataManager.RewardType.GET_HEAL:
+				if is_first:
+					reward_panel.heal_mod = event_data.first_success_heal_mod if success else event_data.first_failure_heal_mod
+				elif is_second:
+					reward_panel.heal_mod = event_data.second_success_heal_mod if success else event_data.second_failure_heal_mod
+			DataManager.RewardType.ENERGY_BUFF:
+				if is_first:
+					reward_panel.buff_amount = event_data.first_success_buff_amount if success else event_data.first_failure_buff_amount
+					reward_panel.buff_duration = event_data.first_success_buff_duration if success else event_data.first_failure_buff_duration
+				elif is_second:
+					reward_panel.buff_amount = event_data.second_success_buff_amount if success else event_data.second_failure_buff_amount
+					reward_panel.buff_duration = event_data.second_success_buff_duration if success else event_data.second_failure_buff_duration
+			DataManager.RewardType.DECK_SIZE_BUFF:
+				if is_first:
+					reward_panel.buff_amount = event_data.first_success_buff_amount if success else event_data.first_failure_buff_amount
+					reward_panel.buff_duration = event_data.first_success_buff_duration if success else event_data.first_failure_buff_duration
+				elif is_second:
+					reward_panel.buff_amount = event_data.second_success_buff_amount if success else event_data.second_failure_buff_amount
+					reward_panel.buff_duration = event_data.second_success_buff_duration if success else event_data.second_failure_buff_duration
+			DataManager.RewardType.GOLD:
+				if is_first:
+					reward_panel.gold_mod = event_data.first_success_gold_mod if success else event_data.first_failure_gold_mod
+				elif is_second:
+					reward_panel.gold_mod = event_data.second_success_gold_mod if success else event_data.second_failure_gold_mod
+			DataManager.RewardType.REMOVE_CARD:
+				if is_first:
+					reward_panel.choice_count = event_data.first_success_choice_count if success else event_data.first_failure_choice_count
+				elif is_second:
+					reward_panel.choice_count = event_data.second_success_choice_count if success else event_data.second_failure_choice_count
+			DataManager.RewardType.UPGRADE_CARD:
+				if is_first:
+					reward_panel.upgrade_count = event_data.first_success_upgrade_count if success else event_data.first_failure_upgrade_count
+				elif is_second:
+					reward_panel.upgrade_count = event_data.second_success_upgrade_count if success else event_data.second_failure_upgrade_count
+			DataManager.RewardType.ADD_PROPERTY_TO_CARD:
+				pass
+			DataManager.RewardType.TRANSFORM_CARD:
+				if is_first:
+					reward_panel.upgrade_count = event_data.first_success_upgrade_count if success else event_data.first_failure_upgrade_count
+				elif is_second:
+					reward_panel.upgrade_count = event_data.second_success_upgrade_count if success else event_data.second_failure_upgrade_count
+			DataManager.RewardType.LOST_MAX_HP:
+				if is_first:
+					reward_panel.damage_mod = event_data.first_success_damage_mod if success else event_data.first_failure_damage_mod
+				elif is_second:
+					reward_panel.damage_mod = event_data.second_success_damage_mod if success else event_data.second_failure_damage_mod
+			DataManager.RewardType.TRADE:
+				pass
+			DataManager.RewardType.GET_BATTLE:
+				pass
+			DataManager.RewardType.CONCRETE_ARTIFACT:
+				if is_first:
+					reward_panel.concrete_artifact_id = event_data.first_success_concrete_artifact_id if success else event_data.first_failure_concrete_artifact_id
+				elif is_second:
+					reward_panel.concrete_artifact_id = event_data.second_success_concrete_artifact_id if success else event_data.second_failure_concrete_artifact_id
+			DataManager.RewardType.CONCRETE_CARD:
+				if is_first:
+					reward_panel.concrete_card_id = event_data.first_success_concrete_card_id if success else event_data.first_failure_concrete_card_id
+				elif is_second:
+					reward_panel.concrete_card_id = event_data.second_success_concrete_card_id if success else event_data.second_failure_concrete_card_id
+			DataManager.RewardType.GET_CONCRETE_BATTLE:
+				if is_first:
+					reward_panel.concrete_enemy = event_data.first_success_enemy if success else event_data.first_failure_enemy
+				elif is_second:
+					reward_panel.concrete_enemy = event_data.second_success_enemy if success else event_data.second_failure_enemy
+	SignalManager.hide_object.emit()
+	SignalManager.show_reward.emit(reward_panel)
+	queue_free()
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	

@@ -10,6 +10,11 @@ var heal_mod: int = 1
 var buff_duration: int = 0
 var energy_buff_amount : int = 1
 var upgrade_count: int = 1
+var choice_count: int = 3
+var buff_amount: int = 1
+var concrete_artifact_id: DataManager.ArtifactId
+var concrete_card_id: DataManager.CardId
+var concrete_enemy: DataManager.EnemyId
 var selected_card: CardData = null
 var preview_container : CenterContainer = null
 var transform_attempts: int = 0
@@ -31,11 +36,11 @@ func setup(type: DataManager.RewardType, items: Array) -> void:
 	match reward_type:
 		DataManager.RewardType.CARD_BIOM, DataManager.RewardType.CARD_CHARACTER:
 			_setup_card_rewards()
-		DataManager.RewardType.CARD_WITHOUT_CHOICE:
+		DataManager.RewardType.CARD_WITHOUT_CHOICE, DataManager.RewardType.CONCRETE_CARD:
 			_setup_card_without_choice_reward()
 		DataManager.RewardType.ARTIFACT:
 			_setup_artifact_rewards()
-		DataManager.RewardType.ARTIFACT_WITHOUT_CHOICE:
+		DataManager.RewardType.ARTIFACT_WITHOUT_CHOICE, DataManager.RewardType.CONCRETE_ARTIFACT:
 			_setup_artifact_without_choice_reward()
 		DataManager.RewardType.ARTIFACT_ELITE:
 			_setup_artifact_elite_rewards()
