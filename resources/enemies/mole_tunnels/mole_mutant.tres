@@ -9,6 +9,6 @@ script = ExtResource("1_2kitk")
 size = 0
 name_key = "enemy_mole_mutant_name"
 description_key = "enemy_mole_mutant_desc"
-base_max_health = 1
+base_max_health = 40
 starting_passives = Array[ExtResource("2_q1s0p")]([ExtResource("3_q1s0p")])
 metadata/_custom_type_script = "uid://beudtcsu45bk7"

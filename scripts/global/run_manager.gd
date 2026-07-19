@@ -8,7 +8,7 @@ var bleed_damage_per_stack: int = DataManager.BLEED_BASE_DAMAGE_PER_STACK
 var burn_damage_per_stack: int = DataManager.BURN_BASE_DAMAGE_PER_STACK
 var regen_heal_per_stack: int = DataManager.REGEN_HEAL_PER_STACK
 
-var coins: int = DataManager.STARTING_COINS + 200
+var coins: int = DataManager.STARTING_COINS
 var bones: int = DataManager.STARTING_BONES
 var keys: int = DataManager.STARTING_KEYS
 ## Массив артефактов, которые есть у игрока в текущем забеге

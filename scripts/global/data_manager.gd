@@ -552,7 +552,7 @@ enum RoomReveal {
 const FLOOR_ROOMS_PER_PATH: int = 3           # комнат в одном пути
 const FLOOR_VISIBLE_ROOMS: int = 3            # видимых комнат в пути
 const FLOOR_PATHS_COUNT: int = 2              # количество путей на развилке
-const FLOOR_SEGMENTS_BEFORE_BOSS: int = 3     # сегментов (развилок) до босса
+const FLOOR_SEGMENTS_BEFORE_BOSS: int = 4     # сегментов (развилок) до босса
 ## ============================================================
 ## 2. БАЛАНСНЫЕ КОНСТАНТЫ
 ## ============================================================
@@ -809,6 +809,16 @@ const NORMAL_ENEMY_COUNT_LATE_MAX: int = 3   # максимум в поздне�
 const ELITE_ENEMY_COUNT_EARLY: int = 1       # начало
 const ELITE_ENEMY_COUNT_MID: int = 2         # середина
 const ELITE_ENEMY_COUNT_LATE: int = 2        # конец
+
+const CONSECUTIVE_BATTLES_COUNT: int = 2
+const SHOPS_ON_FLOOR_COUNT: int = 1
+const EVENTS_ON_FLOOR_COUNT: int = 2
+const CHESTS_ON_FLOOR_COUNT: int = 2
+const TRAPS_ON_FLOOR_COUNT: int = 2
+const BONFIRES_ON_FLOOR_COUNT: int = 2
+const IDOLS_ON_FLOOR_COUNT: int = 1
+const TORTURE_RACK_ON_FLOOR_COUNT: int = 1
+const CAULDRONS_ON_FLOOR_COUNT: int = 1
 
 # Этаж появления миньонов у босса
 const BOSS_ADD_MINIONS_FROM_FLOOR: int = 3
@@ -2194,3 +2204,42 @@ func get_enemies_for_biome(biome: DataManager.Biome) -> Array[DataManager.EnemyI
 			# return [...]
 		_:
 			return []
+
+
+func get_room_label(room: RoomNode) -> String:
+	if not room.is_revealed:
+		return tr("room_unknown")
+	
+	match room.room_type:
+		DataManager.RoomType.COMBAT:
+			match room.combat_type:
+				DataManager.CombatType.NORMAL:
+					return tr("room_combat_normal")
+				DataManager.CombatType.ELITE:
+					return tr("room_combat_elite")
+				DataManager.CombatType.BOSS:
+					return tr("room_combat_boss")
+				_:
+					return tr("room_combat")
+		DataManager.RoomType.OBJECT:
+			match room.object_type:
+				DataManager.ObjectType.SHOP:
+					return tr("room_shop")
+				DataManager.ObjectType.EVENT:
+					return tr("room_event")
+				DataManager.ObjectType.CHEST:
+					return tr("room_chest")
+				DataManager.ObjectType.TRAP:
+					return tr("room_trap")
+				DataManager.ObjectType.BONFIRE:
+					return tr("room_bonfire")
+				DataManager.ObjectType.IDOL:
+					return tr("room_idol")
+				DataManager.ObjectType.TORTURE_RACK:
+					return tr("room_torture_rack")
+				DataManager.ObjectType.CAULDRON:
+					return tr("room_cauldron")
+				_:
+					return tr("room_object")
+		_:
+			return tr("room_unknown")
