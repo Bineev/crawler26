@@ -6,9 +6,6 @@ var draw_pile: Array[CardData] = []
 var hand: Array[CardData] = []
 var discard_pile: Array[CardData] = []
 
-var max_hand_size: int = DataManager.MAX_HAND_SIZE
-var cards_to_draw_per_turn: int = DataManager.CARDS_TO_DRAW_PER_TURN
-
 var hand_ui: HandUI = null
 var card_ui_scene: PackedScene = preload("res://scenes/card.tscn")
 
@@ -26,7 +23,7 @@ func shuffle_draw_pile():
 
 func draw_initial_hand():
 	# Раздаём карты без анимации
-	for i in range(max_hand_size):
+	for i in range(BattleManager.get_player().get_flat(DataManager.FlatStat.HAND_SIZE)):
 		draw_card_silent()
 	
 	# После раздачи применяем layout с анимацией
@@ -37,7 +34,7 @@ func draw_initial_hand():
 
 
 func draw_card(ignore_hand_limit: bool = false) -> bool:
-	if not ignore_hand_limit and hand.size() >= max_hand_size:
+	if not ignore_hand_limit and hand.size() >= BattleManager.get_player().get_flat(DataManager.FlatStat.HAND_SIZE):
 		return false
 	
 	if draw_pile.is_empty():
@@ -109,7 +106,7 @@ func draw_new_hand():
 	hand.clear()
 	
 	# Добавляем все карты (без анимации)
-	for i in range(max_hand_size):
+	for i in range(BattleManager.get_player().get_flat(DataManager.FlatStat.HAND_SIZE)):
 		draw_card_silent()
 	
 	# Применяем layout с анимацией после раздачи
@@ -170,7 +167,7 @@ func get_hand() -> Array[CardData]:
 
 
 func draw_card_without_layout() -> bool:
-	if hand.size() >= max_hand_size:
+	if hand.size() >= BattleManager.get_player().get_flat(DataManager.FlatStat.HAND_SIZE):
 		return false
 	
 	if draw_pile.is_empty():
@@ -191,7 +188,7 @@ func draw_card_without_layout() -> bool:
 
 
 func draw_card_silent() -> bool:
-	if hand.size() >= max_hand_size:
+	if hand.size() >= BattleManager.get_player().get_flat(DataManager.FlatStat.HAND_SIZE):
 		return false
 	
 	if draw_pile.is_empty():

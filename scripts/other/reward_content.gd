@@ -8,7 +8,6 @@ var gold_mod: int = 1  # множитель золота
 var damage_mod: int = 1
 var heal_mod: int = 1
 var buff_duration: int = 0
-var energy_buff_amount : int = 1
 var upgrade_count: int = 1
 var choice_count: int = 3
 var buff_amount: int = 1
@@ -76,34 +75,6 @@ func _setup_title() -> void:
 	title_label.add_theme_color_override("font_color", DataManager.COLOR_MOLE_TUNNELS_ART_BG_LIGHT2)
 	title_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	title_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-
-func _setup_card_rewards() -> void:
-	for card_data in rewards:
-		var vbox = VBoxContainer.new()
-		vbox.alignment = BoxContainer.ALIGNMENT_CENTER
-		# 🆕 Добавляем отступы
-		vbox.add_theme_constant_override("separation", 20)
-		# Обёртка для карты
-		var card_wrapper = Control.new()
-		card_wrapper.custom_minimum_size = Vector2(
-			DataManager.CARD_BASE_WIDTH * 1,
-			DataManager.CARD_BASE_HEIGHT * 1
-		)
-		
-		var card_ui = preload("res://scenes/card.tscn").instantiate() as CardUI
-		card_ui.card_data = card_data
-		card_wrapper.add_child(card_ui)
-		vbox.add_child(card_wrapper)
-		rewards_container.add_child(vbox)
-		
-		card_ui.display()
-		#card_ui.set_hand_scale()
-		card_ui.template.scale = Vector2(0.8, 0.8)
-		card_ui.set_reward_state()  # 🆕 устанавливаем состояние награды
-		
-		# Кнопка выбора
-		var button = _create_reward_button("reward_choose_card", rewards.find(card_data))
-		vbox.add_child(button)
 
 
 func _get_title() -> String:
@@ -216,13 +187,11 @@ func _apply_reward(index: int) -> void:
 	match reward_type:
 		DataManager.RewardType.CARD_BIOM, DataManager.RewardType.CARD_CHARACTER:
 			SignalManager.add_card_to_deck.emit(selected_item)
-		DataManager.RewardType.CARD_WITHOUT_CHOICE:
+		DataManager.RewardType.CARD_WITHOUT_CHOICE, DataManager.RewardType.CONCRETE_CARD:
 			SignalManager.add_card_to_deck.emit(selected_item)
 		DataManager.RewardType.ARTIFACT:
 			SignalManager.add_artifact.emit(selected_item)
-		DataManager.RewardType.ARTIFACT_WITHOUT_CHOICE:
-			SignalManager.add_artifact.emit(selected_item)
-		DataManager.RewardType.ARTIFACT_ELITE:
+		DataManager.RewardType.ARTIFACT_WITHOUT_CHOICE, DataManager.RewardType.CONCRETE_ARTIFACT:
 			SignalManager.add_artifact.emit(selected_item)
 		DataManager.RewardType.POTION:
 			SignalManager.add_potion.emit(selected_item)
@@ -237,11 +206,23 @@ func _apply_reward(index: int) -> void:
 		DataManager.RewardType.ENERGY_BUFF:
 			var player = BattleManager.get_player()
 			if player:
-				var bonus = selected_item
-				var duration = buff_duration
+				var bonus = rewards[0]
+				var duration = rewards[1]
 				RunManager.apply_energy_buff(bonus, duration)
 		DataManager.RewardType.DECK_SIZE_BUFF:
-			SignalManager.deck_size_buff.emit(selected_item)
+			var player = BattleManager.get_player()
+			if player:
+				var buff_amount = rewards[0]
+				var duration = rewards[1]
+				
+				if duration == -1:
+					# Перманентный бафф — сразу применяем
+					var current_hand_size = player.get_flat(DataManager.FlatStat.HAND_SIZE)
+					player.set_flat(DataManager.FlatStat.HAND_SIZE, current_hand_size + buff_amount)
+					SignalManager.log_message.emit("Размер руки увеличен на %d навсегда!" % buff_amount)
+				else:
+					# Временный бафф — через RunManager
+					RunManager.apply_deck_size_buff(buff_amount, duration)
 		DataManager.RewardType.GOLD:
 			SignalManager.add_coins.emit(selected_item)
 		DataManager.RewardType.REMOVE_CARD:
@@ -261,6 +242,35 @@ func _apply_reward(index: int) -> void:
 				SignalManager.log_message.emit("Максимальное здоровье уменьшено на %d!" % selected_item)
 				
 	SignalManager.reward_selected.emit()
+
+
+func _setup_card_rewards() -> void:
+	for card_data in rewards:
+		var vbox = VBoxContainer.new()
+		vbox.alignment = BoxContainer.ALIGNMENT_CENTER
+		# 🆕 Добавляем отступы
+		vbox.add_theme_constant_override("separation", 20)
+		# Обёртка для карты
+		var card_wrapper = Control.new()
+		card_wrapper.custom_minimum_size = Vector2(
+			DataManager.CARD_BASE_WIDTH * 1,
+			DataManager.CARD_BASE_HEIGHT * 1
+		)
+		
+		var card_ui = preload("res://scenes/card.tscn").instantiate() as CardUI
+		card_ui.card_data = card_data
+		card_wrapper.add_child(card_ui)
+		vbox.add_child(card_wrapper)
+		rewards_container.add_child(vbox)
+		
+		card_ui.display()
+		#card_ui.set_hand_scale()
+		card_ui.template.scale = Vector2(0.8, 0.8)
+		card_ui.set_reward_state()  # 🆕 устанавливаем состояние награды
+		
+		# Кнопка выбора
+		var button = _create_reward_button("reward_choose_card", rewards.find(card_data))
+		vbox.add_child(button)
 
 
 func _setup_card_without_choice_reward() -> void:
@@ -454,6 +464,7 @@ func _setup_heal_reward() -> void:
 
 func _setup_energy_buff_reward() -> void:
 	var buff_amount = rewards[0]
+	var buff_duration = rewards[1]
 	var duration_text = ""
 	
 	if buff_duration == -1:
@@ -502,6 +513,7 @@ func _setup_energy_buff_reward() -> void:
 
 func _setup_deck_size_buff_reward() -> void:
 	var buff_amount = rewards[0]
+	var buff_duration = rewards[1]
 	var duration_text = ""
 	if buff_duration == -1:
 		duration_text = tr("buff_permanent")

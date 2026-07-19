@@ -69,12 +69,10 @@ func _create_current_reward():
 			_create_card_reward(DataManager.RewardType.CARD_CHARACTER)
 		DataManager.RewardType.CARD_WITHOUT_CHOICE, DataManager.RewardType.CONCRETE_CARD:
 			_create_card_without_choice_reward(reward_type)
-		DataManager.RewardType.ARTIFACT:
+		DataManager.RewardType.ARTIFACT, DataManager.RewardType.ARTIFACT_ELITE:
 			_create_artifact_reward()
 		DataManager.RewardType.ARTIFACT_WITHOUT_CHOICE, DataManager.RewardType.CONCRETE_ARTIFACT:
 			_create_artifact_without_choice_reward(reward_type)
-		DataManager.RewardType.ARTIFACT_ELITE:
-			_create_artifact_elite_reward()
 		DataManager.RewardType.POTION:
 			_create_potion_reward()
 		DataManager.RewardType.TAKE_DAMAGE:
@@ -107,7 +105,7 @@ func _create_current_reward():
 
 func _create_card_reward(type: DataManager.RewardType) -> void:
 	var cards: Array[CardData] = []
-	var amount: int = DataManager.REWARD_CHOICE_AMOUNT
+	var amount: int = choice_count  # 🆕 используем choice_count вместо константы
 	
 	match type:
 		DataManager.RewardType.CARD_BIOM:
@@ -147,11 +145,11 @@ func _create_card_without_choice_reward(type: DataManager.RewardType = DataManag
 	var content = preload("res://scenes/reward_content.tscn").instantiate() as RewardContent
 	center_container.add_child(content)
 	# Используем CARD_WITHOUT_CHOICE тип, передаём массив с одной картой
-	content.setup(DataManager.RewardType.CARD_WITHOUT_CHOICE, cards)
+	content.setup(type, cards)
 	SignalManager.reward_selected.connect(_on_reward_selected)
 
 func _create_artifact_reward() -> void:
-	var amount: int = 3
+	var amount: int = choice_count
 	var grade: DataManager.ArtifactGrade = DataManager.ArtifactGrade.NORMAL
 	
 	match reward_types[current_index]:
@@ -159,19 +157,16 @@ func _create_artifact_reward() -> void:
 			grade = DataManager.ArtifactGrade.NORMAL
 		DataManager.RewardType.ARTIFACT_ELITE:
 			grade = DataManager.ArtifactGrade.ELITE
-		DataManager.RewardType.ARTIFACT_WITHOUT_CHOICE:
-			grade = DataManager.ArtifactGrade.NORMAL
-			amount = 1
 	
-	# 🆕 Получаем ID артефактов, которые уже есть у игрока
+	# Получаем ID артефактов, которые уже есть у игрока
 	var existing_ids: Array[DataManager.ArtifactId] = []
 	for artifact in RunManager.artifacts:
 		existing_ids.append(artifact.id)
 	
 	# Получаем все доступные артефакты по грейду
-	var all_available = ArtifactManager._get_available_artifacts_by_grade(grade)
+	var all_available = ArtifactManager.get_available_artifacts_by_grade(grade)
 	
-	# 🆕 Фильтруем — убираем те, что уже есть
+	# Фильтруем — убираем те, что уже есть
 	var filtered: Array[DataManager.ArtifactId] = []
 	for artifact_id in all_available:
 		if artifact_id not in existing_ids:
@@ -180,26 +175,20 @@ func _create_artifact_reward() -> void:
 	var selected_artifacts: Array[ArtifactResource] = []
 	
 	if filtered.is_empty():
-		# Если все артефакты уже получены — даём золото вместо артефакта
 		SignalManager.log_message.emit("Все артефакты этого грейда уже получены! Вы получаете золото.")
 		# TODO: выдать золото
 		return
 	
 	filtered.shuffle()
 	
-	if amount == 1:
-		var resource = DataManager.get_artifact_resource(filtered[0])
+	for i in range(min(amount, filtered.size())):
+		var resource = DataManager.get_artifact_resource(filtered[i])
 		if resource:
 			selected_artifacts.append(resource)
-	else:
-		for i in range(min(amount, filtered.size())):
-			var resource = DataManager.get_artifact_resource(filtered[i])
-			if resource:
-				selected_artifacts.append(resource)
 	
 	var content = preload("res://scenes/reward_content.tscn").instantiate() as RewardContent
 	center_container.add_child(content)
-	content.setup(DataManager.RewardType.ARTIFACT, selected_artifacts)
+	content.setup(reward_types[current_index], selected_artifacts)
 	SignalManager.reward_selected.connect(_on_reward_selected)
 
 func _create_artifact_without_choice_reward(type: DataManager.RewardType = DataManager.RewardType.ARTIFACT_WITHOUT_CHOICE) -> void:
@@ -239,16 +228,14 @@ func _create_potion_reward() -> void:
 	
 	var content = preload("res://scenes/reward_content.tscn").instantiate() as RewardContent
 	center_container.add_child(content)
-	content.setup(DataManager.RewardType.POTION, [potion])
+	content.setup(reward_types[current_index], [potion])
 	SignalManager.reward_selected.connect(_on_reward_selected)
 
 func _create_take_damage_reward() -> void:
-	var damage_amount = DataManager.REWARD_DAMAGE_DEFAULT
-	if damage_mod > 1:
-		damage_amount = damage_mod
+	var damage_amount = DataManager.REWARD_DAMAGE_DEFAULT * damage_mod
 	
 	var content = preload("res://scenes/reward_content.tscn").instantiate() as RewardContent
-	content.damage_mod = damage_mod
+	# content.damage_mod = damage_mod  # 🆕 убираем
 	center_container.add_child(content)
 	content.setup(DataManager.RewardType.TAKE_DAMAGE, [damage_amount])
 	SignalManager.reward_selected.connect(_on_reward_selected)
@@ -257,30 +244,21 @@ func _create_heal_reward() -> void:
 	var heal_amount = DataManager.REST_DEFAULT_HEAL * heal_mod
 	
 	var content = preload("res://scenes/reward_content.tscn").instantiate() as RewardContent
-	content.heal_mod = heal_mod
 	center_container.add_child(content)
 	content.setup(DataManager.RewardType.GET_HEAL, [heal_amount])
 	SignalManager.reward_selected.connect(_on_reward_selected)
 
 func _create_energy_buff_reward() -> void:
-	var buff_amount = DataManager.ENERGY_BUFF_REWARD_AMOUNT
-	var duration = buff_duration  # уже передан извне
-	
 	var content = preload("res://scenes/reward_content.tscn").instantiate() as RewardContent
-	content.buff_duration = duration
-	content.energy_buff_amount = buff_amount
+
 	center_container.add_child(content)
-	content.setup(DataManager.RewardType.ENERGY_BUFF, [buff_amount])
+	content.setup(DataManager.RewardType.ENERGY_BUFF, [buff_amount, buff_duration])  # 🆕 передаём оба параметра
 	SignalManager.reward_selected.connect(_on_reward_selected)
 
 func _create_deck_size_buff_reward() -> void:
-	var buff_amount = 1  # +1 к размеру руки
-	var duration = buff_duration if buff_duration > 0 else -1  # -1 = до конца забега
-	
 	var content = preload("res://scenes/reward_content.tscn").instantiate() as RewardContent
-	content.buff_duration = duration
 	center_container.add_child(content)
-	content.setup(DataManager.RewardType.DECK_SIZE_BUFF, [buff_amount])
+	content.setup(DataManager.RewardType.DECK_SIZE_BUFF, [buff_amount, buff_duration])
 	SignalManager.reward_selected.connect(_on_reward_selected)
 
 func _create_gold_reward() -> void:
@@ -298,37 +276,13 @@ func _create_remove_card_reward() -> void:
 
 func _create_upgrade_card_reward() -> void:
 	var content = preload("res://scenes/reward_content.tscn").instantiate() as RewardContent
-	content.upgrade_count = upgrade_count
 	center_container.add_child(content)
-	content.setup(DataManager.RewardType.UPGRADE_CARD, [])
+	content.setup(DataManager.RewardType.UPGRADE_CARD, [upgrade_count])
 	SignalManager.reward_selected.connect(_on_reward_selected)
 
 func _create_add_property_reward() -> void:
 	# TODO: создать UI для добавления свойства к карте
 	pass
-
-func _on_reward_selected() -> void:
-	# Отписываемся, чтобы не было дублирования
-	SignalManager.reward_selected.disconnect(_on_reward_selected)
-	current_index += 1
-	_show_current_reward()
-
-func _animate_final_out():
-	# Оттемняем и закрываем панель
-	var tween = create_tween()
-	tween.tween_property(dark_overlay, "color:a", 0.0, 0.5)
-	await tween.finished
-	
-	SignalManager.getting_all_rewards.emit()
-	queue_free()
-
-func _animate_in():
-	# Начальная анимация появления
-	dark_overlay.color.a = 0.0
-	var tween = create_tween()
-	tween.tween_property(dark_overlay, "color:a", 0.8, 0.5)
-	await tween.finished
-
 
 func _create_transform_card_reward() -> void:
 	var content = preload("res://scenes/reward_content.tscn").instantiate() as RewardContent
@@ -378,3 +332,27 @@ func _create_battle_reward(type: DataManager.RewardType = DataManager.RewardType
 		current_room.queue_free()
 	
 	queue_free()
+
+
+
+func _on_reward_selected() -> void:
+	# Отписываемся, чтобы не было дублирования
+	SignalManager.reward_selected.disconnect(_on_reward_selected)
+	current_index += 1
+	_show_current_reward()
+
+func _animate_final_out():
+	# Оттемняем и закрываем панель
+	var tween = create_tween()
+	tween.tween_property(dark_overlay, "color:a", 0.0, 0.5)
+	await tween.finished
+	
+	SignalManager.getting_all_rewards.emit()
+	queue_free()
+
+func _animate_in():
+	# Начальная анимация появления
+	dark_overlay.color.a = 0.0
+	var tween = create_tween()
+	tween.tween_property(dark_overlay, "color:a", 0.8, 0.5)
+	await tween.finished

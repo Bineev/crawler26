@@ -24,6 +24,8 @@ var temp_buffs: Dictionary = {
 var idol_curse_biome: DataManager.Biome = DataManager.Biome.MOLE_TUNNELS
 var idol_curse_remaining: int = 0  # сколько боёв осталось
 var is_robber: bool = false
+var deck_size_buff_remaining: int = 0
+var deck_size_bonus: int = 0
 
 func _ready():
 	initialize_run()
@@ -504,3 +506,28 @@ func set_robber(value: bool) -> void:
 
 func get_robber() -> bool:
 	return is_robber
+
+
+func apply_deck_size_buff(amount: int, duration: int) -> void:
+	deck_size_buff_remaining = duration
+	deck_size_bonus = amount
+	
+	var player = BattleManager.get_player()
+	if player:
+		var current_hand_size = player.get_flat(DataManager.FlatStat.HAND_SIZE)
+		player.set_flat(DataManager.FlatStat.HAND_SIZE, current_hand_size + amount)
+		SignalManager.log_message.emit("Размер руки увеличен на %d на %d боёв!" % [amount, duration])
+
+func decrement_deck_size_buff() -> void:
+	if deck_size_buff_remaining <= 0:
+		return
+	
+	deck_size_buff_remaining -= 1
+	
+	if deck_size_buff_remaining <= 0:
+		var player = BattleManager.get_player()
+		if player:
+			var current_hand_size = player.get_flat(DataManager.FlatStat.HAND_SIZE)
+			player.set_flat(DataManager.FlatStat.HAND_SIZE, current_hand_size - deck_size_bonus)
+			SignalManager.log_message.emit("Бафф размера руки закончился!")
+		deck_size_bonus = 0

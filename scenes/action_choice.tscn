@@ -39,6 +39,7 @@ layout_mode = 2
 theme_override_constants/separation = 30
 
 [node name="Title" type="Label" parent="DarkOverlay/CenterContainer/VBoxContainer"]
+visible = false
 layout_mode = 2
 label_settings = ExtResource("2_akiov")
 horizontal_alignment = 1

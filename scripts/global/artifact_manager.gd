@@ -18,7 +18,22 @@ func get_random_artifact(grade: DataManager.ArtifactGrade) -> ArtifactResource:
 	var pool = _get_available_artifacts_by_grade(grade)
 	if pool.is_empty():
 		return null
-	return DataManager.get_artifact_resource(pool[randi() % pool.size()])
+	
+	# 🆕 Фильтруем — убираем артефакты, которые уже есть у игрока
+	var existing_ids: Array[DataManager.ArtifactId] = []
+	for artifact in RunManager.artifacts:
+		existing_ids.append(artifact.id)
+	
+	var filtered: Array[DataManager.ArtifactId] = []
+	for artifact_id in pool:
+		if artifact_id not in existing_ids:
+			filtered.append(artifact_id)
+	
+	if filtered.is_empty():
+		return null
+	
+	return DataManager.get_artifact_resource(filtered[randi() % filtered.size()])
+
 
 func get_random_artifacts(grade: DataManager.ArtifactGrade, amount: int) -> Array[ArtifactResource]:
 	var pool = _get_available_artifacts_by_grade(grade)

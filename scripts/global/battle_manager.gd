@@ -59,6 +59,7 @@ func start_battle(player_stats: CharacterStats, enemy_instances: Array, battle_d
 		RunManager.apply_idol_curse_to_player(player)
 	# 🆕 Уменьшаем счётчик баффа энергии (если активен)
 	RunManager.decrement_energy_buff()
+	RunManager.decrement_deck_size_buff()
 	# Инициализация врагов
 	for enemy in enemies:
 		if enemy.has_method("load_intents"):

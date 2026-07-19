@@ -19,7 +19,7 @@ class_name EventResource
 @export var first_success_heal_mod: int = 1
 @export var first_success_buff_duration: int = 3
 @export var first_success_upgrade_count: int = 1
-@export var first_success_choice_count: int = 3
+@export var first_success_choice_count: int = DataManager.REWARD_CHOICE_AMOUNT
 @export var first_success_buff_amount: int = 1
 
 # Параметры для наград первого действия (неудача)
@@ -28,7 +28,7 @@ class_name EventResource
 @export var first_failure_heal_mod: int = 1
 @export var first_failure_buff_duration: int = 3
 @export var first_failure_upgrade_count: int = 1
-@export var first_failure_choice_count: int = 3
+@export var first_failure_choice_count: int = DataManager.REWARD_CHOICE_AMOUNT
 @export var first_failure_buff_amount: int = 1
 
 # === ВТОРОЕ ДЕЙСТВИЕ ===
@@ -44,7 +44,7 @@ class_name EventResource
 @export var second_success_heal_mod: int = 1
 @export var second_success_buff_duration: int = 3
 @export var second_success_upgrade_count: int = 1
-@export var second_success_choice_count: int = 3
+@export var second_success_choice_count: int = DataManager.REWARD_CHOICE_AMOUNT
 @export var second_success_buff_amount: int = 1
 
 # Параметры для наград второго действия (неудача)
@@ -53,7 +53,7 @@ class_name EventResource
 @export var second_failure_heal_mod: int = 1
 @export var second_failure_buff_duration: int = 3
 @export var second_failure_upgrade_count: int = 1
-@export var second_failure_choice_count: int = 3
+@export var second_failure_choice_count: int = DataManager.REWARD_CHOICE_AMOUNT
 @export var second_failure_buff_amount: int = 1
 
 # === КОНКРЕТНЫЕ РЕСУРСЫ И ТИПЫ ВРАГОВ ===
