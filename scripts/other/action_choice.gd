@@ -190,8 +190,11 @@ func _handle_search() -> void:
 
 func _animate_in() -> void:
 	dark_overlay.color.a = 0.0
+	var in_amount: float = 0.8
+	if room_object:
+		in_amount = 0.9
 	var tween = create_tween()
-	await tween.tween_property(dark_overlay, "color:a",0.9, 1)
+	await tween.tween_property(dark_overlay, "color:a", in_amount, 1)
 
 func _animate_out() -> void:
 	var tween = create_tween()
@@ -624,7 +627,7 @@ func _handle_event(action: DataManager.ActionType) -> void:
 	if room_object and not result_key.is_empty():
 		await room_object.print_narrative(tr(result_key))
 	# 🆕 Ждём 1.5 секунды
-	await get_tree().create_timer(1.5).timeout
+	await get_tree().create_timer(3).timeout
 	
 	# 🆕 Парсим награды (заглушка)
 	var rewards: Array[DataManager.RewardType] = []

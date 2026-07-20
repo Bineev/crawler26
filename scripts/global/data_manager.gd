@@ -1882,7 +1882,7 @@ func get_all_artifact_ids() -> Array:
 const OBJECT_SIZES: Dictionary = {
 	DataManager.ObjectType.CHEST: Vector2(256, 256),
 	DataManager.ObjectType.IDOL: Vector2(360, 360),
-	DataManager.ObjectType.TRAP: Vector2(196, 196),
+	DataManager.ObjectType.TRAP: Vector2(160, 160),
 	DataManager.ObjectType.CAULDRON: Vector2(360, 360),
 	DataManager.ObjectType.TORTURE_RACK: Vector2(360, 360),
 	DataManager.ObjectType.BONFIRE: Vector2(256, 256),

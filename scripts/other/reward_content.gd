@@ -132,6 +132,7 @@ func _on_item_selected(index: int) -> void:
 		var button = child.get_child(-1) if child.get_child_count() > 0 else null
 		if button is Button:
 			button.disabled = true
+			button.modulate = Color(0, 0, 0, 0)
 	
 	# Находим выбранный vbox
 	var selected_vbox = rewards_container.get_child(index)

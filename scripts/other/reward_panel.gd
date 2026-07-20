@@ -59,6 +59,9 @@ func _animate_transition_in():
 func _create_current_reward():
 	var reward_type = reward_types[current_index]
 	
+	if reward_type == DataManager.RewardType.UPGRADE_CARD or reward_type == DataManager.RewardType.TRANSFORM_CARD:
+		center_container.position.y = 0
+	
 	for child in center_container.get_children():
 		child.queue_free()
 	

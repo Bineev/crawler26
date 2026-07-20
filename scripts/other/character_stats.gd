@@ -658,6 +658,9 @@ func process_start_of_turn():
 	# Если заморожен — статусы не тикают
 	if has_status(DataManager.Status.FROZEN):
 		return
+	# Снимаем STRENGTH в самом конце (после всех тиков)
+	if has_status(DataManager.Status.STRENGTH):
+		remove_status(DataManager.Status.STRENGTH)
 	
 	# ✅ ШАГ 1: Сначала пассивки ON_TURN_START
 	await _process_passive_triggers(DataManager.PassiveTrigger.ON_TURN_START)
@@ -713,6 +716,7 @@ func process_start_of_turn():
 					if enemy_ui:
 						var icon = enemy_ui.find_status_icon(status_id)
 						if icon:
+							# BUG возможно нужно await
 							icon.animate()
 				elif self is PenitentStats:
 					var portrait = GameTestManager.get_player_portrait()
@@ -738,15 +742,14 @@ func process_start_of_turn():
 						tick_effect.value = tick_value
 					_:
 						tick_effect.base_value = tick_value
-				
+				#BUG здесь тикает статус (после тика враг может быть мертв)
 				EffectExecutor.execute(tick_effect, caster, [self])
 				await Engine.get_main_loop().create_timer(DataManager.STATUS_TRIGGER_DELAY).timeout
-			
 			if status.id == DataManager.Status.BURN and data.stacks >= DataManager.BURN_THRESHOLD_STACKS:
 				_trigger_burn_explosion(data.stacks)
 				statuses_to_remove.append(status_id)
 			# 🆕 Уменьшаем длительность (но не для SHIELD)
-			if status.id != DataManager.Status.SHIELD:
+			if status.id != DataManager.Status.SHIELD and status.id != DataManager.Status.STRENGTH:
 				data.duration -= 1
 			
 			if data.duration <= 0:

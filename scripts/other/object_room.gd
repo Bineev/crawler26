@@ -27,11 +27,11 @@ func _init_content(room_data: Dictionary) -> void:
 		# 🆕 Устанавливаем позицию
 		var room_center_x = DataManager.ROOM_CENTER_X
 		var room_height = DataManager.ROOM_HEIGHT
-		var y_offset_from_bottom = DataManager.ENEMY_Y_OFFSET_FROM_BOTTOM
+		var y_offset_from_bottom = DataManager.ENEMY_Y_OFFSET_FROM_BOTTOM - 50
 		
 		room_object.position = Vector2(
 			room_center_x - room_object.size.x / 2,
-			room_height - y_offset_from_bottom - room_object.size.y
+			DataManager.ROOM_HEIGHT - y_offset_from_bottom
 		)
 	room_object.setup(object_type, current_biome)
 	SignalManager.log_message.emit("Object room initialized")

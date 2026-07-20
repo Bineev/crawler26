@@ -111,6 +111,7 @@ func _execute_damage(effect: EffectEntry, source, targets: Array) -> void:
 		var is_self_damage = (source == target)
 		
 		# 🆕 Модификаторы источника применяются ТОЛЬКО если цель НЕ источник
+		# BUG вот тут может быть баг
 		if not is_self_damage:
 			if source and source.has_method("get_strength_bonus"):
 				final_damage += source.get_strength_bonus()
@@ -122,7 +123,7 @@ func _execute_damage(effect: EffectEntry, source, targets: Array) -> void:
 		# Модификаторы цели всегда применяются (если цель — враг)
 		if target.has_method("get_modifier"):
 			final_damage *= target.get_modifier(DataManager.ModifierStat.DAMAGE_TAKEN_PERCENT)
-		
+		# возможно, вся цепочка должна быть await
 		target.take_damage(floor(final_damage), false, source)
 
 

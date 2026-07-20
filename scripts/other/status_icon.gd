@@ -61,6 +61,10 @@ func setup(data: Dictionary, text_color: Color = DataManager.COLOR_PENITENT_ART_
 		duration_label.visible = true
 	else:
 		duration_label.visible = false
+		
+	if status_id == DataManager.Status.SHIELD or status_id == DataManager.Status.STRENGTH:
+		duration_label.visible = false
+
 
 func _build_tooltip(data: Dictionary) -> String:
 	var tooltip = "%s: %d" % [data["name"], data["stacks"]]

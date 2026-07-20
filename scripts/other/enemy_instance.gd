@@ -314,19 +314,36 @@ func _get_targets_for_effect(effect: EffectEntry, target: CharacterStats) -> Arr
 	match effect.target:
 		DataManager.EffectTarget.SELF:
 			return [self]
+		
 		DataManager.EffectTarget.ENEMY:
-			return [target] if target else []
+			# Враг атакует игрока (цель — это игрок)
+			if target:
+				return [target]
+			# Если цели нет — берём игрока из BattleManager
+			var player = BattleManager.get_player()
+			return [player] if player else []
+		
 		DataManager.EffectTarget.ALL_ENEMIES:
-			# Если есть несколько врагов, возвращаем всех (кроме себя)
-			var all_targets = BattleManager.get_enemies()
-			return all_targets
+			# ALL_ENEMIES для врага — это игрок (один)
+			var player = BattleManager.get_player()
+			return [player] if player else []
+		
 		DataManager.EffectTarget.ALL_ALLIES:
-			# Союзники врага — это он сам
-			return [self]
+			# Союзники врага — все враги (включая себя)
+			return BattleManager.get_enemies()
+		
 		DataManager.EffectTarget.ANY:
-			return [target] if target else []
+			# Для ANY — если есть цель, берём её, иначе игрока
+			if target:
+				return [target]
+			var player = BattleManager.get_player()
+			return [player] if player else []
+		
 		_:
-			return [target] if target else []
+			if target:
+				return [target]
+			var player = BattleManager.get_player()
+			return [player] if player else []
 
 
 func _give_bones_on_death() -> void:

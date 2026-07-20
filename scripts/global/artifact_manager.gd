@@ -15,7 +15,7 @@ func _init_unlocked_artifacts() -> void:
 			unlocked_artifact_ids.append(artifact_id)
 
 func get_random_artifact(grade: DataManager.ArtifactGrade) -> ArtifactResource:
-	var pool = _get_available_artifacts_by_grade(grade)
+	var pool = get_available_artifacts_by_grade(grade)
 	if pool.is_empty():
 		return null
 	
@@ -36,7 +36,7 @@ func get_random_artifact(grade: DataManager.ArtifactGrade) -> ArtifactResource:
 
 
 func get_random_artifacts(grade: DataManager.ArtifactGrade, amount: int) -> Array[ArtifactResource]:
-	var pool = _get_available_artifacts_by_grade(grade)
+	var pool = get_available_artifacts_by_grade(grade)
 	var result: Array[ArtifactResource] = []
 	
 	if pool.is_empty():
@@ -52,7 +52,7 @@ func get_random_artifacts(grade: DataManager.ArtifactGrade, amount: int) -> Arra
 	
 	return result
 
-func _get_available_artifacts_by_grade(grade: DataManager.ArtifactGrade) -> Array[DataManager.ArtifactId]:
+func get_available_artifacts_by_grade(grade: DataManager.ArtifactGrade) -> Array[DataManager.ArtifactId]:
 	var all = DataManager.get_artifacts_by_grade(grade)
 	var available: Array[DataManager.ArtifactId] = []
 	

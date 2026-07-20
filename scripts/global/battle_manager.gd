@@ -126,7 +126,7 @@ func start_player_turn():
 	
 	# Выбираем намерения для всех врагов
 	for enemy in enemies:
-		if enemy.is_alive():
+		if enemy and is_instance_valid(enemy) and enemy.is_alive():
 			var intent = enemy.select_next_intent()
 			if intent:
 				SignalManager.enemy_intent_changed.emit(enemy, intent)
@@ -163,10 +163,11 @@ func start_enemy_turn():
 		
 		if enemy.has_status(DataManager.Status.FROZEN):
 			SignalManager.log_message.emit("%s заморожен и пропускает ход!" % enemy.get_display_name())
-			await get_tree().create_timer(DataManager.ENEMY_STEP_DELAY).timeout
+			await enemy.get_tree().create_timer(DataManager.ENEMY_STEP_DELAY).timeout
 			continue
 		
 		# ШАГ 1: Начало хода врага (пассивки, статусы)
+		# если враг погиб во время своего хода, то мы его вечно ждем????
 		await enemy.process_start_of_turn()
 		
 		if not is_instance_valid(enemy) or not enemy.is_alive():
@@ -365,12 +366,12 @@ func end_player_turn():
 
 func _on_enemy_died(enemy: CharacterStats):
 	print("Enemy died: ", enemy.get_display_name())
-	enemies.erase(enemy)
-	
+	# вот здесь мы стираем врага, а проход идет в другом месте, в итоге смещение на 1
 	# Проверяем, остались ли живые враги
+	# а тут врагов уже нет, потому что мы их стерли
 	var all_dead = true
 	for e in enemies:
-		if e.is_alive():
+		if (e and is_instance_valid(e)) and e.is_alive():
 			all_dead = false
 			break
 	
