@@ -4,7 +4,7 @@ class_name BloodThreadEffect
 
 static func apply(effect: EffectEntry, source, targets: Array, card_info: Dictionary, passive_context: PassiveResource = null):
 	var enemies = BattleManager.get_enemies()
-	var alive_enemies = enemies.filter(func(e): return e.is_alive())
+	var alive_enemies = enemies.filter(func(e): return e and is_instance_valid(e) and e.is_alive())
 	var enemy_count = alive_enemies.size()
 	
 	if enemy_count == 0:

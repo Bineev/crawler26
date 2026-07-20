@@ -17,6 +17,8 @@ class_name EnemyUI
 @onready var enemy_sprite_copy: TextureRect = $VBoxContainer/SpriteContainer/EnemySpriteCopy
 @onready var sprite_container: CenterContainer = $VBoxContainer/SpriteContainer
 @onready var highlight_sprite: TextureRect = $VBoxContainer/SpriteContainer/HighlightSprite
+@onready var v_box_container: VBoxContainer = $VBoxContainer
+
 
 
 const STATUS_ICON_SCENE = preload("res://scenes/status_icon.tscn")
@@ -49,7 +51,6 @@ var freeze_tween: Tween = null
 func setup(enemy: EnemyInstance):
 	enemy_instance = enemy
 	update_display()
-	_setup_click_area()
 	_setup_health_bar()  # ← добавить
 	living_container.custom_minimum_size = enemy_instance.resource.get_size_pixels()
 	
@@ -57,7 +58,7 @@ func setup(enemy: EnemyInstance):
 	living_container.z_index = 10
 	living_container.z_as_relative = false
 	
-	_add_aura_effect()
+	#_add_aura_effect()
 	_start_living_animation()
 	_start_random_jitter()
 	if enemy_sprite:
@@ -77,6 +78,8 @@ func setup(enemy: EnemyInstance):
 	SignalManager.passive_removed.connect(_on_passive_changed)  # ← проверь, что есть
 	SignalManager.passive_changed.connect(_on_passive_changed)  # 🆕
 	SignalManager.passive_added.connect(_on_passive_changed)  # 🆕
+	await get_tree().create_timer(0.1).timeout
+	_setup_click_area()
 	
 
 func _add_aura_effect():
@@ -414,11 +417,11 @@ func _setup_click_area():
 	
 	# Создаём прямоугольную форму
 	var rect_shape = RectangleShape2D.new()
-	rect_shape.size = enemy_size
+	rect_shape.size = v_box_container.size
 	
 	collision_shape.shape = rect_shape
-	collision_shape.position = enemy_size / 2  # центрируем
-	
+	#collision_shape.global_position = v_box_container.global_position + v_box_container.size / 4
+	collision_shape.position = v_box_container.size - v_box_container.size / 2
 	# Подключаем сигнал клика
 	if not click_area.input_event.is_connected(_on_click_area_input):
 		click_area.input_event.connect(_on_click_area_input)

@@ -9,5 +9,6 @@ script = ExtResource("2_hov8m")
 id = 4
 name_key = "status_weakness_name"
 description_key = "status_weakness_desc"
+is_stacking = true
 modifiers = Array[ExtResource("1_g2206")]([ExtResource("2_dc7qe")])
 metadata/_custom_type_script = "uid://cdpdi1bblp6st"

@@ -375,16 +375,10 @@ func _handle_give_blood() -> void:
 	await _show_result_label(tr("idol_blood_result"), DataManager.COLOR_PENITENT_ART_BG_DARK)
 	
 	var player = BattleManager.get_player()
-	var damage = DataManager.IDOL_DAMAGE
-	
-	if player:
-		var current_health = player.get_health()
-		if current_health - damage < 1:
-			damage = current_health - 1
 	
 	var reward_panel = preload("res://scenes/reward_panel.tscn").instantiate() as RewardPanel
 	reward_panel.reward_types = [DataManager.RewardType.TAKE_DAMAGE, DataManager.RewardType.CARD_CHARACTER]
-	reward_panel.damage_mod = damage  # передаём урон
+	reward_panel.damage_mod = DataManager.IDOL_DAMAGE  # передаём урон
 	SignalManager.hide_object.emit()
 	SignalManager.show_reward.emit(reward_panel)
 	queue_free()
@@ -505,11 +499,11 @@ func _handle_craft() -> void:
 		rewards = [DataManager.RewardType.ARTIFACT_WITHOUT_CHOICE]
 	else:
 		await _show_result_label(tr("rack_craft_fail"), DataManager.COLOR_FLESH_CAVES_ART_BG_DARK)
-		rewards = [DataManager.RewardType.TAKE_DAMAGE]
+		rewards = [DataManager.RewardType.TAKE_DAMAGE, DataManager.RewardType.ARTIFACT_WITHOUT_CHOICE]
 	
 	var reward_panel = preload("res://scenes/reward_panel.tscn").instantiate() as RewardPanel
 	reward_panel.reward_types = rewards
-	reward_panel.damage_mod = 5  # базовый урон при неудаче
+	reward_panel.damage_mod = 1  # базовый урон при неудаче
 	SignalManager.hide_object.emit()
 	SignalManager.show_reward.emit(reward_panel)
 	queue_free()

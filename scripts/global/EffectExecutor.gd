@@ -294,6 +294,7 @@ func _execute_apply_passive(effect: EffectEntry, source, targets: Array) -> void
 			var passive_copy = effect.passive.duplicate_for_instance() if effect.passive else null
 			if passive_copy:
 				passive_copy.init_instance()
+				passive_copy.starting_charges = effect.passive_duration
 			target.apply_passive(passive_copy, effect.passive_duration)
 
 

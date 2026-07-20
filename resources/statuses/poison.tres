@@ -17,6 +17,7 @@ name_key = "status_poison_name"
 description_key = "status_poison_desc"
 is_ticking = true
 ignore_block = true
+is_stacking = true
 max_stacks = 99
 modifiers = Array[ExtResource("1_b4dch")]([SubResource("Resource_moyce")])
 tick_effect = ExtResource("3_y784o")

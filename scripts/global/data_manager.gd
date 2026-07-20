@@ -774,7 +774,7 @@ const BONES_SCREEN_POSITION: Vector2 = Vector2(1720, 600)
 const POTION_CONTAINER_POSITION: Vector2 = Vector2(1520, 700)
 
 const MIN_BONES_FOR_IDOL: int = 5
-const IDOL_DAMAGE: int = 15
+const IDOL_DAMAGE: int = 3
 const IDOL_BREAK_CHANCE: float = 0.5
 
 const RACK_MAX_HP_LOST: int = 5
@@ -837,8 +837,8 @@ const STARTING_BONES: int = 0
 
 const TRAP_NEUTRALIZE_CHANCE: float = 0.8  # 80% шанс
 const TRAP_SEARCH_CHANCE: float = 0.5      # 50% шанс
-const TRAP_NEUTRALIZE_DAMAGE: int = 5
-const TRAP_SEARCH_DAMAGE: int = 10
+const TRAP_NEUTRALIZE_DAMAGE: int = 1
+const TRAP_SEARCH_DAMAGE: int = 2
 
 const REST_DEFAULT_HEAL: int = 30
 const BONFIRE_ENERGY_BUFF_DURATION: int = 3  # количество боевых комнат
@@ -1883,7 +1883,7 @@ const OBJECT_SIZES: Dictionary = {
 	DataManager.ObjectType.CHEST: Vector2(256, 256),
 	DataManager.ObjectType.IDOL: Vector2(360, 360),
 	DataManager.ObjectType.TRAP: Vector2(160, 160),
-	DataManager.ObjectType.CAULDRON: Vector2(360, 360),
+	DataManager.ObjectType.CAULDRON: Vector2(256, 256),
 	DataManager.ObjectType.TORTURE_RACK: Vector2(360, 360),
 	DataManager.ObjectType.BONFIRE: Vector2(256, 256),
 	DataManager.ObjectType.SHOP: Vector2(1024, 800),

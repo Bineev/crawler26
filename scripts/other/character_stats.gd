@@ -290,10 +290,31 @@ func _add_status_direct(status: StatusResource, stacks: int, duration: int, cast
 	var existing = active_statuses.get(status_id)
 	
 	if existing:
-		existing.stacks += stacks
-		existing.duration = max(existing.duration, duration)
+		# 🆕 Разная логика стакания в зависимости от статуса
+		match status_id:
+			# Стакаются по стакам + макс длительность
+			DataManager.Status.BLEED, DataManager.Status.COLD, DataManager.Status.BURN, DataManager.Status.REGEN:
+				existing.stacks += stacks
+				existing.duration = max(existing.duration, duration)
+			
+			# Стакаются только по длительности (стаки не меняются)
+			DataManager.Status.POISON, DataManager.Status.WEAKNESS, DataManager.Status.VULNERABILITY:
+				existing.duration += duration
+				# Если duration стало больше, чем max_stacks — обрезаем
+				if status.max_stacks > 0 and existing.duration > status.max_stacks:
+					existing.duration = status.max_stacks
+			
+			# Стакаются только по стакам (длительность остаётся старая)
+			DataManager.Status.GANGRENE, DataManager.Status.SHIELD, DataManager.Status.STRENGTH:
+				existing.stacks += stacks
+				# Длительность остаётся без изменений
+			
+			# Для всех остальных — стандартное поведение (стаки + макс длительность)
+			_:
+				existing.stacks += stacks
+				existing.duration = max(existing.duration, duration)
 	else:
-		# 🆕 Определяем, нужно ли пропустить первый тик
+		# Определяем, нужно ли пропустить первый тик
 		var skip_first = false
 		if not from_passive:
 			skip_first = (caster == self and BattleManager.is_player_turn() and self is PenitentStats) or \
@@ -304,8 +325,8 @@ func _add_status_direct(status: StatusResource, stacks: int, duration: int, cast
 			"duration": duration,
 			"resource": status,
 			"caster": caster if caster else self,
-			"tick_counter": 0,  # 🆕 счётчик тиков
-			"skip_first_tick": skip_first  # 🆕 флаг
+			"tick_counter": 0,
+			"skip_first_tick": skip_first
 		}
 		status_application_order.append(status_id)
 		_apply_status_modifiers(status)
@@ -424,8 +445,26 @@ func apply_passive(passive: PassiveResource, duration: int = -1):
 			# Для PERMANENT не стакаем
 			if instance.charge_type == DataManager.PassiveChargeType.PERMANENT:
 				return
-			# Для всех остальных просто складываем заряды
+			
+			# 🆕 Проверяем, есть ли у эффектов пассивки grow_type
+			var has_growth = false
+			for effect in existing.effects:
+				if effect.grow_type != DataManager.GrowType.NONE:
+					has_growth = true
+					break
+			
+			if has_growth:
+				# Сбрасываем счётчики и значения до дефолтных
+				existing.current_charges += instance.starting_charges
+				existing.effect_application_counters.clear()
+				# Сбрасываем current_value для эффектов
+				for effect in existing.effects:
+					effect.clear_instance_state()
+				SignalManager.player_status_changed.emit(self)
+				return
+			# Складываем заряды
 			existing.current_charges += instance.current_charges
+			SignalManager.player_status_changed.emit(self)
 			return
 	
 	active_passives.append(instance)
@@ -532,6 +571,17 @@ func _process_passive_triggers(trigger: DataManager.PassiveTrigger, attacker = n
 						targets = [self]
 				
 				EffectExecutor.execute(effect, self, targets, {}, passive)
+				
+			# 🆕 Уменьшаем заряды для USAGE_BASED пассивок
+			if passive.charge_type == DataManager.PassiveChargeType.USAGE_BASED:
+				passive.consume_charge()
+				if passive.current_charges <= 0:
+					remove_passive(passive)
+					# Обновляем UI
+				if self is PenitentStats:
+					SignalManager.player_status_changed.emit(self)
+				elif self is EnemyInstance:
+					SignalManager.passive_changed.emit(self, passive.id)
 			
 			await Engine.get_main_loop().create_timer(DataManager.STATUS_TRIGGER_DELAY).timeout
 

@@ -59,7 +59,7 @@ func _animate_transition_in():
 func _create_current_reward():
 	var reward_type = reward_types[current_index]
 	
-	if reward_type == DataManager.RewardType.UPGRADE_CARD or reward_type == DataManager.RewardType.TRANSFORM_CARD:
+	if reward_type == DataManager.RewardType.UPGRADE_CARD or reward_type == DataManager.RewardType.TRANSFORM_CARD or reward_type == DataManager.RewardType.TRADE:
 		center_container.position.y = 0
 	
 	for child in center_container.get_children():
@@ -236,7 +236,12 @@ func _create_potion_reward() -> void:
 
 func _create_take_damage_reward() -> void:
 	var damage_amount = DataManager.REWARD_DAMAGE_DEFAULT * damage_mod
-	
+	# 🆕 Проверяем, чтобы урон не убивал игрока
+	var player = BattleManager.get_player()
+	if player:
+		var current_health = player.get_health()
+		if current_health - damage_amount < 1:
+			damage_amount = current_health - 1
 	var content = preload("res://scenes/reward_content.tscn").instantiate() as RewardContent
 	# content.damage_mod = damage_mod  # 🆕 убираем
 	center_container.add_child(content)
