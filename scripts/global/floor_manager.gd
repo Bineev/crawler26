@@ -304,12 +304,92 @@ func process_next():
 
 
 
+#func _generate_all_segments() -> void:
+	#var rooms_per_path = DataManager.FLOOR_ROOMS_PER_PATH * DataManager.FLOOR_VISIBLE_ROOMS
+	#var room_pool: Array[RoomNode] = []
+	#
+	## Добавляем бои
+	#var total_battles = DataManager.CONSECUTIVE_BATTLES_COUNT * DataManager.FLOOR_SEGMENTS_BEFORE_BOSS
+	#
+	#for i in range(total_battles):
+		#var combat_type = DataManager.CombatType.NORMAL
+		#if i % 3 == 2:
+			#combat_type = DataManager.CombatType.ELITE
+		#if current_floor >= 3 and i % 3 == 1:
+			#combat_type = DataManager.CombatType.ELITE
+		#if current_floor >= 5 and i % 2 == 0:
+			#combat_type = DataManager.CombatType.ELITE
+		#
+		#room_pool.append(_create_room_node(DataManager.RoomType.COMBAT, combat_type))
+	#
+	## Добавляем объекты согласно константам
+	#for i in range(DataManager.SHOPS_ON_FLOOR_COUNT):
+		#room_pool.append(_create_room_node(DataManager.RoomType.OBJECT, DataManager.CombatType.NORMAL, DataManager.ObjectType.SHOP))
+	#
+	#for i in range(DataManager.EVENTS_ON_FLOOR_COUNT):
+		#room_pool.append(_create_room_node(DataManager.RoomType.OBJECT, DataManager.CombatType.NORMAL, DataManager.ObjectType.EVENT))
+	#
+	#for i in range(DataManager.CHESTS_ON_FLOOR_COUNT):
+		#room_pool.append(_create_room_node(DataManager.RoomType.OBJECT, DataManager.CombatType.NORMAL, DataManager.ObjectType.CHEST))
+	#
+	#for i in range(DataManager.TRAPS_ON_FLOOR_COUNT):
+		#room_pool.append(_create_room_node(DataManager.RoomType.OBJECT, DataManager.CombatType.NORMAL, DataManager.ObjectType.TRAP))
+	#
+	#for i in range(DataManager.BONFIRES_ON_FLOOR_COUNT):
+		#room_pool.append(_create_room_node(DataManager.RoomType.OBJECT, DataManager.CombatType.NORMAL, DataManager.ObjectType.BONFIRE))
+	#
+	#for i in range(DataManager.IDOLS_ON_FLOOR_COUNT):
+		#room_pool.append(_create_room_node(DataManager.RoomType.OBJECT, DataManager.CombatType.NORMAL, DataManager.ObjectType.IDOL))
+	#
+	#for i in range(DataManager.TORTURE_RACK_ON_FLOOR_COUNT):
+		#room_pool.append(_create_room_node(DataManager.RoomType.OBJECT, DataManager.CombatType.NORMAL, DataManager.ObjectType.TORTURE_RACK))
+	#
+	#for i in range(DataManager.CAULDRONS_ON_FLOOR_COUNT):
+		#room_pool.append(_create_room_node(DataManager.RoomType.OBJECT, DataManager.CombatType.NORMAL, DataManager.ObjectType.CAULDRON))
+	#
+	## Перемешиваем пул
+	#room_pool.shuffle()
+	#
+	## Распределяем по двум путям
+	#var path1: Array[RoomNode] = []
+	#var path2: Array[RoomNode] = []
+	#
+	#for i in range(room_pool.size()):
+		#if i % 2 == 0:
+			#path1.append(room_pool[i])
+		#else:
+			#path2.append(room_pool[i])
+	#
+	## Дополняем пути до нужной длины
+	#while path1.size() < rooms_per_path:
+		#path1.append(_create_room_node(DataManager.RoomType.COMBAT, DataManager.CombatType.NORMAL))
+	#while path2.size() < rooms_per_path:
+		#path2.append(_create_room_node(DataManager.RoomType.COMBAT, DataManager.CombatType.NORMAL))
+	#
+	## Разбиваем на сегменты и записываем в all_paths
+	#all_paths.clear()
+	#for segment in range(DataManager.FLOOR_SEGMENTS_BEFORE_BOSS):
+		#var start_idx = segment * DataManager.FLOOR_VISIBLE_ROOMS
+		#var end_idx = start_idx + DataManager.FLOOR_VISIBLE_ROOMS
+		#
+		#var segment_paths: Array[Array] = [
+			#path1.slice(start_idx, end_idx),
+			#path2.slice(start_idx, end_idx)
+		#]
+		#
+		#for path in segment_paths:
+			#for i in range(path.size()):
+				#path[i].is_revealed = (i < DataManager.FLOOR_VISIBLE_ROOMS - randi_range(0,2))
+		#
+		#all_paths.append(segment_paths)
+
+
 func _generate_all_segments() -> void:
 	var rooms_per_path = DataManager.FLOOR_ROOMS_PER_PATH * DataManager.FLOOR_VISIBLE_ROOMS
 	var room_pool: Array[RoomNode] = []
 	
 	# Добавляем бои
-	var total_battles = DataManager.CONSECUTIVE_BATTLES_COUNT * DataManager.FLOOR_SEGMENTS_BEFORE_BOSS
+	var total_battles = DataManager.CONSECUTIVE_BATTLES_COUNT * DataManager.FLOOR_SEGMENTS_BEFORE_BOSS * 2  # ×2 для двух путей
 	
 	for i in range(total_battles):
 		var combat_type = DataManager.CombatType.NORMAL
@@ -322,7 +402,7 @@ func _generate_all_segments() -> void:
 		
 		room_pool.append(_create_room_node(DataManager.RoomType.COMBAT, combat_type))
 	
-	# Добавляем объекты согласно константам
+	# Добавляем объекты (для ОБОИХ путей)
 	for i in range(DataManager.SHOPS_ON_FLOOR_COUNT):
 		room_pool.append(_create_room_node(DataManager.RoomType.OBJECT, DataManager.CombatType.NORMAL, DataManager.ObjectType.SHOP))
 	
@@ -350,15 +430,37 @@ func _generate_all_segments() -> void:
 	# Перемешиваем пул
 	room_pool.shuffle()
 	
-	# Распределяем по двум путям
+	# Распределяем по двум путям (ЧЕРЕДУЯ)
 	var path1: Array[RoomNode] = []
 	var path2: Array[RoomNode] = []
 	
-	for i in range(room_pool.size()):
-		if i % 2 == 0:
-			path1.append(room_pool[i])
+	var battle_counter1 = 0
+	var battle_counter2 = 0
+	
+	for room in room_pool:
+		# Определяем, в какой путь положить комнату
+		if room.room_type == DataManager.RoomType.COMBAT:
+			# Бои чередуем между путями, но не даём превысить CONSECUTIVE_BATTLES_COUNT
+			if battle_counter1 <= battle_counter2 and battle_counter1 < DataManager.CONSECUTIVE_BATTLES_COUNT:
+				path1.append(room)
+				battle_counter1 += 1
+				battle_counter2 = 0
+			elif battle_counter2 < DataManager.CONSECUTIVE_BATTLES_COUNT:
+				path2.append(room)
+				battle_counter2 += 1
+				battle_counter1 = 0
+			else:
+				# Если оба пути достигли лимита — сбрасываем
+				battle_counter1 = 0
+				battle_counter2 = 0
+				path1.append(room)
+				battle_counter1 += 1
 		else:
-			path2.append(room_pool[i])
+			# Объекты — просто чередуем
+			if path1.size() <= path2.size():
+				path1.append(room)
+			else:
+				path2.append(room)
 	
 	# Дополняем пути до нужной длины
 	while path1.size() < rooms_per_path:
@@ -379,10 +481,9 @@ func _generate_all_segments() -> void:
 		
 		for path in segment_paths:
 			for i in range(path.size()):
-				path[i].is_revealed = (i < DataManager.FLOOR_VISIBLE_ROOMS - randi_range(0,2))
+				path[i].is_revealed = (i < DataManager.FLOOR_VISIBLE_ROOMS - randi_range(0, 2))
 		
 		all_paths.append(segment_paths)
-
 
 func _create_room_node(room_type: DataManager.RoomType, combat_type: DataManager.CombatType = DataManager.CombatType.NORMAL, object_type: DataManager.ObjectType = DataManager.ObjectType.CHEST, is_revealed: bool = true) -> RoomNode:
 	var room_node = RoomNode.new()

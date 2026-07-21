@@ -44,6 +44,8 @@ func start_test(world_node: Node):
 	TranslationServer.set_locale("ru")
 	game_world = world_node
 	_reset_game_state()
+	# Сбрасываем индексы
+	current_room_index = 0
 	# Загружаем данные намерений для биома
 	DataManager.load_biome_enemies(current_biome)
 	
@@ -562,9 +564,6 @@ func _reset_game_state():
 	if current_room_node and is_instance_valid(current_room_node):
 		current_room_node.queue_free()
 		current_room_node = null
-	
-	# Сбрасываем индексы
-	current_room_index = 0
 	
 	# Очищаем UI
 	clear_ui()
