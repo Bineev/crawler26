@@ -150,9 +150,10 @@ enum CardOrigin {
 
 enum EnemyShaderPriority {
 	NONE,
-	HIT,
-	FREEZE,
-	DEATH,
+	DEBUFF,   # 1 — низший
+	HIT,      # 2 — средний
+	FREEZE,   # 3 — высокий
+	DEATH,    # 4 — наивысший
 }
 
 enum GrowType {

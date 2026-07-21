@@ -81,6 +81,7 @@ func setup(enemy: EnemyInstance):
 	SignalManager.passive_changed.connect(_on_passive_changed)  # 🆕
 	SignalManager.passive_added.connect(_on_passive_changed)  # 🆕
 	SignalManager.get_hit_in_shield.connect(_on_get_hit_in_shield)
+	SignalManager.enemy_get_debuff.connect(_on_enemy_get_debuff)
 	await get_tree().create_timer(0.1).timeout
 	_setup_click_area()
 	
@@ -550,6 +551,8 @@ func _apply_highlight(enabled: bool):
 
 
 func show_floating_text(text: String, color: Color):
+	if int(text) == 0:
+		return
 	var floating_text = preload("res://scenes/floating_text.tscn").instantiate() as FloatingText
 	floating_text.setup(text, color)  # ← сначала настраиваем
 	add_child(floating_text)          # ← потом добавляем
@@ -577,7 +580,7 @@ func _on_heal_received(target: Node, amount: int):
 func _on_shield_received(target: Node, amount: int):
 	if target != enemy_instance:
 		return
-	var color = DataManager.COLOR_WARRIOR_ART_BG_LIGHT  # светло-зелёный
+	var color = DataManager.COLOR_LIGHT_BLUE  # светло-зелёный
 	show_floating_text("+" + str(amount), color)
 
 
@@ -928,3 +931,62 @@ func _on_get_hit_in_shield(target: Node):
 	
 	var tween = create_tween()
 	tween.tween_property(shield_sprite, "modulate", Color(1, 1, 1, 0), 0.3)
+
+
+func _on_enemy_get_debuff(enemy: EnemyInstance):
+	if enemy != enemy_instance:
+		return
+	
+	# Применяем эффект дебаффа
+	_apply_debuff_effect()
+	
+	
+func _apply_debuff_effect():
+	# Если уже есть HIT или более высокий приоритет — игнорируем
+	if current_shader_priority >= DataManager.EnemyShaderPriority.HIT:
+		return
+		
+	push_back()
+	
+	if not enemy_sprite:
+		return
+	
+	# Сохраняем текущий материал
+	var current_material = enemy_sprite.material
+	
+	# Применяем шейдер дебаффа
+	var shader = preload("res://shaders/debuff_shader.gdshader")
+	var shader_material = ShaderMaterial.new()
+	shader_material.shader = shader
+	enemy_sprite.material = shader_material
+	shader_material.set_shader_parameter("debuff_progress", 1.0)
+	
+	current_shader_priority = DataManager.EnemyShaderPriority.DEBUFF
+	
+	if hit_tween:
+		hit_tween.kill()
+	
+	hit_tween = create_tween()
+	hit_tween.tween_property(shader_material, "shader_parameter/debuff_progress", 0.0, 0.5)\
+		.set_trans(Tween.TRANS_QUART)\
+		.set_ease(Tween.EASE_OUT)
+	
+	await hit_tween.finished
+	hit_tween = null
+	
+	# Проверяем, не нужно ли заморозить
+	if pending_freeze:
+		pending_freeze = false
+		_apply_freeze_effect_immediate()
+		return
+	
+	# Возвращаем базовый материал
+	if enemy_sprite:
+		if current_material:
+			enemy_sprite.material = current_material
+		elif base_material:
+			enemy_sprite.material = base_material
+		else:
+			enemy_sprite.material = null
+	
+	current_shader_priority = DataManager.EnemyShaderPriority.NONE

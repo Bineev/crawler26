@@ -15,6 +15,7 @@ var health_label: Label = null
 var atonement_bar: ProgressBar = null
 var atonement_label: Label = null
 var artifact_container: GridContainer = null
+var shield_sprite: TextureRect = null
 
 
 var player_stats: CharacterStats = null
@@ -49,6 +50,7 @@ func _ready() -> void:
 	atonement_bar = $VBoxContainer/AtonementBar
 	atonement_label = $VBoxContainer/AtonementBar/AtonementLabel
 	artifact_container = $VBoxContainer/ArtifactContainer
+	shield_sprite = $VBoxContainer/TextureRect/ShieldSprite
 	# Инициализируем позиции для всплывающих цифр
 	_init_floating_positions()
 
@@ -66,6 +68,9 @@ func setup(stats: CharacterStats):
 	SignalManager.artifact_added.connect(_on_artifact_added)
 	SignalManager.artifact_removed.connect(_on_artifact_removed)
 	SignalManager.artifact_triggered.connect(_on_artifact_triggered)
+	SignalManager.player_hit_in_shield.connect(_on_player_hit_in_shield)
+	SignalManager.shield_recieved.connect(_on_shield_received)
+	SignalManager.player_get_debuff.connect(_on_player_get_debuff)
 	
 	_update_health()
 	_update_atonement()
@@ -214,6 +219,8 @@ func _on_player_heal_received(heal: int):
 
 
 func show_floating_text(text: String, color: Color):
+	if int(text) == 0:
+		return
 	if floating_text_positions.is_empty():
 		_init_floating_positions()
 	
@@ -579,3 +586,69 @@ func _on_artifact_triggered(artifact: ArtifactResource):
 	for child in artifact_container.get_children():
 		if child is ArtifactIcon:
 			child.update_counter()
+
+
+func _on_player_hit_in_shield():
+	shield_sprite.custom_minimum_size = portrait_texture.size
+	shield_sprite.modulate = Color(1, 1, 1, 0.6)
+	
+	var tween = create_tween()
+	tween.tween_property(shield_sprite, "modulate", Color(1, 1, 1, 0), 0.3)
+
+
+func _on_shield_received(target: Node, amount: int):
+	if target != player_stats:
+		return
+	var color = DataManager.COLOR_LIGHT_BLUE  # светло-зелёный
+	show_floating_text("+" + str(amount), color)
+
+
+func _on_player_get_debuff():
+	_apply_debuff_effect()
+	
+	
+func _apply_debuff_effect():
+	# Если уже есть HIT или более высокий приоритет — игнорируем
+	if current_shader_priority >= DataManager.EnemyShaderPriority.HIT:
+		return
+	
+	if not portrait_texture:
+		return
+	
+	var current_material = portrait_texture.material
+	
+	var shader = preload("res://shaders/debuff_shader.gdshader")
+	var shader_material = ShaderMaterial.new()
+	shader_material.shader = shader
+	portrait_texture.material = shader_material
+	shader_material.set_shader_parameter("debuff_progress", 1.0)
+	
+	current_shader_priority = DataManager.EnemyShaderPriority.DEBUFF
+	
+	if hit_tween:
+		hit_tween.kill()
+	
+	hit_tween = create_tween()
+	hit_tween.tween_property(shader_material, "shader_parameter/debuff_progress", 0.0, 0.5)\
+		.set_trans(Tween.TRANS_QUART)\
+		.set_ease(Tween.EASE_OUT)
+	
+	await hit_tween.finished
+	hit_tween = null
+	
+	# Проверяем, не нужно ли заморозить
+	if pending_freeze:
+		pending_freeze = false
+		_apply_freeze_effect_immediate()
+		return
+	
+	# Возвращаем базовый материал
+	if portrait_texture:
+		if current_material:
+			portrait_texture.material = current_material
+		elif _base_portrait_material:
+			portrait_texture.material = _base_portrait_material
+		else:
+			portrait_texture.material = null
+	
+	current_shader_priority = DataManager.EnemyShaderPriority.NONE

@@ -1,9 +1,10 @@
-[gd_scene load_steps=9 format=3 uid="uid://clmyxdwovjiwv"]
+[gd_scene load_steps=10 format=3 uid="uid://clmyxdwovjiwv"]
 
 [ext_resource type="Script" uid="uid://cqgirclrqlv2m" path="res://scripts/other/player_portrait.gd" id="1_xpecc"]
 [ext_resource type="Shader" uid="uid://nyqt5rf23ph0" path="res://shaders/comic_shader.gdshader" id="2_icepd"]
 [ext_resource type="Texture2D" uid="uid://ckbmiay4apyet" path="res://img/portraits/penitent_portrait.png" id="2_yotol"]
 [ext_resource type="Shader" uid="uid://1kutc6pr0rfa" path="res://shaders/card3_shader.gdshader" id="3_ge412"]
+[ext_resource type="Texture2D" uid="uid://dxg3mcj2iisyi" path="res://img/icons/statuses/shield.png" id="4_eunvh"]
 
 [sub_resource type="FastNoiseLite" id="FastNoiseLite_icepd"]
 noise_type = 2
@@ -61,6 +62,13 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+
+[node name="ShieldSprite" type="TextureRect" parent="VBoxContainer/TextureRect"]
+modulate = Color(1, 1, 1, 0)
+layout_mode = 1
+offset_right = 64.0
+offset_bottom = 64.0
+texture = ExtResource("4_eunvh")
 
 [node name="Filler" type="Control" parent="VBoxContainer"]
 custom_minimum_size = Vector2(0, 10)

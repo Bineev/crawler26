@@ -151,6 +151,7 @@ signal potion_deselect_all
 signal potion_discarded(potion_icon: PotionIcon)
 
 signal get_hit_in_shield(target: Node)
+signal player_hit_in_shield()
 
 signal enemy_get_debuff(target: Node)
-signal player_get_debuff(target: Node)
+signal player_get_debuff()
