@@ -206,7 +206,7 @@ func _setup_bars():
 
 
 func _on_player_damage_dealt(damage: int):
-	show_floating_text(str(damage), DataManager.COLOR_FLESH_CAVES_ART_BG_DARK)
+	show_floating_text(str(damage), DataManager.COLOR_PENITENT_ART_BG_DARK)
 
 
 func _on_player_heal_received(heal: int):

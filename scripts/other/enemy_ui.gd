@@ -18,6 +18,7 @@ class_name EnemyUI
 @onready var sprite_container: CenterContainer = $VBoxContainer/SpriteContainer
 @onready var highlight_sprite: TextureRect = $VBoxContainer/SpriteContainer/HighlightSprite
 @onready var v_box_container: VBoxContainer = $VBoxContainer
+@onready var shield_sprite: TextureRect = $VBoxContainer/SpriteContainer/ShieldSprite
 
 
 
@@ -70,6 +71,7 @@ func setup(enemy: EnemyInstance):
 	# Подписываемся на сигнал подсветки
 	SignalManager.damage_dealt.connect(_on_damage_dealt)
 	SignalManager.heal_received.connect(_on_heal_received)
+	SignalManager.shield_recieved.connect(_on_shield_received)
 	SignalManager.enemy_highlight_requested.connect(_on_highlight_requested)
 	SignalManager.get_hit.connect(_on_get_hit)
 	SignalManager.enemy_health_changed.connect(_on_enemy_health_changed)
@@ -78,6 +80,7 @@ func setup(enemy: EnemyInstance):
 	SignalManager.passive_removed.connect(_on_passive_changed)  # ← проверь, что есть
 	SignalManager.passive_changed.connect(_on_passive_changed)  # 🆕
 	SignalManager.passive_added.connect(_on_passive_changed)  # 🆕
+	SignalManager.get_hit_in_shield.connect(_on_get_hit_in_shield)
 	await get_tree().create_timer(0.1).timeout
 	_setup_click_area()
 	
@@ -210,6 +213,9 @@ func update_display():
 		# Копия спрайта
 	if enemy_sprite_copy:
 		enemy_sprite_copy.texture = enemy_instance.get_sprite()
+		
+	if shield_sprite:
+		shield_sprite.custom_minimum_size = enemy_sprite.size
 	
 	if highlight_sprite:
 		highlight_sprite.texture = enemy_instance.get_sprite()
@@ -564,8 +570,16 @@ func _on_damage_dealt(target: Node, amount: int):
 func _on_heal_received(target: Node, amount: int):
 	if target != enemy_instance:
 		return
-	var color = DataManager.COLOR_ROGUE_ART_BG_LIGHT  # светло-зелёный
+	var color = DataManager.COLOR_HEAL_LOG  # светло-зелёный
 	show_floating_text("+" + str(amount), color)
+	
+	
+func _on_shield_received(target: Node, amount: int):
+	if target != enemy_instance:
+		return
+	var color = DataManager.COLOR_WARRIOR_ART_BG_LIGHT  # светло-зелёный
+	show_floating_text("+" + str(amount), color)
+
 
 func die():
 	# Если есть hit — дожидаемся его окончания
@@ -902,3 +916,15 @@ func find_passive_icon(passive_id: int) -> PassiveIcon:
 		if child is PassiveIcon and child.passive_id == passive_id:
 			return child
 	return null
+
+
+func _on_get_hit_in_shield(target: Node):
+	if target != enemy_instance:
+		return
+	
+	# Показываем щит
+	shield_sprite.custom_minimum_size = enemy_sprite.size
+	shield_sprite.modulate = Color(1, 1, 1, 0.6)
+	
+	var tween = create_tween()
+	tween.tween_property(shield_sprite, "modulate", Color(1, 1, 1, 0), 0.3)

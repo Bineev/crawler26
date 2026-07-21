@@ -1,4 +1,3 @@
-# scripts/effects/abyss_dust_effect.gd
 extends Resource
 class_name AbyssDustEffect
 
@@ -13,7 +12,7 @@ static func apply(effect: EffectEntry, source, targets: Array, card_info: Dictio
 		SignalManager.log_message.emit("Колода пуста!")
 		return
 	
-	# 🆕 Собираем карты, у которых стоимость > 0
+	# Собираем карты, у которых стоимость > 0
 	var valid_cards: Array[CardData] = []
 	for card in master_cards:
 		if card.cost > 0:
@@ -26,7 +25,16 @@ static func apply(effect: EffectEntry, source, targets: Array, card_info: Dictio
 	# Выбираем случайную карту из отфильтрованного списка
 	var random_card = valid_cards[randi() % valid_cards.size()]
 	
-	# Устанавливаем стоимость в 0
-	random_card.cost = 0
+	# 🆕 Создаём копию карты
+	var new_card = random_card.duplicate_for_instance()
+	new_card.cost = 0
 	
-	SignalManager.log_message.emit("Пыль бездны: стоимость карты '%s' стала равна 0!" % random_card.get_localized_name())
+	# 🆕 Находим индекс оригинальной карты
+	var index = master_cards.find(random_card)
+	if index != -1:
+		# 🆕 Заменяем оригинальную карту на копию
+		master_cards[index] = new_card
+		
+		SignalManager.log_message.emit("Пыль бездны: стоимость карты '%s' стала равна 0!" % random_card.get_localized_name())
+	else:
+		SignalManager.log_message.emit("Ошибка: карта не найдена в колоде!")

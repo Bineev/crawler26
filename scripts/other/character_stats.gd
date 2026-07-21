@@ -182,6 +182,9 @@ func take_damage(amount: int, ignore_block: bool = false, attacker: CharacterSta
 		var shield_stacks = get_status_stacks(DataManager.Status.SHIELD)
 		if shield_stacks >= damage:
 			modify_status_stacks(DataManager.Status.SHIELD, -damage)
+			# TODO отобразить эффект удара в щит
+			if self is EnemyInstance:
+				SignalManager.get_hit_in_shield.emit(self)
 			damage = 0
 		else:
 			modify_status_stacks(DataManager.Status.SHIELD, -shield_stacks)
@@ -192,6 +195,7 @@ func take_damage(amount: int, ignore_block: bool = false, attacker: CharacterSta
 		SignalManager.player_damage_dealt.emit(damage)
 		SoundManager.play(null, DataManager.get_sound(DataManager.SoundType.PLAYER_GET_DAMAGE))
 	if damage > 0:
+	# TODO эффекты
 	# Визуальный эффект удара для игрока
 		if self is PenitentStats:
 			var portrait = GameTestManager.get_player_portrait()
@@ -336,6 +340,7 @@ func _add_status_direct(status: StatusResource, stacks: int, duration: int, cast
 		var enemy_ui = get_node("EnemyUI") as EnemyUI
 		if enemy_ui:
 			enemy_ui.push_back()
+			SignalManager.enemy_get_debuff.emit(enemy_ui)
 	
 	# Проверка на заморозку (для COLD)
 	if status_id == DataManager.Status.COLD:
@@ -348,6 +353,8 @@ func _add_status_direct(status: StatusResource, stacks: int, duration: int, cast
 	SignalManager.status_added.emit(self, status_id, stacks, duration)
 	if self is EnemyInstance:
 		SignalManager.enemy_status_changed.emit(self)
+		if status_id == DataManager.Status.SHIELD:
+			SignalManager.shield_recieved.emit(self, stacks)
 	elif self is PenitentStats:
 		SignalManager.player_status_changed.emit(self)
 	SignalManager.log_message.emit("Наложен %s: %d стаков на %d ходов" % [status.get_localized_name(), stacks, duration])

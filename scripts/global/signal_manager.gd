@@ -85,6 +85,7 @@ signal selecting_target_changed(is_selecting: bool)
 
 signal damage_dealt(target: Node, amount: int)
 signal heal_received(target: Node, amount: int)
+signal shield_recieved(target: Node, amount: int)
 
 signal next_room()
 signal show_paths(paths: Array)
@@ -148,3 +149,8 @@ signal potion_used(index: int)
 signal potion_deselect_all
 
 signal potion_discarded(potion_icon: PotionIcon)
+
+signal get_hit_in_shield(target: Node)
+
+signal enemy_get_debuff(target: Node)
+signal player_get_debuff(target: Node)
