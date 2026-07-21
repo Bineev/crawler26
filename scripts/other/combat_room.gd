@@ -128,7 +128,7 @@ func _start_battle():
 	var deck_data = RunManager.get_player_deck()
 	var battle_deck = deck_data.create_battle_copy()
 	battle_deck.hand_ui = hand_ui
-	
+	await get_tree().create_timer(1).timeout
 	BattleManager.start_battle(player, enemies, battle_deck, hand_ui, current_floor, current_biome, self)
 
 

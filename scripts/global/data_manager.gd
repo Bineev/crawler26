@@ -552,7 +552,7 @@ enum RoomReveal {
 const FLOOR_ROOMS_PER_PATH: int = 3           # комнат в одном пути
 const FLOOR_VISIBLE_ROOMS: int = 3            # видимых комнат в пути
 const FLOOR_PATHS_COUNT: int = 2              # количество путей на развилке
-const FLOOR_SEGMENTS_BEFORE_BOSS: int = 4     # сегментов (развилок) до босса
+const FLOOR_SEGMENTS_BEFORE_BOSS: int = 3     # сегментов (развилок) до босса
 ## ============================================================
 ## 2. БАЛАНСНЫЕ КОНСТАНТЫ
 ## ============================================================
@@ -909,7 +909,7 @@ const FONT_MAIN : Font = preload("res://fonts/RobotoCondensed-VariableFont_wght.
 
 const INTENT_ICONS: Dictionary = {
 	IntentType.ATTACK: preload("res://img/icons/intents/attack.png"),
-	IntentType.DEFEND: preload("res://img/icons/intents/defend.png"),
+	IntentType.DEFEND: preload("res://img/icons/statuses/shield.png"),
 	IntentType.BUFF: preload("res://img/icons/intents/buff.png"),
 	IntentType.DEBUFF: preload("res://img/icons/intents/debuff.png"),
 	IntentType.UNKNOWN: preload("res://img/icons/intents/unknown.png"),

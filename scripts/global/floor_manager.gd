@@ -41,6 +41,8 @@ func reset():
 	all_paths.clear()
 	current_room_index = 0
 	current_path_index = 0
+	current_path_progress = 0
+	current_floor = 1
 	pending_paths.clear()
 	boss_generated = false
 	print("FloorManager reset")

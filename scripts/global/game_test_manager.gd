@@ -20,6 +20,7 @@ var player : PenitentStats = null
 var energy_display: EnergyDisplay = null
 var potion_container: HBoxContainer = null
 var potion_full_label: Label = null
+var death_ui: DeathUI = null
 var potion_icons: Array[PotionIcon] = []
 # Ссылка на RoomManager (будет доступен как автолоад)
 # RoomManager уже загружен как синглтон
@@ -73,6 +74,8 @@ func start_test(world_node: Node):
 	_create_key_display()
 	_create_bone_display()
 	_create_potion_display()  # 🆕
+	for potion in DataManager.get_random_potions(1):
+		RunManager.add_potion(potion)
 	# Отключаем старые сигналы перед подключением
 	if FloorManager.room_selected.is_connected(_on_room_selected):
 		FloorManager.room_selected.disconnect(_on_room_selected)
@@ -231,11 +234,6 @@ func _on_show_paths(paths: Array):
 
 func _on_choice_panel_selected(path_index: int):
 	FloorManager.select_path(path_index)
-
-
-func _reset_game_state():
-	BattleManager.reset_battle()
-	current_room_node = null
 
 
 func clear_ui():
@@ -502,3 +500,71 @@ func _on_potion_discarded(potion_icon: PotionIcon) -> void:
 func _update_full_label() -> void:
 	if potion_full_label:
 		potion_full_label.visible = RunManager.get_potions().size() >= DataManager.POTION_MAX_COUNT
+
+
+func restart_run():
+	print("=== RESTART RUN ===")
+	
+	# 1. Очищаем всё игровое состояние
+	_reset_game_state()
+	clear_ui()
+	
+	# 2. Очищаем game_world от всех дочерних объектов
+	for child in game_world.get_children():
+		child.queue_free()
+	_disconnect_all_signals()
+	# 3. Сбрасываем менеджеры
+	BattleManager.reset_battle()
+	
+	# 4. Сбрасываем RunManager
+	RunManager.reset_run()
+	
+	# 5. Запускаем забег заново
+	start_test(game_world)
+
+func _disconnect_all_signals():
+	# Отключаем все сигналы, которые могли остаться
+	SignalManager.hand_ui_created.disconnect(_on_hand_ui_created)
+	SignalManager.next_room.disconnect(_on_next_room)
+	SignalManager.show_paths.disconnect(_on_show_paths)
+	SignalManager.choice_panel_selected.disconnect(_on_choice_panel_selected)
+	SignalManager.battle_started.disconnect(_on_battle_started)
+	SignalManager.player_turn_started.disconnect(_on_player_turn_started)
+	SignalManager.enemy_turn_started.disconnect(_on_enemy_turn_started)
+	SignalManager.battle_victory.disconnect(_on_battle_ended)
+	SignalManager.battle_defeat.disconnect(_on_battle_ended)
+	SignalManager.show_reward.disconnect(_on_show_reward)
+	SignalManager.add_action_choice.disconnect(_on_add_action_choice)
+	SignalManager.potion_added.disconnect(_on_potion_added)
+	SignalManager.potion_removed.disconnect(_on_potion_removed)
+	SignalManager.potion_used.disconnect(_on_potion_used)
+	SignalManager.potion_discarded.disconnect(_on_potion_discarded)
+	SignalManager.potion_deselect_all.disconnect(_on_potion_deselect_all)
+
+func create_death_ui():
+	death_ui = preload("res://scenes/death_ui.tscn").instantiate() as DeathUI
+	game_world.add_child(death_ui)
+	death_ui.global_position = Vector2.ZERO
+
+
+func clear_ui_after_death():
+	clear_ui()
+	potion_container.hide()
+	bone_display.hide()
+	gold_display.hide()
+	key_display.hide()
+
+
+func _reset_game_state():
+	BattleManager.reset_battle()
+	
+	# Очищаем текущую комнату
+	if current_room_node and is_instance_valid(current_room_node):
+		current_room_node.queue_free()
+		current_room_node = null
+	
+	# Сбрасываем индексы
+	current_room_index = 0
+	
+	# Очищаем UI
+	clear_ui()

@@ -42,8 +42,6 @@ func initialize_run():
 	DeckManager._load_cards_data()
 	DeckManager._init_unlocked_cards()
 	# 🆕 Добавляем случайные зелья
-	for potion in DataManager.get_random_potions(1):
-		add_potion(potion)
 	print("RunManager initialized with deck size: ", player_deck_data.master_cards.size())
 
 
@@ -531,3 +529,22 @@ func decrement_deck_size_buff() -> void:
 			player.set_flat(DataManager.FlatStat.HAND_SIZE, current_hand_size - deck_size_bonus)
 			SignalManager.log_message.emit("Бафф размера руки закончился!")
 		deck_size_bonus = 0
+
+
+func reset_run():
+	# Сбрасываем все данные забега
+	player_deck_data = null
+	potions.clear()
+	artifacts.clear()
+	coins = 0
+	bones = 0
+	keys = 0
+	is_robber = false
+	temp_buffs = {
+		"max_energy_buff": 0,
+		"bonus_energy": 0
+	}
+	deck_size_buff_remaining = 0
+	deck_size_bonus = 0
+	idol_curse_remaining = 0
+	initialize_run()

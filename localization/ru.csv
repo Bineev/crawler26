@@ -138,6 +138,7 @@ reward_take_heal,Лечиться
 reward_take_damage,Принять
 reward_choose,Выбрать
 reward_default_title,Выберите награду
+reward_lost_max_hp_title, "Примите потерю"
 artifact_strange_mushroom_name,Странный гриб
 artifact_strange_mushroom_desc,"+%d макс. HP, но каждый бой начинается с Ядом на %d хода"
 artifact_strange_mushroom_lore,"Странный гриб, найденный в глубинах. Он даёт силу, но требует платы."
@@ -303,9 +304,10 @@ upgrade_card_confirm,Улучшить
 "shop_title","Магазин"
 "action_trade","Торговать"
 "action_rob","Ограбить"
-"shop_trade_title","Добро пожаловать в магазин!"
+"shop_trade_title","Лавка открыта для всех"
 "shop_leave","Покинуть"
 "shop_trade_welcome","Выберите товар"
+"reward_trade_title","Лавка"
 
 "end_turn_button_label", "Завершить ход"
 "button_path_go", "В путь"
@@ -337,3 +339,9 @@ upgrade_card_confirm,Улучшить
 "room_object","Объект"
 
 "choice_panel_title","Вы нашли записку с картой развилок"
+
+"death_title","Ты погиб..."
+"death_stats_floor","Этаж: %d"
+"death_stats_biome","Биом: %s"
+"death_lobby","В лобби"
+"death_retry","Повторить забег"

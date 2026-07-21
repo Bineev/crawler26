@@ -481,6 +481,8 @@ func remove_freeze_effect():
 
 func die():
 	# Если есть hit — дожидаемся его окончания
+	artifact_container.hide()
+	status_container.hide()
 	if current_shader_priority == DataManager.EnemyShaderPriority.HIT:
 		pending_death = true
 		return

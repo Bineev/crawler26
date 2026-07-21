@@ -138,6 +138,7 @@ reward_take_heal,Heal
 reward_take_damage,Accept
 reward_choose,Choose
 reward_default_title,Choose a reward
+reward_lost_max_hp_title, "Cry"
 artifact_strange_mushroom_name,Strange Mushroom
 artifact_strange_mushroom_desc,"+%d max HP, but start each fight with Poison for %d turns"
 artifact_strange_mushroom_lore,"A strange mushroom found in the depths. It grants power, but demands a price."
@@ -307,6 +308,7 @@ upgrade_card_confirm,Upgrade
 "shop_trade_title","Welcome to the shop!"
 "shop_leave","Leave"
 "shop_trade_welcome","Select an item"
+"reward_trade_title","Shop"
 
 "end_turn_button_label", "End turn"
 "button_path_go", "Go"
@@ -338,3 +340,9 @@ upgrade_card_confirm,Upgrade
 "room_object","Object"
 
 "choice_panel_title","You found a note with a fork map"
+
+"death_title","You have died..."
+"death_stats_floor","Floor: %d"
+"death_stats_biome","Biome: %s"
+"death_lobby","To Lobby"
+"death_retry","Retry Run"

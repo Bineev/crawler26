@@ -1,0 +1,46 @@
+[gd_scene load_steps=2 format=3 uid="uid://c3jonojo341c8"]
+
+[ext_resource type="Script" uid="uid://me7t81o2d0pr" path="res://scripts/other/death_ui.gd" id="1_bb3uk"]
+
+[node name="DeathUI" type="Control"]
+custom_minimum_size = Vector2(1920, 1080)
+layout_mode = 3
+anchors_preset = 0
+script = ExtResource("1_bb3uk")
+
+[node name="DarkOverlay" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 1)
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -20.0
+offset_top = 300.0
+offset_right = 20.0
+offset_bottom = 434.0
+grow_horizontal = 2
+theme_override_constants/separation = 40
+alignment = 1
+
+[node name="DeathLabel" type="Label" parent="VBoxContainer"]
+layout_mode = 2
+
+[node name="StatsLabel" type="Label" parent="VBoxContainer"]
+layout_mode = 2
+
+[node name="ButtonsContainer" type="HBoxContainer" parent="VBoxContainer"]
+layout_mode = 2
+
+[node name="LobbyButton" type="Button" parent="VBoxContainer/ButtonsContainer"]
+layout_mode = 2
+
+[node name="RetryButton" type="Button" parent="VBoxContainer/ButtonsContainer"]
+layout_mode = 2

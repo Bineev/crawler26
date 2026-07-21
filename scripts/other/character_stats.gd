@@ -691,10 +691,14 @@ func _on_death():
 	SignalManager.log_message.emit("%s погиб!" % get_display_name())
 	
 	if self is PenitentStats:
+		# Сохраняем прогресс
+		SaveManager.save_progress()
+		GameTestManager.clear_ui_after_death()
 		var portrait = GameTestManager.get_player_portrait()
 		if portrait:
 			portrait.die()
-		# Сигнал о смерти игрока (показываем экран поражения после анимации)
+		# 🆕 Создаём DeathUI через GameTestManager
+		GameTestManager.create_death_ui()
 		SignalManager.player_died.emit(self)
 	elif self is EnemyInstance:
 		SignalManager.enemy_died.emit(self)
