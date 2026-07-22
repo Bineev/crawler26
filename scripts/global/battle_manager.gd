@@ -163,6 +163,7 @@ func start_enemy_turn():
 		
 		if enemy.has_status(DataManager.Status.FROZEN):
 			SignalManager.log_message.emit("%s заморожен и пропускает ход!" % enemy.get_display_name())
+			enemy.process_end_of_turn()
 			await enemy.get_tree().create_timer(DataManager.ENEMY_STEP_DELAY).timeout
 			continue
 		

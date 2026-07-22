@@ -261,11 +261,11 @@ func _init_floating_positions():
 	var portrait_pos = portrait_texture.global_position
 	var portrait_size = portrait_texture.size
 	
-	# Коэффициенты для позиций
-	var left_margin = 0.05   # от левого края
-	var right_margin = 0.05  # от правого края
-	var top_margin = 0.25    # от верхнего края (ниже глаз)
-	var bottom_margin = 0.75 # до нижнего края
+	# 🆕 Увеличиваем отступы, чтобы текст не вылезал за портрет
+	var left_margin = 0.15   # увеличил с 0.05
+	var right_margin = 0.15  # увеличил с 0.05
+	var top_margin = 0.2     # чуть выше
+	var bottom_margin = 0.8  # чуть ниже
 	
 	# Левые позиции
 	for i in range(5):

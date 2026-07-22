@@ -610,13 +610,19 @@ func process_end_of_turn():
 		# Размораживаем ТОЛЬКО если:
 		# 1. Это не игрок (враг) → всегда размораживаем
 		# 2. ИЛИ это игрок и заморозка была в начале хода
-		if not self is PenitentStats or _frozen_at_turn_start:
+		# BUG с заморозкой
+		if self is EnemyInstance:
 			thaw()
 			_frozen_at_turn_start = false
 			return
-		else:
-			# Игрок заморозил себя — не размораживаем, оставляем на следующий ход
-			return
+		elif self is PenitentStats:
+			if _frozen_at_turn_start:
+				_frozen_at_turn_start = false
+				return
+			else:
+				thaw()
+				_frozen_at_turn_start = false
+				return
 	# ✅ ШАГ 1: Сначала пассивки ON_TURN_END
 	_process_passive_triggers(DataManager.PassiveTrigger.ON_TURN_END)
 	

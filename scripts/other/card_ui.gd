@@ -23,6 +23,8 @@ var effect_overlay: ColorRect = null
 var effect_overlay2: ColorRect = null
 var effect_overlay3: ColorRect = null
 var background : TextureRect = null
+var art_shader: ColorRect = null
+
 
 ## ============================================================
 ## ДАННЫЕ КАРТЫ
@@ -74,6 +76,7 @@ func _ready():
 	effect_overlay = $CardTemplate/ShaderRect
 	effect_overlay2 = $CardTemplate/ShaderRect2
 	effect_overlay3 = $CardTemplate/ShaderRect3
+	art_shader = $CardTemplate/MarginContainer/MainLayout/MiddleLayout/ArtContainer/ArtShader
 	
 	original_position = position
 	original_z_index = z_index
@@ -119,7 +122,10 @@ func display():
 			art_image.size.x * (1 - scale_factor) / 2,
 			art_image.size.y * (1 - scale_factor) / 2
 		)
-	
+		# 🆕 Устанавливаем цвет свечения по биому
+		
+	# 🆕 Устанавливаем цвет свечения по карте
+	set_glow_color_by_biome(card_data)
 	
 	description_label.text = card_data.generate_dynamic_description()
 	
@@ -873,3 +879,15 @@ func set_reward_state() -> void:
 	# Отключаем взаимодействие
 	card_control.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	# Убираем анимации наведения и т.д.
+
+
+func set_glow_color_by_biome(card: CardData) -> void:
+	if not art_shader:
+		return
+	
+	var mat = art_shader.material as ShaderMaterial
+	if not mat:
+		return
+	
+	var color = DataManager.get_glow_color_for_card(card)
+	mat.set_shader_parameter("glow_color", color)

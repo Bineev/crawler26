@@ -587,7 +587,7 @@ const BURN_STRENGTH_DURATION: int = 2
 const COLD_EFFECT_PERCENT_PER_STACK: float = 0.01
 const COLD_MIN_EFFECT_MULTIPLIER: float = 0.75
 #BUG
-const COLD_FREEZE_THRESHOLD: int = 10
+const COLD_FREEZE_THRESHOLD: int = 5
 const COLD_DEFAULT_DURATION: int = 5  # ← изменено с 3 на 5
 const FROZEN_DURATION: int = 1  # заморозка на 1 ход
 
@@ -2245,3 +2245,37 @@ func get_room_label(room: RoomNode) -> String:
 					return tr("room_object")
 		_:
 			return tr("room_unknown")
+
+
+func get_glow_color_for_card(card: CardData) -> Color:
+	match card.origin:
+		DataManager.CardOrigin.CHARACTER:
+			match card.character_class:
+				DataManager.CharacterClass.PENITENT:
+					return COLOR_PENITENT_ART_BG_DARK
+				DataManager.CharacterClass.WARRIOR:
+					return COLOR_WARRIOR_ART_BG_LIGHT
+				DataManager.CharacterClass.MYSTIC:
+					return COLOR_MYSTIC_ART_BG_LIGHT
+				DataManager.CharacterClass.ROGUE:
+					return COLOR_ROGUE_ART_BG_LIGHT
+				_:
+					return COLOR_PENITENT_ART_BG_LIGHT
+		
+		DataManager.CardOrigin.BIOME:
+			match card.biome:
+				DataManager.Biome.MOLE_TUNNELS:
+					return COLOR_MOLE_TUNNELS_ART_BG_DARK  # e9dab0ff
+				DataManager.Biome.FLESH_CAVES:
+					return COLOR_FLESH_CAVES_ART_BG_LIGHT  # BF6A6A
+				DataManager.Biome.BONE_LABYRINTH:
+					return COLOR_BONE_LABYRINTH_ART_BG_LIGHT  # BFB8A6
+				DataManager.Biome.FROZEN_DEPTHS:
+					return COLOR_WARRIOR_ART_BG_LIGHT  # 8A8ABF
+				DataManager.Biome.MAGMA_CORE:
+					return COLOR_FLESH_CAVES_ART_BG_DARK  # 400D0D
+				_:
+					return COLOR_MOLE_TUNNELS_ART_BG_LIGHT2
+		
+		_:
+			return COLOR_PENITENT_ART_BG_LIGHT

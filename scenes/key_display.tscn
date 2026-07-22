@@ -1,6 +1,24 @@
-[gd_scene load_steps=2 format=3 uid="uid://cyxqrq8dn4xw2"]
+[gd_scene load_steps=6 format=3 uid="uid://cyxqrq8dn4xw2"]
 
 [ext_resource type="Script" uid="uid://8q8qtkryd7mx" path="res://scripts/other/key_display.gd" id="1_qy7ty"]
+[ext_resource type="Shader" uid="uid://nyqt5rf23ph0" path="res://shaders/comic_shader.gdshader" id="2_ff2es"]
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_icepd"]
+noise_type = 2
+seed = 4
+frequency = 0.1
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_icepd"]
+noise = SubResource("FastNoiseLite_icepd")
+seamless = true
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_eunvh"]
+shader = ExtResource("2_ff2es")
+shader_parameter/grunge_noise_tex = SubResource("NoiseTexture2D_icepd")
+shader_parameter/grunge_intensity = 0.10000000475
+shader_parameter/jitter_speed = 7.0000003325
+shader_parameter/jitter_amount = 0.0030000001425
+shader_parameter/paper_tint = Color(0.2509804, 0.050980393, 0.050980393, 1)
 
 [node name="KeyDisplay" type="HBoxContainer"]
 offset_right = 40.0
@@ -11,4 +29,5 @@ script = ExtResource("1_qy7ty")
 layout_mode = 2
 
 [node name="KeyIcon" type="TextureRect" parent="."]
+material = SubResource("ShaderMaterial_eunvh")
 layout_mode = 2
