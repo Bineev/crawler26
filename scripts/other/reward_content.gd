@@ -209,7 +209,15 @@ func _apply_reward(index: int) -> void:
 			if player:
 				var bonus = rewards[0]
 				var duration = rewards[1]
-				RunManager.apply_energy_buff(bonus, duration)
+				if duration == -1:
+					# Перманентный бафф — сразу применяем
+					var current_max = player.get_max_energy()
+					player.set_flat(DataManager.FlatStat.MAX_ENERGY, current_max + bonus)
+					player.restore_energy()
+					SignalManager.log_message.emit("Максимальная энергия увеличена на %d навсегда!" % bonus)
+				else:
+					# Временный бафф — через RunManager
+					RunManager.apply_energy_buff(bonus, duration)
 		DataManager.RewardType.DECK_SIZE_BUFF:
 			var player = BattleManager.get_player()
 			if player:

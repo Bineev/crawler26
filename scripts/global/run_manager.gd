@@ -411,41 +411,49 @@ func get_keys() -> int:
 
 
 func apply_energy_buff(bonus: int, duration: int) -> void:
-	# Если duration == -1 — перманентный бафф (храним как 999)
-	var actual_duration = 999 if duration == -1 else duration
+	var old_bonus = temp_buffs["bonus_energy"]
+	var old_duration = temp_buffs["max_energy_buff"]
 	
-	temp_buffs["max_energy_buff"] = actual_duration
-	temp_buffs["bonus_energy"] = bonus
+	if old_bonus == 0:
+		# Если баффа нет — просто применяем
+		temp_buffs["bonus_energy"] = bonus
+		temp_buffs["max_energy_buff"] = duration
+	else:
+		if bonus == old_bonus:
+			# Одинаковые значения — суммируем длительность
+			temp_buffs["max_energy_buff"] = old_duration + duration
+		else:
+			# Разные значения — берём максимум бонуса и максимум длительности
+			temp_buffs["bonus_energy"] = max(bonus, old_bonus)
+			temp_buffs["max_energy_buff"] = max(duration, old_duration)
 	
 	var player = BattleManager.get_player()
 	if player:
 		var current_max = player.get_max_energy()
-		player.set_flat(DataManager.FlatStat.MAX_ENERGY, current_max + bonus)
+		var new_max = DataManager.MAX_ENERGY + temp_buffs["bonus_energy"]
+		player.set_flat(DataManager.FlatStat.MAX_ENERGY, new_max)
 		player.restore_energy()
-		
-		if duration == -1:
-			SignalManager.log_message.emit("Максимальная энергия увеличена на %d навсегда!" % bonus)
-		else:
-			SignalManager.log_message.emit("Максимальная энергия увеличена на %d на %d боёв!" % [bonus, duration])
-
+		SignalManager.log_message.emit("Максимальная энергия: +%d на %d боёв!" % [temp_buffs["bonus_energy"], temp_buffs["max_energy_buff"]])
 
 func decrement_energy_buff() -> void:
-	if temp_buffs["max_energy_buff"] <= 0 or temp_buffs["max_energy_buff"] == 999:
-		return  # 999 — перманентный, не уменьшаем
+	if temp_buffs["max_energy_buff"] <= 0:
+		return
 	
 	temp_buffs["max_energy_buff"] -= 1
 	
 	if temp_buffs["max_energy_buff"] <= 0:
-		# Снимаем бафф
+		# Снимаем временный бафф
 		var player = BattleManager.get_player()
 		if player:
+			# 🆕 Вычитаем только бонус от временного баффа
 			var current_max = player.get_max_energy()
-			var default_max = DataManager.MAX_ENERGY
-			player.set_flat(DataManager.FlatStat.MAX_ENERGY, default_max)
-			if player.get_energy() > default_max:
-				player.set_energy(default_max)
-			SignalManager.log_message.emit("Бафф энергии закончился! Максимальная энергия восстановлена до %d" % default_max)
+			var new_max = current_max - temp_buffs["bonus_energy"]
+			player.set_flat(DataManager.FlatStat.MAX_ENERGY, new_max)
+			if player.get_energy() != new_max:
+				player.set_energy(new_max)
+			SignalManager.log_message.emit("Временный бафф энергии закончился! Максимальная энергия восстановлена до %d" % new_max)
 		temp_buffs["bonus_energy"] = 0
+
 
 func get_energy_buff_remaining() -> int:
 	return temp_buffs["max_energy_buff"]
@@ -455,9 +463,15 @@ func get_energy_bonus() -> int:
 
 
 func apply_idol_curse(biome: DataManager.Biome, duration: int) -> void:
-	idol_curse_biome = biome
-	idol_curse_remaining = duration
-	SignalManager.log_message.emit("На вас проклятие идола на %d боя!" % duration)
+	if idol_curse_remaining > 0:
+		# Если проклятие уже есть — суммируем длительность
+		idol_curse_remaining += duration
+		SignalManager.log_message.emit("Проклятие идола продлено на %d боёв! Всего осталось %d." % [duration, idol_curse_remaining])
+	else:
+		# Новое проклятие
+		idol_curse_biome = biome
+		idol_curse_remaining = duration
+		SignalManager.log_message.emit("На вас проклятие идола на %d боя!" % duration)
 
 func apply_idol_curse_to_player(player: CharacterStats) -> void:
 	if idol_curse_remaining <= 0:
@@ -505,16 +519,31 @@ func set_robber(value: bool) -> void:
 func get_robber() -> bool:
 	return is_robber
 
-
 func apply_deck_size_buff(amount: int, duration: int) -> void:
-	deck_size_buff_remaining = duration
-	deck_size_bonus = amount
+	var old_amount = deck_size_bonus
+	var old_duration = deck_size_buff_remaining
+	
+	if old_amount == 0:
+		# Если баффа нет — просто применяем
+		deck_size_bonus = amount
+		deck_size_buff_remaining = duration
+	else:
+		if amount == old_amount:
+			# Одинаковые значения — суммируем длительность
+			deck_size_buff_remaining = old_duration + duration
+		else:
+			# Разные значения — берём максимум бонуса и максимум длительности
+			deck_size_bonus = max(amount, old_amount)
+			deck_size_buff_remaining = max(duration, old_duration)
 	
 	var player = BattleManager.get_player()
 	if player:
 		var current_hand_size = player.get_flat(DataManager.FlatStat.HAND_SIZE)
-		player.set_flat(DataManager.FlatStat.HAND_SIZE, current_hand_size + amount)
-		SignalManager.log_message.emit("Размер руки увеличен на %d на %d боёв!" % [amount, duration])
+		var new_hand_size = DataManager.STARTING_HAND_SIZE + deck_size_bonus
+		player.set_flat(DataManager.FlatStat.HAND_SIZE, new_hand_size)
+		SignalManager.log_message.emit("Размер руки: +%d на %d боёв!" % [deck_size_bonus, deck_size_buff_remaining])
+
+
 
 func decrement_deck_size_buff() -> void:
 	if deck_size_buff_remaining <= 0:

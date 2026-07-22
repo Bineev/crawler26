@@ -40,7 +40,7 @@ func setup(potion: PotionResource) -> void:
 	stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	custom_minimum_size = Vector2(64, 64)
 	size = Vector2(64, 64)
-	DataManager.apply_shader_to_icon(self, "res://shaders/highlight_item2.gdshader", {'hover_intensity' : 1.0})
+	#DataManager.apply_shader_to_icon(self, "res://shaders/highlight_item2.gdshader", {'hover_intensity' : 1.0})
 	DataManager.apply_shader_overlay(self, "res://shaders/horror_shader.gdshader")
 	# Тултип
 	var tooltip = potion.get_localized_name()

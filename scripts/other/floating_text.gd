@@ -2,12 +2,13 @@
 extends Label
 class_name FloatingText
 
-func setup(text: String, color: Color):
+func setup(text: String, color: Color, is_enemy: bool = true):
 	self.text = text
 	self.add_theme_font_override("font", DataManager.FONT_HEADERS)
 	self.add_theme_font_size_override("font_size", 36)
 	self.add_theme_color_override("font_color", color)
-	
+	if not is_enemy:
+		self.add_theme_font_size_override("font_size", 48)
 	_animate()
 
 

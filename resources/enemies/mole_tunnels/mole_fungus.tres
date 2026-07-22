@@ -10,6 +10,6 @@ script = ExtResource("1_j71wk")
 enemy_id = 3
 name_key = "enemy_mole_fungus_name"
 description_key = "enemy_mole_fungus_desc"
-base_max_health = 45
+base_max_health = 60
 starting_passives = Array[ExtResource("2_t23cl")]([ExtResource("3_3iv35"), ExtResource("4_ok8oa")])
 metadata/_custom_type_script = "uid://beudtcsu45bk7"

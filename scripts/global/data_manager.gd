@@ -670,6 +670,7 @@ const CRY_OF_DESPAIR_HEAL_TIER_3: int = 15
 
 const ENEMY_STEP_DELAY : float = 1
 const STATUS_TRIGGER_DELAY : float = 1
+const PLAYER_STATUS_TRIGGER_DELAY : float = 1.2
 
 const CHEST_BREAK_CHANCE: float = 0.5  # 50% шанс взлома
 ## ============================================================

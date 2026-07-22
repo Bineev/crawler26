@@ -8,6 +8,6 @@ script = ExtResource("1_evpgb")
 enemy_id = 1
 name_key = "enemy_strong_mole_name"
 description_key = "enemy_strong_mole_desc"
-base_max_health = 1
+base_max_health = 70
 base_strength = 8
 metadata/_custom_type_script = "uid://beudtcsu45bk7"

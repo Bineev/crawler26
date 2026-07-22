@@ -154,18 +154,13 @@ func add_block(amount: int):
 		var shield_status = DataManager.get_status_resource(DataManager.Status.SHIELD)
 		add_status(shield_status, final_block, 1, self)  # на 1 ход
 
-func take_damage(amount: int, ignore_block: bool = false, attacker: CharacterStats = null):    # Проверка на заморозку (если заморожена — урон не проходит)
+func take_damage(amount: int, ignore_block: bool = false, attacker: CharacterStats = null, is_direct: bool = true):    # Проверка на заморозку (если заморожена — урон не проходит)
 	# Сохраняем состояние до применения урона
 	var health_before = get_health()
 	var max_health = get_max_health()
 	var percent_before = (float(health_before) / max_health) * 100.0
 	
 	var damage = amount
-	if damage > 0 and self is EnemyInstance:
-		var enemy_ui = get_node("EnemyUI") as EnemyUI
-		if enemy_ui:
-			# Урон — среднее отталкивание
-			enemy_ui.push_back()
 	# Если заморожен — -50% урона
 	if has_status(DataManager.Status.FROZEN):
 		damage = floor(damage * 0.5)
@@ -205,9 +200,16 @@ func take_damage(amount: int, ignore_block: bool = false, attacker: CharacterSta
 				portrait.apply_hit_effect()
 		SignalManager.log_message.emit("%s получил %d урона" % [get_display_name(), damage])
 		SignalManager.damage_dealt.emit(self, damage)
+		if is_direct:
+			if damage > 0 and self is EnemyInstance:
+				var enemy_ui = get_node("EnemyUI") as EnemyUI
+				if enemy_ui:
+					# Урон — среднее отталкивание
+					enemy_ui.push_back()
 		SignalManager.get_hit.emit(self)
 		if self is PenitentStats:
-			SignalManager.player_took_damage.emit(damage)
+			if is_direct:
+				SignalManager.player_took_damage.emit(damage)
 			#SignalManager.player_damage_dealt.emit(damage)
 		modify_flat(DataManager.FlatStat.HEALTH, -damage)
 		# Сохраняем состояние после применения урона
@@ -340,9 +342,11 @@ func _add_status_direct(status: StatusResource, stacks: int, duration: int, cast
 	# Визуальные эффекты
 	if self is EnemyInstance and DataManager.is_negative_status(status_id):
 		SignalManager.enemy_get_debuff.emit(self)
+		SignalManager.something_get_debuff.emit()
 	# Визуальные эффекты
 	elif self is PenitentStats and DataManager.is_negative_status(status_id):
 		SignalManager.player_get_debuff.emit()
+		SignalManager.something_get_debuff.emit()
 	
 	# Проверка на заморозку (для COLD)
 	if status_id == DataManager.Status.COLD:
@@ -808,8 +812,11 @@ func process_start_of_turn():
 					_:
 						tick_effect.base_value = tick_value
 				#BUG здесь тикает статус (после тика враг может быть мертв)
-				EffectExecutor.execute(tick_effect, caster, [self])
-				await Engine.get_main_loop().create_timer(DataManager.STATUS_TRIGGER_DELAY).timeout
+				EffectExecutor.execute(tick_effect, caster, [self], {}, null, tick_effect.is_direct_damage)
+				if self is EnemyInstance:
+					await Engine.get_main_loop().create_timer(DataManager.STATUS_TRIGGER_DELAY).timeout
+				elif self is PenitentStats:
+					await Engine.get_main_loop().create_timer(DataManager.PLAYER_STATUS_TRIGGER_DELAY).timeout
 			if status.id == DataManager.Status.BURN and data.stacks >= DataManager.BURN_THRESHOLD_STACKS:
 				_trigger_burn_explosion(data.stacks)
 				statuses_to_remove.append(status_id)
@@ -840,7 +847,7 @@ func trigger_poison_immediately():
 	if has_status(DataManager.Status.POISON):
 		var stacks = get_status_stacks(DataManager.Status.POISON)
 		var damage = stacks * DataManager.POISON_BASE_DAMAGE_PER_STACK
-		take_damage(damage, true)
+		take_damage(damage, true, null, false)
 		remove_status(DataManager.Status.POISON)
 		SignalManager.log_message.emit("Яд сработал мгновенно! %d урона" % damage)
 

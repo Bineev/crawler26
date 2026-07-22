@@ -25,10 +25,10 @@ script = ExtResource("1_g7g4h")
 
 [node name="ColorRect" type="ColorRect" parent="."]
 custom_minimum_size = Vector2(5000, 5000)
-offset_left = -1729.0
-offset_top = -1204.0
-offset_right = 3271.0
-offset_bottom = 3796.0
+offset_left = -1690.0
+offset_top = -1191.0
+offset_right = 3310.0
+offset_bottom = 3809.0
 mouse_filter = 2
 color = Color(0, 0, 0, 1)
 

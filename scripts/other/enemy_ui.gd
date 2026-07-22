@@ -38,6 +38,7 @@ var current_shader_priority: DataManager.EnemyShaderPriority = DataManager.Enemy
 var pending_death: bool = false
 var pending_freeze: bool = false
 var _is_pushing: bool = false
+var _is_squeezing: bool = false
 
 var _saved_modulate: Color = Color(1, 1, 1, 1)
 
@@ -477,7 +478,7 @@ func _hit_effect():
 		hit_tween.kill()
 	
 	hit_tween = create_tween()
-	hit_tween.tween_property(shader_material, "shader_parameter/hit_progress", 0.0, 0.3)\
+	hit_tween.tween_property(shader_material, "shader_parameter/hit_progress", 0.0, 0.5)\
 		.set_trans(Tween.TRANS_QUART)\
 		.set_ease(Tween.EASE_OUT)
 	
@@ -885,25 +886,43 @@ func push_back():
 	_is_pushing = true
 	
 	var original_scale = scale
-	var target_scale = Vector2(0.7, 0.7)
+	var original_rot = rotation
+	var position_at_start = position # Фиксируем стартовую позицию для безопасного возврата
 	
-	# Вычисляем смещение для центрирования
+	# Эффектный наклон (персонажа косит от удара влево или вправо)
+	var random_tilt = randf_range(-0.12, 0.12)
+	
+	# Делаем сжатие более анатомичным (персонаж приседает от удара: Y сжимается сильнее, чем X)
+	var target_scale = Vector2(0.8, 0.6)
+	
+	# Вычисляем смещение для центрирования (по вашей исходной формуле)
 	var size = enemy_sprite.size
 	var offset = (size * original_scale - size * target_scale) / 2
-	var target_pos = position + offset
+	var target_pos = position_at_start + offset
 	
 	var tween = create_tween()
 	tween.set_parallel(true)
 	
-	tween.tween_property(self, "scale", target_scale, 0.1).set_ease(Tween.EASE_OUT)
-	tween.tween_property(self, "position", target_pos, 0.1).set_ease(Tween.EASE_OUT)
+	# --- ФАЗА 1: Удар (Мгновенный шлепок и отлёт) ---
+	# Молниеносно сжимаем и смещаем персонажа за 0.03 сек
+	tween.tween_property(self, "scale", target_scale, 0.02).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_QUAD)
+	tween.tween_property(self, "position", target_pos, 0.02).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_QUAD)
+	tween.tween_property(self, "rotation", random_tilt, 0.02).set_ease(Tween.EASE_OUT)
 	
-	tween.tween_property(self, "scale", original_scale, 0.1).set_delay(0.1).set_ease(Tween.EASE_IN)
-	tween.tween_property(self, "position", position, 0.1).set_delay(0.1).set_ease(Tween.EASE_IN)
+	# --- ФАЗА 2: Возврат с оттягом (Тяжёлое восстановление) ---
+	# Задержка 0.03 сек. Время возврата 0.25 сек создаёт вязкий, сочный оттяг.
+	# TRANS_CUBIC даёт красивое замедление в самом конце движения.
+	tween.tween_property(self, "scale", original_scale, 0.15).set_delay(0.02).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CUBIC)
+	tween.tween_property(self, "position", position_at_start, 0.15).set_delay(0.02).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CUBIC)
+	tween.tween_property(self, "rotation", original_rot, 0.15).set_delay(0.02).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CUBIC)
+
 	
 	await tween.finished
 	
 	_is_pushing = false
+
+
+
 	
 	
 
@@ -942,45 +961,65 @@ func _on_enemy_get_debuff(enemy: EnemyInstance):
 	
 	
 func _apply_debuff_effect():
-	# Если уже есть HIT или более высокий приоритет — игнорируем
 	if current_shader_priority >= DataManager.EnemyShaderPriority.HIT:
 		return
-		
-	push_back()
-	
 	if not enemy_sprite:
 		return
 	
-	# Сохраняем текущий материал
-	var current_material = enemy_sprite.material
+	# --- НАСТРОЙКИ СКОРОСТИ (в секундах) ---
+	var t_squeeze: float = 0.03    # Скорость сжатия (было 0.15)
+	var t_pause: float = 0.05      # Пауза на пике (было 0.1)
+	var t_return: float = 0.05     # Возврат формы (было 0.3)
+	var t_fade: float = 0.5        # Затухание шейдера (было 1.55)
+	# --------------------------------------
 	
-	# Применяем шейдер дебаффа
+	var current_material = enemy_sprite.material
 	var shader = preload("res://shaders/debuff_shader.gdshader")
 	var shader_material = ShaderMaterial.new()
 	shader_material.shader = shader
 	enemy_sprite.material = shader_material
-	shader_material.set_shader_parameter("debuff_progress", 1.0)
+	shader_material.set_shader_parameter("debuff_progress", 0.0)
 	
 	current_shader_priority = DataManager.EnemyShaderPriority.DEBUFF
 	
 	if hit_tween:
 		hit_tween.kill()
-	
+		
 	hit_tween = create_tween()
-	hit_tween.tween_property(shader_material, "shader_parameter/debuff_progress", 0.0, 0.5)\
+	
+	var original_scale = scale
+	var target_scale = Vector2(0.3, 0.5) 
+	var size = enemy_sprite.size
+	var offset = (size * original_scale - size * target_scale) / 2
+	var target_pos = position + offset
+	
+	# ШАГ 1: Молниеносное сжатие и зажигание шейдера
+	hit_tween.set_parallel(true)
+	hit_tween.tween_property(self, "scale", target_scale, t_squeeze).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_QUAD)
+	hit_tween.tween_property(self, "position", target_pos, t_squeeze).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_QUAD)
+	hit_tween.tween_property(shader_material, "shader_parameter/debuff_progress", 1.0, t_squeeze)
+	
+	# ШАГ 2: Кротчайшая пауза
+	hit_tween.chain().tween_interval(t_pause)
+	
+	# ШАГ 3: Быстрый возврат формы карты
+	var return_card = hit_tween.chain().set_parallel(true)
+	return_card.tween_property(self, "scale", original_scale, t_return).set_ease(Tween.EASE_IN_OUT).set_trans(Tween.TRANS_SINE)
+	return_card.tween_property(self, "position", position, t_return).set_ease(Tween.EASE_IN_OUT).set_trans(Tween.TRANS_SINE)
+	
+	# ШАГ 4: Динамичное исчезновение эффекта скверны
+	hit_tween.chain().tween_property(shader_material, "shader_parameter/debuff_progress", 0.0, t_fade)\
 		.set_trans(Tween.TRANS_QUART)\
 		.set_ease(Tween.EASE_OUT)
 	
 	await hit_tween.finished
 	hit_tween = null
 	
-	# Проверяем, не нужно ли заморозить
 	if pending_freeze:
 		pending_freeze = false
 		_apply_freeze_effect_immediate()
 		return
 	
-	# Возвращаем базовый материал
 	if enemy_sprite:
 		if current_material:
 			enemy_sprite.material = current_material

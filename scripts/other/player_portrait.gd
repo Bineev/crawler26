@@ -243,7 +243,7 @@ func show_floating_text(text: String, color: Color):
 	var floating_text = preload("res://scenes/floating_text.tscn").instantiate() as FloatingText
 	add_child(floating_text)
 	floating_text.global_position = pos
-	floating_text.setup(text, color)
+	floating_text.setup(text, color, false)
 
 
 func _exit_tree():
@@ -307,7 +307,7 @@ func _update_icons(target : Node):
 		var icon = STATUS_ICON_SCENE.instantiate() as StatusIcon
 		status_container.add_child(icon)
 		icon.setup(icon_data, DataManager.COLOR_MOLE_TUNNELS_ART_BG_LIGHT, self)  # светлый для игрока
-		DataManager.apply_shader_to_icon(icon.icon, "res://shaders/highlight_item.gdshader", {'hover_intensity' : 1.0})
+		#DataManager.apply_shader_to_icon(icon.icon, "res://shaders/highlight_item.gdshader", {'hover_intensity' : 1.0})
 		DataManager.apply_shader_overlay(icon.icon, "res://shaders/horror_shader.gdshader", {})
 	
 	# Добавляем пассивки
@@ -323,7 +323,7 @@ func _update_icons(target : Node):
 		var icon = PASSIVE_ICON_SCENE.instantiate() as PassiveIcon
 		status_container.add_child(icon)
 		icon.setup(icon_data, DataManager.COLOR_MOLE_TUNNELS_ART_BG_LIGHT, self)  # светлый для игрока
-		DataManager.apply_shader_to_icon(icon.icon, "res://shaders/highlight_item.gdshader", {'hover_intensity' : 1.0})
+		#DataManager.apply_shader_to_icon(icon.icon, "res://shaders/highlight_item.gdshader", {'hover_intensity' : 1.0})
 		DataManager.apply_shader_overlay(icon.icon, "res://shaders/horror_shader.gdshader", {})
 
 
@@ -335,7 +335,7 @@ func _create_icon(texture: Texture2D, tooltip: String) -> TextureRect:
 	icon_rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	icon_rect.tooltip_text = tooltip
 	# добавить шейдер на обводку
-	DataManager.apply_shader_to_icon(icon_rect, "res://shaders/highlight_enemy.gdshader", {'hover_intensity' : 1.0})
+	#DataManager.apply_shader_to_icon(icon_rect, "res://shaders/highlight_enemy.gdshader", {'hover_intensity' : 1.0})
 	DataManager.apply_shader_overlay(icon_rect, "res://shaders/horror_shader.gdshader", {})
 	return icon_rect
 
