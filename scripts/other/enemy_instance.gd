@@ -229,11 +229,12 @@ func get_active_passives_for_ui() -> Array[Dictionary]:
 		var icon = DataManager.get_passive_icon(passive.id)
 		if icon:
 			result.append({
-				"passive_id": passive.id,  # ← добавляем
+				"passive_id": passive.id,
 				"icon": icon,
 				"name": passive.get_localized_name(),
 				"description": passive.get_localized_description(),
-				"charges": passive.current_charges if passive.has_charges() else 0
+				"charges": passive.current_charges if passive.has_charges() else 0,
+				"passive": passive,  # 🆕 нужно добавить сам ресурс
 			})
 	return result
 

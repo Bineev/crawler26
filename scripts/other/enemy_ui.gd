@@ -333,8 +333,15 @@ func update_statuses():
 	for status_data in enemy_instance.get_active_statuses_for_ui():
 		var icon = STATUS_ICON_SCENE.instantiate() as StatusIcon
 		status_container.add_child(icon)
-		icon.setup(status_data)
 		icon.setup(status_data, DataManager.COLOR_MOLE_TUNNELS_ART_BG_LIGHT2)  # тёмный для врагов
+		
+		# 🆕 Подключаем тултип
+		icon.mouse_entered.connect(_on_status_icon_hovered.bind(
+			status_data["status_id"],
+			status_data["stacks"],
+			status_data["duration"]
+		))
+		icon.mouse_exited.connect(_on_icon_mouse_exited)
 		#DataManager.apply_shader_to_icon(icon.icon, "res://shaders/highlight_enemy.gdshader", {'hover_intensity' : 1.0})
 
 func update_passives():
@@ -351,6 +358,10 @@ func update_passives():
 		var icon = PASSIVE_ICON_SCENE.instantiate() as PassiveIcon
 		passive_container.add_child(icon)
 		icon.setup(passive_data, DataManager.COLOR_MOLE_TUNNELS_ART_BG_LIGHT2)  # тёмный для врагов)
+		# 🆕 Подключаем тултип
+		# 🆕 Подключаем динамический тултип
+		icon.mouse_entered.connect(_on_passive_icon_hovered.bind(passive_data))
+		icon.mouse_exited.connect(_on_icon_mouse_exited)
 		#DataManager.apply_shader_to_icon(icon.icon, "res://shaders/highlight_enemy.gdshader", {'hover_intensity' : 1.0})
 
 
@@ -1034,3 +1045,17 @@ func _apply_debuff_effect():
 			enemy_sprite.material = null
 	
 	current_shader_priority = DataManager.EnemyShaderPriority.NONE
+
+
+func _on_status_icon_hovered(status_id: DataManager.Status, stacks: int, duration: int):
+	var pos = get_global_mouse_position()
+	TooltipManager.request_dynamic_status_tooltip(status_id, stacks, duration, pos)
+
+
+func _on_passive_icon_hovered(passive_data: Dictionary):
+	var pos = get_global_mouse_position()
+	TooltipManager.request_dynamic_passive_tooltip(passive_data, pos)
+
+
+func _on_icon_mouse_exited():
+	SignalManager.hide_tooltip.emit()

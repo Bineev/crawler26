@@ -307,6 +307,9 @@ func _update_icons(target : Node):
 		var icon = STATUS_ICON_SCENE.instantiate() as StatusIcon
 		status_container.add_child(icon)
 		icon.setup(icon_data, DataManager.COLOR_MOLE_TUNNELS_ART_BG_LIGHT, self)  # светлый для игрока
+		# 🆕 Подключаем тултип
+		icon.mouse_entered.connect(_on_status_icon_hovered.bind(status_id, status_data.stacks, status_data.duration))
+		icon.mouse_exited.connect(_on_icon_mouse_exited)
 		#DataManager.apply_shader_to_icon(icon.icon, "res://shaders/highlight_item.gdshader", {'hover_intensity' : 1.0})
 		DataManager.apply_shader_overlay(icon.icon, "res://shaders/horror_shader.gdshader", {})
 	
@@ -317,12 +320,16 @@ func _update_icons(target : Node):
 			"icon": DataManager.get_passive_icon(passive.id),
 			"name": passive.get_localized_name(),
 			"description": passive.get_localized_description(),
-			"charges": passive.current_charges if passive.has_charges() else 0
+			"charges": passive.current_charges if passive.has_charges() else 0,
+			"passive": passive,  # 🆕 добавляем сам ресурс
 		}
 		
 		var icon = PASSIVE_ICON_SCENE.instantiate() as PassiveIcon
 		status_container.add_child(icon)
 		icon.setup(icon_data, DataManager.COLOR_MOLE_TUNNELS_ART_BG_LIGHT, self)  # светлый для игрока
+		# 🆕 Подключаем тултип для пассивок
+		icon.mouse_entered.connect(_on_passive_icon_hovered.bind(icon_data))
+		icon.mouse_exited.connect(_on_icon_mouse_exited)
 		#DataManager.apply_shader_to_icon(icon.icon, "res://shaders/highlight_item.gdshader", {'hover_intensity' : 1.0})
 		DataManager.apply_shader_overlay(icon.icon, "res://shaders/horror_shader.gdshader", {})
 
@@ -653,3 +660,17 @@ func _apply_debuff_effect():
 			portrait_texture.material = null
 	
 	current_shader_priority = DataManager.EnemyShaderPriority.NONE
+
+
+func _on_status_icon_hovered(status_id: DataManager.Status, stacks: int, duration: int):
+	var pos = get_global_mouse_position()
+	TooltipManager.request_dynamic_status_tooltip(status_id, stacks, duration, pos)
+
+
+func _on_passive_icon_hovered(passive_data: Dictionary):
+	var pos = get_global_mouse_position()
+	TooltipManager.request_dynamic_passive_tooltip(passive_data, pos)
+
+
+func _on_icon_mouse_exited():
+	SignalManager.hide_tooltip.emit()

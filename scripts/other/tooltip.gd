@@ -80,7 +80,7 @@ func _setup_style():
 	# Дополнительная информация
 	additional_info.add_theme_font_override("font", DataManager.FONT_MAIN)
 	additional_info.add_theme_font_size_override("font_size", 12)
-	additional_info.add_theme_color_override("font_color", DataManager.COLOR_MOLE_TUNNELS_ART_BG_LIGHT)
+	additional_info.add_theme_color_override("font_color", DataManager.COLOR_MOLE_TUNNELS_ART_BG_LIGHT2)
 	
 	# Футер
 	footer.add_theme_font_override("font", DataManager.FONT_MAIN)

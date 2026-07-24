@@ -12,12 +12,15 @@ func request_passive_tooltip(passive_id: DataManager.Passive, position: Vector2)
 func _build_status_tooltip_data(status_id: DataManager.Status) -> Dictionary:
 	var name = DataManager.get_status_name(status_id)
 	var desc = _get_status_description(status_id)
+	var additional = _get_status_additional_info(status_id)
 	
 	return {
 		"icon": DataManager.get_status_icon(status_id),
 		"title": name,
 		"description": desc,
+		"additional_info": additional,
 	}
+
 
 func _build_passive_tooltip_data(passive_id: DataManager.Passive) -> Dictionary:
 	var resource = DataManager.get_passive_resource(passive_id)
@@ -104,5 +107,243 @@ func _get_card_type_description(card_type: DataManager.CardType) -> String:
 			return tr("card_type_utility_desc")
 		DataManager.CardType.RESOURCE:
 			return tr("card_type_resource_desc")
+		_:
+			return ""
+
+
+func request_dynamic_status_tooltip(status_id: DataManager.Status, stacks: int, duration: int, position: Vector2):
+	var data = _build_dynamic_status_tooltip_data(status_id, stacks, duration)
+	SignalManager.tooltip_requested.emit(data, position)
+
+func _build_dynamic_status_tooltip_data(status_id: DataManager.Status, stacks: int, duration: int) -> Dictionary:
+	var name = DataManager.get_status_name(status_id)
+	var desc = _get_dynamic_status_description(status_id, stacks, duration)
+	var additional = _get_status_additional_info(status_id)
+	
+	return {
+		"icon": DataManager.get_status_icon(status_id),
+		"title": name,
+		"description": desc,
+		"additional_info": additional,
+	}
+
+
+func _get_dynamic_status_description(status_id: DataManager.Status, stacks: int, duration: int) -> String:
+	match status_id:
+		DataManager.Status.POISON:
+			var damage = stacks * RunManager.poison_damage_per_stack
+			return tr("status_poison_dynamic_desc") % [damage, duration]
+		DataManager.Status.BLEED:
+			var damage_per_stack = RunManager.bleed_damage_per_stack
+			return tr("status_bleed_dynamic_desc") % [damage_per_stack, stacks, duration]
+		DataManager.Status.BURN:
+			var damage_per_stack = RunManager.burn_damage_per_stack
+			return tr("status_burn_dynamic_desc") % [damage_per_stack, stacks, duration]
+		DataManager.Status.COLD:
+			var percent = stacks * RunManager.cold_effect_percent * 100
+			return tr("status_cold_dynamic_desc") % [percent, stacks, duration]
+		DataManager.Status.STRENGTH:
+			var bonus = stacks * RunManager.strength_bonus_per_stack
+			return tr("status_strength_dynamic_desc") % [bonus, duration]
+		DataManager.Status.REGEN:
+			var heal = stacks * RunManager.regen_heal_per_stack
+			return tr("status_regen_dynamic_desc") % [heal, duration]
+		DataManager.Status.SHIELD:
+			return tr("status_shield_dynamic_desc") % [stacks, duration]
+		DataManager.Status.FROZEN:
+			return tr("status_frozen_desc")
+		DataManager.Status.GANGRENE:
+			return tr("status_gangrene_dynamic_desc") % [stacks, duration]
+		_:
+			return ""
+
+
+# ============================================================
+# ДИНАМИЧЕСКИЕ ПАССИВКИ (для "живых" иконок)
+# ============================================================
+
+func request_dynamic_passive_tooltip(passive_data: Dictionary, position: Vector2):
+	var data = _build_dynamic_passive_tooltip_data(passive_data)
+	SignalManager.tooltip_requested.emit(data, position)
+
+func _build_dynamic_passive_tooltip_data(passive_data: Dictionary) -> Dictionary:
+	var passive = passive_data["passive"]
+	
+	# 🆕 Статическое описание (из ресурса)
+	var static_desc = passive.get_localized_description()
+	
+	# 🆕 Динамическое описание (триггеры, эффекты, модификаторы)
+	var dynamic_desc = _get_dynamic_passive_description(passive)
+	var charges_info = _get_passive_charges_info(passive)
+	# 🆕 Если есть заряды — добавляем их в additional_info
+	var additional = dynamic_desc
+	if not charges_info.is_empty():
+		if not additional.is_empty():
+			additional += "\n"
+		additional += charges_info
+	return {
+		"icon": passive_data["icon"],
+		"title": passive_data["name"],
+		"description": static_desc,  # статическое описание
+		"additional_info": additional,  # динамическое описание (триггеры, эффекты)
+	}
+
+func _get_dynamic_passive_description(passive: PassiveResource) -> String:
+	var parts: Array[String] = []
+	
+	# Триггер
+	match passive.trigger:
+		DataManager.PassiveTrigger.ON_TURN_START:
+			parts.append(tr("passive_trigger_turn_start"))
+		DataManager.PassiveTrigger.ON_TURN_END:
+			parts.append(tr("passive_trigger_turn_end"))
+		DataManager.PassiveTrigger.ON_TAKE_DAMAGE:
+			parts.append(tr("passive_trigger_take_damage"))
+		DataManager.PassiveTrigger.ON_DEAL_DAMAGE:
+			parts.append(tr("passive_trigger_deal_damage"))
+		DataManager.PassiveTrigger.ON_PLAY_CARD:
+			parts.append(tr("passive_trigger_play_card"))
+		DataManager.PassiveTrigger.ON_APPLY_STATUS:
+			parts.append(tr("passive_trigger_apply_status"))
+		DataManager.PassiveTrigger.ON_GAIN_BLOCK:
+			parts.append(tr("passive_trigger_gain_block"))
+		DataManager.PassiveTrigger.ON_KILL_ENEMY:
+			parts.append(tr("passive_trigger_kill_enemy"))
+		DataManager.PassiveTrigger.ON_STATUS_TICK:
+			parts.append(tr("passive_trigger_status_tick"))
+	
+	# Эффекты
+	for effect in passive.effects:
+		var effect_desc = _effect_to_description(effect)
+		if not effect_desc.is_empty():
+			parts.append(effect_desc)
+	
+	# Модификаторы
+	for mod in passive.modifiers:
+		var mod_desc = _modifier_to_description(mod)
+		if not mod_desc.is_empty():
+			parts.append(mod_desc)
+	
+	return ", ".join(parts)
+
+func _effect_to_description(effect: EffectEntry) -> String:
+	match effect.category:
+		DataManager.EffectCategory.APPLY_STATUS:
+			if effect.status:
+				var target = tr("target_self") if effect.target == DataManager.EffectTarget.SELF else tr("target_enemy")
+				
+				# 🆕 Подсчитываем актуальные значения с учётом роста
+				var value = _get_effect_value(effect)
+				var duration = _get_effect_duration(effect)
+				
+				return tr("passive_effect_apply_status") % [target, value, effect.status.get_localized_name(), duration]
+		DataManager.EffectCategory.HEAL:
+			return tr("passive_effect_heal") % effect.base_value
+		DataManager.EffectCategory.DAMAGE:
+			return tr("passive_effect_damage") % effect.base_value
+		DataManager.EffectCategory.BLOCK:
+			return tr("passive_effect_block") % effect.base_value
+		DataManager.EffectCategory.APPLY_PASSIVE:
+			if effect.passive:
+				return tr("passive_effect_apply_passive") % effect.passive.get_localized_name()
+		_:
+			return ""
+	return ""
+
+func _modifier_to_description(mod: ModifierEntry) -> String:
+	match mod.stat:
+		DataManager.ModifierStat.DAMAGE_DEALT_PERCENT:
+			return tr("passive_modifier_damage_dealt") % [(mod.value - 1.0) * 100]
+		DataManager.ModifierStat.DAMAGE_TAKEN_PERCENT:
+			return tr("passive_modifier_damage_taken") % [(mod.value - 1.0) * 100]
+		DataManager.ModifierStat.ATONEMENT_GAIN_MULTIPLIER:
+			return tr("passive_modifier_atonement") % [(mod.value - 1.0) * 100]
+		_:
+			return ""
+
+func _get_passive_charges_info(passive: PassiveResource) -> String:
+	if not passive.has_charges():
+		return ""
+	
+	match passive.charge_type:
+		DataManager.PassiveChargeType.TURN_BASED:
+			return tr("passive_charges_turn_based") % passive.current_charges
+		DataManager.PassiveChargeType.USAGE_BASED:
+			return tr("passive_charges_usage_based") % passive.current_charges
+		DataManager.PassiveChargeType.CONDITIONAL:
+			return tr("passive_charges_conditional") % passive.current_charges
+		_:
+			return ""
+	return ""
+
+
+func _get_effect_value(effect: EffectEntry) -> int:
+	if effect.grow_type == DataManager.GrowType.NONE:
+		return int(effect.value) if effect.value != null else 1
+	
+	# 🆕 Пересчитываем только если grow_target = VALUE или BOTH
+	if effect.grow_target in [DataManager.GrowTarget.VALUE, DataManager.GrowTarget.BOTH]:
+		match effect.grow_type:
+			DataManager.GrowType.ADD:
+				return effect.current_value + effect.grow_value
+			DataManager.GrowType.SUBTRACT:
+				return effect.current_value - effect.grow_value
+			DataManager.GrowType.MULTIPLY:
+				return effect.current_value * effect.grow_value
+			DataManager.GrowType.DIVIDE:
+				return effect.current_value / effect.grow_value
+			_:
+				return effect.current_value
+	else:
+		# Если растёт только duration, value не меняется
+		return int(effect.value) if effect.value != null else 1
+
+
+func _get_effect_duration(effect: EffectEntry) -> int:
+	if effect.grow_type == DataManager.GrowType.NONE:
+		return int(effect.duration) if effect.duration != null else 1
+	
+	# 🆕 Пересчитываем только если grow_target = DURATION или BOTH
+	if effect.grow_target in [DataManager.GrowTarget.DURATION, DataManager.GrowTarget.BOTH]:
+		match effect.grow_type:
+			DataManager.GrowType.ADD:
+				return effect.current_duration + effect.grow_value
+			DataManager.GrowType.SUBTRACT:
+				return effect.current_duration - effect.grow_value
+			DataManager.GrowType.MULTIPLY:
+				return effect.current_duration * effect.grow_value
+			DataManager.GrowType.DIVIDE:
+				return effect.current_duration / effect.grow_value
+			_:
+				return effect.current_duration
+	else:
+		# Если растёт только value, duration не меняется
+		return int(effect.duration) if effect.duration != null else 1
+
+
+func _get_status_additional_info(status_id: DataManager.Status) -> String:
+	match status_id:
+		DataManager.Status.POISON:
+			return tr("status_poison_additional")
+		DataManager.Status.BLEED:
+			return tr("status_bleed_additional")
+		DataManager.Status.BURN:
+			return tr("status_burn_additional") % RunManager.burn_threshold_stacks
+		DataManager.Status.COLD:
+			return tr("status_cold_additional") % RunManager.cold_freeze_threshold
+		DataManager.Status.WEAKNESS:
+			return tr("status_weakness_additional")
+		DataManager.Status.VULNERABILITY:
+			return tr("status_vulnerability_additional")
+		DataManager.Status.STRENGTH:
+			return tr("status_strength_additional")
+		DataManager.Status.REGEN:
+			return tr("status_regen_additional")
+		DataManager.Status.SHIELD:
+			return tr("status_shield_additional")
+		DataManager.Status.FROZEN:
+			return tr("status_frozen_additional") % RunManager.frozen_energy_loss
+		DataManager.Status.GANGRENE:
+			return tr("status_gangrene_additional")
 		_:
 			return ""

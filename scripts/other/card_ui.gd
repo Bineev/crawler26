@@ -212,6 +212,14 @@ func _collect_left_icons_from_effects(effects: Array[EffectEntry], items: Array[
 					_collect_left_icons_from_effects([effect.true_effect], items)
 				if effect.false_effect:
 					_collect_left_icons_from_effects([effect.false_effect], items)
+			DataManager.EffectCategory.BLOCK:  # 🆕
+				var icon = DataManager.get_status_icon(DataManager.Status.SHIELD)
+				if icon:
+					items.append({
+						"texture": icon,
+						"is_status": true,
+						"id": DataManager.Status.SHIELD
+					})
 
 
 func fill_right_icons():

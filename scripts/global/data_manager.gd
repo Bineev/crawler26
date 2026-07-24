@@ -760,6 +760,8 @@ const POISON_EXPLOSION_MULTIPLIER: int = 1
 const GANGRENE_MULTIPLIER: int = 2
 const GANGRENE_DURATION_DIVIDER: int = 3
 
+
+const FROZEN_ENERGY_LOSS: int = 2
 ## Burn ↔ Cold (контр-статусы, 1:1 вычитание)
 # Константа не нужна, так как вычитание 1:1
 
@@ -921,7 +923,7 @@ const INTENT_ICONS: Dictionary = {
 
 const CARD_TYPE_ICONS: Dictionary = {
 	CardType.ATTACK: preload("res://img/icons/card_types/attack.png"),
-	CardType.DEFEND: preload("res://img/icons/card_types/defend.png"),
+	CardType.DEFEND: preload("res://img/icons/statuses/shield.png"),
 	CardType.BUFF_SELF: preload("res://img/icons/card_types/buff.png"),
 	CardType.DEBUFF: preload("res://img/icons/card_types/debuff.png"),
 	CardType.HEAL: preload("res://img/icons/card_types/heal.png"),

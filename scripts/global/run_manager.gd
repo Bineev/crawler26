@@ -16,7 +16,7 @@ var regen_heal_per_stack: int = DataManager.REGEN_HEAL_PER_STACK
 var strength_bonus_per_stack: int = DataManager.STRENGTH_FLAT_BONUS_PER_STACK
 var weakness_damage_multiplier: float = DataManager.WEAKNESS_DAMAGE_MULTIPLIER
 var vulnerability_damage_multiplier: float = DataManager.VULNERABILITY_DAMAGE_MULTIPLIER
-
+var frozen_energy_loss: int = DataManager.FROZEN_ENERGY_LOSS
 
 
 var coins: int = DataManager.STARTING_COINS
