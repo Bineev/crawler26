@@ -797,7 +797,7 @@ func _init_ice_texture():
 
 
 func apply_freeze_effect():
-	# Если враг умирает — откладываем заморозку
+	# Если умираем — откладываем заморозку
 	if current_shader_priority == DataManager.EnemyShaderPriority.DEATH:
 		pending_freeze = true
 		return
@@ -808,6 +808,11 @@ func apply_freeze_effect():
 	
 	# Если есть hit — дожидаемся его окончания
 	if current_shader_priority == DataManager.EnemyShaderPriority.HIT:
+		pending_freeze = true
+		return
+	
+	# 🆕 Если есть DEBUFF — дожидаемся его окончания
+	if current_shader_priority == DataManager.EnemyShaderPriority.DEBUFF:
 		pending_freeze = true
 		return
 	

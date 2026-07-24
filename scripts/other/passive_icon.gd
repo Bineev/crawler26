@@ -23,17 +23,26 @@ func _setup_labels():
 func setup(data: Dictionary, text_color: Color = DataManager.COLOR_PENITENT_ART_BG_DARK, icon_owner = null) -> void:
 	passive_id = data["passive_id"]
 	
+	# 🆕 Настройка прозрачности самого ColorRect
+	if icon_owner is CardUI:
+		color = Color(1, 1, 1, 0)  # полностью прозрачный
+	else:
+		color = Color(0, 0, 0, 1)  # чёрный фон
+	
 	icon.texture = data["icon"]
 	custom_minimum_size  = Vector2(32, 32)
 	icon.custom_minimum_size = Vector2(16, 16)
 	filler.custom_minimum_size = Vector2(5, 0)
+	if icon_owner is CardUI:
+		custom_minimum_size = Vector2(32, 32)
+		icon.custom_minimum_size = Vector2(24, 24)
+		filler.custom_minimum_size = Vector2(2, 0)
 	if icon_owner is PlayerPortrait:
 		custom_minimum_size = Vector2(48, 48)
 		icon.custom_minimum_size = Vector2(32, 32)
 		filler.custom_minimum_size = Vector2(10, 0)
 	icon.expand_mode = TextureRect.EXPAND_FIT_WIDTH_PROPORTIONAL
 	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-	icon.tooltip_text = _build_tooltip(data)
 	
 	# Применяем цвет текста
 	charges_label.add_theme_color_override("font_color", text_color)
@@ -45,11 +54,6 @@ func setup(data: Dictionary, text_color: Color = DataManager.COLOR_PENITENT_ART_
 	else:
 		charges_label.visible = false
 
-func _build_tooltip(data: Dictionary) -> String:
-	var tooltip = "%s\n%s" % [data["name"], data["description"]]
-	if data.get("charges", 0) > 0:
-		tooltip += "\nЗарядов: %d" % data["charges"]
-	return tooltip
 
 func animate() -> void:
 	var original_scale = icon.scale

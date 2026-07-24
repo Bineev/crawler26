@@ -56,27 +56,16 @@ card_flesh_rage_desc,"Apply 1 Bleed to yourself.\nIf you have Bleed — gain 1 e
 card_torn_wound_name,Torn Wound
 card_torn_wound_desc,"Deals 4 damage.\nApplies 1 stack of Bleed to the enemy."
 status_poison_name,Poison
-status_poison_desc,"Deals 5 damage each turn. Ignores Block. Reduces healing by 25%."
 status_bleed_name,Bleed
-status_bleed_desc,"Deals 3 damage per stack each turn."
 status_burn_name,Burn
-status_burn_desc,"Deals 1 damage per stack each turn. Explodes at 25 stacks."
 status_cold_name,Cold
-status_cold_desc,"Reduces incoming damage by 2%% per stack (max 50%%). At 25 stacks freezes the target."
 status_weakness_name,Weakness
-status_weakness_desc,"Attacks deal 25%% less damage."
 status_vulnerability_name,Vulnerability
-status_vulnerability_desc,"Takes 50%% more damage from all sources."
 status_strength_name,Strength
-status_strength_desc,"Increases damage by 1 per stack."
 status_regen_name,Regeneration
-status_regen_desc,"Heals 1 HP per stack at end of turn."
 status_shield_name,Shield
-status_shield_desc,"Absorbs incoming damage. Resets at start of turn."
 status_frozen_name,Frozen
-status_frozen_desc,"Frozen. Skips turn. Statuses are paused. Takes 50%% less damage."
 status_gangrene_name,Gangrene
-status_gangrene_desc,"Deals all damage at once on the last turn."
 passive_regrowth_name,Regrowth
 passive_regrowth_desc,"Heals increasing amount each turn."
 passive_venomous_shield_name,Venomous Shield
@@ -346,3 +335,23 @@ upgrade_card_confirm,Upgrade
 "death_stats_biome","Biome: %s"
 "death_lobby","To Lobby"
 "death_retry","Retry Run"
+
+"card_type_attack_desc","Deals damage to enemy."
+"card_type_defend_desc","Provides defense."
+"card_type_heal_desc","Restores health."
+"card_type_buff_desc","Strengthens character."
+"card_type_debuff_desc","Weakens enemy."
+"card_type_utility_desc","Utility effect."
+"card_type_resource_desc","Works with resources."
+
+"status_poison_desc","Deals %d damage each turn. Reduces healing by %d%%."
+"status_bleed_desc","Deals %d damage per stack each turn."
+"status_burn_desc","Deals %d damage per stack each turn. Explodes at %d stacks."
+"status_cold_desc","Reduces incoming damage by %.0f%% per stack. Freezes at %d stacks."
+"status_weakness_desc","Attacks deal %.0f%% less damage."
+"status_vulnerability_desc","Takes %.0f%% more damage."
+"status_strength_desc","Increases damage by %d per stack."
+"status_regen_desc","Heals %d HP per stack at end of turn."
+"status_shield_desc","Absorbs incoming damage. Resets at start of turn."
+"status_frozen_desc","Frozen. Skips turn. Takes 50%% less damage."
+"status_gangrene_desc","Deals all damage at once on the last turn."

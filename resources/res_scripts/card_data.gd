@@ -118,24 +118,32 @@ func get_card_types() -> Array[DataManager.CardType]:
 
 func _analyze_card_types() -> Array[DataManager.CardType]:
 	var types: Array[DataManager.CardType] = []
+	
 	for effect in effects:
 		match effect.category:
 			DataManager.EffectCategory.DAMAGE:
 				_add_type_unique(types, DataManager.CardType.ATTACK)
+			
 			DataManager.EffectCategory.BLOCK:
 				_add_type_unique(types, DataManager.CardType.DEFEND)
+			
 			DataManager.EffectCategory.HEAL:
 				_add_type_unique(types, DataManager.CardType.HEAL)
+			
 			DataManager.EffectCategory.APPLY_STATUS:
 				if effect.target == DataManager.EffectTarget.SELF:
-					_add_type_unique(types, DataManager.CardType.BUFF_SELF)
+					# 🆕 Если статус негативный — не добавляем BUFF_SELF
+					if effect.status and not DataManager.is_negative_status(effect.status.id):
+						_add_type_unique(types, DataManager.CardType.BUFF_SELF)
 				else:
 					_add_type_unique(types, DataManager.CardType.DEBUFF)
+			
 			DataManager.EffectCategory.APPLY_PASSIVE:
 				if effect.target == DataManager.EffectTarget.SELF:
 					_add_type_unique(types, DataManager.CardType.BUFF_SELF)
 				else:
 					_add_type_unique(types, DataManager.CardType.DEBUFF)
+			
 			DataManager.EffectCategory.DRAW_CARD, \
 			DataManager.EffectCategory.GAIN_ENERGY, \
 			DataManager.EffectCategory.SACRIFICE_CARD, \
@@ -144,6 +152,50 @@ func _analyze_card_types() -> Array[DataManager.CardType]:
 			DataManager.EffectCategory.MODIFY_STAT, \
 			DataManager.EffectCategory.MODIFY_MODIFIER:
 				_add_type_unique(types, DataManager.CardType.UTILITY)
+			
+			DataManager.EffectCategory.CONDITIONAL:
+				# 🆕 Проверяем true_effect и false_effect
+				if effect.true_effect:
+					var true_types = _analyze_single_effect(effect.true_effect)
+					for t in true_types:
+						_add_type_unique(types, t)
+				if effect.false_effect:
+					var false_types = _analyze_single_effect(effect.false_effect)
+					for t in false_types:
+						_add_type_unique(types, t)
+	
+	return types
+
+func _analyze_single_effect(effect: EffectEntry) -> Array[DataManager.CardType]:
+	var types: Array[DataManager.CardType] = []
+	
+	match effect.category:
+		DataManager.EffectCategory.DAMAGE:
+			types.append(DataManager.CardType.ATTACK)
+		DataManager.EffectCategory.BLOCK:
+			types.append(DataManager.CardType.DEFEND)
+		DataManager.EffectCategory.HEAL:
+			types.append(DataManager.CardType.HEAL)
+		DataManager.EffectCategory.APPLY_STATUS:
+			if effect.target == DataManager.EffectTarget.SELF:
+				if effect.status and not DataManager.is_negative_status(effect.status.id):
+					types.append(DataManager.CardType.BUFF_SELF)
+			else:
+				types.append(DataManager.CardType.DEBUFF)
+		DataManager.EffectCategory.APPLY_PASSIVE:
+			if effect.target == DataManager.EffectTarget.SELF:
+				types.append(DataManager.CardType.BUFF_SELF)
+			else:
+				types.append(DataManager.CardType.DEBUFF)
+		DataManager.EffectCategory.DRAW_CARD, \
+		DataManager.EffectCategory.GAIN_ENERGY, \
+		DataManager.EffectCategory.SACRIFICE_CARD, \
+		DataManager.EffectCategory.CONVERT, \
+		DataManager.EffectCategory.CONVERT_EXCESS_TO_BLOCK, \
+		DataManager.EffectCategory.MODIFY_STAT, \
+		DataManager.EffectCategory.MODIFY_MODIFIER:
+			types.append(DataManager.CardType.UTILITY)
+	
 	return types
 
 

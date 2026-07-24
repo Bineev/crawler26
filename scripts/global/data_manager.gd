@@ -886,18 +886,18 @@ func is_negative_status(status: Status) -> bool:
 
 func get_status_name(status: Status) -> String:
 	match status:
-		Status.POISON: return "Poison"
-		Status.BLEED: return "Bleed"
-		Status.BURN: return "Burn"
-		Status.COLD: return "Cold"
-		Status.WEAKNESS: return "Weakness"
-		Status.VULNERABILITY: return "Vulnerability"
-		Status.STRENGTH: return "Strength"
-		Status.REGEN: return "Regeneration"
-		Status.SHIELD: return "Shield"
-		Status.FROZEN: return "Frozen"
-		Status.GANGRENE: return "Gangrene"
-		_: return "Unknown"
+		Status.POISON: return tr("status_poison_name")
+		Status.BLEED: return tr("status_bleed_name")
+		Status.BURN: return tr("status_burn_name")
+		Status.COLD: return tr("status_cold_name")
+		Status.WEAKNESS: return tr("status_weakness_name")
+		Status.VULNERABILITY: return tr("status_vulnerability_name")
+		Status.STRENGTH: return tr("status_strength_name")
+		Status.REGEN: return tr("status_regen_name")
+		Status.SHIELD: return tr("status_shield_name")
+		Status.FROZEN: return tr("status_frozen_name")
+		Status.GANGRENE: return tr("status_gangrene_name")
+		_: return tr("status_unknown")
 
 ##
 ## FONT

@@ -21,6 +21,7 @@ var energy_display: EnergyDisplay = null
 var potion_container: HBoxContainer = null
 var potion_full_label: Label = null
 var death_ui: DeathUI = null
+var tooltip_canvas: CanvasLayer = null
 var potion_icons: Array[PotionIcon] = []
 # Ссылка на RoomManager (будет доступен как автолоад)
 # RoomManager уже загружен как синглтон
@@ -29,7 +30,7 @@ var gold_display: GoldDisplay = null
 var key_display: KeyDisplay = null
 var bone_display: BoneDisplay = null
 var sub_viewport: SubViewport = null
-
+var current_tooltip: Tooltip = null
 var hit_effect: HitEffect = null
 ## ============================================================
 ## ПУБЛИЧНЫЕ МЕТОДЫ
@@ -66,6 +67,8 @@ func start_test(world_node: Node):
 	SignalManager.battle_defeat.connect(_on_battle_ended)
 	SignalManager.show_reward.connect(_on_show_reward)
 	SignalManager.add_action_choice.connect(_on_add_action_choice)
+	SignalManager.tooltip_requested.connect(_on_tooltip_requested)
+	SignalManager.hide_tooltip.connect(_on_hide_tooltip)
 	# Сбрасываем менеджеры
 	FloorManager.reset()
 	SoundManager.start_gameplay_playlist()
@@ -567,3 +570,29 @@ func _reset_game_state():
 	
 	# Очищаем UI
 	clear_ui()
+
+
+func _on_tooltip_requested(tooltip_data: Dictionary, position: Vector2):
+	# 🆕 Удаляем старый тултип, если есть
+	if current_tooltip:
+		current_tooltip.queue_free()
+		current_tooltip = null
+	
+	if not tooltip_canvas:
+		tooltip_canvas = CanvasLayer.new()
+		tooltip_canvas.layer = 1000
+		game_world.add_child(tooltip_canvas)
+	
+	var tooltip = preload("res://scenes/tooltip.tscn").instantiate() as Tooltip
+	tooltip_canvas.add_child(tooltip)
+	
+	tooltip.setup(tooltip_data)
+	tooltip.show_at(position)
+	
+	current_tooltip = tooltip
+	
+	
+func _on_hide_tooltip():
+	if current_tooltip:
+		current_tooltip.queue_free()
+		current_tooltip = null

@@ -56,27 +56,16 @@ card_flesh_rage_desc,"Накладывает на себя 1 стак Крово
 card_torn_wound_name,Рваная рана
 card_torn_wound_desc,"Наносит 4 урона.\nНакладывает на врага 1 стак Кровотечения."
 status_poison_name,Яд
-status_poison_desc,"Наносит 5 урона каждый ход. Игнорирует блок. Снижает лечение на 25%."
 status_bleed_name,Кровотечение
-status_bleed_desc,"Наносит 3 урона за каждый стак каждый ход."
 status_burn_name,Горение
-status_burn_desc,"Наносит 1 урона за каждый стак каждый ход. Взрывается при 25 стаках."
 status_cold_name,Холод
-status_cold_desc,"Снижает входящий урон на 2% за стак (макс 50%). При 25 стаках замораживает цель."
 status_weakness_name,Слабость
-status_weakness_desc,"Атаки наносят на 25% меньше урона."
 status_vulnerability_name,Уязвимость
-status_vulnerability_desc,"Получает на 50% больше урона от всех источников."
 status_strength_name,Сила
-status_strength_desc,"Увеличивает урон на 1 за стак."
 status_regen_name,Регенерация
-status_regen_desc,"Лечит 1 HP за стак в конце хода."
 status_shield_name,Щит
-status_shield_desc,"Поглощает входящий урон. Сбрасывается в начале хода."
 status_frozen_name,Заморозка
-status_frozen_desc,"Цель заморожена. Пропускает ход. Статусы приостановлены. Получает на 50% меньше урона."
 status_gangrene_name,Гангрена
-status_gangrene_desc,"В последний ход наносит весь урон разом."
 passive_regrowth_name,Оживление
 passive_regrowth_desc,"Каждый ход лечит на растущую величину."
 passive_venomous_shield_name,Ядовитый щит
@@ -345,3 +334,23 @@ upgrade_card_confirm,Улучшить
 "death_stats_biome","Биом: %s"
 "death_lobby","В лобби"
 "death_retry","Повторить забег"
+
+"card_type_attack_desc","Наносит урон врагу."
+"card_type_defend_desc","Даёт защиту."
+"card_type_heal_desc","Восстанавливает здоровье."
+"card_type_buff_desc","Усиливает персонажа."
+"card_type_debuff_desc","Ослабляет врага."
+"card_type_utility_desc","Вспомогательный эффект."
+"card_type_resource_desc","Работает с ресурсами."
+
+"status_poison_desc","Наносит %d урона каждый ход. Снижает лечение на %d%%."
+"status_bleed_desc","Наносит %d урона за стак каждый ход."
+"status_burn_desc","Наносит %d урона за стак каждый ход. Взрывается при %d стаках."
+"status_cold_desc","Снижает входящий урон на %.0f%% за стак. При %d стаках замораживает."
+"status_weakness_desc","Атаки наносят на %.0f%% меньше урона."
+"status_vulnerability_desc","Получает на %.0f%% больше урона."
+"status_strength_desc","Увеличивает урон на %d за стак."
+"status_regen_desc","Лечит %d HP за стак в конце хода."
+"status_shield_desc","Поглощает входящий урон. Сбрасывается в начале хода."
+"status_frozen_desc","Заморожен. Пропускает ход. Получает на 50%% меньше урона."
+"status_gangrene_desc","В последний ход наносит весь урон разом."

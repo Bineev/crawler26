@@ -23,7 +23,7 @@ shader_parameter/paper_tint = Color(0.2509804, 0.050980393, 0.050980393, 1)
 [node name="StatusIcon" type="ColorRect"]
 offset_right = 40.0
 offset_bottom = 40.0
-mouse_filter = 2
+mouse_filter = 1
 color = Color(0, 0, 0, 1)
 script = ExtResource("1_eop52")
 

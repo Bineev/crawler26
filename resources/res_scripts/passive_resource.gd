@@ -128,19 +128,19 @@ func get_localized_description() -> String:
 func _generate_default_description() -> String:
 	match id:
 		DataManager.Passive.REGROWTH:
-			return "Каждый ход лечит на растущую величину."
+			return tr("passive_regrowth_desc")
 		DataManager.Passive.VENOMOUS_SHIELD:
-			return "При получении урона накладывает Яд на атакующего."
+			return tr("passive_venomous_shield_desc")
 		DataManager.Passive.WRATH:
-			return "В конце каждого хода даёт +1 Силы."
+			return tr("passive_wrath_desc")
 		DataManager.Passive.FREEZING_GROUND:
-			return "При получении атаки накладывает Лёд на атакующего. 3 заряда."
+			return tr("passive_freezing_ground_desc")
 		DataManager.Passive.DENIAL:
-			return "Блокирует первые 3 негативных статуса."
+			return tr("passive_denial_desc")
 		DataManager.Passive.SHAME:
-			return "Увеличивает входящий урон на 25%% и удваивает получаемое Искупление."
+			return tr("passive_shame_desc")
 		_:
-			return ""
+			return tr("passive_unknown_desc")
 
 
 ## ============================================================

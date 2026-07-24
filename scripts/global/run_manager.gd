@@ -3,10 +3,21 @@ extends Node
 
 var player_deck_data: DeckData = null
 var current_character: DataManager.CharacterClass = DataManager.CharacterClass.PENITENT
+
+#CONSTANTS
 var poison_damage_per_stack: int = DataManager.POISON_BASE_DAMAGE_PER_STACK
 var bleed_damage_per_stack: int = DataManager.BLEED_BASE_DAMAGE_PER_STACK
 var burn_damage_per_stack: int = DataManager.BURN_BASE_DAMAGE_PER_STACK
+var burn_threshold_stacks: int = DataManager.BURN_THRESHOLD_STACKS
+var cold_freeze_threshold: int = DataManager.COLD_FREEZE_THRESHOLD
+var cold_effect_percent: float = DataManager.COLD_EFFECT_PERCENT_PER_STACK
+var cold_min_multiplier: float = DataManager.COLD_MIN_EFFECT_MULTIPLIER
 var regen_heal_per_stack: int = DataManager.REGEN_HEAL_PER_STACK
+var strength_bonus_per_stack: int = DataManager.STRENGTH_FLAT_BONUS_PER_STACK
+var weakness_damage_multiplier: float = DataManager.WEAKNESS_DAMAGE_MULTIPLIER
+var vulnerability_damage_multiplier: float = DataManager.VULNERABILITY_DAMAGE_MULTIPLIER
+
+
 
 var coins: int = DataManager.STARTING_COINS
 var bones: int = DataManager.STARTING_BONES

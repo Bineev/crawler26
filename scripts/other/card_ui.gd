@@ -179,66 +179,61 @@ func fill_left_icons():
 	if not left_icons:
 		return
 	
-	var icons: Array[Texture2D] = []
-	var tooltips: Array[String] = []
-	_collect_left_icons_from_effects(card_data.effects, icons, tooltips)
+	var items: Array[Dictionary] = []
+	_collect_left_icons_from_effects(card_data.effects, items)
 	
-	for icon_data in _unique_icons(icons, tooltips):
-		add_icon(left_icons, icon_data["texture"], icon_data["tooltip"])
+	for item in _unique_items(items):
+		add_icon(left_icons, item["texture"], item["is_status"], item["id"])
 
 
-func _collect_left_icons_from_effects(effects: Array[EffectEntry], icons: Array[Texture2D], tooltips: Array[String]):
+func _collect_left_icons_from_effects(effects: Array[EffectEntry], items: Array[Dictionary]):
 	for effect in effects:
 		match effect.category:
 			DataManager.EffectCategory.APPLY_STATUS:
 				if effect.status:
 					var icon = DataManager.get_status_icon(effect.status.id)
 					if icon:
-						icons.append(icon)
-						tooltips.append(effect.status.get_localized_name())
+						items.append({
+							"texture": icon,
+							"is_status": true,
+							"id": effect.status.id
+						})
 			DataManager.EffectCategory.APPLY_PASSIVE:
 				if effect.passive:
 					var icon = DataManager.get_passive_icon(effect.passive.id)
 					if icon:
-						icons.append(icon)
-						tooltips.append(effect.passive.get_localized_name())
+						items.append({
+							"texture": icon,
+							"is_status": false,
+							"id": effect.passive.id
+						})
 			DataManager.EffectCategory.CONDITIONAL:
 				if effect.true_effect:
-					_collect_left_icons_from_effects([effect.true_effect], icons, tooltips)
+					_collect_left_icons_from_effects([effect.true_effect], items)
 				if effect.false_effect:
-					_collect_left_icons_from_effects([effect.false_effect], icons, tooltips)
+					_collect_left_icons_from_effects([effect.false_effect], items)
 
 
 func fill_right_icons():
 	if not right_icons:
 		return
 	
-	var icons: Array[Texture2D] = []
-	var tooltips: Array[String] = []
+	var items: Array[Dictionary] = []
 	
 	for card_type in card_data.get_card_types():
 		var icon = DataManager.get_card_type_icon(card_type)
 		if not icon:
 			continue
 		
-		match card_type:
-			DataManager.CardType.ATTACK:
-				_add_right_icon(icon, tr("ui_attack"), icons, tooltips)
-			DataManager.CardType.DEFEND:
-				_add_right_icon(icon, tr("ui_defend"), icons, tooltips)
-			DataManager.CardType.HEAL:
-				_add_right_icon(icon, tr("ui_heal"), icons, tooltips)
-			DataManager.CardType.RESOURCE:
-				_add_right_icon(icon, tr("ui_resource"), icons, tooltips)
-			DataManager.CardType.BUFF_SELF:
-				_add_right_icon(icon, tr("ui_buff"), icons, tooltips)
-			DataManager.CardType.DEBUFF:
-				_add_right_icon(icon, tr("ui_debuff"), icons, tooltips)
-			DataManager.CardType.UTILITY:
-				_add_right_icon(icon, tr("ui_utility"), icons, tooltips)
+		items.append({
+			"texture": icon,
+			"is_status": false,
+			"id": card_type,
+			"is_card_type": true,
+		})
 	
-	for icon_data in _unique_icons(icons, tooltips):
-		add_icon(right_icons, icon_data["texture"], icon_data["tooltip"])
+	for item in _unique_items(items):
+		add_icon(right_icons, item["texture"], false, item["id"], true)  # 🆕 передаём is_card_type 
 
 
 func _add_right_icon(icon: Texture2D, tooltip: String, icons: Array[Texture2D], tooltips: Array[String]):
@@ -246,16 +241,66 @@ func _add_right_icon(icon: Texture2D, tooltip: String, icons: Array[Texture2D], 
 		icons.append(icon)
 		tooltips.append(tooltip)
 
+func add_icon(container: VBoxContainer, texture: Texture2D, is_status: bool = true, id: int = -1, is_card_type: bool = false):
+	var icon_node: Control
+	
+	if is_status:
+		# Статусы
+		icon_node = preload("res://scenes/status_icon.tscn").instantiate() as StatusIcon
+		container.add_child(icon_node)
+		
+		var data = {
+			"status_id": id,
+			"icon": texture,
+			"name": DataManager.get_status_name(id),
+			"stacks": 0,
+			"duration": 0,
+		}
+		icon_node.setup(data, DataManager.COLOR_PENITENT_ART_BG_DARK, self)
+		icon_node.mouse_entered.connect(_on_status_icon_hovered.bind(id))
+		icon_node.mouse_exited.connect(_on_icon_mouse_exited)
+	
+	elif is_card_type:
+		# Типы карт (правые иконки)
+		var icon = TextureRect.new()
+		icon.texture = texture
+		icon.custom_minimum_size = Vector2(ICON_SIZE, ICON_SIZE)
+		icon.expand_mode = TextureRect.EXPAND_FIT_WIDTH_PROPORTIONAL
+		icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		icon.mouse_filter = Control.MOUSE_FILTER_PASS
+		container.add_child(icon)
+		icon.mouse_entered.connect(_on_card_type_icon_hovered.bind(id))
+		icon.mouse_exited.connect(_on_icon_mouse_exited)
+	else:
+		# Пассивки
+		icon_node = preload("res://scenes/passive_icon.tscn").instantiate() as PassiveIcon
+		container.add_child(icon_node)
+		
+		var passive_resource = DataManager.get_passive_resource(id)
+		var data = {
+			"passive_id": id,
+			"icon": texture,
+			"name": passive_resource.get_localized_name(),
+			"description": passive_resource.get_localized_description(),
+			"charges": 0,
+		}
+		icon_node.setup(data, DataManager.COLOR_PENITENT_ART_BG_DARK, self)
+		icon_node.mouse_entered.connect(_on_passive_icon_hovered.bind(id))
+		icon_node.mouse_exited.connect(_on_icon_mouse_exited)
 
-func add_icon(container: VBoxContainer, texture: Texture2D, tooltip: String):
-	var icon = TextureRect.new()
-	icon.texture = texture
-	icon.custom_minimum_size = Vector2(ICON_SIZE, ICON_SIZE)
-	icon.expand_mode = TextureRect.EXPAND_FIT_WIDTH_PROPORTIONAL
-	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-	icon.tooltip_text = tooltip
-	icon.mouse_filter = Control.MOUSE_FILTER_PASS
-	container.add_child(icon)
+func _get_status_id_from_tooltip(tooltip_text: String) -> int:
+	for status_id in DataManager.Status.values():
+		var name = DataManager.get_status_name(status_id)
+		if tooltip_text == name:
+			return status_id
+	return -1
+
+func _get_passive_id_from_tooltip(tooltip_text: String) -> int:
+	for passive_id in DataManager.Passive.values():
+		var name = DataManager.get_passive_name(passive_id)
+		if tooltip_text == name:
+			return passive_id
+	return -1
 	
 	
 func set_glow(enabled: bool):
@@ -891,3 +936,34 @@ func set_glow_color_by_biome(card: CardData) -> void:
 	
 	var color = DataManager.get_glow_color_for_card(card)
 	mat.set_shader_parameter("glow_color", color)
+
+
+func _on_status_icon_hovered(status_id: DataManager.Status):
+	var pos = get_global_mouse_position()
+	TooltipManager.request_status_tooltip(status_id, pos)
+
+func _on_passive_icon_hovered(passive_id: DataManager.Passive):
+	var pos = get_global_mouse_position()
+	TooltipManager.request_passive_tooltip(passive_id, pos)
+
+
+func _unique_items(items: Array[Dictionary]) -> Array[Dictionary]:
+	var unique: Array[Dictionary] = []
+	for item in items:
+		var exists = false
+		for u in unique:
+			if u["texture"] == item["texture"]:
+				exists = true
+				break
+		if not exists:
+			unique.append(item)
+	return unique
+
+
+func _on_card_type_icon_hovered(card_type: DataManager.CardType):
+	var pos = get_global_mouse_position()
+	TooltipManager.request_card_type_tooltip(card_type, pos)
+
+
+func _on_icon_mouse_exited():
+	SignalManager.hide_tooltip.emit()

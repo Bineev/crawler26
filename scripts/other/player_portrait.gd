@@ -410,17 +410,18 @@ func _on_hit_finished():
 # ===== ЗАМОРОЗКА (FREEZE) =====
 
 func apply_freeze_effect():
-	# Если умираем — откладываем заморозку
 	if current_shader_priority == DataManager.EnemyShaderPriority.DEATH:
 		pending_freeze = true
 		return
 	
-	# Если уже есть заморозка — не применяем повторно
 	if current_shader_priority == DataManager.EnemyShaderPriority.FREEZE:
 		return
 	
-	# Если есть hit — дожидаемся его окончания
 	if current_shader_priority == DataManager.EnemyShaderPriority.HIT:
+		pending_freeze = true
+		return
+	
+	if current_shader_priority == DataManager.EnemyShaderPriority.DEBUFF:  # 🆕
 		pending_freeze = true
 		return
 	
