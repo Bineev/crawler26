@@ -347,3 +347,61 @@ func _get_status_additional_info(status_id: DataManager.Status) -> String:
 			return tr("status_gangrene_additional")
 		_:
 			return ""
+
+
+func request_artifact_tooltip(artifact: ArtifactResource, position: Vector2):
+	var data = _build_artifact_tooltip_data(artifact)
+	SignalManager.tooltip_requested.emit(data, position)
+
+func _build_artifact_tooltip_data(artifact: ArtifactResource) -> Dictionary:
+	var desc = artifact.get_localized_description()
+	var additional = _get_artifact_additional_info(artifact)
+	
+	return {
+		"icon": artifact.get_icon(),
+		"title": artifact.get_localized_name(),
+		"description": desc,
+		"additional_info": additional,
+	}
+
+func _get_artifact_additional_info(artifact: ArtifactResource) -> String:
+	var parts: Array[String] = []
+	
+	# Триггеры
+	for trigger in artifact.triggers:
+		match trigger:
+			DataManager.ArtifactTrigger.ONE_TIME:
+				parts.append(tr("artifact_trigger_one_time"))
+			DataManager.ArtifactTrigger.TURN_COUNT_START:
+				parts.append(tr("artifact_trigger_turn_count_start") % artifact.trigger_count)
+			DataManager.ArtifactTrigger.TURN_COUNT_END:
+				parts.append(tr("artifact_trigger_turn_count_end") % artifact.trigger_count)
+			DataManager.ArtifactTrigger.ON_START_FIGHT:
+				parts.append(tr("artifact_trigger_on_start_fight"))
+			DataManager.ArtifactTrigger.CARD_PLAYED_COUNTER:
+				parts.append(tr("artifact_trigger_card_played_counter") % artifact.card_count_threshold)
+			DataManager.ArtifactTrigger.HEALTH_DROPPED_BELOW:
+				var value = str(artifact.amount_check_conditional)
+				if artifact.is_amount_check_percent:
+					value = tr("artifact_trigger_health_dropped_below_percent") % artifact.amount_check_conditional
+				else:
+					value = tr("artifact_trigger_health_dropped_below_flat") % artifact.amount_check_conditional
+				parts.append(value)
+			DataManager.ArtifactTrigger.CUSTOM:
+				parts.append(tr("artifact_trigger_custom"))
+	
+	return ", ".join(parts)
+
+
+func request_potion_tooltip(potion: PotionResource, position: Vector2):
+	var data = _build_potion_tooltip_data(potion)
+	SignalManager.tooltip_requested.emit(data, position)
+
+func _build_potion_tooltip_data(potion: PotionResource) -> Dictionary:
+	var desc = potion.get_localized_description()
+	
+	return {
+		"icon": DataManager.get_potion_icon(potion.potion_type),
+		"title": potion.get_localized_name(),
+		"description": desc,
+	}

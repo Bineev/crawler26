@@ -151,6 +151,8 @@ artifact_trigger_on_start_fight,Срабатывает в начале боя
 artifact_trigger_card_played_counter,Каждые %d сыгранных карт
 artifact_trigger_conditional,Срабатывает при условии
 artifact_trigger_custom,Особая логика
+"artifact_trigger_health_dropped_below_percent","Срабатывает при падении здоровья ниже %d%%"
+"artifact_trigger_health_dropped_below_flat","Срабатывает при падении здоровья ниже %d"
 action_use_key,Использовать ключ
 action_break,Взломать
 action_pray,Помолиться

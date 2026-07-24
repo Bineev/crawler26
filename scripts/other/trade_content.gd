@@ -74,7 +74,7 @@ func _add_artifact_item(item: Dictionary) -> void:
 	
 	# Теперь можно настраивать
 	artifact_icon.setup(item["data"], true)
-	artifact_icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	#artifact_icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	
 	# Получаем иконку монеты и уменьшаем её
 	var coin_icon = DataManager.get_currency_icon(DataManager.CurrencyType.COIN)

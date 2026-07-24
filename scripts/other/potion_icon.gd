@@ -4,7 +4,7 @@ class_name PotionIcon
 var potion_data: PotionResource = null
 var is_selected: bool = false
 var use_button: Button = null
-var is_interactable: bool = true
+var is_interactable: bool = false
 var is_in_combat: bool = false
 
 func _ready():
@@ -42,17 +42,14 @@ func setup(potion: PotionResource) -> void:
 	size = Vector2(64, 64)
 	#DataManager.apply_shader_to_icon(self, "res://shaders/highlight_item2.gdshader", {'hover_intensity' : 1.0})
 	DataManager.apply_shader_overlay(self, "res://shaders/horror_shader.gdshader")
-	# Тултип
-	var tooltip = potion.get_localized_name()
-	var desc = potion.get_localized_description()
-	if not desc.is_empty():
-		tooltip += "\n" + desc
-	tooltip_text = tooltip
 	# Позиционируем кнопку под зельем
 	use_button.position = Vector2(
 		(size.x - use_button.size.x) / 2,
 		size.y + 10
 	)
+	# 🆕 Подключаем тултип
+	mouse_entered.connect(_on_mouse_entered)
+	mouse_exited.connect(_on_mouse_exited)
 
 func select() -> void:
 	is_selected = true
@@ -138,3 +135,12 @@ func update_state() -> void:
 	else:
 		set_interactable(true)
 	_update_button_text()
+
+
+func _on_mouse_entered():
+	if potion_data:
+		var pos = get_global_mouse_position()
+		TooltipManager.request_potion_tooltip(potion_data, pos)
+
+func _on_mouse_exited():
+	SignalManager.hide_tooltip.emit()

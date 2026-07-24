@@ -151,6 +151,8 @@ artifact_trigger_on_start_fight,Triggers at fight start
 artifact_trigger_card_played_counter,Every %d cards played
 artifact_trigger_conditional,Triggers on condition
 artifact_trigger_custom,Special logic
+"artifact_trigger_health_dropped_below_percent","Triggers when health drops below %d%%"
+"artifact_trigger_health_dropped_below_flat","Triggers when health drops below %d"
 action_use_key,Use Key
 action_break,Break
 action_pray,Pray

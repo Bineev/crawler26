@@ -37,9 +37,12 @@ func setup(artifact: ArtifactResource, is_in_reward: bool) -> void:
 		color = Color(0, 0, 0, 0)
 	icon.expand_mode = TextureRect.EXPAND_FIT_WIDTH_PROPORTIONAL
 	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-	icon.tooltip_text = _build_tooltip()
 	#DataManager.apply_shader_to_icon(icon, "res://shaders/highlight_item.gdshader", {'hover_intensity' : 1.0})
 	DataManager.apply_shader_overlay(icon, "res://shaders/horror_shader.gdshader", {})
+	
+	# 🆕 Подключаем кастомный тултип
+	mouse_entered.connect(_on_mouse_entered)
+	mouse_exited.connect(_on_mouse_exited)
 	
 	_show_counter(artifact)
 
@@ -68,38 +71,6 @@ func _show_counter(artifact: ArtifactResource) -> void:
 	else:
 		counter_label.visible = false
 
-func _build_tooltip() -> String:
-	var name = artifact_resource.get_localized_name()
-	var desc = artifact_resource.get_localized_description()
-	var lore = artifact_resource.get_localized_lore()
-	
-	var tooltip = "%s\n%s" % [name, desc]
-	if not lore.is_empty():
-		tooltip += "\n\n%s" % lore
-	
-	#var trigger_texts: Array[String] = []
-	#for trigger in artifact_resource.triggers:
-		#match trigger:
-			#DataManager.ArtifactTrigger.ONE_TIME:
-				#trigger_texts.append(tr("artifact_trigger_one_time"))
-			#DataManager.ArtifactTrigger.TURN_COUNT_START:
-				#trigger_texts.append(tr("artifact_trigger_turn_count_start") % artifact_resource.trigger_count)
-			#DataManager.ArtifactTrigger.TURN_COUNT_END:
-				#trigger_texts.append(tr("artifact_trigger_turn_count_end") % artifact_resource.trigger_count)
-			#DataManager.ArtifactTrigger.ON_START_FIGHT:
-				#trigger_texts.append(tr("artifact_trigger_on_start_fight"))
-			#DataManager.ArtifactTrigger.CARD_PLAYED_COUNTER:
-				#trigger_texts.append(tr("artifact_trigger_card_played_counter") % artifact_resource.card_count_threshold)
-			#DataManager.ArtifactTrigger.HEALTH_DROPPED_BELOW:
-				#trigger_texts.append(tr("artifact_trigger_conditional"))
-			#DataManager.ArtifactTrigger.CUSTOM:
-				#trigger_texts.append(tr("artifact_trigger_custom"))
-	#
-	#if not trigger_texts.is_empty():
-		#tooltip += "\n\n" + "\n".join(trigger_texts)
-	
-	return tooltip
-
 func update_counter() -> void:
 	if not artifact_resource:
 		return
@@ -125,3 +96,12 @@ func _on_artifact_triggered(artifact: ArtifactResource) -> void:
 		return
 	# 🆕 Только анимация (счётчик уже обновился через counter_changed)
 	animate()
+
+
+func _on_mouse_entered():
+	if artifact_resource:
+		var pos = get_global_mouse_position()
+		TooltipManager.request_artifact_tooltip(artifact_resource, pos)
+
+func _on_mouse_exited():
+	SignalManager.hide_tooltip.emit()
