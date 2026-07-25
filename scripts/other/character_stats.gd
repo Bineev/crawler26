@@ -208,7 +208,7 @@ func take_damage(amount: int, ignore_block: bool = false, attacker: CharacterSta
 					enemy_ui.push_back()
 		SignalManager.get_hit.emit(self)
 		if self is PenitentStats:
-			if is_direct:
+			#if is_direct:
 				SignalManager.player_took_damage.emit(damage)
 			#SignalManager.player_damage_dealt.emit(damage)
 		modify_flat(DataManager.FlatStat.HEALTH, -damage)

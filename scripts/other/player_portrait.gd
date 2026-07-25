@@ -11,12 +11,18 @@ var vbox: VBoxContainer = null
 var portrait_texture: TextureRect = null
 var status_container: GridContainer = null
 var health_bar: ProgressBar = null
+var back_health_bar: ProgressBar
 var health_label: Label = null
 var atonement_bar: ProgressBar = null
 var atonement_label: Label = null
 var artifact_container: GridContainer = null
 var shield_sprite: TextureRect = null
 
+var health_bg: StyleBoxFlat = null
+var health_fill: StyleBoxFlat = null
+var back_health_bg: StyleBoxFlat = null
+var back_health_fill: StyleBoxFlat = null
+var back_health_heal_fill: StyleBoxFlat = null
 
 var player_stats: CharacterStats = null
 
@@ -51,6 +57,7 @@ func _ready() -> void:
 	atonement_label = $VBoxContainer/AtonementBar/AtonementLabel
 	artifact_container = $VBoxContainer/ArtifactContainer
 	shield_sprite = $VBoxContainer/TextureRect/ShieldSprite
+	back_health_bar = $VBoxContainer/HealthBar/HealthBar2
 	# Инициализируем позиции для всплывающих цифр
 	_init_floating_positions()
 
@@ -86,9 +93,18 @@ func _update_health():
 	var current = player_stats.get_health()
 	var max_health = player_stats.get_max_health()
 	
+	if current != max_health:
+		back_health_fill.border_width_right = 0
+		health_fill.border_width_right = 0
+	
+	# Обновляем максимальные значения для обоих баров
 	health_bar.max_value = max_health
-	health_bar.value = current
+	back_health_bar.max_value = max_health # 🆕 Обязательно для правильного масштаба буфера
+	
 	health_label.text = "%d/%d" % [current, max_health]
+	
+	# 🩸 Анимируем бары динамически (строку health_bar.value = current мы удалили)
+	_animate_double_bar(health_bar, back_health_bar, current)
 	
 	# Цвет при низком здоровье
 	if current < max_health * 0.25:
@@ -109,6 +125,50 @@ func _update_atonement():
 	atonement_bar.max_value = max_atonement
 	atonement_bar.value = current
 	atonement_label.text = "%d/%d" % [current, max_atonement]
+	
+	# 🆕 Анимируем бар
+	#_animate_bar(atonement_bar, current)
+
+
+func _animate_double_bar(main_bar: ProgressBar, bg_bar: ProgressBar, target_value: float):
+	var current_value = main_bar.value
+	if current_value == target_value:
+		return
+	
+	var tween_speed_modifier: float = 0.6
+	# 1. Рассчитываем процент изменения от общего объема шкалы
+	var max_val = main_bar.max_value if main_bar.max_value > 0 else 100.0
+	var pct_difference = abs(current_value - target_value) / max_val
+	
+	# 2. Базовое время для изменения 100% шкалы
+	var base_damage_time = 0.4  
+	var base_heal_time = 1000    
+	
+	# 3. Применяем модификатор скорости к итоговому времени
+	var damage_duration = clamp(pct_difference * base_damage_time * tween_speed_modifier, 0.05, 0.3)
+	var heal_duration = clamp(pct_difference * base_heal_time * tween_speed_modifier, 0.05, 0.4)
+
+	# Настройка твина
+	var tween = create_tween()
+	tween.set_ease(Tween.EASE_OUT)
+	tween.set_trans(Tween.TRANS_SINE)
+	
+	if target_value < current_value:
+		# 🩸 УРОН / ТРАТА РЕСУРСА
+		main_bar.value = target_value
+		bg_bar.add_theme_stylebox_override('fill', back_health_fill)
+		# Задержку (interval) тоже можно умножить на модификатор, если нужно ускорить и её
+		tween.tween_interval(0.1 * tween_speed_modifier) 
+		tween.tween_property(bg_bar, "value", target_value, damage_duration)
+		
+	else:
+		bg_bar.add_theme_stylebox_override('fill', back_health_heal_fill)
+		# 💚 ЛЕЧЕНИЕ / ВОССТАНОВЛЕНИЕ
+		bg_bar.value = target_value
+		tween.tween_property(main_bar, "value", target_value, heal_duration)
+
+
+
 
 
 func _update_statuses(target : Node):
@@ -147,8 +207,8 @@ func _on_status_changed(target: Node, status_id: int, stacks: int, duration: int
 func _setup_bars():
 	# ===== ЗДОРОВЬЕ =====
 	# Фон
-	var health_bg = StyleBoxFlat.new()
-	health_bg.bg_color = Color.BLACK
+	health_bg = StyleBoxFlat.new()
+	health_bg.bg_color = Color(0,0,0,0)
 	health_bg.border_width_bottom = 2
 	health_bg.border_width_top = 2
 	health_bg.border_width_left = 2
@@ -157,12 +217,12 @@ func _setup_bars():
 	health_bar.add_theme_stylebox_override("background", health_bg)
 	
 	# Заливка (красный)
-	var health_fill = StyleBoxFlat.new()
+	health_fill = StyleBoxFlat.new()
 	health_fill.bg_color = DataManager.COLOR_FLESH_CAVES_ART_BG_DARK
-	health_fill.border_width_bottom = 1
-	health_fill.border_width_top = 1
-	health_fill.border_width_left = 1
-	health_fill.border_width_right = 1
+	health_fill.border_width_bottom = 2
+	health_fill.border_width_top = 2
+	health_fill.border_width_left = 2
+	health_fill.border_width_right = 2
 	health_fill.border_color = DataManager.COLOR_MOLE_TUNNELS_ART_BG_LIGHT
 	health_bar.add_theme_stylebox_override("fill", health_fill)
 	
@@ -172,6 +232,33 @@ func _setup_bars():
 	health_label.add_theme_font_size_override("font_size", 14)
 	health_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	health_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	
+	back_health_bg = StyleBoxFlat.new()
+	back_health_bg.bg_color = Color.BLACK
+	back_health_bg.border_width_bottom = 2
+	back_health_bg.border_width_top = 2
+	back_health_bg.border_width_left = 2
+	back_health_bg.border_width_right = 2
+	back_health_bg.border_color = DataManager.COLOR_MOLE_TUNNELS_ART_BG_LIGHT
+	back_health_bar.add_theme_stylebox_override("background", back_health_bg)
+	
+	# Заливка (красный)
+	back_health_fill = StyleBoxFlat.new()
+	back_health_fill.bg_color = DataManager.COLOR_FLESH_CAVES_ART_BG_DARK.lightened(0.05)
+	back_health_fill.border_width_bottom = 0
+	back_health_fill.border_width_top = 0
+	back_health_fill.border_width_left = 0
+	back_health_fill.border_width_right = 0
+	back_health_fill.border_color = DataManager.COLOR_MOLE_TUNNELS_ART_BG_LIGHT
+	back_health_bar.add_theme_stylebox_override("fill", back_health_fill)
+	# Заливка (красный)
+	back_health_heal_fill = StyleBoxFlat.new()
+	back_health_heal_fill.bg_color = DataManager.COLOR_ROGUE_ART_BG_LIGHT
+	back_health_heal_fill.border_width_bottom = 0
+	back_health_heal_fill.border_width_top = 0
+	back_health_heal_fill.border_width_left = 0
+	back_health_heal_fill.border_width_right = 0
+	back_health_heal_fill.border_color = DataManager.COLOR_MOLE_TUNNELS_ART_BG_LIGHT
 	
 	# ===== ИСКУПЛЕНИЕ =====
 	# Фон

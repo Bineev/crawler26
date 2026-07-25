@@ -1481,6 +1481,8 @@ const COLOR_ROGUE_ART_BG_DARK: Color = Color("263326")        # тёмно-зе�
 # Цвета для фона иллюстрации (ArtBackground) - карты биома
 const COLOR_MOLE_TUNNELS_ART_BG_DARK: Color = Color("261A0D")    # тёмно-коричневый
 const COLOR_FLESH_CAVES_ART_BG_DARK: Color = Color("400D0D")     # тёмно-красный
+const COLOR_FLESH_CAVES_ART_BG_BRIGHT: Color = Color("9E1A1A")     # ярко-красный
+const COLOR_FLESH_CAVES_ART_BG_PASTELE: Color = Color("7D2D2D")     # ярко-красный
 const COLOR_BONE_LABYRINTH_ART_BG_DARK: Color = Color("332E26")  # тёмно-серый
 
 # === СВЕТЛЫЕ ЦВЕТА (альтернативные) ===
