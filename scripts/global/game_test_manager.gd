@@ -545,6 +545,8 @@ func _disconnect_all_signals():
 	SignalManager.potion_used.disconnect(_on_potion_used)
 	SignalManager.potion_discarded.disconnect(_on_potion_discarded)
 	SignalManager.potion_deselect_all.disconnect(_on_potion_deselect_all)
+	SignalManager.tooltip_requested.disconnect(_on_tooltip_requested)
+	SignalManager.hide_tooltip.disconnect(_on_hide_tooltip)
 
 func create_death_ui():
 	death_ui = preload("res://scenes/death_ui.tscn").instantiate() as DeathUI

@@ -95,8 +95,6 @@ func start_player_turn():
 	var is_frozen = player and player.has_status(DataManager.Status.FROZEN)
 	
 	if is_frozen:
-		# Отмечаем, что игрок начал ход замороженным
-		player._frozen_at_turn_start = true
 		# Уменьшаем энергию на 2 (но не меньше 0)
 		var current_energy = player.get_energy()
 		player.set_energy(max(0, current_energy - 2))

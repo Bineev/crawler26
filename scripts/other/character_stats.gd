@@ -731,115 +731,114 @@ func get_applied_statuses() -> Array:
 
 func process_start_of_turn():
 	# Если заморожен — статусы не тикают
-	if has_status(DataManager.Status.FROZEN):
-		return
-	# Снимаем STRENGTH в самом конце (после всех тиков)
-	if has_status(DataManager.Status.STRENGTH):
-		remove_status(DataManager.Status.STRENGTH)
-	
-	# ✅ ШАГ 1: Сначала пассивки ON_TURN_START
-	await _process_passive_triggers(DataManager.PassiveTrigger.ON_TURN_START)
-	
-	# 🆕 УМЕНЬШАЕМ ЗАРЯДЫ TURN_BASED ПАССИВОК С ТРИГГЕРОМ ON_TURN_START
-	var passives_to_remove = []
-	for passive in active_passives:
-		if passive.charge_type == DataManager.PassiveChargeType.TURN_BASED and passive.trigger == DataManager.PassiveTrigger.ON_TURN_START and passive.current_charges > 0:
-			passive.current_charges -= 1
-			if passive.current_charges <= 0:
-				passives_to_remove.append(passive)
-	
-	for passive in passives_to_remove:
-		remove_passive(passive)
-	
-	# 🆕 Эмитим сигнал для обновления UI
-	for passive in active_passives:
-		if passive.charge_type == DataManager.PassiveChargeType.TURN_BASED and passive.trigger == DataManager.PassiveTrigger.ON_TURN_START:
-			SignalManager.passive_changed.emit(self, passive.id)
-	
-	for passive in passives_to_remove:
-		remove_passive(passive)
-	
-	# ✅ ШАГ 3: Теперь обрабатываем статусы
-	var statuses_to_remove = []
-	var status_keys = active_statuses.keys()
-	
-	for status_id in status_keys:
-		var enemy : EnemyInstance = self as EnemyInstance
-		if enemy and not enemy.is_alive():
-			return
-		if not active_statuses.has(status_id):
-			continue
+	if not has_status(DataManager.Status.FROZEN):
+		# Снимаем STRENGTH в самом конце (после всех тиков)
+		if has_status(DataManager.Status.STRENGTH):
+			remove_status(DataManager.Status.STRENGTH)
 		
-		var data = active_statuses[status_id]
-		var status = data["resource"]
+		# ✅ ШАГ 1: Сначала пассивки ON_TURN_START
+		await _process_passive_triggers(DataManager.PassiveTrigger.ON_TURN_START)
 		
-		if status.is_ticking:
-			# 🆕 Проверяем, настал ли момент для тика
-			var tick_counter = data.get("tick_counter", 0)
-			var tick_interval = status.tick_interval if status.tick_interval > 0 else 1
-			# Увеличиваем счётчик
-			tick_counter += 1
-			data["tick_counter"] = tick_counter
+		# 🆕 УМЕНЬШАЕМ ЗАРЯДЫ TURN_BASED ПАССИВОК С ТРИГГЕРОМ ON_TURN_START
+		var passives_to_remove = []
+		for passive in active_passives:
+			if passive.charge_type == DataManager.PassiveChargeType.TURN_BASED and passive.trigger == DataManager.PassiveTrigger.ON_TURN_START and passive.current_charges > 0:
+				passive.current_charges -= 1
+				if passive.current_charges <= 0:
+					passives_to_remove.append(passive)
+		
+		for passive in passives_to_remove:
+			remove_passive(passive)
+		
+		# 🆕 Эмитим сигнал для обновления UI
+		for passive in active_passives:
+			if passive.charge_type == DataManager.PassiveChargeType.TURN_BASED and passive.trigger == DataManager.PassiveTrigger.ON_TURN_START:
+				SignalManager.passive_changed.emit(self, passive.id)
+		
+		for passive in passives_to_remove:
+			remove_passive(passive)
+		
+		# ✅ ШАГ 3: Теперь обрабатываем статусы
+		var statuses_to_remove = []
+		var status_keys = active_statuses.keys()
+		
+		for status_id in status_keys:
+			var enemy : EnemyInstance = self as EnemyInstance
+			if enemy and not enemy.is_alive():
+				return
+			if not active_statuses.has(status_id):
+				continue
 			
-			# Проверяем, настал ли момент для тика
-			var should_tick = tick_counter >= tick_interval
-			if should_tick:
-				# Сбрасываем счётчик
-				data["tick_counter"] = 0
-				if self is EnemyInstance:
-					var enemy_ui = get_node("EnemyUI") as EnemyUI
-					if enemy_ui:
-						var icon = enemy_ui.find_status_icon(status_id)
-						if icon:
-							# BUG возможно нужно await
-							icon.animate()
-				elif self is PenitentStats:
-					var portrait = GameTestManager.get_player_portrait()
-					if portrait:
-						var icon = portrait.find_status_icon(status_id)
-						if icon:
-							icon.animate()
-			if status.tick_effect and should_tick:
-				var tick_effect = status.tick_effect.duplicate_for_instance()
-				var caster = data.get("caster", null)
-				if not is_instance_valid(caster):
-					caster = null
-				var tick_value = status.get_tick_value(data.stacks, caster)
+			var data = active_statuses[status_id]
+			var status = data["resource"]
+			
+			if status.is_ticking:
+				# 🆕 Проверяем, настал ли момент для тика
+				var tick_counter = data.get("tick_counter", 0)
+				var tick_interval = status.tick_interval if status.tick_interval > 0 else 1
+				# Увеличиваем счётчик
+				tick_counter += 1
+				data["tick_counter"] = tick_counter
 				
-				match tick_effect.category:
-					DataManager.EffectCategory.DAMAGE:
-						tick_effect.base_value = tick_value
-					DataManager.EffectCategory.HEAL:
-						tick_effect.base_value = tick_value
-					DataManager.EffectCategory.BLOCK:
-						tick_effect.base_value = tick_value
-					DataManager.EffectCategory.APPLY_STATUS:
-						tick_effect.value = tick_value
-					_:
-						tick_effect.base_value = tick_value
-				#BUG здесь тикает статус (после тика враг может быть мертв)
-				EffectExecutor.execute(tick_effect, caster, [self], {}, null, tick_effect.is_direct_damage)
-				if self is EnemyInstance:
-					await Engine.get_main_loop().create_timer(DataManager.STATUS_TRIGGER_DELAY).timeout
-				elif self is PenitentStats:
-					await Engine.get_main_loop().create_timer(DataManager.PLAYER_STATUS_TRIGGER_DELAY).timeout
-			if status.id == DataManager.Status.BURN and data.stacks >= DataManager.BURN_THRESHOLD_STACKS:
-				_trigger_burn_explosion(data.stacks)
-				statuses_to_remove.append(status_id)
-			# 🆕 Уменьшаем длительность (но не для SHIELD)
-			if status.id != DataManager.Status.SHIELD and status.id != DataManager.Status.STRENGTH:
-				data.duration -= 1
-			
-			if data.duration <= 0:
-				statuses_to_remove.append(status_id)
-	
-	# Удаляем статусы после итерации
-	for status_id in statuses_to_remove:
-		if active_statuses.has(status_id):
-			remove_status(status_id)
-	# Снимаем SHIELD в самом конце (после всех тиков)
-	if has_status(DataManager.Status.SHIELD):
-		remove_status(DataManager.Status.SHIELD)
+				# Проверяем, настал ли момент для тика
+				var should_tick = tick_counter >= tick_interval
+				if should_tick:
+					# Сбрасываем счётчик
+					data["tick_counter"] = 0
+					if self is EnemyInstance:
+						var enemy_ui = get_node("EnemyUI") as EnemyUI
+						if enemy_ui:
+							var icon = enemy_ui.find_status_icon(status_id)
+							if icon:
+								# BUG возможно нужно await
+								icon.animate()
+					elif self is PenitentStats:
+						var portrait = GameTestManager.get_player_portrait()
+						if portrait:
+							var icon = portrait.find_status_icon(status_id)
+							if icon:
+								icon.animate()
+				if status.tick_effect and should_tick:
+					var tick_effect = status.tick_effect.duplicate_for_instance()
+					var caster = data.get("caster", null)
+					if not is_instance_valid(caster):
+						caster = null
+					var tick_value = status.get_tick_value(data.stacks, caster)
+					
+					match tick_effect.category:
+						DataManager.EffectCategory.DAMAGE:
+							tick_effect.base_value = tick_value
+						DataManager.EffectCategory.HEAL:
+							tick_effect.base_value = tick_value
+						DataManager.EffectCategory.BLOCK:
+							tick_effect.base_value = tick_value
+						DataManager.EffectCategory.APPLY_STATUS:
+							tick_effect.value = tick_value
+						_:
+							tick_effect.base_value = tick_value
+					#BUG здесь тикает статус (после тика враг может быть мертв)
+					EffectExecutor.execute(tick_effect, caster, [self], {}, null, tick_effect.is_direct_damage)
+					if self is EnemyInstance:
+						await Engine.get_main_loop().create_timer(DataManager.STATUS_TRIGGER_DELAY).timeout
+					elif self is PenitentStats:
+						await Engine.get_main_loop().create_timer(DataManager.PLAYER_STATUS_TRIGGER_DELAY).timeout
+				if status.id == DataManager.Status.BURN and data.stacks >= DataManager.BURN_THRESHOLD_STACKS:
+					_trigger_burn_explosion(data.stacks)
+					statuses_to_remove.append(status_id)
+				# 🆕 Уменьшаем длительность (но не для SHIELD)
+				if status.id != DataManager.Status.SHIELD and status.id != DataManager.Status.STRENGTH:
+					data.duration -= 1
+				
+				if data.duration <= 0:
+					statuses_to_remove.append(status_id)
+		
+		# Удаляем статусы после итерации
+		for status_id in statuses_to_remove:
+			if active_statuses.has(status_id):
+				remove_status(status_id)
+		# Снимаем SHIELD в самом конце (после всех тиков)
+		if has_status(DataManager.Status.SHIELD):
+			remove_status(DataManager.Status.SHIELD)
 		
 	if self is EnemyInstance:
 		SignalManager.enemy_status_changed.emit(self)
@@ -863,10 +862,23 @@ func _apply_freeze(caster: CharacterStats = null):
 	
 	var frozen_status = DataManager.get_status_resource(DataManager.Status.FROZEN)
 	if frozen_status:
-		# Просто накладываем FROZEN поверх существующих статусов
+		# 🆕 Определяем, был ли это ход игрока или врага
+		if self is PenitentStats:
+			var is_player_turn = BattleManager.is_player_turn()
+			
+			if is_player_turn:
+				_frozen_at_turn_start = true
+				# 🆕 Сжигаем всю энергию до нуля
+				var current_energy = get_energy()
+				if current_energy > 0:
+					set_energy(0)
+					SignalManager.log_message.emit("Заморозка сожгла всю энергию!")
+			else:
+				_frozen_at_turn_start = false
+		
 		add_status(frozen_status, 1, DataManager.FROZEN_DURATION, caster)
 		
-		# Применяем визуальный эффект заморозки (для врагов)
+		# Визуальные эффекты
 		if self is EnemyInstance:
 			var enemy_ui = get_node("EnemyUI") as EnemyUI
 			if enemy_ui:
