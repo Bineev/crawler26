@@ -14,6 +14,7 @@ var health_bar: ProgressBar = null
 var back_health_bar: ProgressBar
 var health_label: Label = null
 var atonement_bar: ProgressBar = null
+var back_atonement_bar: ProgressBar
 var atonement_label: Label = null
 var artifact_container: GridContainer = null
 var shield_sprite: TextureRect = null
@@ -23,6 +24,11 @@ var health_fill: StyleBoxFlat = null
 var back_health_bg: StyleBoxFlat = null
 var back_health_fill: StyleBoxFlat = null
 var back_health_heal_fill: StyleBoxFlat = null
+var atonement_bg: StyleBoxFlat = null
+var atonement_fill: StyleBoxFlat = null
+var back_atonement_bg: StyleBoxFlat = null
+var back_atonement_fill: StyleBoxFlat = null
+var back_atonement_heal_fill: StyleBoxFlat = null
 
 var player_stats: CharacterStats = null
 
@@ -58,6 +64,7 @@ func _ready() -> void:
 	artifact_container = $VBoxContainer/ArtifactContainer
 	shield_sprite = $VBoxContainer/TextureRect/ShieldSprite
 	back_health_bar = $VBoxContainer/HealthBar/HealthBar2
+	back_atonement_bar = $VBoxContainer/AtonementBar/AtonementBar2
 	# Инициализируем позиции для всплывающих цифр
 	_init_floating_positions()
 
@@ -96,7 +103,9 @@ func _update_health():
 	if current != max_health:
 		back_health_fill.border_width_right = 0
 		health_fill.border_width_right = 0
-	
+	else:
+		back_health_fill.border_width_right = 2
+		health_fill.border_width_right = 2
 	# Обновляем максимальные значения для обоих баров
 	health_bar.max_value = max_health
 	back_health_bar.max_value = max_health # 🆕 Обязательно для правильного масштаба буфера
@@ -122,15 +131,23 @@ func _update_atonement():
 	var current = player_stats.get_flat(DataManager.FlatStat.ATONEMENT)
 	var max_atonement = player_stats.get_flat(DataManager.FlatStat.MAX_ATONEMENT)
 	
+	if current != max_atonement:
+		back_atonement_fill.border_width_right = 0
+		atonement_fill.border_width_right = 0
+	else:
+		back_atonement_fill.border_width_right = 2
+		atonement_fill.border_width_right = 2
+	# Обновляем максимумы для обеих шкал
 	atonement_bar.max_value = max_atonement
-	atonement_bar.value = current
+	back_atonement_bar.max_value = max_atonement # 🆕 Важно для масштаба буфера
+	
 	atonement_label.text = "%d/%d" % [current, max_atonement]
 	
-	# 🆕 Анимируем бар
-	#_animate_bar(atonement_bar, current)
+	# 🩸 Анимируем бары динамически (строку atonement_bar.value = current мы удалили)
+	_animate_double_bar(atonement_bar, back_atonement_bar, current, true)
 
 
-func _animate_double_bar(main_bar: ProgressBar, bg_bar: ProgressBar, target_value: float):
+func _animate_double_bar(main_bar: ProgressBar, bg_bar: ProgressBar, target_value: float, is_atonement: bool = false):
 	var current_value = main_bar.value
 	if current_value == target_value:
 		return
@@ -162,7 +179,10 @@ func _animate_double_bar(main_bar: ProgressBar, bg_bar: ProgressBar, target_valu
 		tween.tween_property(bg_bar, "value", target_value, damage_duration)
 		
 	else:
-		bg_bar.add_theme_stylebox_override('fill', back_health_heal_fill)
+		if is_atonement:
+			bg_bar.add_theme_stylebox_override('fill', back_atonement_heal_fill)
+		else:
+			bg_bar.add_theme_stylebox_override('fill', back_health_heal_fill)
 		# 💚 ЛЕЧЕНИЕ / ВОССТАНОВЛЕНИЕ
 		bg_bar.value = target_value
 		tween.tween_property(main_bar, "value", target_value, heal_duration)
@@ -262,8 +282,8 @@ func _setup_bars():
 	
 	# ===== ИСКУПЛЕНИЕ =====
 	# Фон
-	var atonement_bg = StyleBoxFlat.new()
-	atonement_bg.bg_color = Color.BLACK
+	atonement_bg = StyleBoxFlat.new()
+	atonement_bg.bg_color = Color(0, 0, 0, 0)
 	atonement_bg.border_width_bottom = 2
 	atonement_bg.border_width_top = 2
 	atonement_bg.border_width_left = 2
@@ -272,14 +292,42 @@ func _setup_bars():
 	atonement_bar.add_theme_stylebox_override("background", atonement_bg)
 	
 	# Заливка (бежевый)
-	var atonement_fill = StyleBoxFlat.new()
+	atonement_fill = StyleBoxFlat.new()
 	atonement_fill.bg_color = DataManager.COLOR_ATONEMENT_DARK
-	atonement_fill.border_width_bottom = 1
-	atonement_fill.border_width_top = 1
-	atonement_fill.border_width_left = 1
-	atonement_fill.border_width_right = 1
+	atonement_fill.border_width_bottom = 2
+	atonement_fill.border_width_top = 2
+	atonement_fill.border_width_left = 2
+	atonement_fill.border_width_right = 2
 	atonement_fill.border_color = DataManager.COLOR_MOLE_TUNNELS_ART_BG_LIGHT
 	atonement_bar.add_theme_stylebox_override("fill", atonement_fill)
+	# Фон
+	back_atonement_bg = StyleBoxFlat.new()
+	back_atonement_bg.bg_color = Color(0, 0, 0, 0)
+	back_atonement_bg.border_width_bottom = 2
+	back_atonement_bg.border_width_top = 2
+	back_atonement_bg.border_width_left = 2
+	back_atonement_bg.border_width_right = 2
+	back_atonement_bg.border_color = DataManager.COLOR_MOLE_TUNNELS_ART_BG_LIGHT
+	back_atonement_bar.add_theme_stylebox_override("background", back_atonement_bg)
+	
+	# Заливка (бежевый)
+	back_atonement_fill = StyleBoxFlat.new()
+	back_atonement_fill.bg_color = DataManager.COLOR_ATONEMENT_DARK.lightened(0.05)
+	back_atonement_fill.border_width_bottom = 0
+	back_atonement_fill.border_width_top = 0
+	back_atonement_fill.border_width_left = 0
+	back_atonement_fill.border_width_right = 0
+	back_atonement_fill.border_color = DataManager.COLOR_MOLE_TUNNELS_ART_BG_LIGHT
+	back_atonement_bar.add_theme_stylebox_override("fill", back_atonement_fill)
+	
+		# Заливка (красный)
+	back_atonement_heal_fill = StyleBoxFlat.new()
+	back_atonement_heal_fill.bg_color = DataManager.COLOR_ATONEMENT_PURPLE
+	back_atonement_heal_fill.border_width_bottom = 0
+	back_atonement_heal_fill.border_width_top = 0
+	back_atonement_heal_fill.border_width_left = 0
+	back_atonement_heal_fill.border_width_right = 0
+	back_atonement_heal_fill.border_color = DataManager.COLOR_MOLE_TUNNELS_ART_BG_LIGHT
 	
 	# Текст
 	atonement_label.add_theme_color_override("font_color", DataManager.COLOR_MOLE_TUNNELS_ART_BG_LIGHT)
