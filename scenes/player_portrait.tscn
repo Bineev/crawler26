@@ -93,6 +93,7 @@ custom_minimum_size = Vector2(0, 10)
 layout_mode = 2
 
 [node name="HealthBar" type="ProgressBar" parent="VBoxContainer"]
+material = SubResource("ShaderMaterial_fhadu")
 layout_mode = 2
 show_percentage = false
 

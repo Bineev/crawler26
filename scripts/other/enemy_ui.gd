@@ -19,6 +19,7 @@ class_name EnemyUI
 @onready var highlight_sprite: TextureRect = $VBoxContainer/SpriteContainer/HighlightSprite
 @onready var v_box_container: VBoxContainer = $VBoxContainer
 @onready var shield_sprite: TextureRect = $VBoxContainer/SpriteContainer/ShieldSprite
+@onready var back_health_bar: ProgressBar = $VBoxContainer/HealthBar/HealthBar2
 
 
 
@@ -33,6 +34,12 @@ var aura_particles: GPUParticles2D = null
 var highlight_material: ShaderMaterial = null
 var is_highlighted: bool = false
 var base_material: Material = null
+
+var health_bg: StyleBoxFlat = null
+var health_fill: StyleBoxFlat = null
+var back_health_bg: StyleBoxFlat = null
+var back_health_fill: StyleBoxFlat = null
+var back_health_heal_fill: StyleBoxFlat = null
 
 var current_shader_priority: DataManager.EnemyShaderPriority = DataManager.EnemyShaderPriority.NONE
 var pending_death: bool = false
@@ -52,8 +59,8 @@ var freeze_tween: Tween = null
 
 func setup(enemy: EnemyInstance):
 	enemy_instance = enemy
-	update_display()
 	_setup_health_bar()  # ← добавить
+	update_display()
 	living_container.custom_minimum_size = enemy_instance.resource.get_size_pixels()
 	
 	# Поднимаем врага выше дыма
@@ -221,12 +228,19 @@ func update_display():
 	
 	if highlight_sprite:
 		highlight_sprite.texture = enemy_instance.get_sprite()
-	# Здоровье
+
+	# Здоровье (Инициализация при открытии экрана без анимации)
 	var current_health = enemy_instance.get_health()
 	var max_health = enemy_instance.get_max_health()
-	if health_bar:
+	
+	if health_bar and back_health_bar:
 		health_bar.max_value = max_health
+		back_health_bar.max_value = max_health
+		
+		# Мгновенно выставляем текущие значения, чтобы при старте не было ложных анимаций
 		health_bar.value = current_health
+		back_health_bar.value = current_health
+		
 	if health_label:
 		health_label.text = "%d/%d" % [current_health, max_health]
 	
@@ -383,8 +397,21 @@ func _create_icon(texture: Texture2D, size: int, tooltip: String) -> TextureRect
 func _on_enemy_health_changed(enemy: EnemyInstance, new_health: int, max_health: int):
 	if enemy != enemy_instance:
 		return
-	if health_bar:
-		health_bar.value = new_health
+		
+	if health_bar and back_health_bar: # 🆕 Проверяем оба бара перед анимацией
+		health_bar.max_value = max_health
+		back_health_bar.max_value = max_health # 🆕 Обновляем максимум для буфера
+		
+		if new_health != health_bar.value:
+			health_fill.border_width_right = 0
+			back_health_fill.border_width_right = 0
+		else:
+			health_fill.border_width_right = 2
+			back_health_fill.border_width_right = 2
+		
+		# 🩸 Запускаем динамическую анимацию (строку health_bar.value = new_health удалили)
+		_animate_double_bar(health_bar, back_health_bar, float(new_health))
+		
 	if health_label:
 		health_label.text = "%d/%d" % [new_health, max_health]
 
@@ -742,12 +769,10 @@ func _on_passive_changed(target: Node, passive_id: int = 999):
 
 
 func _setup_health_bar():
-	if not health_bar:
-		return
-	
+	# ===== ЗДОРОВЬЕ =====
 	# Фон
-	var health_bg = StyleBoxFlat.new()
-	health_bg.bg_color = Color.BLACK
+	health_bg = StyleBoxFlat.new()
+	health_bg.bg_color = Color(0,0,0,0)
 	health_bg.border_width_bottom = 2
 	health_bg.border_width_top = 2
 	health_bg.border_width_left = 2
@@ -756,22 +781,48 @@ func _setup_health_bar():
 	health_bar.add_theme_stylebox_override("background", health_bg)
 	
 	# Заливка (красный)
-	var health_fill = StyleBoxFlat.new()
+	health_fill = StyleBoxFlat.new()
 	health_fill.bg_color = DataManager.COLOR_FLESH_CAVES_ART_BG_DARK
-	health_fill.border_width_bottom = 1
-	health_fill.border_width_top = 1
-	health_fill.border_width_left = 1
-	health_fill.border_width_right = 1
+	health_fill.border_width_bottom = 2
+	health_fill.border_width_top = 2
+	health_fill.border_width_left = 2
+	health_fill.border_width_right = 2
 	health_fill.border_color = DataManager.COLOR_MOLE_TUNNELS_ART_BG_LIGHT
 	health_bar.add_theme_stylebox_override("fill", health_fill)
 	
 	# Текст
-	if health_label:
-		health_label.add_theme_color_override("font_color", DataManager.COLOR_MOLE_TUNNELS_ART_BG_LIGHT)
-		health_label.add_theme_font_override("font", DataManager.FONT_MAIN)
-		health_label.add_theme_font_size_override("font_size", 14)
-		health_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		health_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	health_label.add_theme_color_override("font_color", DataManager.COLOR_MOLE_TUNNELS_ART_BG_LIGHT)
+	health_label.add_theme_font_override("font", DataManager.FONT_MAIN)
+	health_label.add_theme_font_size_override("font_size", 14)
+	health_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	health_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	
+	back_health_bg = StyleBoxFlat.new()
+	back_health_bg.bg_color = DataManager.COLOR_BUTTON_DISABLED_BORDER
+	back_health_bg.border_width_bottom = 2
+	back_health_bg.border_width_top = 2
+	back_health_bg.border_width_left = 2
+	back_health_bg.border_width_right = 2
+	back_health_bg.border_color = DataManager.COLOR_MOLE_TUNNELS_ART_BG_LIGHT
+	back_health_bar.add_theme_stylebox_override("background", back_health_bg)
+	
+	# Заливка (красный)
+	back_health_fill = StyleBoxFlat.new()
+	back_health_fill.bg_color = DataManager.COLOR_FLESH_CAVES_ART_BG_DARK.lightened(0.1)
+	back_health_fill.border_width_bottom = 0
+	back_health_fill.border_width_top = 0
+	back_health_fill.border_width_left = 0
+	back_health_fill.border_width_right = 0
+	back_health_fill.border_color = DataManager.COLOR_MOLE_TUNNELS_ART_BG_LIGHT
+	back_health_bar.add_theme_stylebox_override("fill", back_health_fill)
+	# Заливка (красный)
+	back_health_heal_fill = StyleBoxFlat.new()
+	back_health_heal_fill.bg_color = DataManager.COLOR_ROGUE_ART_BG_LIGHT
+	back_health_heal_fill.border_width_bottom = 0
+	back_health_heal_fill.border_width_top = 0
+	back_health_heal_fill.border_width_left = 0
+	back_health_heal_fill.border_width_right = 0
+	back_health_heal_fill.border_color = DataManager.COLOR_MOLE_TUNNELS_ART_BG_LIGHT
 	
 	# Высота бара
 	health_bar.custom_minimum_size = Vector2(0, 24)
@@ -938,11 +989,6 @@ func push_back():
 	_is_pushing = false
 
 
-
-	
-	
-
-
 func find_status_icon(status_id: int) -> StatusIcon:
 	for child in status_container.get_children():
 		if child is StatusIcon and child.status_id == status_id:
@@ -1059,3 +1105,41 @@ func _on_passive_icon_hovered(passive_data: Dictionary):
 
 func _on_icon_mouse_exited():
 	SignalManager.hide_tooltip.emit()
+
+
+func _animate_double_bar(main_bar: ProgressBar, bg_bar: ProgressBar, target_value: float):
+	var current_value = main_bar.value
+	if current_value == target_value:
+		return
+	
+	var tween_speed_modifier: float = 3
+	# 1. Рассчитываем процент изменения от общего объема шкалы
+	var max_val = main_bar.max_value if main_bar.max_value > 0 else 100.0
+	var pct_difference = abs(current_value - target_value) / max_val
+	
+	# 2. Базовое время для изменения 100% шкалы
+	var base_damage_time = 0.4  
+	var base_heal_time = 1000    
+	
+	# 3. Применяем модификатор скорости к итоговому времени
+	var damage_duration = clamp(pct_difference * base_damage_time * tween_speed_modifier, 0.05, 0.3)
+	var heal_duration = clamp(pct_difference * base_heal_time * tween_speed_modifier, 0.05, 0.4)
+
+	# Настройка твина
+	var tween = create_tween()
+	tween.set_ease(Tween.EASE_OUT)
+	tween.set_trans(Tween.TRANS_SINE)
+	
+	if target_value < current_value:
+		# 🩸 УРОН / ТРАТА РЕСУРСА
+		main_bar.value = target_value
+		bg_bar.add_theme_stylebox_override('fill', back_health_fill)
+		# Задержку (interval) тоже можно умножить на модификатор, если нужно ускорить и её
+		tween.tween_interval(0.1 * tween_speed_modifier) 
+		tween.tween_property(bg_bar, "value", target_value, damage_duration)
+		
+	else:
+		bg_bar.add_theme_stylebox_override('fill', back_health_heal_fill)
+		# 💚 ЛЕЧЕНИЕ / ВОССТАНОВЛЕНИЕ
+		bg_bar.value = target_value
+		tween.tween_property(main_bar, "value", target_value, heal_duration)

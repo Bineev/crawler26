@@ -254,7 +254,7 @@ func _setup_bars():
 	health_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	
 	back_health_bg = StyleBoxFlat.new()
-	back_health_bg.bg_color = Color.BLACK
+	back_health_bg.bg_color = DataManager.COLOR_BUTTON_DISABLED_BORDER
 	back_health_bg.border_width_bottom = 2
 	back_health_bg.border_width_top = 2
 	back_health_bg.border_width_left = 2
@@ -264,7 +264,7 @@ func _setup_bars():
 	
 	# Заливка (красный)
 	back_health_fill = StyleBoxFlat.new()
-	back_health_fill.bg_color = DataManager.COLOR_FLESH_CAVES_ART_BG_DARK.lightened(0.05)
+	back_health_fill.bg_color = DataManager.COLOR_FLESH_CAVES_ART_BG_DARK.lightened(0.1)
 	back_health_fill.border_width_bottom = 0
 	back_health_fill.border_width_top = 0
 	back_health_fill.border_width_left = 0
@@ -302,7 +302,7 @@ func _setup_bars():
 	atonement_bar.add_theme_stylebox_override("fill", atonement_fill)
 	# Фон
 	back_atonement_bg = StyleBoxFlat.new()
-	back_atonement_bg.bg_color = Color(0, 0, 0, 0)
+	back_atonement_bg.bg_color = DataManager.COLOR_BUTTON_DISABLED_BORDER
 	back_atonement_bg.border_width_bottom = 2
 	back_atonement_bg.border_width_top = 2
 	back_atonement_bg.border_width_left = 2
@@ -312,7 +312,7 @@ func _setup_bars():
 	
 	# Заливка (бежевый)
 	back_atonement_fill = StyleBoxFlat.new()
-	back_atonement_fill.bg_color = DataManager.COLOR_ATONEMENT_DARK.lightened(0.05)
+	back_atonement_fill.bg_color = DataManager.COLOR_ATONEMENT_DARK.lightened(0.1)
 	back_atonement_fill.border_width_bottom = 0
 	back_atonement_fill.border_width_top = 0
 	back_atonement_fill.border_width_left = 0

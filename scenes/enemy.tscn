@@ -1,10 +1,11 @@
-[gd_scene load_steps=7 format=3 uid="uid://rfsuaeky3l17"]
+[gd_scene load_steps=9 format=3 uid="uid://rfsuaeky3l17"]
 
 [ext_resource type="Script" uid="uid://cujnkju5sswv0" path="res://scripts/other/enemy_instance.gd" id="1_7p1mj"]
 [ext_resource type="Script" uid="uid://hpnp0qu0c4eu" path="res://scripts/other/enemy_ui.gd" id="2_md0e3"]
 [ext_resource type="Shader" uid="uid://bni0wehijhgim" path="res://shaders/ui_shadow.gdshader" id="3_5uy6h"]
 [ext_resource type="Material" uid="uid://condfg0d2nlyu" path="res://styles/shadow_mat.tres" id="4_5uy6h"]
 [ext_resource type="Texture2D" uid="uid://dxg3mcj2iisyi" path="res://img/icons/statuses/shield.png" id="5_c4w8v"]
+[ext_resource type="Shader" uid="uid://cfcs8l2y88blq" path="res://shaders/mood_shader.gdshader" id="6_xwavj"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_c4w8v"]
 shader = ExtResource("3_5uy6h")
@@ -13,6 +14,12 @@ shader_parameter/shadow_width = 0.80000001425
 shader_parameter/shadow_skew = 4.7499999933364734e-08
 shader_parameter/vertical_offset = 0.05000002612499998
 shader_parameter/shadow_color = Color(0, 0, 0, 0.3529412)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_fhadu"]
+shader = ExtResource("6_xwavj")
+shader_parameter/darkness = 0.010000000475
+shader_parameter/vignette_strength = 0.30000001425
+shader_parameter/noise_amount = 0.0
 
 [node name="Enemy" type="Node2D"]
 script = ExtResource("1_7p1mj")
@@ -62,7 +69,20 @@ mouse_filter = 2
 texture = ExtResource("5_c4w8v")
 
 [node name="HealthBar" type="ProgressBar" parent="EnemyUI/VBoxContainer"]
+material = SubResource("ShaderMaterial_fhadu")
 layout_mode = 2
+mouse_filter = 1
+show_percentage = false
+
+[node name="HealthBar2" type="ProgressBar" parent="EnemyUI/VBoxContainer/HealthBar"]
+show_behind_parent = true
+material = SubResource("ShaderMaterial_fhadu")
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 mouse_filter = 1
 show_percentage = false
 
