@@ -154,7 +154,7 @@ func add_block(amount: int):
 		var shield_status = DataManager.get_status_resource(DataManager.Status.SHIELD)
 		add_status(shield_status, final_block, 1, self)  # на 1 ход
 
-func take_damage(amount: int, ignore_block: bool = false, attacker: CharacterStats = null, is_direct: bool = true):    # Проверка на заморозку (если заморожена — урон не проходит)
+func take_damage(amount: int, ignore_block: bool = false, attacker: CharacterStats = null, is_direct: bool = true, status_icon: Texture2D = null):    # Проверка на заморозку (если заморожена — урон не проходит)
 	# Сохраняем состояние до применения урона
 	var health_before = get_health()
 	var max_health = get_max_health()
@@ -189,7 +189,7 @@ func take_damage(amount: int, ignore_block: bool = false, attacker: CharacterSta
 	if self is EnemyInstance:
 		SoundManager.play(null, DataManager.get_sound(DataManager.SoundType.ENEMY_GET_DAMAGE))
 	if self is PenitentStats:
-		SignalManager.player_damage_dealt.emit(damage)
+		SignalManager.player_damage_dealt.emit(damage, status_icon)
 		SoundManager.play(null, DataManager.get_sound(DataManager.SoundType.PLAYER_GET_DAMAGE))
 	if damage > 0:
 	# TODO эффекты
@@ -199,7 +199,7 @@ func take_damage(amount: int, ignore_block: bool = false, attacker: CharacterSta
 			if portrait:
 				portrait.apply_hit_effect()
 		SignalManager.log_message.emit("%s получил %d урона" % [get_display_name(), damage])
-		SignalManager.damage_dealt.emit(self, damage)
+		SignalManager.damage_dealt.emit(self, damage, status_icon)
 		if is_direct:
 			if damage > 0 and self is EnemyInstance:
 				var enemy_ui = get_node("EnemyUI") as EnemyUI
@@ -817,7 +817,8 @@ func process_start_of_turn():
 						_:
 							tick_effect.base_value = tick_value
 					#BUG здесь тикает статус (после тика враг может быть мертв)
-					EffectExecutor.execute(tick_effect, caster, [self], {}, null, tick_effect.is_direct_damage)
+					var status_icon = DataManager.get_status_icon(status_id)
+					EffectExecutor.execute(tick_effect, caster, [self], {}, null, tick_effect.is_direct_damage, status_icon)
 					if self is EnemyInstance:
 						await Engine.get_main_loop().create_timer(DataManager.STATUS_TRIGGER_DELAY).timeout
 					elif self is PenitentStats:

@@ -398,7 +398,7 @@ upgrade_card_confirm,Upgrade
 "status_cold_additional","Stacks are summed. Refreshes duration. At %d stacks freezes target."
 "status_weakness_additional","Stacks by duration."
 "status_vulnerability_additional","Stacks by duration."
-"status_strength_additional","Added to final damage. Works on status effects."
+"status_strength_additional","Added to final damage. Does not affect status effects"
 "status_regen_additional","Stacks are summed. Refreshes duration."
 "status_shield_additional","Stacks are summed. Refreshes duration. Resets at turn start."
 "status_frozen_additional","If character — loses %d energy. If enemy — skips turn."

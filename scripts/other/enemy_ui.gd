@@ -589,11 +589,11 @@ func _apply_highlight(enabled: bool):
 		highlight_sprite.visible = false
 
 
-func show_floating_text(text: String, color: Color):
+func show_floating_text(text: String, color: Color, status_icon: Texture2D = null):
 	if int(text) == 0:
 		return
 	var floating_text = preload("res://scenes/floating_text.tscn").instantiate() as FloatingText
-	floating_text.setup(text, color)  # ← сначала настраиваем
+	floating_text.setup(text, color, true, status_icon)  # ← сначала настраиваем
 	add_child(floating_text)          # ← потом добавляем
 	
 	await get_tree().process_frame
@@ -602,11 +602,11 @@ func show_floating_text(text: String, color: Color):
 	floating_text.global_position = sprite_top
 
 
-func _on_damage_dealt(target: Node, amount: int):
+func _on_damage_dealt(target: Node, amount: int, status_icon: Texture2D = null):
 	if target != enemy_instance:
 		return
 	var color = DataManager.COLOR_DAMAGE_LOG  # тёмно-красный
-	show_floating_text(str(amount), color)
+	show_floating_text(str(amount), color, status_icon)
 
 
 func _on_heal_received(target: Node, amount: int):
@@ -620,7 +620,7 @@ func _on_shield_received(target: Node, amount: int):
 	if target != enemy_instance:
 		return
 	var color = DataManager.COLOR_LIGHT_BLUE  # светло-зелёный
-	show_floating_text("+" + str(amount), color)
+	show_floating_text("+" + str(amount), color, DataManager.get_status_icon(DataManager.Status.SHIELD))
 
 
 func die():
@@ -1030,9 +1030,9 @@ func _apply_debuff_effect():
 	
 	# --- НАСТРОЙКИ СКОРОСТИ (в секундах) ---
 	var t_squeeze: float = 0.03    # Скорость сжатия (было 0.15)
-	var t_pause: float = 0.05      # Пауза на пике (было 0.1)
+	var t_pause: float = 0.2      # Пауза на пике (было 0.1)
 	var t_return: float = 0.05     # Возврат формы (было 0.3)
-	var t_fade: float = 0.5        # Затухание шейдера (было 1.55)
+	var t_fade: float = 1        # Затухание шейдера (было 1.55)
 	# --------------------------------------
 	
 	var current_material = enemy_sprite.material
@@ -1050,7 +1050,7 @@ func _apply_debuff_effect():
 	hit_tween = create_tween()
 	
 	var original_scale = scale
-	var target_scale = Vector2(0.3, 0.5) 
+	var target_scale = Vector2(0.5, 0.1) 
 	var size = enemy_sprite.size
 	var offset = (size * original_scale - size * target_scale) / 2
 	var target_pos = position + offset

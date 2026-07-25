@@ -345,15 +345,15 @@ func _setup_bars():
 	_update_atonement()
 
 
-func _on_player_damage_dealt(damage: int):
-	show_floating_text(str(damage), DataManager.COLOR_PENITENT_ART_BG_DARK)
+func _on_player_damage_dealt(damage: int, status_icon: Texture2D = null):
+	show_floating_text(str(damage), DataManager.COLOR_FLESH_CAVES_ART_BG_BRIGHT, status_icon)
 
 
 func _on_player_heal_received(heal: int):
 	show_floating_text("+" + str(heal), DataManager.COLOR_ROGUE_ART_BG_LIGHT)
 
 
-func show_floating_text(text: String, color: Color):
+func show_floating_text(text: String, color: Color, status_icon: Texture2D = null):
 	if int(text) == 0:
 		return
 	if floating_text_positions.is_empty():
@@ -378,7 +378,7 @@ func show_floating_text(text: String, color: Color):
 	var floating_text = preload("res://scenes/floating_text.tscn").instantiate() as FloatingText
 	add_child(floating_text)
 	floating_text.global_position = pos
-	floating_text.setup(text, color, false)
+	floating_text.setup(text, color, false, status_icon)
 
 
 func _exit_tree():
@@ -396,23 +396,23 @@ func _init_floating_positions():
 	var portrait_pos = portrait_texture.global_position
 	var portrait_size = portrait_texture.size
 	
-	# 🆕 Увеличиваем отступы, чтобы текст не вылезал за портрет
-	var left_margin = 0.15   # увеличил с 0.05
-	var right_margin = 0.15  # увеличил с 0.05
-	var top_margin = 0.2     # чуть выше
-	var bottom_margin = 0.8  # чуть ниже
+	# 🆕 Меньше отступов от краёв → цифры ближе к краям
+	var left_margin = 0.08    # маленький отступ от левого края
+	var right_margin = 0.15   # маленький отступ от правого края
+	var top_margin = 0.15     # сверху
+	var bottom_margin = 0.85  # снизу
 	
-	# Левые позиции
+	# Левые позиции (ближе к левому краю)
 	for i in range(5):
 		var t = float(i) / 4.0
-		var x = portrait_pos.x + portrait_size.x * left_margin + portrait_size.x * 0.05
+		var x = portrait_pos.x + portrait_size.x * left_margin
 		var y = portrait_pos.y + portrait_size.y * (top_margin + t * (bottom_margin - top_margin))
 		floating_text_positions.append(Vector2(x, y))
 	
-	# Правые позиции
+	# Правые позиции (ближе к правому краю)
 	for i in range(5):
 		var t = float(i) / 4.0
-		var x = portrait_pos.x + portrait_size.x * (1 - right_margin) - portrait_size.x * 0.05
+		var x = portrait_pos.x + portrait_size.x * (1 - right_margin)
 		var y = portrait_pos.y + portrait_size.y * (top_margin + t * (bottom_margin - top_margin))
 		floating_text_positions.append(Vector2(x, y))
 
@@ -743,7 +743,7 @@ func _on_shield_received(target: Node, amount: int):
 	if target != player_stats:
 		return
 	var color = DataManager.COLOR_LIGHT_BLUE  # светло-зелёный
-	show_floating_text("+" + str(amount), color)
+	show_floating_text("+" + str(amount), color, DataManager.get_status_icon(DataManager.Status.SHIELD))
 
 
 func _on_player_get_debuff():
