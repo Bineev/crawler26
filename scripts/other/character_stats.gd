@@ -186,6 +186,22 @@ func take_damage(amount: int, ignore_block: bool = false, attacker: CharacterSta
 		else:
 			modify_status_stacks(DataManager.Status.SHIELD, -shield_stacks)
 			damage -= shield_stacks
+			
+	# 🆕 Если есть статус BLISTER — урон идёт в пузырь
+	if has_status(DataManager.Status.BLISTER):
+		var status_data = active_statuses.get(DataManager.Status.BLISTER)
+		if status_data and status_data.has("blister_data"):
+			var blister_data = status_data["blister_data"]
+			blister_data.current_health -= damage
+			
+			if blister_data.current_health <= 0:
+				# Пузырь уничтожен — взрыв
+				_explode_blister()
+				return
+			else:
+				SignalManager.log_message.emit("Чёрный пузырь поглотил %d урона. Осталось %d прочности." % [damage, blister_data.current_health])
+				return  # урон не проходит на цель
+			
 	if self is EnemyInstance:
 		SoundManager.play(null, DataManager.get_sound(DataManager.SoundType.ENEMY_GET_DAMAGE))
 	if self is PenitentStats:
@@ -1036,3 +1052,34 @@ func _can_interact(status_a: DataManager.Status, status_b: DataManager.Status) -
 			return true
 	
 	return false
+
+
+func _explode_blister():
+	var status_data = active_statuses.get(DataManager.Status.BLISTER)
+	if not status_data or not status_data.has("blister_data"):
+		return
+	
+	var blister_data = status_data["blister_data"]
+	var burn_stacks = blister_data.burn_stacks_on_create
+	var poison_duration = blister_data.poison_duration_on_create
+	var burn_amount = burn_stacks * poison_duration
+	
+	# Удаляем пузырь
+	remove_status(DataManager.Status.BLISTER)
+	
+	# Определяем, кому наносить BURN
+	var is_player = self is PenitentStats
+	var targets: Array = []
+	
+	if is_player:
+		# Если пузырь был на игроке — взрыв наносит BURN игроку
+		targets = [self]
+	else:
+		# Если пузырь был на враге — все враги получают BURN
+		targets = BattleManager.get_enemies()
+	
+	var burn_status = DataManager.get_status_resource(DataManager.Status.BURN)
+	for target in targets:
+		target.add_status(burn_status, burn_amount, 2, self)
+	
+	SignalManager.log_message.emit("Чёрный пузырь уничтожен! %d стаков Горения наложено!" % burn_amount)

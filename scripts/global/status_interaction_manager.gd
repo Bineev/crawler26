@@ -63,10 +63,10 @@ func handle_interaction(target, new_status: DataManager.Status, stacks: int, dur
 		_handle_poison_bleed_agony(target, stacks, duration)
 		return
 	
-	# Poison + Burn → Химический взрыв
+	# Poison + Burn → BLISTER
 	if (last_status == DataManager.Status.POISON and new_status == DataManager.Status.BURN) or \
 	   (last_status == DataManager.Status.BURN and new_status == DataManager.Status.POISON):
-		_handle_poison_burn_explosion(target, last_status, new_status, stacks)
+		_handle_poison_burn_blister(target, last_status, new_status, stacks, duration)
 		return
 	
 	# Bleed + Cold → Гангрена
@@ -210,3 +210,58 @@ func has_interaction(target, new_status: DataManager.Status) -> bool:
 			return true
 	
 	return false
+
+
+func _handle_poison_burn_blister(target, status_a: DataManager.Status, status_b: DataManager.Status, new_stacks: int, new_duration: int):
+	# Получаем стаки и длительность обоих статусов
+	var poison_stacks = target.get_status_stacks(DataManager.Status.POISON)
+	var poison_duration = target.active_statuses.get(DataManager.Status.POISON, {}).get("duration", 0)
+	var burn_stacks = target.get_status_stacks(DataManager.Status.BURN)
+	
+	if status_b == DataManager.Status.BURN:
+		burn_stacks = new_stacks
+		poison_duration = new_duration
+	elif status_b == DataManager.Status.POISON:
+		poison_stacks = new_stacks
+		poison_duration = new_duration
+	
+	target.remove_status(DataManager.Status.POISON)
+	target.remove_status(DataManager.Status.BURN)
+	
+	var blister_status = DataManager.get_status_resource(DataManager.Status.BLISTER)
+	if blister_status:
+		# Создаём копию статуса
+		var status_copy = blister_status.duplicate_for_instance()
+		status_copy.is_ticking = true
+		status_copy.tick_interval = poison_duration  # тикнет один раз в конце
+		
+		# 🆕 Создаём tick_effect для Блистера
+		var tick_effect = EffectEntry.new()
+		tick_effect.category = DataManager.EffectCategory.CUSTOM
+		tick_effect.target = DataManager.EffectTarget.SELF
+		tick_effect.custom_script = preload("res://scripts/effects/blister_explosion.gd")
+		
+		# Передаём параметры через custom_script
+		tick_effect.custom_description = "blister_explosion"
+		# Сохраняем данные в эффекте
+		tick_effect.value = burn_stacks * DataManager.BLISTER_DENSITY  # current_health
+		tick_effect.base_value = burn_stacks * poison_duration  # burn_amount для взрыва
+		tick_effect.amount = burn_stacks  # burn_stacks_on_create
+		
+		status_copy.tick_effect = tick_effect
+		
+		# Накладываем статус
+		target._add_status_direct(status_copy, 1, poison_duration, target)
+		
+		# Сохраняем данные в активном статусе для поглощения урона
+		var blister_data = {
+			"max_health": burn_stacks * DataManager.BLISTER_DENSITY,
+			"current_health": burn_stacks * DataManager.BLISTER_DENSITY,
+			"burn_stacks_on_create": burn_stacks,
+			"poison_duration_on_create": poison_duration,
+		}
+		var status_data = target.active_statuses.get(DataManager.Status.BLISTER)
+		if status_data:
+			status_data["blister_data"] = blister_data
+		
+		SignalManager.log_message.emit("Чёрный пузырь! Прочность: %d, Длительность: %d ходов." % [blister_data.max_health, poison_duration])
