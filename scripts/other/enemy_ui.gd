@@ -71,8 +71,8 @@ func setup(enemy: EnemyInstance):
 	living_container.custom_minimum_size = enemy_instance.resource.get_size_pixels()
 	
 	# Поднимаем врага выше дыма
-	living_container.z_index = 10
-	living_container.z_as_relative = false
+	#living_container.z_index = 10
+	#living_container.z_as_relative = false
 	
 	#_add_aura_effect()
 	_start_living_animation()
@@ -1165,7 +1165,7 @@ func mark_current():
 	current_mark_scale = target_scale
 	current_mark_position = original_position + offset
 	
-	z_index = original_z_index + 10
+	#z_index = original_z_index + 1
 	
 	var tween = create_tween()
 	tween.set_parallel(true)

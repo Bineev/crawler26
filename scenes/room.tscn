@@ -10,7 +10,6 @@ shader = ExtResource("2_85yof")
 shader_parameter/darkness = 0.4
 shader_parameter/vignette_strength = 0.5
 shader_parameter/noise_amount = 0.03
-shader_parameter/tint_color = Color(0.2, 0.05, 0.1, 1)
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_jn645"]
 shader = ExtResource("3_14vil")
@@ -57,6 +56,7 @@ mouse_filter = 2
 [node name="Content" type="Node2D" parent="."]
 
 [node name="HorrorOverlay" type="ColorRect" parent="."]
+z_index = 1000
 material = SubResource("ShaderMaterial_jn645")
 custom_minimum_size = Vector2(1024, 800)
 layout_mode = 1
@@ -66,6 +66,7 @@ mouse_filter = 2
 color = Color(0, 0, 0, 1)
 
 [node name="ShaderLayer" type="ColorRect" parent="."]
+z_index = 1000
 material = SubResource("ShaderMaterial_qvc4m")
 custom_minimum_size = Vector2(1024, 800)
 layout_mode = 1

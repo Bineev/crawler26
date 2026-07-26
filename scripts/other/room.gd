@@ -26,7 +26,7 @@ func _ready():
 		background.texture = _pending_background_texture
 	
 	if not _pending_room_data.is_empty():
-		await _init_content(_pending_room_data)
+		_init_content(_pending_room_data)
 		_pending_room_data.clear()
 	_setup_dark_overlay()
 	_setup_horror_overlay()
@@ -195,7 +195,7 @@ func _enter_room_animation() -> void:
 	dark_overlay.color = Color(0, 0, 0, 1)
 	dark_overlay.size = get_viewport().get_visible_rect().size
 	dark_overlay.position = Vector2.ZERO
-	dark_overlay.z_index = 100
+	dark_overlay.z_index = 1001
 	add_child(dark_overlay)
 	
 	# Получаем размер и позицию background
@@ -210,7 +210,7 @@ func _enter_room_animation() -> void:
 	left_door.color = Color(0, 0, 0)
 	left_door.size = Vector2(door_width, bg_size.y)
 	left_door.position = Vector2(center_x - door_width, bg_global_pos.y)
-	left_door.z_index = 101
+	left_door.z_index = 1002
 	add_child(left_door)
 	
 	# Правая створка
@@ -219,7 +219,7 @@ func _enter_room_animation() -> void:
 	right_door.color = Color(0, 0, 0)
 	right_door.size = Vector2(door_width, bg_size.y)
 	right_door.position = Vector2(center_x, bg_global_pos.y)
-	right_door.z_index = 101
+	right_door.z_index = 1001
 	add_child(right_door)
 	
 	var tween = create_tween()

@@ -514,6 +514,7 @@ func remove_passive(passive: PassiveResource):
 		
 		SignalManager.passive_removed.emit(self, passive.id)
 		print("Passive removed: ", passive.get_localized_name())  # ← отладка
+		SignalManager.player_status_changed.emit(self)
 
 
 func _process_passive_triggers(trigger: DataManager.PassiveTrigger, attacker = null):
@@ -819,7 +820,7 @@ func process_start_of_turn():
 							tick_effect.base_value = tick_value
 					#BUG здесь тикает статус (после тика враг может быть мертв)
 					var status_icon = DataManager.get_status_icon(status_id)
-					EffectExecutor.execute(tick_effect, caster, [self], {}, null, tick_effect.is_direct_damage, status_icon)
+					EffectExecutor.execute(tick_effect, caster, [self], {}, null, tick_effect.is_direct_damage, status_icon, status.ignore_block)
 					if self is EnemyInstance:
 						await Engine.get_main_loop().create_timer(DataManager.STATUS_TRIGGER_DELAY).timeout
 					elif self is PenitentStats:

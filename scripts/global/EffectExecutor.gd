@@ -23,7 +23,7 @@ extends Node
 ## @param targets: Array - список целей
 ## @param card_info: Dictionary - дополнительная информация (например, сожжённая карта)
 ## @param passive_context: PassiveResource - пассивка, из которой вызван эффект (опционально)
-func execute(effect: EffectEntry, source: Node, targets: Array, card_info: Dictionary = {}, passive_context: PassiveResource = null, is_direct: bool = true, status_icon: Texture2D = null) -> void:
+func execute(effect: EffectEntry, source: Node, targets: Array, card_info: Dictionary = {}, passive_context: PassiveResource = null, is_direct: bool = true, status_icon: Texture2D = null, is_ignore_block: bool = false) -> void:
 	if not effect:
 		return
 	
@@ -32,7 +32,7 @@ func execute(effect: EffectEntry, source: Node, targets: Array, card_info: Dicti
 	
 	match effect.category:
 		DataManager.EffectCategory.DAMAGE:
-			_execute_damage(effect, source, targets, is_direct, status_icon)
+			_execute_damage(effect, source, targets, is_direct, status_icon, is_ignore_block)
 		
 		DataManager.EffectCategory.BLOCK:
 			_execute_block(effect, source, targets)
@@ -87,7 +87,7 @@ func execute(effect: EffectEntry, source: Node, targets: Array, card_info: Dicti
 ## ПРИВАТНЫЕ МЕТОДЫ ВЫПОЛНЕНИЯ
 ## ============================================================
 
-func _execute_damage(effect: EffectEntry, source, targets: Array, is_direct: bool = true, status_icon: Texture2D = null) -> void:
+func _execute_damage(effect: EffectEntry, source, targets: Array, is_direct: bool = true, status_icon: Texture2D = null, is_ignore_block: bool = false) -> void:
 	var base_damage = effect.base_value
 	
 	# Масштабирование от статов (всегда применяется)
@@ -124,7 +124,7 @@ func _execute_damage(effect: EffectEntry, source, targets: Array, is_direct: boo
 		if target.has_method("get_modifier"):
 			final_damage *= target.get_modifier(DataManager.ModifierStat.DAMAGE_TAKEN_PERCENT)
 		# возможно, вся цепочка должна быть await
-		target.take_damage(floor(final_damage), false, source, is_direct, status_icon)
+		target.take_damage(floor(final_damage), is_ignore_block, source, is_direct, status_icon)
 
 
 func _execute_block(effect: EffectEntry, source, targets: Array) -> void:
