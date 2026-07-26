@@ -999,6 +999,7 @@ func load_status_resources():
 	_status_resources[Status.SHIELD] = load("res://resources/statuses/shield.tres")
 	_status_resources[Status.FROZEN] = load("res://resources/statuses/frozen.tres")
 	_status_resources[Status.GANGRENE] = load("res://resources/statuses/gangrene.tres")
+	_status_resources[Status.BLISTER] = load("res://resources/statuses/blister.tres")
 	
 	_status_resources_loaded = true
 

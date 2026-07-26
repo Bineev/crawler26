@@ -54,6 +54,8 @@ func _get_status_description(status_id: DataManager.Status) -> String:
 			return tr("status_frozen_desc")
 		DataManager.Status.GANGRENE:
 			return tr("status_gangrene_desc")
+		DataManager.Status.BLISTER:
+			return tr("status_blister_desc")
 		_:
 			return ""
 
@@ -111,14 +113,14 @@ func _get_card_type_description(card_type: DataManager.CardType) -> String:
 			return ""
 
 
-func request_dynamic_status_tooltip(status_id: DataManager.Status, stacks: int, duration: int, position: Vector2):
-	var data = _build_dynamic_status_tooltip_data(status_id, stacks, duration)
+func request_dynamic_status_tooltip(status_id: DataManager.Status, stacks: int, duration: int, status_data: Dictionary, position: Vector2):
+	var data = _build_dynamic_status_tooltip_data(status_id, stacks, duration, status_data)
 	SignalManager.tooltip_requested.emit(data, position)
 
-func _build_dynamic_status_tooltip_data(status_id: DataManager.Status, stacks: int, duration: int) -> Dictionary:
+func _build_dynamic_status_tooltip_data(status_id: DataManager.Status, stacks: int, duration: int, status_data: Dictionary) -> Dictionary:
 	var name = DataManager.get_status_name(status_id)
 	var desc = _get_dynamic_status_description(status_id, stacks, duration)
-	var additional = _get_status_additional_info(status_id)
+	var additional = _get_status_additional_info(status_id, status_data)  # ← передаём status_data
 	
 	return {
 		"icon": DataManager.get_status_icon(status_id),
@@ -154,6 +156,11 @@ func _get_dynamic_status_description(status_id: DataManager.Status, stacks: int,
 			return tr("status_frozen_desc")
 		DataManager.Status.GANGRENE:
 			return tr("status_gangrene_dynamic_desc") % [stacks, duration]
+		DataManager.Status.BLISTER:
+			var blister_data = _get_blister_data()
+			if blister_data:
+				return tr("status_blister_dynamic_desc") % [blister_data.current_health, blister_data.duration]
+			return tr("status_blister_desc")
 		_:
 			return ""
 
@@ -321,7 +328,7 @@ func _get_effect_duration(effect: EffectEntry) -> int:
 		return int(effect.duration) if effect.duration != null else 1
 
 
-func _get_status_additional_info(status_id: DataManager.Status) -> String:
+func _get_status_additional_info(status_id: DataManager.Status, status_data: Dictionary = {}) -> String:
 	match status_id:
 		DataManager.Status.POISON:
 			return tr("status_poison_additional")
@@ -345,7 +352,15 @@ func _get_status_additional_info(status_id: DataManager.Status) -> String:
 			return tr("status_frozen_additional") % RunManager.frozen_energy_loss
 		DataManager.Status.GANGRENE:
 			return tr("status_gangrene_additional")
+		DataManager.Status.BLISTER:
+			var blister_data = status_data.get("blister_data", {})
+			if blister_data and not blister_data.is_empty():
+				var burn_on_destroy = blister_data.get("burn_stacks_on_create", 0) * blister_data.get("poison_duration_on_create", 0)
+				var damage_on_expire = blister_data.get("current_health", 0)
+				return tr("status_blister_additional") % [burn_on_destroy, damage_on_expire]
+			return ""
 		_:
+			return ""
 			return ""
 
 
@@ -405,3 +420,9 @@ func _build_potion_tooltip_data(potion: PotionResource) -> Dictionary:
 		"title": potion.get_localized_name(),
 		"description": desc,
 	}
+
+
+func _get_blister_data() -> Dictionary:
+	# Получаем данные о текущем блистере (нужно передавать извне)
+	# Пока заглушка
+	return {"current_health": 0, "duration": 0}
