@@ -168,8 +168,8 @@ func take_damage(amount: int, ignore_block: bool = false, attacker: CharacterSta
 
 	if has_status(DataManager.Status.COLD):
 		var cold_stacks = get_status_stacks(DataManager.Status.COLD)
-		var cold_multiplier = 1.0 - (cold_stacks * DataManager.COLD_EFFECT_PERCENT_PER_STACK)
-		damage *= max(cold_multiplier, DataManager.COLD_MIN_EFFECT_MULTIPLIER)
+		var cold_multiplier = 1.0 - (cold_stacks * RunManager.cold_effect_percent)
+		damage *= max(cold_multiplier, RunManager.cold_min_multiplier)
 	
 	damage = floor(damage)
 	
@@ -351,7 +351,7 @@ func _add_status_direct(status: StatusResource, stacks: int, duration: int, cast
 	# Проверка на заморозку (для COLD)
 	if status_id == DataManager.Status.COLD:
 		var total_stacks = get_status_stacks(DataManager.Status.COLD)
-		if total_stacks >= DataManager.COLD_FREEZE_THRESHOLD:
+		if total_stacks >= RunManager.cold_freeze_threshold:
 			_apply_freeze(caster)
 			return
 	
@@ -408,23 +408,49 @@ func modify_status_stacks(status_id: DataManager.Status, amount: int):
 
 func _apply_status_modifiers(status: StatusResource):
 	for mod in status.modifiers:
+		var final_value = mod.value
+		
+		match status.id:
+			DataManager.Status.WEAKNESS:
+				if mod.stat == DataManager.ModifierStat.DAMAGE_DEALT_PERCENT:
+					final_value = RunManager.weakness_damage_multiplier - 1.0
+			DataManager.Status.VULNERABILITY:
+				if mod.stat == DataManager.ModifierStat.DAMAGE_TAKEN_PERCENT:
+					final_value = RunManager.vulnerability_damage_multiplier - 1.0
+			DataManager.Status.POISON:
+				if mod.stat == DataManager.ModifierStat.HEALING_RECEIVED_PERCENT:
+					final_value = -RunManager.poison_healing_reduction
+		
 		match mod.change_type:
 			DataManager.ModifierChangeType.MULTIPLIER:
-				modifiers[mod.stat] = modifiers.get(mod.stat, 1.0) * mod.value
+				modifiers[mod.stat] = modifiers.get(mod.stat, 1.0) * (1.0 + final_value)
 			DataManager.ModifierChangeType.PERCENT:
-				modifiers[mod.stat] = modifiers.get(mod.stat, 1.0) + mod.value
+				modifiers[mod.stat] = modifiers.get(mod.stat, 1.0) + final_value
 			DataManager.ModifierChangeType.FLAT_BONUS:
-				modifiers[mod.stat] = modifiers.get(mod.stat, 0.0) + mod.value
+				modifiers[mod.stat] = modifiers.get(mod.stat, 0.0) + final_value
 
 func _remove_status_modifiers(status: StatusResource):
 	for mod in status.modifiers:
+		var final_value = mod.value
+		
+		match status.id:
+			DataManager.Status.WEAKNESS:
+				if mod.stat == DataManager.ModifierStat.DAMAGE_DEALT_PERCENT:
+					final_value = RunManager.weakness_damage_multiplier - 1.0
+			DataManager.Status.VULNERABILITY:
+				if mod.stat == DataManager.ModifierStat.DAMAGE_TAKEN_PERCENT:
+					final_value = RunManager.vulnerability_damage_multiplier - 1.0
+			DataManager.Status.POISON:
+				if mod.stat == DataManager.ModifierStat.HEALING_RECEIVED_PERCENT:
+					final_value = -RunManager.poison_healing_reduction
+		
 		match mod.change_type:
 			DataManager.ModifierChangeType.MULTIPLIER:
-				modifiers[mod.stat] = modifiers.get(mod.stat, 1.0) / mod.value
+				modifiers[mod.stat] = modifiers.get(mod.stat, 1.0) / (1.0 + final_value)
 			DataManager.ModifierChangeType.PERCENT:
-				modifiers[mod.stat] = modifiers.get(mod.stat, 1.0) - mod.value
+				modifiers[mod.stat] = modifiers.get(mod.stat, 1.0) - final_value
 			DataManager.ModifierChangeType.FLAT_BONUS:
-				modifiers[mod.stat] = modifiers.get(mod.stat, 0.0) - mod.valuelat_bonus
+				modifiers[mod.stat] = modifiers.get(mod.stat, 0.0) - final_value
 
 func _check_denial(status: StatusResource) -> bool:
 	for passive in active_passives:
@@ -484,15 +510,25 @@ func apply_passive(passive: PassiveResource, duration: int = -1):
 	
 	active_passives.append(instance)
 	
-	# Применяем модификаторы
+	# 🆕 Применяем модификаторы с учётом RunManager
 	for mod in instance.modifiers:
+		var final_value = mod.value
+		
+		match instance.id:
+			DataManager.Passive.SHAME:
+				if mod.stat == DataManager.ModifierStat.DAMAGE_TAKEN_PERCENT:
+					final_value = RunManager.shame_damage_taken_multiplier - 1.0
+				elif mod.stat == DataManager.ModifierStat.ATONEMENT_GAIN_MULTIPLIER:
+					final_value = RunManager.shame_atonement_multiplier - 1.0
+			# 🆕 другие пассивки с модификаторами
+		
 		match mod.change_type:
 			DataManager.ModifierChangeType.MULTIPLIER:
-				modifiers[mod.stat] = modifiers.get(mod.stat, 1.0) * mod.value
+				modifiers[mod.stat] = modifiers.get(mod.stat, 1.0) * (1.0 + final_value)
 			DataManager.ModifierChangeType.PERCENT:
-				modifiers[mod.stat] = modifiers.get(mod.stat, 1.0) + mod.value
+				modifiers[mod.stat] = modifiers.get(mod.stat, 1.0) + final_value
 			DataManager.ModifierChangeType.FLAT_BONUS:
-				modifiers[mod.stat] = modifiers.get(mod.stat, 0.0) + mod.value
+				modifiers[mod.stat] = modifiers.get(mod.stat, 0.0) + final_value
 	
 	SignalManager.passive_added.emit(self, instance.id)
 	SignalManager.player_status_changed.emit(self)
@@ -503,14 +539,26 @@ func remove_passive(passive: PassiveResource):
 	if idx != -1:
 		active_passives.remove_at(idx)
 		
+		# 🆕 Снимаем модификаторы с учётом RunManager
 		for mod in passive.modifiers:
+			var final_value = mod.value
+			
+			match passive.id:
+				DataManager.Passive.SHAME:
+					if mod.stat == DataManager.ModifierStat.DAMAGE_TAKEN_PERCENT:
+						final_value = RunManager.shame_damage_taken_multiplier - 1.0
+					elif mod.stat == DataManager.ModifierStat.ATONEMENT_GAIN_MULTIPLIER:
+						final_value = RunManager.shame_atonement_multiplier - 1.0
+			
 			match mod.change_type:
 				DataManager.ModifierChangeType.MULTIPLIER:
-					modifiers[mod.stat] = modifiers.get(mod.stat, 1.0) / mod.value
+					modifiers[mod.stat] = modifiers.get(mod.stat, 1.0) / (1.0 + final_value)
 				DataManager.ModifierChangeType.PERCENT:
-					modifiers[mod.stat] = modifiers.get(mod.stat, 1.0) - mod.value
+					modifiers[mod.stat] = modifiers.get(mod.stat, 1.0) - final_value
 				DataManager.ModifierChangeType.FLAT_BONUS:
-					modifiers[mod.stat] = modifiers.get(mod.stat, 0.0) - mod.value
+					modifiers[mod.stat] = modifiers.get(mod.stat, 0.0) - final_value
+		
+		SignalManager.passive_removed.emit(self, passive.id)
 		
 		SignalManager.passive_removed.emit(self, passive.id)
 		print("Passive removed: ", passive.get_localized_name())  # ← отладка
@@ -666,7 +714,7 @@ func _trigger_burn_explosion(stacks: int):
 ## ============================================================
 
 func get_strength_bonus() -> int:
-	return get_status_stacks(DataManager.Status.STRENGTH)
+	return get_status_stacks(DataManager.Status.STRENGTH) * RunManager.strength_bonus_per_stack
 
 func get_energy() -> int:
 	return get_flat(DataManager.FlatStat.ENERGY)
@@ -825,7 +873,7 @@ func process_start_of_turn():
 						await Engine.get_main_loop().create_timer(DataManager.STATUS_TRIGGER_DELAY).timeout
 					elif self is PenitentStats:
 						await Engine.get_main_loop().create_timer(DataManager.PLAYER_STATUS_TRIGGER_DELAY).timeout
-				if status.id == DataManager.Status.BURN and data.stacks >= DataManager.BURN_THRESHOLD_STACKS:
+				if status.id == DataManager.Status.BURN and data.stacks >= RunManager.burn_threshold_stacks:
 					_trigger_burn_explosion(data.stacks)
 					statuses_to_remove.append(status_id)
 				# 🆕 Уменьшаем длительность (но не для SHIELD)

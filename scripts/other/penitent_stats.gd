@@ -23,11 +23,12 @@ func _init():
 func _init_flat_stats():
 	flats[DataManager.FlatStat.HEALTH] = DataManager.PENITENT_STARTING_HEALTH
 	flats[DataManager.FlatStat.MAX_HEALTH] = DataManager.PENITENT_STARTING_HEALTH
-	flats[DataManager.FlatStat.ENERGY] = DataManager.STARTING_ENERGY
-	flats[DataManager.FlatStat.MAX_ENERGY] = DataManager.MAX_ENERGY
+	flats[DataManager.FlatStat.ENERGY] = RunManager.max_energy
+	flats[DataManager.FlatStat.MAX_ENERGY] = RunManager.max_energy
 	#flats[DataManager.FlatStat.BLOCK] = 0
 	flats[DataManager.FlatStat.ATONEMENT] = 0
 	flats[DataManager.FlatStat.MAX_ATONEMENT] = DataManager.PENITENT_MAX_ATONEMENT
+	flats[DataManager.FlatStat.HAND_SIZE] = RunManager.starting_hand_size
 
 ## ============================================================
 ## МЕТОДЫ ДОСТУПА К ИСКУПЛЕНИЮ

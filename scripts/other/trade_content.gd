@@ -121,7 +121,7 @@ func _get_price(item: Dictionary) -> int:
 	if data.has_method("get_cost_grade"):
 		grade = data.get_cost_grade()
 	
-	return int(grade) * DataManager.DEFAULT_ITEM_COST
+	return int(grade) * RunManager.default_item_cost
 
 
 func _update_buttons() -> void:

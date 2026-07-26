@@ -590,9 +590,11 @@ const COLD_MIN_EFFECT_MULTIPLIER: float = 0.75
 const COLD_FREEZE_THRESHOLD: int = 5
 const COLD_DEFAULT_DURATION: int = 5  # ← изменено с 3 на 5
 const FROZEN_DURATION: int = 1  # заморозка на 1 ход
-
+#BUG
 const WEAKNESS_DAMAGE_MULTIPLIER: float = 0.75
 const VULNERABILITY_DAMAGE_MULTIPLIER: float = 1.5
+
+const POISON_HEALING_REDUCTION: float = 0.25
 
 const DESPAIR_DURATION: int = 2
 const DESPAIR_DAMAGE_DEALT_MULTIPLIER: float = 0.75

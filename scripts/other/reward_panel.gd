@@ -235,7 +235,7 @@ func _create_potion_reward() -> void:
 	SignalManager.reward_selected.connect(_on_reward_selected)
 
 func _create_take_damage_reward() -> void:
-	var damage_amount = DataManager.REWARD_DAMAGE_DEFAULT * damage_mod
+	var damage_amount = RunManager.reward_damage_default * damage_mod
 	# 🆕 Проверяем, чтобы урон не убивал игрока
 	var player = BattleManager.get_player()
 	if player:
@@ -249,7 +249,7 @@ func _create_take_damage_reward() -> void:
 	SignalManager.reward_selected.connect(_on_reward_selected)
 
 func _create_heal_reward() -> void:
-	var heal_amount = DataManager.REST_DEFAULT_HEAL * heal_mod
+	var heal_amount = RunManager.rest_default_heal * heal_mod
 	
 	var content = preload("res://scenes/reward_content.tscn").instantiate() as RewardContent
 	center_container.add_child(content)
@@ -270,7 +270,7 @@ func _create_deck_size_buff_reward() -> void:
 	SignalManager.reward_selected.connect(_on_reward_selected)
 
 func _create_gold_reward() -> void:
-	var gold_amount = DataManager.REWARD_GOLD_DEFAULT * gold_mod
+	var gold_amount = RunManager.reward_gold_default * gold_mod
 	
 	var content = preload("res://scenes/reward_content.tscn").instantiate() as RewardContent
 	content.gold_mod = gold_mod

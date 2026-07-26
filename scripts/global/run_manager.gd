@@ -16,6 +16,9 @@ var regen_heal_per_stack: int = DataManager.REGEN_HEAL_PER_STACK
 var strength_bonus_per_stack: int = DataManager.STRENGTH_FLAT_BONUS_PER_STACK
 var weakness_damage_multiplier: float = DataManager.WEAKNESS_DAMAGE_MULTIPLIER
 var vulnerability_damage_multiplier: float = DataManager.VULNERABILITY_DAMAGE_MULTIPLIER
+var poison_healing_reduction: float = DataManager.POISON_HEALING_REDUCTION
+var shame_damage_taken_multiplier: float = DataManager.SHAME_DAMAGE_TAKEN_MULTIPLIER
+var shame_atonement_multiplier: float = DataManager.SHAME_ATONEMENT_MULTIPLIER
 var frozen_energy_loss: int = DataManager.FROZEN_ENERGY_LOSS
 
 # === Балансные константы ===
@@ -627,6 +630,9 @@ func reset_run_constants():
 	strength_bonus_per_stack = DataManager.STRENGTH_FLAT_BONUS_PER_STACK
 	weakness_damage_multiplier = DataManager.WEAKNESS_DAMAGE_MULTIPLIER
 	vulnerability_damage_multiplier = DataManager.VULNERABILITY_DAMAGE_MULTIPLIER
+	poison_healing_reduction = DataManager.POISON_HEALING_REDUCTION
+	shame_damage_taken_multiplier = DataManager.SHAME_DAMAGE_TAKEN_MULTIPLIER
+	shame_atonement_multiplier = DataManager.SHAME_ATONEMENT_MULTIPLIER
 	frozen_energy_loss = DataManager.FROZEN_ENERGY_LOSS
 	
 	# === Балансные константы ===

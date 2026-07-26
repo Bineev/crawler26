@@ -102,9 +102,8 @@ func start_player_turn():
 	var is_frozen = player and player.has_status(DataManager.Status.FROZEN)
 	
 	if is_frozen:
-		# Уменьшаем энергию на 2 (но не меньше 0)
 		var current_energy = player.get_energy()
-		player.set_energy(max(0, current_energy - 2))
+		player.set_energy(max(0, current_energy - RunManager.frozen_energy_loss))
 		SignalManager.log_message.emit("Вы заморожены! Энергия уменьшена на 2. Статусы приостановлены.")
 		
 		# Выбираем намерения врагов (чтобы игрок видел, что они собираются делать)

@@ -33,7 +33,7 @@ func _build_passive_tooltip_data(passive_id: DataManager.Passive) -> Dictionary:
 func _get_status_description(status_id: DataManager.Status) -> String:
 	match status_id:
 		DataManager.Status.POISON:
-			return tr("status_poison_desc") % [RunManager.poison_damage_per_stack, 25]
+			return tr("status_poison_desc") % [RunManager.poison_damage_per_stack, RunManager.poison_healing_reduction * 100]
 		DataManager.Status.BLEED:
 			return tr("status_bleed_desc") % RunManager.bleed_damage_per_stack
 		DataManager.Status.BURN:
