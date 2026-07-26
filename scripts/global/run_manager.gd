@@ -4,7 +4,7 @@ extends Node
 var player_deck_data: DeckData = null
 var current_character: DataManager.CharacterClass = DataManager.CharacterClass.PENITENT
 
-#CONSTANTS
+# === Статусы ===
 var poison_damage_per_stack: int = DataManager.POISON_BASE_DAMAGE_PER_STACK
 var bleed_damage_per_stack: int = DataManager.BLEED_BASE_DAMAGE_PER_STACK
 var burn_damage_per_stack: int = DataManager.BURN_BASE_DAMAGE_PER_STACK
@@ -18,10 +18,26 @@ var weakness_damage_multiplier: float = DataManager.WEAKNESS_DAMAGE_MULTIPLIER
 var vulnerability_damage_multiplier: float = DataManager.VULNERABILITY_DAMAGE_MULTIPLIER
 var frozen_energy_loss: int = DataManager.FROZEN_ENERGY_LOSS
 
+# === Балансные константы ===
+var starting_hand_size: int = DataManager.STARTING_HAND_SIZE
+var cards_to_draw_per_turn: int = DataManager.CARDS_TO_DRAW_PER_TURN
+var max_energy: int = DataManager.MAX_ENERGY
 
-var coins: int = DataManager.STARTING_COINS
-var bones: int = DataManager.STARTING_BONES
-var keys: int = DataManager.STARTING_KEYS
+# === Ресурсы ===
+var default_item_cost: int = DataManager.DEFAULT_ITEM_COST
+var reward_gold_default: int = DataManager.REWARD_GOLD_DEFAULT
+var reward_damage_default: int = DataManager.REWARD_DAMAGE_DEFAULT
+var energy_buff_reward_amount: int = DataManager.ENERGY_BUFF_REWARD_AMOUNT
+var rest_default_heal: int = DataManager.REST_DEFAULT_HEAL
+
+# === Стартовые валюты ===
+var starting_coins: int = DataManager.STARTING_COINS
+var starting_bones: int = DataManager.STARTING_BONES
+var starting_keys: int = DataManager.STARTING_KEYS
+
+var coins: int = 0
+var bones: int = 0
+var keys: int = 0
 ## Массив артефактов, которые есть у игрока в текущем забеге
 var artifacts: Array[ArtifactResource] = []
 ## Счётчики для артефактов (например, для CARD_PLAYED_COUNTER)
@@ -48,8 +64,16 @@ func _ready():
 
 
 func initialize_run():
+	# 🆕 Сбрасываем константы до базовых значений
+	reset_run_constants()
 	player_deck_data = DeckData.new()
 	player_deck_data.master_cards = DataManager.get_starting_deck().duplicate()
+	
+	# 🆕 Устанавливаем стартовые валюты
+	coins = starting_coins
+	bones = starting_bones
+	keys = starting_keys
+	
 	DeckManager._load_cards_data()
 	DeckManager._init_unlocked_cards()
 	# 🆕 Добавляем случайные зелья
@@ -588,3 +612,36 @@ func reset_run():
 	deck_size_bonus = 0
 	idol_curse_remaining = 0
 	initialize_run()
+
+
+func reset_run_constants():
+	# === Статусы ===
+	poison_damage_per_stack = DataManager.POISON_BASE_DAMAGE_PER_STACK
+	bleed_damage_per_stack = DataManager.BLEED_BASE_DAMAGE_PER_STACK
+	burn_damage_per_stack = DataManager.BURN_BASE_DAMAGE_PER_STACK
+	burn_threshold_stacks = DataManager.BURN_THRESHOLD_STACKS
+	cold_freeze_threshold = DataManager.COLD_FREEZE_THRESHOLD
+	cold_effect_percent = DataManager.COLD_EFFECT_PERCENT_PER_STACK
+	cold_min_multiplier = DataManager.COLD_MIN_EFFECT_MULTIPLIER
+	regen_heal_per_stack = DataManager.REGEN_HEAL_PER_STACK
+	strength_bonus_per_stack = DataManager.STRENGTH_FLAT_BONUS_PER_STACK
+	weakness_damage_multiplier = DataManager.WEAKNESS_DAMAGE_MULTIPLIER
+	vulnerability_damage_multiplier = DataManager.VULNERABILITY_DAMAGE_MULTIPLIER
+	frozen_energy_loss = DataManager.FROZEN_ENERGY_LOSS
+	
+	# === Балансные константы ===
+	starting_hand_size = DataManager.STARTING_HAND_SIZE
+	cards_to_draw_per_turn = DataManager.CARDS_TO_DRAW_PER_TURN
+	max_energy = DataManager.MAX_ENERGY
+	
+	# === Стартовые валюты ===
+	starting_coins = DataManager.STARTING_COINS
+	starting_bones = DataManager.STARTING_BONES
+	starting_keys = DataManager.STARTING_KEYS
+	
+	# === Ресурсы ===
+	default_item_cost = DataManager.DEFAULT_ITEM_COST
+	reward_gold_default = DataManager.REWARD_GOLD_DEFAULT
+	reward_damage_default = DataManager.REWARD_DAMAGE_DEFAULT
+	energy_buff_reward_amount = DataManager.ENERGY_BUFF_REWARD_AMOUNT
+	rest_default_heal = DataManager.REST_DEFAULT_HEAL
