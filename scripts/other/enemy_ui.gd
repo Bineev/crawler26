@@ -26,6 +26,13 @@ class_name EnemyUI
 const STATUS_ICON_SCENE = preload("res://scenes/status_icon.tscn")
 const PASSIVE_ICON_SCENE = preload("res://scenes/passive_icon.tscn")
 
+var original_scale: Vector2 = Vector2(1, 1)
+var original_position: Vector2 = Vector2.ZERO
+var original_z_index: int = 0
+var current_mark_scale: Vector2 = Vector2(1, 1)
+var current_mark_position: Vector2 = Vector2.ZERO
+var is_marked: bool = false
+
 var enemy_instance: EnemyInstance = null
 var breath_tween: Tween = null
 var wobble_tween: Tween = null
@@ -717,26 +724,24 @@ func _get_intent_text(intent: IntentEntry) -> String:
 
 
 func play_attack_animation():
-	if not enemy_instance:
-		return
+	var current_position = current_mark_position if is_marked else position
+	var current_scale = current_mark_scale if is_marked else scale
 	
-	var original_position = position
-	var attack_offset = Vector2(0, -30)  # приближение к игроку
+	var attack_offset = Vector2(0, -30)
 	
 	var tween = create_tween()
 	tween.set_parallel(true)
 	
-	# Приближаемся к игроку
-	tween.tween_property(self, "position", original_position + attack_offset, 0.1).set_ease(Tween.EASE_OUT)
-	tween.tween_property(self, "scale", Vector2(1.6, 1.6), 0.1).set_ease(Tween.EASE_OUT)
+	# 🆕 Масштаб во время атаки — 1.2
+	tween.tween_property(self, "position", current_position + attack_offset, 0.1).set_ease(Tween.EASE_OUT)
+	tween.tween_property(self, "scale", Vector2(1.2, 1.2), 0.1).set_ease(Tween.EASE_OUT)
 	
-	# Возвращаемся
-	tween.tween_property(self, "position", original_position, 0.1).set_delay(0.1).set_ease(Tween.EASE_IN)
-	tween.tween_property(self, "scale", Vector2(1.0, 1.0), 0.1).set_delay(0.1).set_ease(Tween.EASE_IN)
+	# Возвращаемся к отмеченному состоянию
+	tween.tween_property(self, "position", current_position, 0.1).set_delay(0.1).set_ease(Tween.EASE_IN)
+	tween.tween_property(self, "scale", current_scale, 0.1).set_delay(0.1).set_ease(Tween.EASE_IN)
 	
-	# Пауза после анимации
 	await get_tree().create_timer(0.3).timeout
-	
+
 
 func play_debuff_animation():
 	if not enemy_instance:
@@ -829,16 +834,16 @@ func _setup_health_bar():
 
 
 func play_appear_animation() -> void:
-	# Начальное состояние: враг скрыт и уменьшен
+	# 🆕 Начальное состояние: враг скрыт и уменьшен
 	modulate = Color(1, 1, 1, 0)
 	scale = Vector2(0.5, 0.5)
 	
 	var tween = create_tween()
 	tween.set_parallel(true)
 	
-	# Появляется и увеличивается
+	# 🆕 Появляется и увеличивается до базового масштаба 0.85
 	tween.tween_property(self, "modulate", Color(1, 1, 1, 1), 2)
-	tween.tween_property(self, "scale", Vector2(1, 1), 1).set_ease(Tween.EASE_OUT)
+	tween.tween_property(self, "scale", Vector2(0.85, 0.85), 1).set_ease(Tween.EASE_OUT)
 	
 	# Небольшой перелёт (overshoot)
 	tween.tween_property(self, "position", position + Vector2(0, -10), 0.15).set_delay(1)
@@ -1143,3 +1148,42 @@ func _animate_double_bar(main_bar: ProgressBar, bg_bar: ProgressBar, target_valu
 		# 💚 ЛЕЧЕНИЕ / ВОССТАНОВЛЕНИЕ
 		bg_bar.value = target_value
 		tween.tween_property(main_bar, "value", target_value, heal_duration)
+
+
+func mark_current():
+	original_scale = scale
+	original_position = position
+	original_z_index = z_index
+	
+	is_marked = true
+	
+	# 🆕 Целевой масштаб для отметки — 1.0
+	var target_scale = Vector2(1.0, 1.0)
+	var size = enemy_sprite.size if enemy_sprite else Vector2(256, 256)
+	var offset = (size * original_scale - size * target_scale) / 2
+	
+	current_mark_scale = target_scale
+	current_mark_position = original_position + offset
+	
+	z_index = original_z_index + 10
+	
+	var tween = create_tween()
+	tween.set_parallel(true)
+	tween.tween_property(self, "scale", target_scale, 0.3).set_ease(Tween.EASE_OUT)
+	tween.tween_property(self, "position", original_position + offset, 0.3).set_ease(Tween.EASE_OUT)
+	await tween.finished
+
+func remove_mark():
+	if not is_marked:
+		return
+	
+	is_marked = false
+	
+	# 🆕 Возвращаемся к базовому масштабу 0.85
+	var tween = create_tween()
+	tween.set_parallel(true)
+	tween.tween_property(self, "scale", Vector2(0.85, 0.85), 0.2).set_ease(Tween.EASE_IN)
+	tween.tween_property(self, "position", original_position, 0.2).set_ease(Tween.EASE_IN)
+	
+	z_index = original_z_index
+	modulate = Color(1, 1, 1, 1)

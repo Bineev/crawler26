@@ -48,8 +48,10 @@ func setup(potion: PotionResource) -> void:
 		size.y + 10
 	)
 	# 🆕 Подключаем тултип
-	mouse_entered.connect(_on_mouse_entered)
-	mouse_exited.connect(_on_mouse_exited)
+	if not mouse_entered.is_connected(_on_mouse_entered):
+		mouse_entered.connect(_on_mouse_entered)
+	if not mouse_exited.is_connected(_on_mouse_exited):
+		mouse_exited.connect(_on_mouse_exited)
 
 func select() -> void:
 	is_selected = true

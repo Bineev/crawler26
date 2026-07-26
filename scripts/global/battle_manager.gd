@@ -85,6 +85,13 @@ func start_player_turn():
 	if current_state != DataManager.BattleState.IDLE and current_state != DataManager.BattleState.ENEMY_TURN:
 		return
 	
+	# 🆕 Снимаем отметку со всех врагов
+	for enemy in enemies:
+		if is_instance_valid(enemy):
+			var enemy_ui = enemy.get_node("EnemyUI") as EnemyUI
+			if enemy_ui:
+				await enemy_ui.remove_mark()
+	
 	current_state = DataManager.BattleState.PLAYER_TURN
 	
 	# Восстанавливаем энергию
@@ -165,6 +172,10 @@ func start_enemy_turn():
 			await enemy.get_tree().create_timer(DataManager.ENEMY_STEP_DELAY).timeout
 			continue
 		
+		# 🆕 Отмечаем врага, который сейчас ходит
+		var enemy_ui = enemy.get_node("EnemyUI") as EnemyUI
+		if enemy_ui and is_instance_valid(enemy_ui):
+			await enemy_ui.mark_current()
 		# ШАГ 1: Начало хода врага (пассивки, статусы)
 		# если враг погиб во время своего хода, то мы его вечно ждем????
 		await enemy.process_start_of_turn()
@@ -190,6 +201,8 @@ func start_enemy_turn():
 			return
 		
 		await get_tree().create_timer(DataManager.ENEMY_STEP_DELAY).timeout
+		if enemy_ui and is_instance_valid(enemy_ui):
+			await enemy_ui.remove_mark()
 	
 	# 🆕 Только проверяем победу/поражение
 	check_defeat()
