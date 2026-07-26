@@ -80,7 +80,6 @@ z_index = 100
 script = ExtResource("1_d81rb")
 
 [node name="CardTemplate" type="MarginContainer" parent="."]
-custom_minimum_size = Vector2(234, 330)
 offset_right = 234.0
 offset_bottom = 330.0
 

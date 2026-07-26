@@ -658,47 +658,42 @@ func _setup_upgrade_card_reward() -> void:
 	)
 	main_vbox.add_child(preview_container)
 	
-	# Grid контейнер с уменьшенными картами (0.5)
+	# Grid контейнер с уменьшенными картами
 	var scroll = ScrollContainer.new()
 	scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_AUTO
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	scroll.custom_minimum_size = Vector2(760, 400)
 	main_vbox.add_child(scroll)
-	var center_cont = CenterContainer.new()
 	var grid = GridContainer.new()
-	grid.columns = 5
-	grid.add_theme_constant_override("h_separation", 30)
-	grid.add_theme_constant_override("v_separation", 30)
-	scroll.add_child(center_cont)
-	center_cont.add_child(grid)
+	grid.columns = 4
+	grid.add_theme_constant_override("h_separation", 20)
+	grid.add_theme_constant_override("v_separation", 20)
+	scroll.add_child(grid)
 	
 	selected_card = null
 	
+	var card_scale = 0.65
+	var card_size = Vector2(DataManager.CARD_BASE_WIDTH, DataManager.CARD_BASE_HEIGHT) * card_scale
+
 	for card_data in master_cards:
-		# 🆕 Создаём копию для отображения (чтобы не менять оригинал)
 		var display_card = card_data.duplicate_for_instance()
 		display_card.upgrade_type = _get_upgrade_type_for_card(card_data)
-		# Обёртка для карты (кликабельная)
+		
 		var card_wrapper = Control.new()
-		#card_wrapper.custom_minimum_size = Vector2(
-			#DataManager.CARD_BASE_WIDTH * 0.6,
-			#DataManager.CARD_BASE_HEIGHT * 0.6
-		#)
+		card_wrapper.custom_minimum_size = card_size * 1.2
 		card_wrapper.mouse_filter = Control.MOUSE_FILTER_STOP
 		
 		var card_ui = preload("res://scenes/card.tscn").instantiate() as CardUI
 		card_ui.card_data = display_card
 		card_wrapper.add_child(card_ui)
 		
-		await get_tree().create_timer(0.03).timeout
-		
 		grid.add_child(card_wrapper)
 		card_ui.display()
-		card_ui.card_control.scale = Vector2(0.5, 0.5)
+		card_ui.card_control.scale = Vector2(card_scale, card_scale)
 		card_ui.set_reward_state()
-		card_wrapper.custom_minimum_size = card_ui.get_actual_size()
-		# Клик по обёртке выбирает карту
+		
 		card_wrapper.gui_input.connect(_on_card_wrapper_clicked.bind(display_card, card_wrapper, preview_container))
+	scroll.custom_minimum_size = Vector2(4 * card_size.x * 1.2 + 3 * 20 + 20 , 2 * card_size.y * 1.2 + 20)
+	
 	
 	var confirm_button = DataManager.create_button(tr("upgrade_card_confirm"), DataManager.ButtonType.PRIMARY)
 	confirm_button.modulate = Color(1, 1, 1, 0)
@@ -731,7 +726,19 @@ func _on_upgrade_confirm() -> void:
 	if not selected_card:
 		return
 	
-	_apply_upgrade_to_card(selected_card)
+	# 🆕 Создаём копию карты с улучшением
+	var upgraded_card = selected_card.duplicate_for_instance()
+	_apply_upgrade_to_card(upgraded_card)
+	
+	# 🆕 Заменяем оригинальную карту в мастер-колоде
+	var master_cards = RunManager.get_player_deck().master_cards
+	var index = master_cards.find(selected_card)
+	if index != -1:
+		master_cards[index] = upgraded_card
+	else:
+		# Если не нашли — просто добавляем
+		master_cards.append(upgraded_card)
+	
 	SignalManager.log_message.emit("Карта улучшена: %s" % selected_card.get_localized_name())
 	SignalManager.reward_selected.emit()
 
@@ -1018,18 +1025,17 @@ func _setup_transform_card_reward() -> void:
 	var scroll = ScrollContainer.new()
 	scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_AUTO
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	scroll.custom_minimum_size = Vector2(760, 400)
 	main_vbox.add_child(scroll)
-	var center_cont = CenterContainer.new()
 	var grid = GridContainer.new()
-	grid.columns = 5
-	grid.add_theme_constant_override("h_separation", 30)
-	grid.add_theme_constant_override("v_separation", 30)
-	scroll.add_child(center_cont)
-	center_cont.add_child(grid)
+	grid.columns = 4
+	grid.add_theme_constant_override("h_separation", 20)
+	grid.add_theme_constant_override("v_separation", 20)
+	scroll.add_child(grid)
 	
 	selected_card = null
 	
+	var card_scale = 0.65
+	var card_size = Vector2(DataManager.CARD_BASE_WIDTH, DataManager.CARD_BASE_HEIGHT) * card_scale
 	for card_data in transformable_cards:
 		var display_card = card_data.duplicate_for_instance()
 		display_card.upgrade_type = _get_upgrade_type_for_card(card_data)
@@ -1040,16 +1046,18 @@ func _setup_transform_card_reward() -> void:
 		var card_ui = preload("res://scenes/card.tscn").instantiate() as CardUI
 		card_ui.card_data = display_card
 		card_wrapper.add_child(card_ui)
+		card_wrapper.custom_minimum_size = card_size * 1.2
 		
 		await get_tree().create_timer(0.03).timeout
 		
 		grid.add_child(card_wrapper)
 		card_ui.display()
-		card_ui.card_control.scale = Vector2(0.5, 0.5)
+		card_ui.card_control.scale = card_scale
 		card_ui.set_reward_state()
 		card_wrapper.custom_minimum_size = card_ui.get_actual_size()
 		
 		card_wrapper.gui_input.connect(_on_transform_card_selected.bind(card_data, card_wrapper))
+	scroll.custom_minimum_size = Vector2(4 * card_size.x * 1.2 + 3 * 20 + 20 , 2 * card_size.y * 1.2 + 20)
 	
 	# Кнопка подтверждения (всегда видима)
 	confirm_button = DataManager.create_button(tr("transform_card_confirm"), DataManager.ButtonType.PRIMARY)

@@ -696,7 +696,9 @@ func get_card_size() -> Vector2:
 
 
 func get_actual_size() -> Vector2:
-	return card_control.custom_minimum_size * card_control.scale
+	var s = card_control.size
+	var sc = card_control.scale
+	return card_control.size * card_control.scale
 
 
 func set_hand_ui(hand_ui: HandUI):
