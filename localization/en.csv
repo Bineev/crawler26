@@ -403,3 +403,7 @@ upgrade_card_confirm,Upgrade
 "status_shield_additional","Stacks are summed. Refreshes duration. Resets at turn start."
 "status_frozen_additional","If character — loses %d energy. If enemy — skips turn."
 "status_gangrene_additional","Stacks are summed. Refreshes duration. Deals all damage on last turn."
+
+"artifact_troll_blade_name","Troll Blade"
+"artifact_troll_blade_desc","Enables Cold and Bleed interaction. If a target has both statuses, they disappear and transform into Gangrene. Gangrene accumulates damage and deals it all in one strike on the last turn."
+"artifact_troll_blade_lore","A crude blade made from a troll's icy teeth. Its black frost turns blood to crystal and wounds to rot."

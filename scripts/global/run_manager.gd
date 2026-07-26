@@ -41,6 +41,12 @@ var starting_keys: int = DataManager.STARTING_KEYS
 var coins: int = 0
 var bones: int = 0
 var keys: int = 0
+
+# === Взаимодействия статусов ===
+var is_bleed_poison_interaction_enabled: bool = false   # Bleed + Poison → Мука
+var is_poison_burn_interaction_enabled: bool = false    # Poison + Burn → Взрыв
+var is_bleed_cold_interaction_enabled: bool = false     # Bleed + Cold → Гангрена
+
 ## Массив артефактов, которые есть у игрока в текущем забеге
 var artifacts: Array[ArtifactResource] = []
 ## Счётчики для артефактов (например, для CARD_PLAYED_COUNTER)
@@ -651,3 +657,8 @@ func reset_run_constants():
 	reward_damage_default = DataManager.REWARD_DAMAGE_DEFAULT
 	energy_buff_reward_amount = DataManager.ENERGY_BUFF_REWARD_AMOUNT
 	rest_default_heal = DataManager.REST_DEFAULT_HEAL
+
+	# === Взаимодействия статусов ===
+	is_bleed_poison_interaction_enabled = false
+	is_poison_burn_interaction_enabled = false
+	is_bleed_cold_interaction_enabled = false

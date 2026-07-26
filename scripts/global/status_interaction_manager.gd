@@ -44,22 +44,15 @@ func can_apply(target, new_status: DataManager.Status) -> bool:
 # StatusInteractionManager.gd
 
 func handle_interaction(target, new_status: DataManager.Status, stacks: int, duration: int, status_resource: StatusResource, caster: CharacterStats = null):
-	# 1. Получаем последний статус
+	# 1. Получаем последний статус (уже без Burn/Cold, так как они обработаны до)
 	var last_status = target._get_last_status(new_status)
 	
-	# 2. Проверяем контр-статусы (Burn ↔ Cold) — ТОЛЬКО если есть противоположный статус
-	if new_status == DataManager.Status.BURN or new_status == DataManager.Status.COLD:
-		var opposite = DataManager.Status.COLD if new_status == DataManager.Status.BURN else DataManager.Status.BURN
-		if target.has_status(opposite):
-			_handle_burn_cold(target, new_status, stacks, duration)
-			return
-	
-	# 3. Если нет последнего статуса — просто накладываем
+	# 2. Если нет последнего статуса — просто накладываем
 	if last_status == -1:
 		target._add_status_direct(status_resource, stacks, duration, caster)
 		return
 	
-	# 4. Обрабатываем взаимодействие по паре
+	# 3. Обрабатываем взаимодействие по паре
 	# Bleed + Poison → Мука (Bleed уже есть, Poison новый)
 	if last_status == DataManager.Status.BLEED and new_status == DataManager.Status.POISON:
 		_handle_bleed_poison_flour(target, stacks, duration)
@@ -73,49 +66,35 @@ func handle_interaction(target, new_status: DataManager.Status, stacks: int, dur
 	# Poison + Burn → Химический взрыв
 	if (last_status == DataManager.Status.POISON and new_status == DataManager.Status.BURN) or \
 	   (last_status == DataManager.Status.BURN and new_status == DataManager.Status.POISON):
-		# Передаём стаки обоих статусов
 		_handle_poison_burn_explosion(target, last_status, new_status, stacks)
 		return
 	
 	# Bleed + Cold → Гангрена
 	if (last_status == DataManager.Status.BLEED and new_status == DataManager.Status.COLD) or \
 	   (last_status == DataManager.Status.COLD and new_status == DataManager.Status.BLEED):
-		# Передаём стаки и длительности обоих статусов
 		_handle_bleed_cold_gangrene(target, new_status, stacks, duration)
 		return
 	
-	# 5. Если ни одно взаимодействие не подошло — просто накладываем
+	# 4. Если ни одно взаимодействие не подошло — просто накладываем
 	target._add_status_direct(status_resource, stacks, duration, caster)
 
 
-# ===== BURN + COLD (контр-статусы) =====
-func _handle_burn_cold(target, new_status: DataManager.Status, stacks: int, duration: int):
-	var counter_status = DataManager.Status.COLD if new_status == DataManager.Status.BURN else DataManager.Status.BURN
-	
-	if not target.has_status(counter_status):
-		# Нет контр-статуса — просто накладываем
-		var status_resource = DataManager.get_status_resource(new_status)
-		if status_resource:
-			target._add_status_direct(status_resource, stacks, duration, target)
-		return
-	
-	var counter_stacks = target.get_status_stacks(counter_status)
-	var remaining = counter_stacks - stacks
+func _handle_burn_cold(target, new_status: DataManager.Status, stacks: int, duration: int) -> int:
+	var opposite = DataManager.Status.COLD if new_status == DataManager.Status.BURN else DataManager.Status.BURN
+	var opposite_stacks = target.get_status_stacks(opposite)
+	var remaining = opposite_stacks - stacks
 	
 	if remaining > 0:
-		# Контр-статус побеждает — уменьшаем его, новый статус НЕ накладывается
-		target.modify_status_stacks(counter_status, -stacks)
-		SignalManager.log_message.emit("%s уменьшен на %d, осталось %d" % [DataManager.get_status_name(counter_status), stacks, remaining])
+		target.modify_status_stacks(opposite, -stacks)
+		SignalManager.log_message.emit("%s уменьшен на %d, осталось %d" % [DataManager.get_status_name(opposite), stacks, remaining])
+		return 0  # новый статус полностью погашен
 	else:
-		# Новый статус побеждает — снимаем контр-статус полностью
-		target.remove_status(counter_status)
+		target.remove_status(opposite)
 		var left = abs(remaining)
 		if left > 0:
-			# Накладываем остаток нового статуса
-			var status_resource = DataManager.get_status_resource(new_status)
-			if status_resource:
-				target._add_status_direct(status_resource, left, duration, target)
-		SignalManager.log_message.emit("%s полностью снят, наложен %s %d" % [DataManager.get_status_name(counter_status), DataManager.get_status_name(new_status), left])
+			SignalManager.log_message.emit("%s полностью снят, наложен %s %d" % [DataManager.get_status_name(opposite), DataManager.get_status_name(new_status), left])
+			return left  # возвращаем остаток нового статуса
+		return 0
 
 
 # ===== POISON + BURN (Химический взрыв) =====
@@ -211,29 +190,23 @@ func _handle_poison_bleed_agony(target, stacks: int, duration: int):
 
 
 func has_interaction(target, new_status: DataManager.Status) -> bool:
-	# Проверяем пары взаимодействий
-	var pairs = [
-		[DataManager.Status.BLEED, DataManager.Status.POISON],
-		[DataManager.Status.POISON, DataManager.Status.BLEED],
-		[DataManager.Status.POISON, DataManager.Status.BURN],
-		[DataManager.Status.BURN, DataManager.Status.POISON],
-		[DataManager.Status.BLEED, DataManager.Status.COLD],
-		[DataManager.Status.COLD, DataManager.Status.BLEED],
-	]
-	
-	# Специальная проверка для Burn/Cold — они всегда взаимодействуют друг с другом
-	if new_status == DataManager.Status.BURN or new_status == DataManager.Status.COLD:
-		var opposite = DataManager.Status.COLD if new_status == DataManager.Status.BURN else DataManager.Status.BURN
-		if target.has_status(opposite):
-			return true
-	
 	# Получаем последний статус
 	var last_status = target._get_last_status(new_status)
 	if last_status == -1:
 		return false
 	
+	# Проверяем пары взаимодействий с учётом флагов
+	var pairs = [
+		[DataManager.Status.BLEED, DataManager.Status.POISON, RunManager.is_bleed_poison_interaction_enabled],
+		[DataManager.Status.POISON, DataManager.Status.BLEED, RunManager.is_bleed_poison_interaction_enabled],
+		[DataManager.Status.POISON, DataManager.Status.BURN, RunManager.is_poison_burn_interaction_enabled],
+		[DataManager.Status.BURN, DataManager.Status.POISON, RunManager.is_poison_burn_interaction_enabled],
+		[DataManager.Status.BLEED, DataManager.Status.COLD, RunManager.is_bleed_cold_interaction_enabled],
+		[DataManager.Status.COLD, DataManager.Status.BLEED, RunManager.is_bleed_cold_interaction_enabled],
+	]
+	
 	for pair in pairs:
-		if last_status == pair[0] and new_status == pair[1]:
+		if last_status == pair[0] and new_status == pair[1] and pair[2]:
 			return true
 	
 	return false

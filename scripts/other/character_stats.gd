@@ -261,11 +261,10 @@ func on_take_damage_gain_resource(amount: int):
 ## УПРАВЛЕНИЕ СТАТУСАМИ
 ## ============================================================
 
-func add_status(status: StatusResource, value: int, duration: int, caster: CharacterStats = null, passive_context: PassiveResource = null, from_passive: bool = false):
+func add_status(status: StatusResource, value: int, duration: int, caster: CharacterStats = null, passive_context: PassiveResource = null):
 	if not status:
 		return
 	
-	# Проверки (заморозка, denial, иммунитет)
 	if has_status(DataManager.Status.FROZEN):
 		SignalManager.log_message.emit("%s заморожен! Нельзя наложить статус." % get_display_name())
 		return
@@ -276,21 +275,29 @@ func add_status(status: StatusResource, value: int, duration: int, caster: Chara
 	if not StatusInteractionManager.can_apply(self, status.id):
 		return
 	
-	if status.id == DataManager.Status.COLD and has_status(DataManager.Status.FROZEN):
-		SignalManager.log_message.emit("Цель заморожена! Нельзя наложить Холод.")
-		return
-	
 	var status_id = status.id
 	var stacks = value
 	var dur = duration
 	
-	# Проверяем наличие взаимодействия
+	# 🆕 Сначала обрабатываем Burn ↔ Cold
+	if status_id == DataManager.Status.BURN or status_id == DataManager.Status.COLD:
+		var opposite = DataManager.Status.COLD if status_id == DataManager.Status.BURN else DataManager.Status.BURN
+		if has_status(opposite):
+			# Если есть противоположный статус — обрабатываем взаимодействие
+			var result = StatusInteractionManager._handle_burn_cold(self, status_id, stacks, dur)
+			# Если после взаимодействия не осталось стаков — выходим
+			if result == 0:
+				return
+			# Иначе продолжаем с остатком
+			stacks = result
+			# Убираем противоположный статус (он уже обработан)
+			remove_status(opposite)
+	
+	# Проверяем наличие взаимодействия (теперь уже без Burn/Cold)
 	if StatusInteractionManager.has_interaction(self, status_id):
-		# Есть взаимодействие — передаём управление в StatusInteractionManager
 		StatusInteractionManager.handle_interaction(self, status_id, stacks, dur, status, caster)
 	else:
-		# Нет взаимодействия — добавляем статус напрямую
-		_add_status_direct(status, stacks, dur, caster, from_passive)
+		_add_status_direct(status, stacks, dur, caster)
 
 
 func _add_status_direct(status: StatusResource, stacks: int, duration: int, caster: CharacterStats = null, from_passive: bool = false):

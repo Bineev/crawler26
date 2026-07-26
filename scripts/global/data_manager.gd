@@ -255,6 +255,7 @@ enum ArtifactId {
 	KINGS_ORDER,           # CARD_PLAYED_COUNTER
 	HEALERS_AMULET,        # CONDITIONAL
 	ABYSS_DUST,            # CUSTOM
+	TROLL_BLADE,  # 🆕
 }
 
 ## ============================================================
@@ -1466,6 +1467,7 @@ const ARTIFACT_ICONS: Dictionary = {
 	DataManager.ArtifactId.KINGS_ORDER: preload("res://img/icons/artifacts/kings_order.png"),
 	DataManager.ArtifactId.HEALERS_AMULET: preload("res://img/icons/artifacts/healers_amulet.png"),
 	DataManager.ArtifactId.ABYSS_DUST: preload("res://img/icons/artifacts/abyss_dust.png"),
+	DataManager.ArtifactId.TROLL_BLADE: preload("res://img/icons/artifacts/troll_blade.png"),
 }
 
 
@@ -1863,7 +1865,7 @@ func load_artifact_resources() -> void:
 	_artifact_resources[ArtifactId.KINGS_ORDER] = load("res://resources/artifacts/kings_order.tres")
 	_artifact_resources[ArtifactId.HEALERS_AMULET] = load("res://resources/artifacts/healers_amulet.tres")
 	_artifact_resources[ArtifactId.ABYSS_DUST] = load("res://resources/artifacts/abyss_dust.tres")
-	
+	_artifact_resources[ArtifactId.TROLL_BLADE] = load("res://resources/artifacts/troll_blade.tres")  # 🆕
 	_artifact_resources_loaded = true
 
 func get_random_artifact_by_grade(grade: ArtifactGrade) -> ArtifactResource:
