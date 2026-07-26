@@ -6,7 +6,7 @@ extends Node
 ## ============================================================
 
 var current_state: DataManager.BattleState = DataManager.BattleState.IDLE
-
+var turn_counter: int = 0
 ## ============================================================
 ## УЧАСТНИКИ БОЯ
 ## ============================================================
@@ -46,7 +46,7 @@ func start_battle(player_stats: CharacterStats, enemy_instances: Array, battle_d
 	print("бой стартует")
 	SignalManager.battle_victory.connect(_on_battle_victory)
 	SignalManager.battle_defeat.connect(_on_battle_defeat)
-	
+	turn_counter = 1  # 🆕 первый ход
 	self.player = player_stats
 	self.enemies = enemy_instances
 	self.hand_ui = hand_ui_node
@@ -60,10 +60,10 @@ func start_battle(player_stats: CharacterStats, enemy_instances: Array, battle_d
 	# 🆕 Уменьшаем счётчик баффа энергии (если активен)
 	RunManager.decrement_energy_buff()
 	RunManager.decrement_deck_size_buff()
-	# Инициализация врагов
-	for enemy in enemies:
-		if enemy.has_method("load_intents"):
-			enemy.load_intents()
+	## Инициализация врагов
+	#for enemy in enemies:
+		#if enemy.has_method("load_intents"):
+			#enemy.load_intents()
 	
 	# Раздаём карты (внутри вызывается add_card для каждой карты)
 	#battle_deck.draw_initial_hand()
@@ -129,12 +129,16 @@ func start_player_turn():
 	if player:
 		await player.process_start_of_turn()
 	
-	# Выбираем намерения для всех врагов
-	for enemy in enemies:
-		if enemy and is_instance_valid(enemy) and enemy.is_alive():
-			var intent = enemy.select_next_intent()
-			if intent:
-				SignalManager.enemy_intent_changed.emit(enemy, intent)
+	# 🆕 Выбираем намерения только если это НЕ первый ход
+	if turn_counter > 1:
+		for enemy in enemies:
+			if enemy.is_alive():
+				var intent = enemy.select_next_intent()
+				if intent:
+					SignalManager.enemy_intent_changed.emit(enemy, intent)
+	
+	# Увеличиваем счётчик ходов
+	turn_counter += 1
 	
 	# Восстанавливаем энергию
 	if player and player.has_method("restore_energy"):

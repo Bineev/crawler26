@@ -35,34 +35,43 @@ func spawn_enemies(enemy_resources: Array[EnemyResource]):
 	enemies.clear()
 	
 	for res in enemy_resources:
-		# Инстанциируем сцену врага (корневая нода теперь EnemyInstance)
 		var enemy_instance = ENEMY_SCENE.instantiate() as EnemyInstance
-		
-		# Получаем EnemyUI (дочерняя нода)
 		var enemy_ui = enemy_instance.get_node("EnemyUI") as EnemyUI
 		
-		# Настраиваем размер врага
 		var size = DataManager.get_enemy_size_pixels(res.size)
 		if enemy_ui:
 			enemy_ui.size = size
 		
-		# Добавляем в контент
 		content.add_child(enemy_instance)
 		
-		# Настраиваем врага
 		enemy_instance.resource = res
-		enemy_instance.init(current_floor)  # нужно передать floor_level и biome
+		enemy_instance.init(current_floor)
 		enemy_instance.load_intents()
 		
-		# Настраиваем UI
 		if enemy_ui:
 			enemy_ui.setup(enemy_instance)
 		
-		# Сохраняем для позиционирования
+		# 🆕 Делаем врага невидимым
+		enemy_instance.modulate = Color(1, 1, 1, 0)
+		
 		enemies.append(enemy_instance)
-		if enemy_ui:
-			enemy_ui.play_appear_animation()
+	
+	# 🆕 Выбираем первое намерение для каждого врага
+	for enemy in enemies:
+		if enemy.is_alive():
+			var intent = enemy.select_next_intent()
+			if intent:
+				SignalManager.enemy_intent_changed.emit(enemy, intent)
+	
+	await get_tree().process_frame
+
 	layout_enemies()
+	# 🆕 Ждём один кадр, чтобы позиции обновились
+	await get_tree().process_frame
+	# 🆕 После позиционирования — показываем врагов
+	for enemy in enemies:
+		enemy.modulate = Color(1, 1, 1, 1)
+		pass
 
 
 func layout_enemies():
@@ -74,33 +83,35 @@ func layout_enemies():
 	var room_height = DataManager.ROOM_HEIGHT
 	var y_offset_from_bottom = DataManager.ENEMY_Y_OFFSET_FROM_BOTTOM
 	var spacing = DataManager.ENEMY_SPACING
+	var base_scale = 0.85
 	
 	var y_base = room_height - y_offset_from_bottom
 	
-	# Собираем размеры всех врагов
 	var enemy_sizes: Array[Vector2] = []
 	for enemy in enemies:
-		var size = DataManager.get_enemy_size_pixels(enemy.resource.size)
-		enemy_sizes.append(size)
+		var base_size = DataManager.get_enemy_size_pixels(enemy.resource.size)
+		enemy_sizes.append(base_size * base_scale)
 	
-	# Вычисляем общую ширину группы
 	var total_width = 0
 	for size in enemy_sizes:
 		total_width += size.x
 	total_width += spacing * (count - 1)
 	
-	# Стартовая X позиция (чтобы группа была по центру)
 	var start_x = room_center_x - total_width / 2
 	
-	# Размещаем каждого врага
 	for i in range(count):
-		var enemy = enemies[i]  # ← сам враг (EnemyInstance)
+		var enemy = enemies[i]
+		var enemy_ui = enemy.get_node("EnemyUI") as EnemyUI
 		
 		var size = enemy_sizes[i]
 		var x_pos = start_x
 		var y_pos = y_base - size.y
 		
-		enemy.position = Vector2(x_pos, y_pos)  # ← позиционируем врага напрямую
+		enemy.position = Vector2(x_pos, y_pos)
+		
+		if enemy_ui:
+			enemy_ui.scale = Vector2(base_scale, base_scale)
+			enemy_ui.original_scale = enemy_ui.scale
 		
 		start_x += size.x + spacing
 
@@ -128,7 +139,6 @@ func _start_battle():
 	var deck_data = RunManager.get_player_deck()
 	var battle_deck = deck_data.create_battle_copy()
 	battle_deck.hand_ui = hand_ui
-	await get_tree().create_timer(1).timeout
 	BattleManager.start_battle(player, enemies, battle_deck, hand_ui, current_floor, current_biome, self)
 
 

@@ -730,6 +730,7 @@ func get_applied_statuses() -> Array:
 
 
 func process_start_of_turn():
+	await Engine.get_main_loop().create_timer(0.5).timeout
 	# Если заморожен — статусы не тикают
 	if not has_status(DataManager.Status.FROZEN):
 		# Снимаем STRENGTH в самом конце (после всех тиков)

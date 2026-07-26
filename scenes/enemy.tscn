@@ -22,6 +22,7 @@ shader_parameter/vignette_strength = 0.30000001425
 shader_parameter/noise_amount = 0.0
 
 [node name="Enemy" type="Node2D"]
+modulate = Color(1, 1, 1, 0)
 script = ExtResource("1_7p1mj")
 
 [node name="EnemyUI" type="Control" parent="."]

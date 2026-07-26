@@ -26,7 +26,7 @@ func _ready():
 		background.texture = _pending_background_texture
 	
 	if not _pending_room_data.is_empty():
-		_init_content(_pending_room_data)
+		await _init_content(_pending_room_data)
 		_pending_room_data.clear()
 	_setup_dark_overlay()
 	_setup_horror_overlay()

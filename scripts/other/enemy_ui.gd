@@ -1179,10 +1179,10 @@ func remove_mark():
 	
 	is_marked = false
 	
-	# 🆕 Возвращаемся к базовому масштабу 0.85
+	# 🆕 Возвращаемся к базовому масштабу 0.9
 	var tween = create_tween()
 	tween.set_parallel(true)
-	tween.tween_property(self, "scale", Vector2(0.85, 0.85), 0.2).set_ease(Tween.EASE_IN)
+	tween.tween_property(self, "scale", Vector2(0.9, 0.9), 0.2).set_ease(Tween.EASE_IN)
 	tween.tween_property(self, "position", original_position, 0.2).set_ease(Tween.EASE_IN)
 	
 	z_index = original_z_index
