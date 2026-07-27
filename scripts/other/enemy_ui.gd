@@ -66,6 +66,7 @@ var freeze_tween: Tween = null
 
 func setup(enemy: EnemyInstance):
 	enemy_instance = enemy
+	# 🆕 Получаем SubViewportContainer через enemy
 	_setup_health_bar()  # ← добавить
 	update_display()
 	living_container.custom_minimum_size = enemy_instance.resource.get_size_pixels()
@@ -814,7 +815,7 @@ func _setup_health_bar():
 	
 	# Заливка (красный)
 	back_health_fill = StyleBoxFlat.new()
-	back_health_fill.bg_color = Color.GHOST_WHITE
+	back_health_fill.bg_color = DataManager.COLOR_FLESH_CAVES_ART_BG_DARK.lightened(0.5)
 	back_health_fill.border_width_bottom = 0
 	back_health_fill.border_width_top = 0
 	back_health_fill.border_width_left = 0

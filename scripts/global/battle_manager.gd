@@ -36,7 +36,7 @@ func _ready():
 func _get_target_at_position(pos: Vector2) -> Node:
 	# Проверяем всех врагов на коллизию
 	for enemy in enemies:
-		var enemy_ui = enemy.get_node("EnemyUI")
+		var enemy_ui = enemy.enemy_ui
 		if enemy_ui and enemy_ui.get_rect().has_point(enemy_ui.to_local(pos)):
 			return enemy
 	return null
@@ -88,7 +88,7 @@ func start_player_turn():
 	# 🆕 Снимаем отметку со всех врагов
 	for enemy in enemies:
 		if is_instance_valid(enemy):
-			var enemy_ui = enemy.get_node("EnemyUI") as EnemyUI
+			var enemy_ui = enemy.enemy_ui
 			if enemy_ui:
 				await enemy_ui.remove_mark()
 	
@@ -176,7 +176,7 @@ func start_enemy_turn():
 			continue
 		
 		# 🆕 Отмечаем врага, который сейчас ходит
-		var enemy_ui = enemy.get_node("EnemyUI") as EnemyUI
+		var enemy_ui = enemy.enemy_ui
 		if enemy_ui and is_instance_valid(enemy_ui):
 			await enemy_ui.mark_current()
 		# ШАГ 1: Начало хода врага (пассивки, статусы)

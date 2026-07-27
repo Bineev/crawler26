@@ -36,7 +36,7 @@ func spawn_enemies(enemy_resources: Array[EnemyResource]):
 	
 	for res in enemy_resources:
 		var enemy_instance = ENEMY_SCENE.instantiate() as EnemyInstance
-		var enemy_ui = enemy_instance.get_node("EnemyUI") as EnemyUI
+		var enemy_ui = enemy_instance.get_enemy_ui()
 		
 		var size = DataManager.get_enemy_size_pixels(res.size)
 		if enemy_ui:
@@ -101,7 +101,7 @@ func layout_enemies():
 	
 	for i in range(count):
 		var enemy = enemies[i]
-		var enemy_ui = enemy.get_node("EnemyUI") as EnemyUI
+		var enemy_ui = enemy.enemy_ui
 		
 		var size = enemy_sizes[i]
 		var x_pos = start_x

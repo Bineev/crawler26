@@ -6,7 +6,7 @@ uniform sampler2D noise_tex : hint_normal, filter_linear;
 uniform vec4 cut_color : source_color = vec4(1.0, 0.0, 0.0, 1.0);
 uniform float distortion_strength : hint_range(0.0, 0.1) = 0.03;
 uniform float progress : hint_range(0.0, 1.0) = 0.0;
-uniform float mask_scale : hint_range(0.1, 2.0) = 1.0;
+uniform float mask_scale : hint_range(0.1, 10.0) = 1.0;
 
 const float slash_width = 0.3;
 

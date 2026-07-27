@@ -35,6 +35,10 @@ func _ready():
 	SignalManager.enemy_died.connect(_on_self_died)
 
 
+func get_enemy_ui() -> EnemyUI:
+	return $EnemyUI
+
+
 func init(floor_level: int = 1):
 	var scale_multiplier = _calculate_scale(floor_level)
 	var scaled_max_health = int(resource.base_max_health * scale_multiplier)

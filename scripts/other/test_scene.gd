@@ -19,12 +19,13 @@ func _process(delta):
 
 
 func play_slash_effect(amount : int):
-	$SubViewportContainer.play_slash_effect()
+	$SubViewportContainer.play_player_slash_effect()
 	$SubViewportContainer.shake_screen(3, 0.05)
 	$SubViewportContainer.trigger_hit_stop(0.15)
 
 
 func play_enemy_get_hit_effect():
+	$SubViewportContainer.play_enemy_slash_effect()
 	$SubViewportContainer.shake_screen(2, 0.1)
 	$SubViewportContainer.trigger_hit_stop(0.07)
 

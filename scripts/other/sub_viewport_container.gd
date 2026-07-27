@@ -1,19 +1,43 @@
 extends SubViewportContainer
 
+@export var player_hit_duration: float = 0.3
+@export var enemy_hit_duration: float = 0.7
 @export var duration: float = 0.3
+@export var player_hit_material: ShaderMaterial = preload("res://shaders/slash_mat.tres")
+@export var enemy_hit_material: ShaderMaterial = preload("res://shaders/slash_enemy_mat.tres")
 @onready var sub_viewport: SubViewport = $SubViewport
 
-		
-func play_slash_effect() -> void:
+func play_player_slash_effect() -> void:
+	if player_hit_material:
+		material = player_hit_material.duplicate()
+		duration = player_hit_duration
+		_play_slash_effect()
+
+func play_enemy_slash_effect() -> void:
+	if enemy_hit_material:
+		material = enemy_hit_material.duplicate()
+		duration = enemy_hit_duration
+		_play_slash_effect()
+
+func _play_slash_effect() -> void:
+	if not material:
+		return
+	
 	material.set_shader_parameter("progress", 0.0)
 	
 	var tween = create_tween()
+	tween.set_ignore_time_scale(true)
 	tween.tween_property(material, "shader_parameter/progress", 1.0, duration)\
 		.set_trans(Tween.TRANS_SINE)\
 		.set_ease(Tween.EASE_OUT)
-		
-	tween.tween_callback(func(): material.set_shader_parameter("progress", 0.0))
+	
+	tween.tween_callback(func(): 
+		if material:
+			material.set_shader_parameter("progress", 0.0)
+	)
 	await tween.finished
+	
+	material = null
 
 
 func trigger_hit_stop(duration: float = 0.08) -> void:
@@ -29,6 +53,7 @@ func trigger_hit_stop(duration: float = 0.08) -> void:
 # Функция симулирует резкий удар и затухающую тряску
 func shake_screen(intensity: float, time: float) -> void:
 	var shake_tween: Tween = create_tween()
+	shake_tween.set_ignore_time_scale(true)
 	var start_position: Vector2 = position # Запоминаем исходную позицию экрана
 	
 	var steps: int = 6 # Количество прыжков экрана

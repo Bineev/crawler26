@@ -218,7 +218,7 @@ func take_damage(amount: int, ignore_block: bool = false, attacker: CharacterSta
 		SignalManager.damage_dealt.emit(self, damage, status_icon)
 		if is_direct:
 			if damage > 0 and self is EnemyInstance:
-				var enemy_ui = get_node("EnemyUI") as EnemyUI
+				var enemy_ui = self.enemy_ui
 				if enemy_ui:
 					# Урон — среднее отталкивание
 					enemy_ui.push_back()
@@ -596,7 +596,7 @@ func _process_passive_triggers(trigger: DataManager.PassiveTrigger, attacker = n
 		if passive.trigger == trigger and passive.is_active():
 			# Анимируем иконку пассивки у врага
 			if self is EnemyInstance:
-				var enemy_ui = get_node("EnemyUI") as EnemyUI
+				var enemy_ui = self.enemy_ui
 				if enemy_ui:
 					var icon = enemy_ui.find_passive_icon(passive.id)
 					if icon:
@@ -859,7 +859,7 @@ func process_start_of_turn():
 					# Сбрасываем счётчик
 					data["tick_counter"] = 0
 					if self is EnemyInstance:
-						var enemy_ui = get_node("EnemyUI") as EnemyUI
+						var enemy_ui = self.enemy_ui
 						if enemy_ui:
 							var icon = enemy_ui.find_status_icon(status_id)
 							if icon:
@@ -962,7 +962,7 @@ func _apply_freeze(caster: CharacterStats = null):
 		
 		# Визуальные эффекты
 		if self is EnemyInstance:
-			var enemy_ui = get_node("EnemyUI") as EnemyUI
+			var enemy_ui = self.enemy_ui
 			if enemy_ui:
 				enemy_ui.apply_freeze_effect()
 		elif self is PenitentStats:
@@ -980,7 +980,7 @@ func thaw():
 	_frozen_at_turn_start = false
 	# Убираем визуальный эффект заморозки
 	if self is EnemyInstance:
-		var enemy_ui = get_node("EnemyUI") as EnemyUI
+		var enemy_ui = self.enemy_ui
 		if enemy_ui:
 			enemy_ui.remove_freeze_effect()
 	elif self is PenitentStats:

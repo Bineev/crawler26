@@ -1,0 +1,25 @@
+[gd_resource type="ShaderMaterial" load_steps=5 format=3 uid="uid://dhsk786qi07v2"]
+
+[ext_resource type="Shader" uid="uid://n6ldtoqejdro" path="res://shaders/enemy_get_slice.gdshader" id="1_poh1q"]
+[ext_resource type="Texture2D" uid="uid://07hmq7knblab" path="res://img/icons/effects/test_slice.png" id="2_poh1q"]
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_w8i8w"]
+noise_type = 2
+seed = 4
+frequency = 0.0058
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_otmr2"]
+width = 900
+height = 900
+generate_mipmaps = false
+noise = SubResource("FastNoiseLite_w8i8w")
+normalize = false
+
+[resource]
+shader = ExtResource("1_poh1q")
+shader_parameter/slash_mask = ExtResource("2_poh1q")
+shader_parameter/noise_tex = SubResource("NoiseTexture2D_otmr2")
+shader_parameter/cut_color = Color(0.83, 0.83, 0.83, 0.38039216)
+shader_parameter/distortion_strength = 0.0150000007125
+shader_parameter/progress = 0.0
+shader_parameter/mask_scale = 2.50000011549012
