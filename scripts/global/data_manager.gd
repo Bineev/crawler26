@@ -256,6 +256,8 @@ enum ArtifactId {
 	HEALERS_AMULET,        # CONDITIONAL
 	ABYSS_DUST,            # CUSTOM
 	TROLL_BLADE,  # 🆕
+	IMP_BLADE,  # 🆕 Клинок Импа
+	PLAGUE_AMULET,  # 🆕
 }
 
 ## ============================================================
@@ -312,7 +314,8 @@ enum RewardType {
 	CARD_WITHOUT_CHOICE,
 	ARTIFACT,
 	ARTIFACT_WITHOUT_CHOICE,
-	ARTIFACT_ELITE,          # 🆕 элитный артефакт
+	ARTIFACT_ELITE,          # 🆕 элитный артефакт     
+	ARTIFACT_COMBO,          # 🆕 элитный артефакт     
 	POTION,                  # 🆕 зелье
 	TAKE_DAMAGE,
 	GET_HEAL,
@@ -383,6 +386,7 @@ enum Status {
 	FROZEN,
 	GANGRENE,  # ← добавить
 	BLISTER,  # Чёрный пузырь
+	INFECTION,  # 🆕 Заражение
 }
 
 ## Классы персонажей
@@ -601,6 +605,7 @@ const POISON_HEALING_REDUCTION: float = 0.25
 const DESPAIR_DURATION: int = 2
 const DESPAIR_DAMAGE_DEALT_MULTIPLIER: float = 0.75
 
+const INFECTION_BLEED_MULTIPLIER: int = 3
 ## === Пассивки ===
 
 const REGROWTH_STARTING_HEAL: int = 2
@@ -947,7 +952,8 @@ const STATUS_ICONS: Dictionary = {
 	Status.SHIELD: preload("res://img/icons/statuses/shield.png"),
 	Status.FROZEN: preload("res://img/icons/statuses/cold.png"),
 	Status.GANGRENE: preload("res://img/icons/statuses/gangrene.png"),
-	#Status.BLISTER: preload("res://img/icons/statuses/blister.png"),
+	Status.BLISTER: preload("res://img/icons/statuses/blister.png"),
+	Status.INFECTION: preload("res://img/icons/statuses/infection.png"),
 }
 
 const PASSIVE_ICONS: Dictionary = {
@@ -1471,6 +1477,8 @@ const ARTIFACT_ICONS: Dictionary = {
 	DataManager.ArtifactId.HEALERS_AMULET: preload("res://img/icons/artifacts/healers_amulet.png"),
 	DataManager.ArtifactId.ABYSS_DUST: preload("res://img/icons/artifacts/abyss_dust.png"),
 	DataManager.ArtifactId.TROLL_BLADE: preload("res://img/icons/artifacts/troll_blade.png"),
+	DataManager.ArtifactId.IMP_BLADE: preload("res://img/icons/artifacts/imp_blade.png"),
+	DataManager.ArtifactId.PLAGUE_AMULET: preload("res://img/icons/artifacts/plague_amulet.png"),
 }
 
 
@@ -1821,6 +1829,12 @@ func get_artifact_name(artifact_id: ArtifactId) -> String:
 			return tr("artifact_healers_amulet_name")
 		ArtifactId.ABYSS_DUST:
 			return tr("artifact_abyss_dust_name")
+		ArtifactId.TROLL_BLADE:  # 🆕
+			return tr("artifact_troll_blade_name")
+		ArtifactId.IMP_BLADE:  # 🆕
+			return tr("artifact_imp_blade_name")
+		ArtifactId.PLAGUE_AMULET:  # 🆕
+			return tr("artifact_plague_amulet_name")
 		_:
 			return tr("artifact_unknown_name")
 
@@ -1832,10 +1846,6 @@ func get_artifact_description(artifact_id: ArtifactId) -> String:
 				ARTIFACT_STRANGE_MUSHROOM_POISON_DURATION
 			]
 		ArtifactId.HEROS_BROOCH:
-			var temp = tr("artifact_heros_brooch_desc") % [
-				ARTIFACT_HEROS_BROOCH_TURN_INTERVAL,
-				ARTIFACT_HEROS_BROOCH_STRENGTH_STACKS
-			]
 			return tr("artifact_heros_brooch_desc") % [
 				ARTIFACT_HEROS_BROOCH_TURN_INTERVAL,
 				ARTIFACT_HEROS_BROOCH_STRENGTH_STACKS
@@ -1852,6 +1862,12 @@ func get_artifact_description(artifact_id: ArtifactId) -> String:
 			]
 		ArtifactId.ABYSS_DUST:
 			return tr("artifact_abyss_dust_desc") % ARTIFACT_ABYSS_DUST_CARD_COST
+		ArtifactId.TROLL_BLADE:  # 🆕
+			return tr("artifact_troll_blade_desc")
+		ArtifactId.IMP_BLADE:  # 🆕
+			return tr("artifact_imp_blade_desc")
+		ArtifactId.PLAGUE_AMULET:  # 🆕
+			return tr("artifact_plague_amulet_desc")
 		_:
 			return ""
 
@@ -1869,6 +1885,8 @@ func load_artifact_resources() -> void:
 	_artifact_resources[ArtifactId.HEALERS_AMULET] = load("res://resources/artifacts/healers_amulet.tres")
 	_artifact_resources[ArtifactId.ABYSS_DUST] = load("res://resources/artifacts/abyss_dust.tres")
 	_artifact_resources[ArtifactId.TROLL_BLADE] = load("res://resources/artifacts/troll_blade.tres")  # 🆕
+	_artifact_resources[ArtifactId.IMP_BLADE] = load("res://resources/artifacts/imp_blade.tres")
+	_artifact_resources[ArtifactId.PLAGUE_AMULET] = load("res://resources/artifacts/plague_amulet.tres")
 	_artifact_resources_loaded = true
 
 func get_random_artifact_by_grade(grade: ArtifactGrade) -> ArtifactResource:

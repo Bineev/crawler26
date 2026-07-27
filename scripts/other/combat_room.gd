@@ -221,7 +221,7 @@ func show_rewards() -> void:
 			reward_panel.gold_mod = 5
 		
 		DataManager.CombatType.BOSS:
-			reward_types = [DataManager.RewardType.ARTIFACT_ELITE, DataManager.RewardType.CARD_CHARACTER, DataManager.RewardType.GOLD]
+			reward_types = [DataManager.RewardType.ARTIFACT_COMBO, DataManager.RewardType.CARD_CHARACTER, DataManager.RewardType.GOLD]
 			reward_panel.gold_mod = 3
 	
 	reward_panel.reward_types = reward_types

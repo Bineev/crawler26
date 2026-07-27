@@ -9,6 +9,6 @@ enemy_id = 6
 size = 3
 name_key = "enemy_rodent_mound_name"
 description_key = "enemy_rodent_mound_desc"
-base_max_health = 180
+base_max_health = 1
 base_strength = 15
 metadata/_custom_type_script = "uid://beudtcsu45bk7"

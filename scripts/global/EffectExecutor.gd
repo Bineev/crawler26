@@ -277,7 +277,6 @@ func _execute_scaled_value(effect: EffectEntry, source, targets: Array) -> void:
 func _execute_apply_status(effect: EffectEntry, source, targets: Array, passive_context: PassiveResource = null) -> void:
 	var value = effect.get_current_value()
 	var duration = effect.get_current_duration()
-	var from_passive = passive_context != null  # 🆕 если передан контекст пассивки
 	if effect.stat_multiplier != null and effect.stat_divisor > 0:
 		if source and source.has_method("get_flat"):
 			var stat_value = source.get_flat(effect.stat_multiplier)
@@ -285,7 +284,7 @@ func _execute_apply_status(effect: EffectEntry, source, targets: Array, passive_
 	
 	for target in targets:
 		if target and target.has_method("add_status"):
-			target.add_status(effect.status, value, max(1, duration), source, passive_context, from_passive)
+			target.add_status(effect.status, value, max(1, duration), source, passive_context)
 
 
 func _execute_apply_passive(effect: EffectEntry, source, targets: Array) -> void:

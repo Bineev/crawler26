@@ -57,6 +57,7 @@ layout_mode = 2
 
 [node name="Filler" type="Control" parent="MarginContainer/VBoxContainer/HBoxContainer"]
 layout_mode = 2
+mouse_filter = 2
 
 [node name="DurationLabel" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer"]
 layout_mode = 2

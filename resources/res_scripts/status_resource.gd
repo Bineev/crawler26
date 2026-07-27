@@ -89,6 +89,8 @@ func get_tick_value(stacks: int, caster: CharacterStats = null) -> int:
 			return stacks * RunManager.regen_heal_per_stack
 		DataManager.Status.GANGRENE:
 			return stacks
+		DataManager.Status.INFECTION:
+			return effect_per_stack
 		_:
 			return 0
 

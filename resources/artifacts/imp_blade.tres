@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="ArtifactResource" load_steps=5 format=3 uid="uid://bh51ciwhhwj2e"]
+
+[ext_resource type="Script" uid="uid://cmra25r1r3ivt" path="res://resources/res_scripts/effect_entry.gd" id="1_68qqt"]
+[ext_resource type="Script" uid="uid://crhkvl74xv4mq" path="res://scripts/effects/imp_blade_effect.gd" id="2_70xhh"]
+[ext_resource type="Script" uid="uid://dxepc28vep34d" path="res://resources/res_scripts/artifact_resource.gd" id="2_fxppb"]
+
+[sub_resource type="Resource" id="Resource_myg4r"]
+script = ExtResource("1_68qqt")
+category = 15
+target = 0
+custom_script = ExtResource("2_70xhh")
+metadata/_custom_type_script = "uid://cmra25r1r3ivt"
+
+[resource]
+script = ExtResource("2_fxppb")
+id = 6
+cost_grade = 6
+grade = 2
+triggers = Array[int]([6])
+name_key = "artifact_imp_blade_name"
+description_key = "artifact_imp_blade_desc"
+lore_key = "artifact_imp_blade_lore"
+effects = Array[ExtResource("1_68qqt")]([SubResource("Resource_myg4r")])
+metadata/_custom_type_script = "uid://dxepc28vep34d"

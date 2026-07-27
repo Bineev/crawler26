@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="ArtifactResource" load_steps=5 format=3 uid="uid://7toi03cjfmjp"]
+
+[ext_resource type="Script" uid="uid://cmra25r1r3ivt" path="res://resources/res_scripts/effect_entry.gd" id="1_ajkw5"]
+[ext_resource type="Script" uid="uid://dxepc28vep34d" path="res://resources/res_scripts/artifact_resource.gd" id="2_7yvp3"]
+[ext_resource type="Script" uid="uid://dr2gpfybu7a27" path="res://scripts/effects/plague_amulet_effect.gd" id="2_sexb1"]
+
+[sub_resource type="Resource" id="Resource_uu85h"]
+script = ExtResource("1_ajkw5")
+category = 15
+target = 0
+custom_script = ExtResource("2_sexb1")
+metadata/_custom_type_script = "uid://cmra25r1r3ivt"
+
+[resource]
+script = ExtResource("2_7yvp3")
+id = 7
+cost_grade = 6
+grade = 2
+triggers = Array[int]([6])
+name_key = "artifact_plague_amulet_name"
+description_key = "artifact_plague_amulet_desc"
+lore_key = "artifact_plague_amulet_lore"
+effects = Array[ExtResource("1_ajkw5")]([SubResource("Resource_uu85h")])
+metadata/_custom_type_script = "uid://dxepc28vep34d"

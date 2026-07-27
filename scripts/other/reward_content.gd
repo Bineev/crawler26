@@ -37,12 +37,10 @@ func setup(type: DataManager.RewardType, items: Array) -> void:
 			_setup_card_rewards()
 		DataManager.RewardType.CARD_WITHOUT_CHOICE, DataManager.RewardType.CONCRETE_CARD:
 			_setup_card_without_choice_reward()
-		DataManager.RewardType.ARTIFACT:
+		DataManager.RewardType.ARTIFACT, DataManager.RewardType.ARTIFACT_ELITE, DataManager.RewardType.ARTIFACT_COMBO:
 			_setup_artifact_rewards()
 		DataManager.RewardType.ARTIFACT_WITHOUT_CHOICE, DataManager.RewardType.CONCRETE_ARTIFACT:
 			_setup_artifact_without_choice_reward()
-		DataManager.RewardType.ARTIFACT_ELITE:
-			_setup_artifact_elite_rewards()
 		DataManager.RewardType.POTION:
 			_setup_potion_rewards()
 		DataManager.RewardType.TAKE_DAMAGE:
@@ -190,7 +188,7 @@ func _apply_reward(index: int) -> void:
 			SignalManager.add_card_to_deck.emit(selected_item)
 		DataManager.RewardType.CARD_WITHOUT_CHOICE, DataManager.RewardType.CONCRETE_CARD:
 			SignalManager.add_card_to_deck.emit(selected_item)
-		DataManager.RewardType.ARTIFACT:
+		DataManager.RewardType.ARTIFACT, DataManager.RewardType.ARTIFACT_COMBO, DataManager.RewardType.ARTIFACT_ELITE:
 			SignalManager.add_artifact.emit(selected_item)
 		DataManager.RewardType.ARTIFACT_WITHOUT_CHOICE, DataManager.RewardType.CONCRETE_ARTIFACT:
 			SignalManager.add_artifact.emit(selected_item)

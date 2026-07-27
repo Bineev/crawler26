@@ -52,15 +52,9 @@ func handle_interaction(target, new_status: DataManager.Status, stacks: int, dur
 		target._add_status_direct(status_resource, stacks, duration, caster)
 		return
 	
-	# 3. Обрабатываем взаимодействие по паре
-	# Bleed + Poison → Мука (Bleed уже есть, Poison новый)
-	if last_status == DataManager.Status.BLEED and new_status == DataManager.Status.POISON:
-		_handle_bleed_poison_flour(target, stacks, duration)
-		return
-	
-	# Poison + Bleed → Агония (Poison уже есть, Bleed новый)
-	if last_status == DataManager.Status.POISON and new_status == DataManager.Status.BLEED:
-		_handle_poison_bleed_agony(target, stacks, duration)
+	if (last_status == DataManager.Status.BLEED and new_status == DataManager.Status.POISON) or \
+	   (last_status == DataManager.Status.POISON and new_status == DataManager.Status.BLEED):
+		_handle_bleed_poison_infection(target, last_status, new_status, stacks, duration)
 		return
 	
 	# Poison + Burn → BLISTER
@@ -159,36 +153,6 @@ func _handle_bleed_cold_gangrene(target, new_status: DataManager.Status, new_sta
 
 # ===== ВЗАИМОДЕЙСТВИЯ СТАТУСОВ =====
 
-func _handle_bleed_poison_flour(target, stacks: int, duration: int):
-	# Bleed + Poison → Мука: Bleed стаки += длительность Poison / 3
-	var bleed_stacks = target.get_status_stacks(DataManager.Status.BLEED)
-	var added_stacks = floor(duration / DataManager.BLEED_POISON_FLOUR_DIVIDER)
-	target.modify_status_stacks(DataManager.Status.BLEED, added_stacks)
-	
-	# Poison НАКЛАДЫВАЕТСЯ
-	var poison_status = DataManager.get_status_resource(DataManager.Status.POISON)
-	if poison_status:
-		target._add_status_direct(poison_status, stacks, duration, target)
-	
-	SignalManager.log_message.emit("Кровь смешалась с ядом! Кровотечение +%d стаков, наложен Яд." % added_stacks)
-
-
-func _handle_poison_bleed_agony(target, stacks: int, duration: int):
-	# Poison + Bleed → Агония: Poison длительность += Bleed стаки × 3
-	var bleed_stacks = target.get_status_stacks(DataManager.Status.BLEED)
-	var added_duration = bleed_stacks * DataManager.POISON_BLEED_AGONY_MULTIPLIER
-	var poison_data = target.active_statuses.get(DataManager.Status.POISON)
-	if poison_data:
-		poison_data.duration += added_duration
-	
-	# Bleed НАКЛАДЫВАЕТСЯ
-	var bleed_status = DataManager.get_status_resource(DataManager.Status.BLEED)
-	if bleed_status:
-		target._add_status_direct(bleed_status, stacks, duration, target)
-	
-	SignalManager.log_message.emit("Яд усилился от крови! Длительность яда +%d ходов, наложено Кровотечение." % added_duration)
-
-
 func has_interaction(target, new_status: DataManager.Status) -> bool:
 	# Получаем последний статус
 	var last_status = target._get_last_status(new_status)
@@ -218,6 +182,7 @@ func _handle_poison_burn_blister(target, status_a: DataManager.Status, status_b:
 	var poison_duration = target.active_statuses.get(DataManager.Status.POISON, {}).get("duration", 0)
 	var burn_stacks = target.get_status_stacks(DataManager.Status.BURN)
 	
+	# Если новый статус — BURN, используем переданные значения
 	if status_b == DataManager.Status.BURN:
 		burn_stacks = new_stacks
 		poison_duration = new_duration
@@ -225,9 +190,31 @@ func _handle_poison_burn_blister(target, status_a: DataManager.Status, status_b:
 		poison_stacks = new_stacks
 		poison_duration = new_duration
 	
+	# Удаляем оба статуса
 	target.remove_status(DataManager.Status.POISON)
 	target.remove_status(DataManager.Status.BURN)
 	
+	# Проверяем, есть ли уже BLISTER
+	var existing_data = target.active_statuses.get(DataManager.Status.BLISTER)
+	if existing_data and existing_data.has("blister_data"):
+		var blister_data = existing_data["blister_data"]
+		
+		# Увеличиваем прочность
+		var additional_health = burn_stacks * DataManager.BLISTER_DENSITY
+		blister_data.max_health += additional_health
+		blister_data.current_health += additional_health
+		
+		# Обновляем длительность (максимум)
+		existing_data.duration = max(existing_data.duration, poison_duration)
+		
+		# Обновляем параметры взрыва
+		blister_data.burn_stacks_on_create += burn_stacks
+		blister_data.poison_duration_on_create = max(blister_data.poison_duration_on_create, poison_duration)
+		
+		SignalManager.log_message.emit("Чёрный пузырь усилился! Прочность: %d, Длительность: %d ходов." % [blister_data.current_health, existing_data.duration])
+		return
+	
+	# Создаём новый BLISTER
 	var blister_status = DataManager.get_status_resource(DataManager.Status.BLISTER)
 	if blister_status:
 		# Создаём копию статуса
@@ -235,15 +222,13 @@ func _handle_poison_burn_blister(target, status_a: DataManager.Status, status_b:
 		status_copy.is_ticking = true
 		status_copy.tick_interval = poison_duration  # тикнет один раз в конце
 		
-		# 🆕 Создаём tick_effect для Блистера
+		# Создаём tick_effect для Блистера
 		var tick_effect = EffectEntry.new()
 		tick_effect.category = DataManager.EffectCategory.CUSTOM
 		tick_effect.target = DataManager.EffectTarget.SELF
 		tick_effect.custom_script = preload("res://scripts/effects/blister_explosion.gd")
 		
-		# Передаём параметры через custom_script
-		tick_effect.custom_description = "blister_explosion"
-		# Сохраняем данные в эффекте
+		# Сохраняем параметры в эффекте
 		tick_effect.value = burn_stacks * DataManager.BLISTER_DENSITY  # current_health
 		tick_effect.base_value = burn_stacks * poison_duration  # burn_amount для взрыва
 		tick_effect.amount = burn_stacks  # burn_stacks_on_create
@@ -265,3 +250,56 @@ func _handle_poison_burn_blister(target, status_a: DataManager.Status, status_b:
 			status_data["blister_data"] = blister_data
 		
 		SignalManager.log_message.emit("Чёрный пузырь! Прочность: %d, Длительность: %d ходов." % [blister_data.max_health, poison_duration])
+
+
+func _handle_bleed_poison_infection(target, status_a: DataManager.Status, status_b: DataManager.Status, new_stacks: int, new_duration: int):
+	# Получаем стаки и длительность обоих статусов
+	var bleed_stacks = target.get_status_stacks(DataManager.Status.BLEED)
+	var bleed_duration = target.active_statuses.get(DataManager.Status.BLEED, {}).get("duration", 0)
+	var poison_stacks = target.get_status_stacks(DataManager.Status.POISON)
+	var poison_duration = target.active_statuses.get(DataManager.Status.POISON, {}).get("duration", 0)
+	
+	# Если новый статус — BLEED, используем переданные значения
+	if status_b == DataManager.Status.BLEED:
+		bleed_stacks = new_stacks
+		bleed_duration = new_duration
+	elif status_b == DataManager.Status.POISON:
+		poison_stacks = new_stacks
+		poison_duration = new_duration
+	
+	# Удаляем оба статуса
+	target.remove_status(DataManager.Status.BLEED)
+	target.remove_status(DataManager.Status.POISON)
+	
+	# Рассчитываем параметры Заражения
+	var infection_stacks = 1
+	var infection_duration = poison_duration
+	var damage_per_stack = bleed_stacks * RunManager.infection_bleed_multiplier
+	
+	# Проверяем, есть ли уже Заражение
+	var existing = target.active_statuses.get(DataManager.Status.INFECTION)
+	if existing:
+		# Стакаем: урон складывается, длительность — максимум
+		var existing_damage = existing.get("damage_per_stack", 0)
+		damage_per_stack += existing_damage
+		infection_duration = max(infection_duration, existing.duration)
+		
+		# Обновляем существующий статус
+		existing.stacks = infection_stacks
+		existing.duration = infection_duration
+		existing["damage_per_stack"] = damage_per_stack
+		
+		SignalManager.log_message.emit("Заражение усилилось! Урон за стак: %d, Длительность: %d ходов." % [damage_per_stack, infection_duration])
+		return
+	
+	# Создаём новый статус
+	var infection_status = DataManager.get_status_resource(DataManager.Status.INFECTION)
+	if infection_status:
+		target._add_status_direct(infection_status, infection_stacks, infection_duration, target)
+		
+		# Сохраняем дополнительные данные
+		var status_data = target.active_statuses.get(DataManager.Status.INFECTION)
+		if status_data:
+			status_data["damage_per_stack"] = damage_per_stack
+		
+		SignalManager.log_message.emit("Заражение! Урон за стак: %d, Длительность: %d ходов." % [damage_per_stack, infection_duration])

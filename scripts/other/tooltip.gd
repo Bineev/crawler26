@@ -12,6 +12,7 @@ class_name Tooltip
 var _is_visible: bool = false
 
 func setup(data: Dictionary) -> void:
+	modulate = Color(0, 0, 0 ,0)
 	# Скрываем все элементы (они перестают занимать место)
 	icon.hide()
 	title.hide()
@@ -88,11 +89,13 @@ func _setup_style():
 	footer.add_theme_color_override("font_color", DataManager.COLOR_MOLE_TUNNELS_ART_BG_LIGHT)
 
 func show_at(mouse_position: Vector2):
+	await get_tree().create_timer(0.2).timeout
+	modulate = Color(1, 1, 1, 1)
 	var viewport_size = get_viewport().get_visible_rect().size
 	var tooltip_size = size
 	
 	# Базовое смещение — справа от курсора, нижний край на уровне курсора
-	var offset = Vector2(15, 0)
+	var offset = Vector2(25, -25)
 	var target_pos = mouse_position + offset - Vector2(0, tooltip_size.y)
 	
 	# Проверка на выход за левую границу

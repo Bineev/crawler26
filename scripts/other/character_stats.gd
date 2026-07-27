@@ -876,7 +876,15 @@ func process_start_of_turn():
 					var caster = data.get("caster", null)
 					if not is_instance_valid(caster):
 						caster = null
-					var tick_value = status.get_tick_value(data.stacks, caster)
+					
+					# 🆕 Получаем значение тика
+					var tick_value = 0
+					if status.id == DataManager.Status.INFECTION:
+						# Для Заражения — берём урон из данных статуса
+						tick_value = get_infection_damage()
+					else:
+						# Для остальных статусов — стандартная логика
+						tick_value = status.get_tick_value(data.stacks, caster)
 					
 					match tick_effect.category:
 						DataManager.EffectCategory.DAMAGE:
@@ -1083,3 +1091,10 @@ func _explode_blister():
 		target.add_status(burn_status, burn_amount, 2, self)
 	
 	SignalManager.log_message.emit("Чёрный пузырь уничтожен! %d стаков Горения наложено!" % burn_amount)
+
+
+func get_infection_damage() -> int:
+	var status_data = active_statuses.get(DataManager.Status.INFECTION)
+	if status_data and status_data.has("damage_per_stack"):
+		return status_data["damage_per_stack"]
+	return 1

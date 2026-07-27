@@ -20,7 +20,7 @@ var poison_healing_reduction: float = DataManager.POISON_HEALING_REDUCTION
 var shame_damage_taken_multiplier: float = DataManager.SHAME_DAMAGE_TAKEN_MULTIPLIER
 var shame_atonement_multiplier: float = DataManager.SHAME_ATONEMENT_MULTIPLIER
 var frozen_energy_loss: int = DataManager.FROZEN_ENERGY_LOSS
-
+var infection_bleed_multiplier: int = DataManager.INFECTION_BLEED_MULTIPLIER
 # === Балансные константы ===
 var starting_hand_size: int = DataManager.STARTING_HAND_SIZE
 var cards_to_draw_per_turn: int = DataManager.CARDS_TO_DRAW_PER_TURN
@@ -43,7 +43,7 @@ var bones: int = 0
 var keys: int = 0
 
 # === Взаимодействия статусов ===
-var is_bleed_poison_interaction_enabled: bool = false   # Bleed + Poison → Мука
+var is_bleed_poison_interaction_enabled: bool = true   # Bleed + Poison → Мука
 var is_poison_burn_interaction_enabled: bool = false    # Poison + Burn → Взрыв
 var is_bleed_cold_interaction_enabled: bool = false     # Bleed + Cold → Гангрена
 
@@ -640,7 +640,7 @@ func reset_run_constants():
 	shame_damage_taken_multiplier = DataManager.SHAME_DAMAGE_TAKEN_MULTIPLIER
 	shame_atonement_multiplier = DataManager.SHAME_ATONEMENT_MULTIPLIER
 	frozen_energy_loss = DataManager.FROZEN_ENERGY_LOSS
-	
+	infection_bleed_multiplier = DataManager.INFECTION_BLEED_MULTIPLIER
 	# === Балансные константы ===
 	starting_hand_size = DataManager.STARTING_HAND_SIZE
 	cards_to_draw_per_turn = DataManager.CARDS_TO_DRAW_PER_TURN

@@ -474,7 +474,7 @@ func _handle_search_trap() -> void:
 
 
 func _handle_lose_flesh() -> void:
-	await _show_result_label(tr("rack_lose_flesh_result"), DataManager.COLOR_FLESH_CAVES_ART_BG_DARK)
+	await _show_result_label(tr("rack_lose_flesh_result"), DataManager.COLOR_PENITENT_ART_BG_DARK)
 	
 	var reward_panel = preload("res://scenes/reward_panel.tscn").instantiate() as RewardPanel
 	# Сначала урон, потом бафф
@@ -498,7 +498,7 @@ func _handle_craft() -> void:
 		await _show_result_label(tr("rack_craft_success"), DataManager.COLOR_HEAL_LOG)
 		rewards = [DataManager.RewardType.ARTIFACT_WITHOUT_CHOICE]
 	else:
-		await _show_result_label(tr("rack_craft_fail"), DataManager.COLOR_FLESH_CAVES_ART_BG_DARK)
+		await _show_result_label(tr("rack_craft_fail"), DataManager.COLOR_PENITENT_ART_BG_DARK)
 		rewards = [DataManager.RewardType.TAKE_DAMAGE, DataManager.RewardType.ARTIFACT_WITHOUT_CHOICE]
 	
 	var reward_panel = preload("res://scenes/reward_panel.tscn").instantiate() as RewardPanel

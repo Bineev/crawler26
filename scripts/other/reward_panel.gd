@@ -72,7 +72,7 @@ func _create_current_reward():
 			_create_card_reward(DataManager.RewardType.CARD_CHARACTER)
 		DataManager.RewardType.CARD_WITHOUT_CHOICE, DataManager.RewardType.CONCRETE_CARD:
 			_create_card_without_choice_reward(reward_type)
-		DataManager.RewardType.ARTIFACT, DataManager.RewardType.ARTIFACT_ELITE:
+		DataManager.RewardType.ARTIFACT, DataManager.RewardType.ARTIFACT_ELITE, DataManager.RewardType.ARTIFACT_COMBO:
 			_create_artifact_reward()
 		DataManager.RewardType.ARTIFACT_WITHOUT_CHOICE, DataManager.RewardType.CONCRETE_ARTIFACT:
 			_create_artifact_without_choice_reward(reward_type)
@@ -160,6 +160,8 @@ func _create_artifact_reward() -> void:
 			grade = DataManager.ArtifactGrade.NORMAL
 		DataManager.RewardType.ARTIFACT_ELITE:
 			grade = DataManager.ArtifactGrade.ELITE
+		DataManager.RewardType.ARTIFACT_COMBO:
+			grade = DataManager.ArtifactGrade.COMBO
 	
 	# Получаем ID артефактов, которые уже есть у игрока
 	var existing_ids: Array[DataManager.ArtifactId] = []

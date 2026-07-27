@@ -16,6 +16,7 @@ script = ExtResource("2_4yy6v")
 id = 5
 cost_grade = 6
 grade = 2
+triggers = Array[int]([6])
 name_key = "artifact_troll_blade_name"
 description_key = "artifact_troll_blade_desc"
 lore_key = "artifact_troll_blade_lore"

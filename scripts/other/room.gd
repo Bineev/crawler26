@@ -105,7 +105,7 @@ func _close_room_animation() -> void:
 	dark_overlay.color = Color(0, 0, 0, 0)
 	dark_overlay.size = get_viewport().get_visible_rect().size
 	dark_overlay.position = Vector2.ZERO
-	dark_overlay.z_index = 100
+	dark_overlay.z_index = 1000
 	add_child(dark_overlay)
 	
 	# Включаем обрезку для комнаты, чтобы контент не выходил за границы

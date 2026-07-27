@@ -254,7 +254,7 @@ func _setup_bars():
 	health_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	
 	back_health_bg = StyleBoxFlat.new()
-	back_health_bg.bg_color = DataManager.COLOR_BUTTON_DISABLED_BORDER
+	back_health_bg.bg_color = Color.BLACK
 	back_health_bg.border_width_bottom = 2
 	back_health_bg.border_width_top = 2
 	back_health_bg.border_width_left = 2
@@ -264,7 +264,7 @@ func _setup_bars():
 	
 	# Заливка (красный)
 	back_health_fill = StyleBoxFlat.new()
-	back_health_fill.bg_color = DataManager.COLOR_FLESH_CAVES_ART_BG_DARK.lightened(0.1)
+	back_health_fill.bg_color = Color.GHOST_WHITE
 	back_health_fill.border_width_bottom = 0
 	back_health_fill.border_width_top = 0
 	back_health_fill.border_width_left = 0
@@ -443,7 +443,7 @@ func _update_icons(target : Node):
 		status_container.add_child(icon)
 		icon.setup(icon_data, DataManager.COLOR_MOLE_TUNNELS_ART_BG_LIGHT, self)  # светлый для игрока
 		# 🆕 Подключаем тултип
-		icon.mouse_entered.connect(_on_status_icon_hovered.bind(status_id, status_data.stacks, status_data.duration))
+		icon.mouse_entered.connect(_on_status_icon_hovered.bind(status_id, status_data.stacks, status_data.duration, status_data))
 		icon.mouse_exited.connect(_on_icon_mouse_exited)
 		#DataManager.apply_shader_to_icon(icon.icon, "res://shaders/highlight_item.gdshader", {'hover_intensity' : 1.0})
 		DataManager.apply_shader_overlay(icon.icon, "res://shaders/horror_shader.gdshader", {})
@@ -797,9 +797,9 @@ func _apply_debuff_effect():
 	current_shader_priority = DataManager.EnemyShaderPriority.NONE
 
 
-func _on_status_icon_hovered(status_id: DataManager.Status, stacks: int, duration: int):
+func _on_status_icon_hovered(status_id: DataManager.Status, stacks: int, duration: int, status_data: Dictionary):
 	var pos = get_global_mouse_position()
-	TooltipManager.request_dynamic_status_tooltip(status_id, stacks, duration, pos)
+	TooltipManager.request_dynamic_status_tooltip(status_id, stacks, duration, status_data, pos)
 
 
 func _on_passive_icon_hovered(passive_data: Dictionary):

@@ -56,6 +56,8 @@ func _get_status_description(status_id: DataManager.Status) -> String:
 			return tr("status_gangrene_desc")
 		DataManager.Status.BLISTER:
 			return tr("status_blister_desc")
+		DataManager.Status.INFECTION:
+			return tr("status_infection_desc")
 		_:
 			return ""
 
@@ -119,7 +121,7 @@ func request_dynamic_status_tooltip(status_id: DataManager.Status, stacks: int, 
 
 func _build_dynamic_status_tooltip_data(status_id: DataManager.Status, stacks: int, duration: int, status_data: Dictionary) -> Dictionary:
 	var name = DataManager.get_status_name(status_id)
-	var desc = _get_dynamic_status_description(status_id, stacks, duration)
+	var desc = _get_dynamic_status_description(status_id, stacks, duration, status_data)  # ← передаём
 	var additional = _get_status_additional_info(status_id, status_data)  # ← передаём status_data
 	
 	return {
@@ -130,7 +132,7 @@ func _build_dynamic_status_tooltip_data(status_id: DataManager.Status, stacks: i
 	}
 
 
-func _get_dynamic_status_description(status_id: DataManager.Status, stacks: int, duration: int) -> String:
+func _get_dynamic_status_description(status_id: DataManager.Status, stacks: int, duration: int, status_data: Dictionary = {}) -> String:
 	match status_id:
 		DataManager.Status.POISON:
 			var damage = stacks * RunManager.poison_damage_per_stack
@@ -161,6 +163,11 @@ func _get_dynamic_status_description(status_id: DataManager.Status, stacks: int,
 			if blister_data:
 				return tr("status_blister_dynamic_desc") % [blister_data.current_health, blister_data.duration]
 			return tr("status_blister_desc")
+		DataManager.Status.INFECTION:
+			var damage_per_stack = status_data.get("damage_per_stack", 1)
+			return tr("status_infection_dynamic_desc") % [damage_per_stack, duration]
+		_:
+			return ""
 		_:
 			return ""
 
@@ -359,6 +366,8 @@ func _get_status_additional_info(status_id: DataManager.Status, status_data: Dic
 				var damage_on_expire = blister_data.get("current_health", 0)
 				return tr("status_blister_additional") % [burn_on_destroy, damage_on_expire]
 			return ""
+		DataManager.Status.INFECTION:
+			return tr("status_infection_additional") % RunManager.infection_bleed_multiplier
 		_:
 			return ""
 			return ""
