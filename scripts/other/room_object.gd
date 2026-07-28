@@ -45,7 +45,7 @@ func setup(type: DataManager.ObjectType, biome: DataManager.Biome) -> void:
 		
 		# Отключаем клики и подсветку
 		mouse_filter = Control.MOUSE_FILTER_IGNORE
-		await get_tree().create_timer(2).timeout
+		await get_tree().create_timer(1.5).timeout
 		interact()
 		return
 	# 🆕 Логика для EVENT
@@ -113,7 +113,7 @@ func setup(type: DataManager.ObjectType, biome: DataManager.Biome) -> void:
 		
 		# Запускаем печать нарратива
 		await print_narrative(event_data.get_localized_narrative())
-		await get_tree().create_timer(1.5).timeout
+		await get_tree().create_timer(3).timeout
 		# После печати вызываем interact()
 		interact()
 		return
@@ -335,7 +335,7 @@ func _interact_event() -> void:
 	SignalManager.add_action_choice.emit(action_choice, event_data.get_localized_name(), actions)
 
 
-func print_narrative(text: String) -> void:
+func print_narrative(text: String):
 	if not narrative_label:
 		return
 	
@@ -357,3 +357,6 @@ func print_narrative(text: String) -> void:
 	for word in words:
 		narrative_label.text += word + " "
 		await get_tree().create_timer(word_delay).timeout
+	
+	# 🆕 Возвращаем label, чтобы на него можно было повесить обработчик клика
+	return narrative_label

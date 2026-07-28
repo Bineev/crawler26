@@ -21,11 +21,10 @@ class_name EnemyUI
 @onready var shield_sprite: TextureRect = $VBoxContainer/SpriteContainer/ShieldSprite
 @onready var back_health_bar: ProgressBar = $VBoxContainer/HealthBar/HealthBar2
 
-
-
 const STATUS_ICON_SCENE = preload("res://scenes/status_icon.tscn")
 const PASSIVE_ICON_SCENE = preload("res://scenes/passive_icon.tscn")
 
+var enemy_state: DataManager.EnemyAnimationState = DataManager.EnemyAnimationState.IDLE
 var original_scale: Vector2 = Vector2(1, 1)
 var original_position: Vector2 = Vector2.ZERO
 var original_z_index: int = 0
@@ -226,16 +225,16 @@ func update_display():
 	
 	# Спрайт
 	if enemy_sprite:
-		enemy_sprite.texture = enemy_instance.get_sprite()
+		set_animation_state(enemy_state)
 		# Копия спрайта
-	if enemy_sprite_copy:
-		enemy_sprite_copy.texture = enemy_instance.get_sprite()
+	#if enemy_sprite_copy:
+		#enemy_sprite_copy.texture = enemy_sprite.texture
 		
 	if shield_sprite:
 		shield_sprite.custom_minimum_size = enemy_sprite.size
 	
-	if highlight_sprite:
-		highlight_sprite.texture = enemy_instance.get_sprite()
+	#if highlight_sprite:
+		#highlight_sprite.texture = enemy_sprite.texture
 
 	# Здоровье (Инициализация при открытии экрана без анимации)
 	var current_health = enemy_instance.get_health()
@@ -496,7 +495,7 @@ func _on_get_hit(target: Node):
 	# Проверяем, что удар пришёлся по этому врагу
 	if target != enemy_instance:
 		return
-	
+
 	# Применяем эффект удара
 	_hit_effect()
 
@@ -508,6 +507,8 @@ func _hit_effect():
 	
 	if not enemy_sprite:
 		return
+	
+	set_animation_state(DataManager.EnemyAnimationState.GET_HIT)
 	
 	# Сохраняем текущий материал
 	var current_material = enemy_sprite.material
@@ -530,6 +531,7 @@ func _hit_effect():
 		.set_ease(Tween.EASE_OUT)
 	
 	await hit_tween.finished
+	set_animation_state(DataManager.EnemyAnimationState.IDLE)
 	hit_tween = null
 	
 	_on_hit_finished(current_material)
@@ -726,6 +728,7 @@ func _get_intent_text(intent: IntentEntry) -> String:
 
 
 func play_attack_animation():
+	set_animation_state(DataManager.EnemyAnimationState.ATTACK)
 	var current_position = current_mark_position if is_marked else position
 	var current_scale = current_mark_scale if is_marked else scale
 	
@@ -742,7 +745,8 @@ func play_attack_animation():
 	tween.tween_property(self, "position", current_position, 0.1).set_delay(0.1).set_ease(Tween.EASE_IN)
 	tween.tween_property(self, "scale", current_scale, 0.1).set_delay(0.1).set_ease(Tween.EASE_IN)
 	
-	await get_tree().create_timer(0.3).timeout
+	await get_tree().create_timer(0.35).timeout
+	set_animation_state(DataManager.EnemyAnimationState.IDLE)
 
 
 func play_debuff_animation():
@@ -1034,11 +1038,11 @@ func _apply_debuff_effect():
 		return
 	if not enemy_sprite:
 		return
-	
+	set_animation_state(DataManager.EnemyAnimationState.GET_HIT)
 	# --- НАСТРОЙКИ СКОРОСТИ (в секундах) ---
 	var t_squeeze: float = 0.03    # Скорость сжатия (было 0.15)
 	var t_pause: float = 0.2      # Пауза на пике (было 0.1)
-	var t_return: float = 0.05     # Возврат формы (было 0.3)
+	var t_return: float = 0.02     # Возврат формы (было 0.3)
 	var t_fade: float = 1        # Затухание шейдера (было 1.55)
 	# --------------------------------------
 	
@@ -1082,10 +1086,12 @@ func _apply_debuff_effect():
 		.set_ease(Tween.EASE_OUT)
 	
 	await hit_tween.finished
+	set_animation_state(DataManager.EnemyAnimationState.IDLE)
 	hit_tween = null
 	
 	if pending_freeze:
 		pending_freeze = false
+		set_animation_state(DataManager.EnemyAnimationState.GET_HIT)
 		_apply_freeze_effect_immediate()
 		return
 	
@@ -1171,8 +1177,8 @@ func mark_current():
 	
 	var tween = create_tween()
 	tween.set_parallel(true)
-	tween.tween_property(self, "scale", target_scale, 0.3).set_ease(Tween.EASE_OUT)
-	tween.tween_property(self, "position", original_position + offset, 0.3).set_ease(Tween.EASE_OUT)
+	tween.tween_property(self, "scale", target_scale, 0.15).set_ease(Tween.EASE_OUT)
+	tween.tween_property(self, "position", original_position + offset, 0.15).set_ease(Tween.EASE_OUT)
 	await tween.finished
 
 func remove_mark():
@@ -1184,8 +1190,16 @@ func remove_mark():
 	# 🆕 Возвращаемся к базовому масштабу 0.9
 	var tween = create_tween()
 	tween.set_parallel(true)
-	tween.tween_property(self, "scale", Vector2(0.9, 0.9), 0.2).set_ease(Tween.EASE_IN)
-	tween.tween_property(self, "position", original_position, 0.2).set_ease(Tween.EASE_IN)
+	tween.tween_property(self, "scale", Vector2(0.9, 0.9), 0.1).set_ease(Tween.EASE_IN)
+	tween.tween_property(self, "position", original_position, 0.1).set_ease(Tween.EASE_IN)
 	
 	z_index = original_z_index
 	modulate = Color(1, 1, 1, 1)
+
+
+func set_animation_state(state: DataManager.EnemyAnimationState):
+	var sprite = DataManager.get_enemy_sprite(enemy_instance.resource.enemy_id, enemy_instance.resource.biome, state)
+	if sprite:
+		enemy_sprite.texture = sprite
+		enemy_sprite_copy.texture = sprite
+		highlight_sprite.texture = sprite

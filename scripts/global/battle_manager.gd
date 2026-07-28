@@ -131,7 +131,7 @@ func start_player_turn():
 	# 🆕 Выбираем намерения только если это НЕ первый ход
 	if turn_counter > 1:
 		for enemy in enemies:
-			if enemy.is_alive():
+			if enemy and is_instance_valid(enemy) and enemy.is_alive():
 				var intent = enemy.select_next_intent()
 				if intent:
 					SignalManager.enemy_intent_changed.emit(enemy, intent)
@@ -203,9 +203,11 @@ func start_enemy_turn():
 			defeat()
 			return
 		
-		await get_tree().create_timer(DataManager.ENEMY_STEP_DELAY).timeout
+		#await get_tree().create_timer(DataManager.ENEMY_STEP_DELAY).timeout
 		if enemy_ui and is_instance_valid(enemy_ui):
 			await enemy_ui.remove_mark()
+		
+		await get_tree().create_timer(DataManager.ENEMY_STEP_DELAY / 2).timeout
 	
 	# 🆕 Только проверяем победу/поражение
 	check_defeat()

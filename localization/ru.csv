@@ -113,7 +113,8 @@ reward_potion_title,Выберите зелье
 reward_take_damage_title,Получить урон
 reward_get_heal_title,Лечение
 reward_energy_buff_title,Увеличение энергии
-reward_deck_size_buff_title,Увеличение колоды
+reward_deck_size_buff_title,Увеличение руки
+"deck_size_buff_label","+%d к размеру руки"
 reward_gold_title,Золото
 reward_remove_card_title,Удалить карту
 reward_upgrade_card_title,Улучшить карту
@@ -170,8 +171,8 @@ gold_label,+%d
 heal_label,+%d Здоровья
 damage_label,-%d Здоровья
 energy_buff_label,+%d Энергии
-energy_buff_duration,"Длительность: %d боевых комнат"
-energy_buff_permanent,"Длительность: вечно"
+buff_duration,"Длительность: %d боевых комнат"
+buff_permanent,"Длительность: вечно"
 reward_take_buff,Принять бафф
 bonfire_title,Привал у костра
 bonfire_rest_result,Силы восстановлены!
@@ -252,7 +253,7 @@ upgrade_card_confirm,Улучшить
 "cauldron_transform_title","Выберите карту для преобразования"
 "cauldron_brew_result","Зелье сварено!"
 "transform_card_confirm","Преобразовать"
-"reward_transform_card_title","Преобразовать карту (осталось %d попыток)"
+"reward_transform_card_title","Преобразовать карту (осталось %d попытки)"
 "reward_transform_attempts_zero","Попыток больше нет"
 
 "potion_use","Использовать"
@@ -348,19 +349,19 @@ upgrade_card_confirm,Улучшить
 "status_poison_desc","Наносит %d урона каждый ход. Снижает лечение на %d%%."
 "status_bleed_desc","Наносит %d урона за стак каждый ход."
 "status_burn_desc","Наносит %d урона за стак каждый ход. Взрывается при %d стаках."
-"status_cold_desc","Снижает входящий урон на %.0f%% за стак. При %d стаках замораживает."
+"status_cold_desc","Снижает прямой урон на %.0f%% за стак. При %d стаках замораживает."
 "status_weakness_desc","Атаки наносят на %.0f%% меньше урона."
 "status_vulnerability_desc","Получает на %.0f%% больше урона."
 "status_strength_desc","Увеличивает урон на %d за стак."
 "status_regen_desc","Лечит %d HP за стак в конце хода."
 "status_shield_desc","Поглощает входящий урон. Сбрасывается в начале хода."
-"status_frozen_desc","Заморожен. Пропускает ход. Получает на 50%% меньше урона."
+"status_frozen_desc","Статусы заморожены. Получает на 50% меньше урона."
 "status_gangrene_desc","В последний ход наносит весь урон разом."
 
 "status_poison_dynamic_desc","Наносит %d урона в начале хода. Длительность: %d ходов."
 "status_bleed_dynamic_desc","Наносит %d × %d в начале хода. Длительность: %d ходов."
-"status_burn_dynamic_desc","Наносит %d × %d в начале хода. Длительность: %d ходов. Взрывается при 25 стаках."
-"status_cold_dynamic_desc","Снижает входящий урон на %.1f%%. Стаков: %d. Длительность: %d ходов. При 25 стаках замораживает."
+"status_burn_dynamic_desc","Наносит %d × %d в начале хода. Длительность: %d ходов. Взрывается при %d стаках."
+"status_cold_dynamic_desc","Снижает примой урон на %.1f%%. Стаков: %d. Длительность: %d ходов. При %d стаках замораживает."
 "status_strength_dynamic_desc","Увеличивает урон на %d. Длительность: %d ходов."
 "status_regen_dynamic_desc","Лечит %d HP в конце хода. Длительность: %d ходов."
 "status_shield_dynamic_desc","Поглощает %d урона. Длительность: %d ходов."

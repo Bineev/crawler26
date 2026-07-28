@@ -6,6 +6,8 @@ var action_data: Dictionary = {}  # дополнительные данные д
 var context_object: Node = null  # 🆕 ссылка на объект, вызвавший действие
 var event_data: EventResource = null
 var room_object: RoomObject = null
+var result_timer: Timer = null
+var result_label: Label = null
 
 @onready var dark_overlay: ColorRect = $DarkOverlay
 @onready var title_label: Label = $DarkOverlay/CenterContainer/VBoxContainer/Title
@@ -15,6 +17,11 @@ func setup(title: String, actions_array: Array[DataManager.ActionType], context:
 	actions = actions_array
 	action_data = data
 	context_object = context
+	
+	result_timer = Timer.new()
+	add_child(result_timer)
+	result_timer.one_shot = true
+	result_timer.wait_time = 5.0
 	
 	title_label.text = title
 	_animate_in()
@@ -222,7 +229,7 @@ func _generate_rewards(action: DataManager.ActionType, success: bool) -> Array[D
 			if success:
 				# Ключ — всегда хорошие награды
 				rewards.append(DataManager.RewardType.GOLD)
-				rewards.append(DataManager.RewardType.CARD_BIOM)
+				rewards.append(DataManager.RewardType.CARD_WITHOUT_CHOICE)
 				
 				# Шанс на артефакт (20%)
 				if randf() < 0.2:
@@ -238,7 +245,7 @@ func _generate_rewards(action: DataManager.ActionType, success: bool) -> Array[D
 				
 				# Шанс на карту (40%)
 				if randf() < 0.4:
-					rewards.append(DataManager.RewardType.CARD_BIOM)
+					rewards.append(DataManager.RewardType.CARD_WITHOUT_CHOICE)
 				
 				# Шанс на зелье (20%)
 				if randf() < 0.2:
@@ -462,7 +469,7 @@ func _handle_search_trap() -> void:
 		rewards = [DataManager.RewardType.GOLD, DataManager.RewardType.POTION]
 	else:
 		await _show_result_label(tr("trap_search_fail"), DataManager.COLOR_PENITENT_ART_BG_DARK)
-		rewards = [DataManager.RewardType.GOLD, DataManager.RewardType.TAKE_DAMAGE]
+		rewards = [DataManager.RewardType.TAKE_DAMAGE, DataManager.RewardType.GOLD]
 	
 	var reward_panel = preload("res://scenes/reward_panel.tscn").instantiate() as RewardPanel
 	reward_panel.reward_types = rewards
@@ -617,11 +624,18 @@ func _handle_event(action: DataManager.ActionType) -> void:
 	# 🆕 Оттеняемся (затемнение исчезает)
 	_animate_out()
 	
-	# 🆕 Показываем текст результата
+	# Показываем текст результата
 	if room_object and not result_key.is_empty():
-		await room_object.print_narrative(tr(result_key))
-	# 🆕 Ждём 1.5 секунды
-	await get_tree().create_timer(3).timeout
+		result_label = await room_object.print_narrative(tr(result_key))
+		
+		# 🆕 Добавляем обработчик клика на текст
+		if result_label:
+			result_label.mouse_filter = Control.MOUSE_FILTER_STOP
+			result_label.gui_input.connect(_on_result_label_clicked)
+		
+		# 🆕 Запускаем таймер
+		result_timer.start()
+		await result_timer.timeout
 	
 	# 🆕 Парсим награды (заглушка)
 	var rewards: Array[DataManager.RewardType] = []
@@ -736,7 +750,15 @@ func _handle_event(action: DataManager.ActionType) -> void:
 	SignalManager.show_reward.emit(reward_panel)
 	queue_free()
 	
-	
+func _on_result_label_clicked(event: InputEvent) -> void:
+	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
+		if result_label:
+			result_label.gui_input.disconnect(_on_result_label_clicked)
+			result_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		
+		# 🆕 Уменьшаем оставшееся время до 0.1 секунды
+		if result_timer and result_timer.is_stopped() == false:
+			result_timer.timeout.emit()
 	
 	
 	

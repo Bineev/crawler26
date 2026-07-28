@@ -169,7 +169,8 @@ func take_damage(amount: int, ignore_block: bool = false, attacker: CharacterSta
 	if has_status(DataManager.Status.COLD):
 		var cold_stacks = get_status_stacks(DataManager.Status.COLD)
 		var cold_multiplier = 1.0 - (cold_stacks * RunManager.cold_effect_percent)
-		damage *= max(cold_multiplier, RunManager.cold_min_multiplier)
+		if is_direct:
+			damage *= max(cold_multiplier, RunManager.cold_min_multiplier)
 	
 	damage = floor(damage)
 	
@@ -365,11 +366,11 @@ func _add_status_direct(status: StatusResource, stacks: int, duration: int, cast
 	# Визуальные эффекты
 	if self is EnemyInstance and DataManager.is_negative_status(status_id):
 		SignalManager.enemy_get_debuff.emit(self)
-		SignalManager.something_get_debuff.emit()
+		SignalManager.something_get_debuff.emit(self)
 	# Визуальные эффекты
 	elif self is PenitentStats and DataManager.is_negative_status(status_id):
 		SignalManager.player_get_debuff.emit()
-		SignalManager.something_get_debuff.emit()
+		SignalManager.something_get_debuff.emit(self)
 	
 	# Проверка на заморозку (для COLD)
 	if status_id == DataManager.Status.COLD:

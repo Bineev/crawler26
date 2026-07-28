@@ -20,6 +20,16 @@ var transform_attempts: int = 0
 var max_transform_attempts: int = 3
 var confirm_button : Button
 var shop_items: Array[Dictionary] = []
+var hover_tween: Tween = null
+var _last_hovered_vbox: Control = null
+
+enum ItemState {
+	IDLE,
+	HOVERED,
+	UNHOVERED,
+}
+
+var item_tweens: Dictionary = {}  # key: Control (vbox), value: { "tween": Tween, "state": ItemState }
 
 @onready var title_label: Label = $Title
 @onready var rewards_container: HBoxContainer = $HBoxContainer
@@ -65,6 +75,107 @@ func setup(type: DataManager.RewardType, items: Array) -> void:
 			_setup_lost_max_hp_reward()
 		DataManager.RewardType.TRADE:
 			_setup_trade_reward()
+
+	# 🆕 Добавляем анимацию наведения для поддерживаемых типов
+	_setup_hover_animation()
+
+
+func _setup_hover_animation():
+	var hover_types = [
+		DataManager.RewardType.CARD_BIOM,
+		DataManager.RewardType.CARD_CHARACTER,
+		DataManager.RewardType.CARD_WITHOUT_CHOICE,
+		DataManager.RewardType.CONCRETE_CARD,
+		DataManager.RewardType.ARTIFACT,
+		DataManager.RewardType.ARTIFACT_ELITE,
+		DataManager.RewardType.ARTIFACT_WITHOUT_CHOICE,
+		DataManager.RewardType.CONCRETE_ARTIFACT,
+		DataManager.RewardType.POTION,
+	]
+	
+	if reward_type not in hover_types:
+		return
+	
+	for child in rewards_container.get_children():
+		var button = _find_button(child)
+		if button:
+			# Инициализируем структуру данных для этого vbox
+			_get_item_data(child)
+			
+			button.mouse_entered.connect(_on_item_hovered.bind(child))
+			button.mouse_exited.connect(_on_item_unhovered.bind(child))
+
+func _find_button(node: Node) -> Button:
+	# Ищем кнопку внутри VBoxContainer
+	for child in node.get_children():
+		if child is Button:
+			return child
+	return null
+
+func _get_item_data(vbox: Control) -> Dictionary:
+	if not item_tweens.has(vbox):
+		item_tweens[vbox] = {
+			"tween": null,
+			"state": ItemState.IDLE,
+		}
+	return item_tweens[vbox]
+
+func _on_item_hovered(vbox: Control):
+	var first_child = vbox.get_child(0)
+	if not first_child:
+		return
+	
+	var data = _get_item_data(vbox)
+	
+	# Если уже в состоянии HOVERED — ничего не делаем
+	if data.state == ItemState.HOVERED:
+		return
+	
+	# Убиваем старый твин (если есть)
+	if data.tween:
+		data.tween.kill()
+		data.tween = null
+	
+	# Мгновенно устанавливаем начальное состояние
+	first_child.scale = Vector2.ONE
+	
+	var new_tween = create_tween()
+	new_tween.tween_property(first_child, "scale", Vector2(1.05, 1.05), 0.1).set_ease(Tween.EASE_OUT)
+	data.tween = new_tween
+	data.tween.finished.connect(func(): 
+		data.tween = null
+	)
+	
+	data.state = ItemState.HOVERED
+
+func _on_item_unhovered(vbox: Control):
+	var first_child = vbox.get_child(0)
+	if not first_child:
+		return
+	
+	var data = _get_item_data(vbox)
+	
+	# Если уже в состоянии IDLE — ничего не делаем
+	if data.state == ItemState.IDLE:
+		return
+	
+	# Убиваем старый твин (если есть)
+	if data.tween:
+		data.tween.kill()
+		data.tween = null
+	
+	# Мгновенно устанавливаем начальное состояние
+	first_child.scale = Vector2(1.05, 1.05)
+	
+	# Создаём новый твин
+	var new_tween = create_tween()
+	new_tween.tween_property(first_child, "scale", Vector2.ONE, 0.1).set_ease(Tween.EASE_IN)
+	data.tween = new_tween
+	data.tween.finished.connect(func(): 
+		data.tween = null
+	)
+	
+	data.state = ItemState.IDLE
 
 
 func _setup_title() -> void:
@@ -475,9 +586,9 @@ func _setup_energy_buff_reward() -> void:
 	var duration_text = ""
 	
 	if buff_duration == -1:
-		duration_text = tr("energy_buff_permanent")
+		duration_text = tr("buff_permanent")
 	else:
-		duration_text = tr("energy_buff_duration") % buff_duration
+		duration_text = tr("buff_duration") % buff_duration
 	
 	var vbox = VBoxContainer.new()
 	vbox.alignment = BoxContainer.ALIGNMENT_CENTER
@@ -525,6 +636,7 @@ func _setup_deck_size_buff_reward() -> void:
 	if buff_duration == -1:
 		duration_text = tr("buff_permanent")
 	else:
+		#BUG
 		duration_text = tr("buff_duration") % buff_duration
 	
 	var vbox = VBoxContainer.new()
@@ -1050,9 +1162,8 @@ func _setup_transform_card_reward() -> void:
 		
 		grid.add_child(card_wrapper)
 		card_ui.display()
-		card_ui.card_control.scale = card_scale
+		card_ui.card_control.scale = Vector2(card_scale, card_scale)
 		card_ui.set_reward_state()
-		card_wrapper.custom_minimum_size = card_ui.get_actual_size()
 		
 		card_wrapper.gui_input.connect(_on_transform_card_selected.bind(card_data, card_wrapper))
 	scroll.custom_minimum_size = Vector2(4 * card_size.x * 1.2 + 3 * 20 + 20 , 2 * card_size.y * 1.2 + 20)

@@ -156,7 +156,7 @@ signal player_hit_in_shield()
 signal enemy_get_debuff(target: Node)
 signal player_get_debuff()
 
-signal something_get_debuff()
+signal something_get_debuff(target: CharacterStats)
 
 signal tooltip_requested(tooltip_data: Dictionary, position: Vector2)
 signal hide_tooltip()

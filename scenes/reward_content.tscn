@@ -18,5 +18,5 @@ layout_mode = 2
 [node name="HBoxContainer" type="HBoxContainer" parent="."]
 layout_mode = 2
 mouse_filter = 2
-theme_override_constants/separation = 10
+theme_override_constants/separation = 20
 alignment = 1

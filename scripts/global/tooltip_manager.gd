@@ -142,10 +142,13 @@ func _get_dynamic_status_description(status_id: DataManager.Status, stacks: int,
 			return tr("status_bleed_dynamic_desc") % [damage_per_stack, stacks, duration]
 		DataManager.Status.BURN:
 			var damage_per_stack = RunManager.burn_damage_per_stack
-			return tr("status_burn_dynamic_desc") % [damage_per_stack, stacks, duration]
+			var total_damage = stacks * damage_per_stack
+			var threshold = RunManager.burn_threshold_stacks
+			return tr("status_burn_dynamic_desc") % [damage_per_stack, stacks, duration, threshold]
 		DataManager.Status.COLD:
 			var percent = stacks * RunManager.cold_effect_percent * 100
-			return tr("status_cold_dynamic_desc") % [percent, stacks, duration]
+			var threshold = RunManager.cold_freeze_threshold
+			return tr("status_cold_dynamic_desc") % [percent, stacks, duration, threshold]
 		DataManager.Status.STRENGTH:
 			var bonus = stacks * RunManager.strength_bonus_per_stack
 			return tr("status_strength_dynamic_desc") % [bonus, duration]
@@ -379,13 +382,13 @@ func request_artifact_tooltip(artifact: ArtifactResource, position: Vector2):
 
 func _build_artifact_tooltip_data(artifact: ArtifactResource) -> Dictionary:
 	var desc = artifact.get_localized_description()
-	var additional = _get_artifact_additional_info(artifact)
+	#var additional = _get_artifact_additional_info(artifact)
 	
 	return {
 		"icon": artifact.get_icon(),
 		"title": artifact.get_localized_name(),
 		"description": desc,
-		"additional_info": additional,
+		#"additional_info": additional,
 	}
 
 func _get_artifact_additional_info(artifact: ArtifactResource) -> String:

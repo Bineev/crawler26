@@ -10,6 +10,12 @@ extends Node
 ## СОСТОЯНИЯ КАРТ
 ## ============================================================
 
+enum EnemyAnimationState {
+	IDLE,
+	ATTACK,
+	GET_HIT,
+}
+
 enum ButtonType {
 	DEFAULT,
 	PRIMARY,
@@ -593,8 +599,8 @@ const BURN_STRENGTH_DURATION: int = 2
 const COLD_EFFECT_PERCENT_PER_STACK: float = 0.01
 const COLD_MIN_EFFECT_MULTIPLIER: float = 0.75
 #BUG
-const COLD_FREEZE_THRESHOLD: int = 5
-const COLD_DEFAULT_DURATION: int = 5  # ← изменено с 3 на 5
+const COLD_FREEZE_THRESHOLD: int = 15
+const COLD_DEFAULT_DURATION: int = 3  # ← изменено с 3 на 5
 const FROZEN_DURATION: int = 1  # заморозка на 1 ход
 #BUG
 const WEAKNESS_DAMAGE_MULTIPLIER: float = 0.75
@@ -1202,35 +1208,67 @@ func get_card_default_name(card_id: CardId) -> String:
 ## СПРАЙТЫ ВРАГОВ
 ## ============================================================
 
-var _enemy_sprites: Dictionary = {}  # "biome_enemy" -> Texture2D
+## ============================================================
+## СПРАЙТЫ ВРАГОВ (с поддержкой анимации)
+## ============================================================
+
+var _enemy_sprites: Dictionary = {}  # "biome_enemy_state" -> Texture2D
+
+func load_enemy_sprites_for_biome(biome: DataManager.Biome, enemy_data: Array, base_path: String):
+	# Соответствие состояний суффиксам файлов
+	var state_suffix = {
+		EnemyAnimationState.IDLE: "1",
+		EnemyAnimationState.ATTACK: "2",
+		EnemyAnimationState.GET_HIT: "3",
+	}
+	
+	for enemy in enemy_data:
+		var enemy_folder = base_path + enemy.folder + "/"
+		for state in EnemyAnimationState.values():
+			var suffix = state_suffix[state]
+			var path = enemy_folder + enemy.file + "_" + suffix + ".png"
+			_register_enemy_sprite(biome, enemy.id, state, path)
 
 func load_enemy_sprites():
-	# Кротовые норы (Mole Tunnels)
-	_register_enemy_sprite(DataManager.Biome.MOLE_TUNNELS, DataManager.EnemyId.MOLE_MUTANT, "res://img/enemies/mole_tunnels/mole_mutant.png")
-	_register_enemy_sprite(DataManager.Biome.MOLE_TUNNELS, DataManager.EnemyId.STRONG_MOLE, "res://img/enemies/mole_tunnels/strong_mole.png")
-	_register_enemy_sprite(DataManager.Biome.MOLE_TUNNELS, DataManager.EnemyId.RABID_RAT, "res://img/enemies/mole_tunnels/rabid_rat.png")
-	_register_enemy_sprite(DataManager.Biome.MOLE_TUNNELS, DataManager.EnemyId.MOLE_FUNGUS, "res://img/enemies/mole_tunnels/mole_fungus.png")
-	_register_enemy_sprite(DataManager.Biome.MOLE_TUNNELS, DataManager.EnemyId.MANY_HEADED_MOLE, "res://img/enemies/mole_tunnels/many_headed_mole.png")
-	_register_enemy_sprite(DataManager.Biome.MOLE_TUNNELS, DataManager.EnemyId.FUNGAL_MINER, "res://img/enemies/mole_tunnels/fungal_miner.png")
-	_register_enemy_sprite(DataManager.Biome.MOLE_TUNNELS, DataManager.EnemyId.RODENT_MOUND, "res://img/enemies/mole_tunnels/rodent_mound.png")
+	# Кротовые норы
+	load_enemy_sprites_for_biome(
+		DataManager.Biome.MOLE_TUNNELS,
+		[
+			{id = DataManager.EnemyId.MOLE_MUTANT, folder = "mole_mutant", file = "mole_mutant"},
+			{id = DataManager.EnemyId.STRONG_MOLE, folder = "strong_mole", file = "strong_mole"},
+			{id = DataManager.EnemyId.RABID_RAT, folder = "rabid_rat", file = "rabid_rat"},
+			{id = DataManager.EnemyId.MOLE_FUNGUS, folder = "mole_fungus", file = "mole_fungus"},
+			{id = DataManager.EnemyId.MANY_HEADED_MOLE, folder = "many_headed_mole", file = "many_headed_mole"},
+			{id = DataManager.EnemyId.FUNGAL_MINER, folder = "fungal_miner", file = "fungal_miner"},
+			{id = DataManager.EnemyId.RODENT_MOUND, folder = "rodent_mound", file = "rodent_mound"},
+		],
+		"res://img/enemies/mole_tunnels/"
+	)
 
-func _register_enemy_sprite(biome: DataManager.Biome, enemy_id, path: String):
-	var key = str(biome) + "_" + str(enemy_id)
+func _register_enemy_sprite(biome: DataManager.Biome, enemy_id, state: EnemyAnimationState, path: String):
+	var key = str(biome) + "_" + str(enemy_id) + "_" + str(state)
 	if ResourceLoader.exists(path):
 		_enemy_sprites[key] = load(path)
 	else:
-		printerr("Enemy sprite not found: ", path)
+		printerr("Enemy sprite not found: ", path, " for state: ", state)
 
-func get_enemy_sprite(enemy_id, biome: DataManager.Biome) -> Texture2D:
+## Получить спрайт врага для конкретного состояния
+func get_enemy_sprite(enemy_id, biome: DataManager.Biome, state: EnemyAnimationState = EnemyAnimationState.IDLE) -> Texture2D:
 	if _enemy_sprites.is_empty():
 		load_enemy_sprites()
 	
-	var key = str(biome) + "_" + str(enemy_id)
+	var key = str(biome) + "_" + str(enemy_id) + "_" + str(state)
 	var sprite = _enemy_sprites.get(key)
 	
-	# Если спрайт не найден, возвращаем заглушку
+	# Если спрайт не найден, пробуем использовать IDLE для этого врага
+	if not sprite and state != EnemyAnimationState.IDLE:
+		# Пробуем найти IDLE спрайт
+		var idle_key = str(biome) + "_" + str(enemy_id) + "_" + str(EnemyAnimationState.IDLE)
+		sprite = _enemy_sprites.get(idle_key)
+	
+	# Если всё ещё не найден, возвращаем заглушку
 	if not sprite:
-		printerr("Missing sprite for enemy: ", enemy_id, " in biome: ", biome)
+		printerr("Missing sprite for enemy: ", enemy_id, " in biome: ", biome, " state: ", state)
 		return _get_fallback_sprite()
 	
 	return sprite
@@ -1238,6 +1276,55 @@ func get_enemy_sprite(enemy_id, biome: DataManager.Biome) -> Texture2D:
 func _get_fallback_sprite() -> Texture2D:
 	# Заглушка на случай отсутствия спрайта
 	return load("res://img/enemies/fallback.png")
+
+## Получить все спрайты врага для анимации (возвращает словарь)
+func get_enemy_animation_frames(enemy_id, biome: DataManager.Biome) -> Dictionary:
+	var frames = {}
+	for state in EnemyAnimationState.values():
+		var sprite = get_enemy_sprite(enemy_id, biome, state)
+		if sprite:
+			frames[state] = sprite
+	return frames
+
+
+
+#
+#var _enemy_sprites: Dictionary = {}  # "biome_enemy" -> Texture2D
+#
+#func load_enemy_sprites():
+	## Кротовые норы (Mole Tunnels)
+	#_register_enemy_sprite(DataManager.Biome.MOLE_TUNNELS, DataManager.EnemyId.MOLE_MUTANT, "res://img/enemies/mole_tunnels/mole_mutant.png")
+	#_register_enemy_sprite(DataManager.Biome.MOLE_TUNNELS, DataManager.EnemyId.STRONG_MOLE, "res://img/enemies/mole_tunnels/strong_mole.png")
+	#_register_enemy_sprite(DataManager.Biome.MOLE_TUNNELS, DataManager.EnemyId.RABID_RAT, "res://img/enemies/mole_tunnels/rabid_rat.png")
+	#_register_enemy_sprite(DataManager.Biome.MOLE_TUNNELS, DataManager.EnemyId.MOLE_FUNGUS, "res://img/enemies/mole_tunnels/mole_fungus.png")
+	#_register_enemy_sprite(DataManager.Biome.MOLE_TUNNELS, DataManager.EnemyId.MANY_HEADED_MOLE, "res://img/enemies/mole_tunnels/many_headed_mole.png")
+	#_register_enemy_sprite(DataManager.Biome.MOLE_TUNNELS, DataManager.EnemyId.FUNGAL_MINER, "res://img/enemies/mole_tunnels/fungal_miner.png")
+	#_register_enemy_sprite(DataManager.Biome.MOLE_TUNNELS, DataManager.EnemyId.RODENT_MOUND, "res://img/enemies/mole_tunnels/rodent_mound.png")
+#
+#func _register_enemy_sprite(biome: DataManager.Biome, enemy_id, path: String):
+	#var key = str(biome) + "_" + str(enemy_id)
+	#if ResourceLoader.exists(path):
+		#_enemy_sprites[key] = load(path)
+	#else:
+		#printerr("Enemy sprite not found: ", path)
+#
+#func get_enemy_sprite(enemy_id, biome: DataManager.Biome) -> Texture2D:
+	#if _enemy_sprites.is_empty():
+		#load_enemy_sprites()
+	#
+	#var key = str(biome) + "_" + str(enemy_id)
+	#var sprite = _enemy_sprites.get(key)
+	#
+	## Если спрайт не найден, возвращаем заглушку
+	#if not sprite:
+		#printerr("Missing sprite for enemy: ", enemy_id, " in biome: ", biome)
+		#return _get_fallback_sprite()
+	#
+	#return sprite
+#
+#func _get_fallback_sprite() -> Texture2D:
+	## Заглушка на случай отсутствия спрайта
+	#return load("res://img/enemies/fallback.png")
 ## ============================================================
 ## РЕСУРСЫ ВРАГОВ
 ## ============================================================
