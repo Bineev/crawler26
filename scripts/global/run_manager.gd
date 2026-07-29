@@ -658,7 +658,7 @@ func reset_run_constants():
 	# === Балансные константы ===
 	starting_hand_size = DataManager.STARTING_HAND_SIZE
 	cards_to_draw_per_turn = DataManager.CARDS_TO_DRAW_PER_TURN
-	max_energy = DataManager.MAX_ENERGY
+	max_energy = DataManager.MAX_ENERGY + 5
 	
 	# === Стартовые валюты ===
 	starting_coins = DataManager.STARTING_COINS

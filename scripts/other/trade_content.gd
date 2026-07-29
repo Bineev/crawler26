@@ -121,7 +121,14 @@ func _get_price(item: Dictionary) -> int:
 	if data.has_method("get_cost_grade"):
 		grade = data.get_cost_grade()
 	
-	return int(grade) * RunManager.default_item_cost
+	var base_price = int(grade) * RunManager.default_item_cost
+	
+	# 🆕 Добавляем разброс ±20% (от 0.8 до 1.2)
+	var variance = randf_range(0.7, 1.3)
+	var final_price = floor(base_price * variance)
+	
+	# Минимальная цена — 1
+	return max(1, final_price)
 
 
 func _update_buttons() -> void:

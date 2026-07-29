@@ -83,9 +83,8 @@ func remove_card(card_ui: CardUI):
 			layout_cards()
 
 func layout_cards():
-	#BUG
 	var card_count = cards_container.get_child_count()
-	print("layout_cards: card_count=", card_count)  # ← отладка
+	print("layout_cards: card_count=", card_count)
 	if card_count == 0:
 		return
 	
@@ -104,7 +103,14 @@ func layout_cards():
 			continue
 		
 		var x_pos = start_x + i * (card_width + DataManager.CARD_SPACING_IN_HAND)
-		var t = float(i) / float(card_count - 1)
+		
+		# 🆕 Защита от деления на ноль
+		var t: float
+		if card_count == 1:
+			t = 0.5
+		else:
+			t = float(i) / float(card_count - 1)
+		
 		var y_offset = -arc_height * (1.0 - abs(t * 2.0 - 1.0))
 		var y_pos = base_y + y_offset
 		
@@ -329,7 +335,14 @@ func _calculate_card_positions() -> Array[Vector2]:
 	
 	for i in range(card_count):
 		var x_pos = start_x + i * (card_width + DataManager.CARD_SPACING_IN_HAND)
-		var t = float(i) / float(card_count - 1)
+		
+		# 🆕 Если только одна карта — центрируем без дуги
+		var t: float
+		if card_count == 1:
+			t = 0.5
+		else:
+			t = float(i) / float(card_count - 1)
+		
 		var y_offset = -arc_height * (1.0 - abs(t * 2.0 - 1.0))
 		var y_pos = base_y + y_offset
 		
@@ -342,6 +355,12 @@ func _calculate_card_positions() -> Array[Vector2]:
 			card.original_position = target_position
 			card.original_z_index = i
 			card.z_index = i
+	
+	
+	print("card_count: ", card_count)
+	print("screen_size: ", screen_size)
+	print("card_height: ", card_height)
+	print("base_y: ", base_y)
 	
 	return positions
 

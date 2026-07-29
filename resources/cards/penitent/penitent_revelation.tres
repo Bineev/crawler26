@@ -2,13 +2,25 @@
 
 [ext_resource type="Script" uid="uid://cmra25r1r3ivt" path="res://resources/res_scripts/effect_entry.gd" id="1_mofk5"]
 [ext_resource type="Script" uid="uid://badcs22cck6n5" path="res://resources/res_scripts/card_data.gd" id="2_dl0ou"]
-[ext_resource type="Resource" uid="uid://e2kya1kjmt6" path="res://resources/effects/effect_penitent_revelation.tres" id="2_te7es"]
-[ext_resource type="Resource" uid="uid://cic6cvpby2bnd" path="res://resources/effects/effect_penitent_revelation2.tres" id="3_h30dn"]
+
+[sub_resource type="Resource" id="Resource_t2mea"]
+script = ExtResource("1_mofk5")
+target = 0
+base_value = 5
+metadata/_custom_type_script = "uid://cmra25r1r3ivt"
+
+[sub_resource type="Resource" id="Resource_iyhvj"]
+script = ExtResource("1_mofk5")
+target = 2
+base_value = 10
+metadata/_custom_type_script = "uid://cmra25r1r3ivt"
 
 [resource]
 script = ExtResource("2_dl0ou")
 id = 2
+is_burned = true
 name_key = "card_penitent_revelation_name"
 description_key = "card_penitent_revelation_desc"
-effects = Array[ExtResource("1_mofk5")]([ExtResource("2_te7es"), ExtResource("3_h30dn")])
+cost = 0
+effects = Array[ExtResource("1_mofk5")]([SubResource("Resource_t2mea"), SubResource("Resource_iyhvj")])
 metadata/_custom_type_script = "uid://badcs22cck6n5"

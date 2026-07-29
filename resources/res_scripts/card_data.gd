@@ -9,6 +9,9 @@ class_name CardData
 ## Уникальный ID карты
 @export var id: DataManager.CardId
 
+## 🆕 Сжигается ли карта после использования
+@export var is_burned: bool = false
+
 ## Грейд стоимости в магазине
 @export var cost_grade: DataManager.CostGrade = DataManager.CostGrade.NORMAL
 
@@ -247,6 +250,7 @@ func duplicate_for_instance() -> CardData:
 	# 🆕 Добавляем новые поля
 	copy.upgrade_type = upgrade_type
 	copy.is_can_upgrade = is_can_upgrade
+	copy.is_burned = is_burned  # 🆕
 	
 	for effect in effects:
 		copy.effects.append(effect.duplicate_for_instance())
@@ -283,6 +287,9 @@ func _effect_to_string(effect: EffectEntry) -> String:
 	
 	match effect.category:
 		DataManager.EffectCategory.DAMAGE:
+			# 🆕 Для SELF урона используем другой ключ
+			if effect.target == DataManager.EffectTarget.SELF:
+				return tr("effect_damage_self") % effect.base_value
 			return tr("effect_damage") % [target_text, effect.base_value]
 		
 		DataManager.EffectCategory.BLOCK:
@@ -305,12 +312,41 @@ func _effect_to_string(effect: EffectEntry) -> String:
 
 		DataManager.EffectCategory.APPLY_PASSIVE:
 			if effect.passive:
-				return tr("effect_apply_passive") % [_get_target_action_for_status(effect.target), effect.passive.get_localized_name()]
+				var passive_name = effect.passive.get_localized_name()
+				var charges_text = _get_passive_charges_text(effect)
+				
+				match effect.target:
+					DataManager.EffectTarget.SELF:
+						return tr("effect_apply_passive_self") % [passive_name, charges_text]
+					DataManager.EffectTarget.ENEMY:
+						return tr("effect_apply_passive_enemy") % [passive_name, charges_text]
+					DataManager.EffectTarget.ALL_ENEMIES:
+						return tr("effect_apply_passive_all_enemies") % [passive_name, charges_text]
+					DataManager.EffectTarget.ALL_ALLIES:
+						return tr("effect_apply_passive_all_allies") % [passive_name, charges_text]
+					DataManager.EffectTarget.ANY:
+						return tr("effect_apply_passive_any") % [passive_name, charges_text]
+					_:
+						return tr("effect_apply_passive") % [passive_name, charges_text]
 			return ""
 		
 		DataManager.EffectCategory.MODIFY_STAT:
-			var stat_name = DataManager.FlatStat.keys()[effect.target_stat]
-			return tr("effect_modify_stat") % [_get_target_action(effect.target), stat_name, effect.delta]
+			var stat_name = _get_stat_name(effect.target_stat)
+			var delta_text = _format_delta(effect.delta)
+			
+			match effect.target:
+				DataManager.EffectTarget.SELF:
+					return tr("effect_modify_stat_self") % [stat_name, delta_text]
+				DataManager.EffectTarget.ENEMY:
+					return tr("effect_modify_stat_enemy") % [stat_name, delta_text]
+				DataManager.EffectTarget.ALL_ENEMIES:
+					return tr("effect_modify_stat_all_enemies") % [stat_name, delta_text]
+				DataManager.EffectTarget.ALL_ALLIES:
+					return tr("effect_modify_stat_all_allies") % [stat_name, delta_text]
+				DataManager.EffectTarget.ANY:
+					return tr("effect_modify_stat_any") % [stat_name, delta_text]
+				_:
+					return tr("effect_modify_stat") % [target_text, stat_name, delta_text]
 		
 		DataManager.EffectCategory.DRAW_CARD:
 			return tr("effect_draw_card") % effect.amount
@@ -319,19 +355,34 @@ func _effect_to_string(effect: EffectEntry) -> String:
 			return tr("effect_gain_energy") % effect.amount
 		
 		DataManager.EffectCategory.SCALED_VALUE:
-			var resource_name = DataManager.ScaledResource.keys()[effect.scaled_resource]
-			match effect.scaled_type:
-				DataManager.ScaledType.DAMAGE:
-					return tr("effect_scaled_damage") % [resource_name]
-				DataManager.ScaledType.BLOCK:
-					return tr("effect_scaled_block") % [resource_name]
-				DataManager.ScaledType.HEAL:
-					return tr("effect_scaled_heal") % [resource_name]
-				DataManager.ScaledType.GAIN_ENERGY:
-					return tr("effect_scaled_energy") % resource_name
-				DataManager.ScaledType.DRAW_CARD:
-					return tr("effect_scaled_draw") % resource_name
-			return ""
+			var resource_name = _get_scaled_resource_name(effect.scaled_resource)
+			var values_text = _format_scaled_values(effect.scaled_values)
+			var thresholds_text = _format_scaled_thresholds(effect.scaled_thresholds, effect.scaled_compare)
+			var spend_text = _get_scaled_spend_text(effect.scaled_spend_resource)
+			var type_name = _get_scaled_type_name(effect.scaled_type)
+			
+			# 🆕 Для DAMAGE используем другие ключи
+			if effect.scaled_type == DataManager.ScaledType.DAMAGE:
+				match effect.target:
+					DataManager.EffectTarget.ENEMY:
+						return tr("effect_scaled_damage_enemy") % [values_text, resource_name, thresholds_text, spend_text]
+					DataManager.EffectTarget.ALL_ENEMIES:
+						return tr("effect_scaled_damage_all_enemies") % [values_text, resource_name, thresholds_text, spend_text]
+					DataManager.EffectTarget.ANY:
+						return tr("effect_scaled_damage_any") % [values_text, resource_name, thresholds_text, spend_text]
+					DataManager.EffectTarget.SELF:
+						return tr("effect_scaled_damage_self") % [values_text, resource_name, thresholds_text, spend_text]
+			
+			# Для остальных типов
+			match effect.target:
+				DataManager.EffectTarget.SELF:
+					return tr("effect_scaled_value_self") % [type_name, values_text, resource_name, thresholds_text, spend_text]
+				DataManager.EffectTarget.ENEMY:
+					return tr("effect_scaled_value_enemy") % [type_name, values_text, resource_name, thresholds_text, spend_text]
+				DataManager.EffectTarget.ALL_ENEMIES:
+					return tr("effect_scaled_value_all_enemies") % [type_name, values_text, resource_name, thresholds_text, spend_text]
+				_:
+					return tr("effect_scaled_value") % [type_name, values_text, resource_name, thresholds_text, spend_text]
 		
 		DataManager.EffectCategory.CONDITIONAL:
 			var condition_name = _get_condition_name(effect.condition_script)
@@ -448,6 +499,10 @@ func _post_process_description(desc: String) -> String:
 		
 		"en":
 			desc = _fix_multiple_dots(desc)
+
+	# 🆕 Добавляем информацию о сжигании, если карта сгораемая
+	if is_burned:
+		desc += "\n" + tr("card_is_burned")
 	
 	return desc
 
@@ -496,6 +551,17 @@ func _fix_russian_endings(desc: String) -> String:
 		" 8 карт": " 8 карт",
 		" 9 карт": " 9 карт",
 		
+		# Заряды
+		"1 заряд": " 1 заряд",
+		"2 заряд": " 2 заряда",
+		"3 заряд": " 3 заряда",
+		"4 заряд": " 4 заряда",
+		"5 заряд": " 5 зарядов",
+		"6 заряд": " 6 зарядов",
+		"7 заряд": " 7 зарядов",
+		"8 заряд": " 8 зарядов",
+		"9 заряд": " 9 зарядов",
+		
 		# Блок — всегда "блока"
 		" блок": " блока",
 		
@@ -524,3 +590,122 @@ func _fix_russian_endings(desc: String) -> String:
 
 func get_cost_grade() -> DataManager.CostGrade:
 	return cost_grade
+
+func _get_stat_name(stat: DataManager.FlatStat) -> String:
+	match stat:
+		DataManager.FlatStat.HEALTH:
+			return tr("stat_health")
+		DataManager.FlatStat.MAX_HEALTH:
+			return tr("stat_max_health")
+		DataManager.FlatStat.ENERGY:
+			return tr("stat_energy")
+		DataManager.FlatStat.MAX_ENERGY:
+			return tr("stat_max_energy")
+		DataManager.FlatStat.HAND_SIZE:
+			return tr("stat_hand_size")
+		DataManager.FlatStat.DRAW_PER_TURN:
+			return tr("stat_draw_per_turn")
+		DataManager.FlatStat.ATONEMENT:
+			return tr("stat_atonement")
+		DataManager.FlatStat.MAX_ATONEMENT:
+			return tr("stat_max_atonement")
+		_:
+			return DataManager.FlatStat.keys()[stat]
+			
+
+func _format_delta(delta: int) -> String:
+	if delta > 0:
+		return "+" + str(delta)
+	elif delta < 0:
+		return str(delta)  # уже с минусом
+	else:
+		return "0"
+
+
+func _get_passive_charges_text(effect: EffectEntry) -> String:
+	if not effect.passive:
+		return ""
+	
+	var charges = effect.passive_duration
+	if charges <= 0:
+		return ""
+	
+	return tr("passive_charges_info") % charges
+
+
+# resources/cards/card_data.gd
+
+func _get_scaled_resource_name(resource: DataManager.ScaledResource) -> String:
+	match resource:
+		DataManager.ScaledResource.ATONEMENT:
+			return tr("scaled_resource_atonement")
+		DataManager.ScaledResource.HEALTH:
+			return tr("scaled_resource_health")
+		DataManager.ScaledResource.MAX_HEALTH:
+			return tr("scaled_resource_max_health")
+		DataManager.ScaledResource.ENERGY:
+			return tr("scaled_resource_energy")
+		DataManager.ScaledResource.BLOCK:
+			return tr("scaled_resource_block")
+		DataManager.ScaledResource.ENEMY_STATUSES:
+			return tr("scaled_resource_enemy_statuses")
+		DataManager.ScaledResource.PLAYER_STATUSES:
+			return tr("scaled_resource_player_statuses")
+		DataManager.ScaledResource.BURN_STACKS:
+			return tr("scaled_resource_burn_stacks")
+		DataManager.ScaledResource.POISON_STACKS:
+			return tr("scaled_resource_poison_stacks")
+		DataManager.ScaledResource.BLEED_STACKS:
+			return tr("scaled_resource_bleed_stacks")
+		_:
+			return DataManager.ScaledResource.keys()[resource]
+
+func _get_scaled_type_name(type: DataManager.ScaledType) -> String:
+	match type:
+		DataManager.ScaledType.DAMAGE:
+			return tr("scaled_type_damage")
+		DataManager.ScaledType.BLOCK:
+			return tr("scaled_type_block")
+		DataManager.ScaledType.HEAL:
+			return tr("scaled_type_heal")
+		DataManager.ScaledType.GAIN_ENERGY:
+			return tr("scaled_type_energy")
+		DataManager.ScaledType.DRAW_CARD:
+			return tr("scaled_type_draw")
+		DataManager.ScaledType.APPLY_STATUS:
+			return tr("scaled_type_apply_status")
+		_:
+			return DataManager.ScaledType.keys()[type]
+
+func _format_scaled_values(values: Array[int]) -> String:
+	var parts: Array[String] = []
+	for value in values:
+		parts.append(str(value))
+	return "/".join(parts)
+
+func _format_scaled_thresholds(thresholds: Array[int], compare: DataManager.ScaledCompare) -> String:
+	var compare_symbol = _get_compare_symbol(compare)
+	var parts: Array[String] = []
+	for threshold in thresholds:
+		parts.append(str(threshold))
+	return "%s%s" % [compare_symbol, "/".join(parts)]
+
+func _get_compare_symbol(compare: DataManager.ScaledCompare) -> String:
+	match compare:
+		DataManager.ScaledCompare.GREATER_EQUAL:
+			return ">="
+		DataManager.ScaledCompare.LESSER_EQUAL:
+			return "<="
+		DataManager.ScaledCompare.GREATER:
+			return ">"
+		DataManager.ScaledCompare.LESSER:
+			return "<"
+		DataManager.ScaledCompare.EQUAL:
+			return "="
+		_:
+			return ""
+
+func _get_scaled_spend_text(spend: bool) -> String:
+	if spend:
+		return tr("scaled_spend_resource")
+	return ""

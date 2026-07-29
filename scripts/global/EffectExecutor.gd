@@ -221,11 +221,8 @@ func _execute_scaled_value(effect: EffectEntry, source, targets: Array) -> void:
 			printerr("Unknown scaled_resource: ", effect.scaled_resource)
 			return
 	
-	# Если нужно потратить ресурс
-	if effect.scaled_spend_resource:
-		_spend_scaled_resource(effect, source, resource_value)
 	# Получаем значение по порогам
-	var value = effect.get_scaled_value(resource_value)
+	var value = effect.get_scaled_value(resource_value, source)
 	
 	# Применяем эффект
 	match effect.scaled_type:

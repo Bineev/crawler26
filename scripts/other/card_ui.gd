@@ -429,18 +429,17 @@ func play_card(target = null):
 
 	# 🆕 Обрабатываем артефакты с триггером CARD_PLAYED_COUNTER
 	RunManager.process_artifacts_on_card_played(card_data)
+	
 
-	# Сначала анимация улёта
+	
 	if target and target is EnemyInstance:
 		await animate_to_target(target)  # ← await
 	else:
 		await animate_to_center()        # ← await
 
-	# Если карта сожжена — она уже удалится через burn анимацию
-	if state != DataManager.CardState.BURNED:
-		var battle_deck = BattleManager.get_battle_deck()
-		if battle_deck:
-			battle_deck.play_card(self, card_data, target)
+	var battle_deck = BattleManager.get_battle_deck()
+	if battle_deck:
+		battle_deck.play_card(self, card_data, target)
 
 
 func _needs_target() -> bool:
@@ -748,21 +747,8 @@ func play_burn_animation():
 		1.0, 
 		1
 	)
-	
+
 	# Сигнал сработает в самом конце, когда шейдер полностью догорит
-	tween.finished.connect(_on_burn_animation_finished)
-
-
-
-func _on_burn_animation_finished():
-	# Удаляем карту из родителя и перестраиваем руку
-	var hand_ui = hand_ui_ref
-	if hand_ui:
-		if get_parent():
-			get_parent().remove_child(self)
-		#hand_ui.layout_cards()
-	
-	queue_free()
 
 
 func animate_to_target(target_node: Node2D):
@@ -798,7 +784,6 @@ func animate_to_center():
 	current_tween.tween_property(self, "modulate", Color.TRANSPARENT, 0.25)
 	
 	await current_tween.finished
-	queue_free()
 
 
 func play_appear_animation(target_position: Vector2, delay: float = 0.0):

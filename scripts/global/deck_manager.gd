@@ -178,9 +178,9 @@ func _get_penitent_starting_deck() -> Array[CardData]:
 	
 	# Утилити
 	deck.append(DataManager.get_card(DataManager.CardId.PENITENT_REVELATION))
+	deck.append(DataManager.get_card(DataManager.CardId.PENITENT_REVELATION))
 	
 	# Защита
-	deck.append(DataManager.get_card(DataManager.CardId.ATONEMENT_BARRIER))
 	deck.append(DataManager.get_card(DataManager.CardId.ATONEMENT_BARRIER))
 	
 	return deck

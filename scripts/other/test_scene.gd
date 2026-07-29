@@ -19,18 +19,24 @@ func _process(delta):
 
 
 func play_slash_effect(amount : int):
+	if is_other_effect_played:
+		return
 	$SubViewportContainer.play_player_slash_effect()
 	$SubViewportContainer.shake_screen(3, 0.05)
 	$SubViewportContainer.trigger_hit_stop(0.15)
 
 
 func play_enemy_get_hit_effect():
+	if is_other_effect_played:
+		return
 	$SubViewportContainer.play_enemy_slash_effect()
 	$SubViewportContainer.shake_screen(2, 0.1)
 	$SubViewportContainer.trigger_hit_stop(0.07)
 
 
 func play_get_debuff_effect(target: CharacterStats):
+	if is_other_effect_played:
+		return
 	if target is EnemyInstance:
 		$SubViewportContainer.play_enemy_slash_effect()
 	$SubViewportContainer.shake_screen(3, 0.05)

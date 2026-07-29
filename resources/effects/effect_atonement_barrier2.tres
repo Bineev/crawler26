@@ -6,7 +6,7 @@
 script = ExtResource("1_l0kgw")
 category = 3
 target = 0
-scaled_values = Array[int]([0, 10, 16, 22])
-scaled_thresholds = Array[int]([0, 10, 20, 30])
+scaled_values = Array[int]([5, 10, 15])
+scaled_thresholds = Array[int]([0, 15, 30])
 scaled_spend_resource = true
 metadata/_custom_type_script = "uid://cmra25r1r3ivt"

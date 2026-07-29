@@ -422,3 +422,61 @@ upgrade_card_confirm,Upgrade
 "artifact_plague_amulet_name","Plague Amulet"
 "artifact_plague_amulet_desc","Activates Bleed and Poison interaction: combining these statuses creates Infection."
 "artifact_plague_amulet_lore","A dark amulet woven from bones and rat tails. Shamans used it to blend blood and poison into a single infection."
+
+"stat_health","Health"
+"stat_max_health","Max Health"
+"stat_energy","Energy"
+"stat_max_energy","Max Energy"
+"stat_hand_size","Hand Size"
+"stat_draw_per_turn","Draw per Turn"
+"stat_atonement","Atonement"
+"stat_max_atonement","Max Atonement"
+
+"effect_modify_stat_self","%s %s"
+"effect_modify_stat_enemy","Enemy %s %s"
+"effect_modify_stat_all_enemies","All Enemies %s %s"
+"effect_modify_stat_all_allies","All Allies %s %s"
+"effect_modify_stat_any","%s %s"
+
+"effect_apply_passive_self","Gain passive %s%s"
+"effect_apply_passive_enemy","Target gains passive %s%s"
+"effect_apply_passive_all_enemies","All enemies gain passive %s%s"
+"effect_apply_passive_all_allies","All allies gain passive %s%s"
+"effect_apply_passive_any","Everyone in room gains passive %s%s"
+"effect_apply_passive","%s%s"
+
+"passive_charges_info"," (%d charges)"
+
+"effect_damage_self","Deal %d damage to self"
+
+"scaled_resource_atonement","Atonement"
+"scaled_resource_health","Health"
+"scaled_resource_max_health","Max Health"
+"scaled_resource_energy","Energy"
+"scaled_resource_block","Block"
+"scaled_resource_enemy_statuses","number of statuses on enemy"
+"scaled_resource_player_statuses","number of statuses on character"
+"scaled_resource_burn_stacks","number of Burn stacks on character"
+"scaled_resource_poison_stacks","number of Poison stacks on character"
+"scaled_resource_bleed_stacks","number of Bleed stacks on character"
+
+"scaled_type_damage","Damage"
+"scaled_type_block","Block"
+"scaled_type_heal","Heal"
+"scaled_type_energy","Energy"
+"scaled_type_draw","Draw"
+"scaled_type_apply_status","Status"
+
+"scaled_spend_resource"," Resource spent"
+
+"effect_scaled_value_self","Gain %s (%s) based on %s (%s).%s"
+"effect_scaled_value_enemy","Enemy gains %s (%s) based on %s (%s).%s"
+"effect_scaled_value_all_enemies","All enemies gain %s (%s) based on %s (%s).%s"
+"effect_scaled_value","%s (%s) based on %s (%s).%s"
+
+"effect_scaled_damage_enemy","Deal (%s) damage to enemy based on %s (%s).%s"
+"effect_scaled_damage_all_enemies","Deal (%s) damage to all enemies based on %s (%s).%s"
+"effect_scaled_damage_any","Deal (%s) damage to everyone based on %s (%s).%s"
+"effect_scaled_damage_self","Deal (%s) damage to self based on %s (%s).%s"
+
+"card_is_burned","🔥 Burns"

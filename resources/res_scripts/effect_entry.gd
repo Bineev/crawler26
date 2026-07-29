@@ -247,7 +247,7 @@ func is_scaled() -> bool:
 	return category == DataManager.EffectCategory.SCALED_VALUE
 
 
-func get_scaled_value(resource_value: int) -> int:
+func get_scaled_value(resource_value: int, source: CharacterStats) -> int:
 	if scaled_values.is_empty():
 		return 0
 	
@@ -270,5 +270,7 @@ func get_scaled_value(resource_value: int) -> int:
 			DataManager.ScaledCompare.EQUAL:
 				if resource_value == threshold:
 					tier = i
-	
+		# Если нужно потратить ресурс
+	if scaled_spend_resource:
+		EffectExecutor._spend_scaled_resource(self, source, scaled_thresholds[tier])
 	return scaled_values[tier] if tier < scaled_values.size() else scaled_values[0]

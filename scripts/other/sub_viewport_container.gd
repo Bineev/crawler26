@@ -23,6 +23,7 @@ func _play_slash_effect() -> void:
 	if not material:
 		return
 	
+	get_parent().is_other_effect_played = true
 	material.set_shader_parameter("progress", 0.0)
 	
 	var tween = create_tween()
@@ -36,6 +37,8 @@ func _play_slash_effect() -> void:
 			material.set_shader_parameter("progress", 0.0)
 	)
 	await tween.finished
+	
+	get_parent().is_other_effect_played = false
 	
 	material = null
 

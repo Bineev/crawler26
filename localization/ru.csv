@@ -421,3 +421,61 @@ upgrade_card_confirm,Улучшить
 "artifact_plague_amulet_name","Чумной амулет"
 "artifact_plague_amulet_desc","Сочетание Кровотечения и Яда образует Инфекцию."
 "artifact_plague_amulet_lore","Тёмный амулет, сплетённый из костей и крысиных хвостов. Шаманы использовали его, чтобы смешивать кровь и яд в единое заражение."
+
+"stat_health","Здоровье"
+"stat_max_health","Макс. здоровье"
+"stat_energy","Энергия"
+"stat_max_energy","Макс. энергия"
+"stat_hand_size","Размер руки"
+"stat_draw_per_turn","Добор карт"
+"stat_atonement","Искупление"
+"stat_max_atonement","Макс. искупление"
+
+"effect_modify_stat_self","%s %s"
+"effect_modify_stat_enemy","%s цели %s"
+"effect_modify_stat_all_enemies","%s врагов %s"
+"effect_modify_stat_all_allies","%s союзников %s"
+"effect_modify_stat_any","%s %s"
+
+"effect_apply_passive_self","Получить эффект %s%s"
+"effect_apply_passive_enemy","Цель получит эффект %s%s"
+"effect_apply_passive_all_enemies","Все враги получат эффект %s%s"
+"effect_apply_passive_all_allies","Все союзники получат эффект %s%s"
+"effect_apply_passive_any","Все в комнате получат эффект %s%s"
+"effect_apply_passive","%s%s"
+
+"passive_charges_info"," (%d заряд)"
+
+"effect_damage_self","Нанести себе %d урон"
+
+"scaled_resource_atonement","Искупления"
+"scaled_resource_health","Здоровья"
+"scaled_resource_max_health","Макс. здоровья"
+"scaled_resource_energy","Энергии"
+"scaled_resource_block","Щита"
+"scaled_resource_enemy_statuses","количества статусов на враге"
+"scaled_resource_player_statuses","количества статусов на персонаже"
+"scaled_resource_burn_stacks","количества стаков Горения на персонаже"
+"scaled_resource_poison_stacks","количества стаков Яда на персонаже"
+"scaled_resource_bleed_stacks","количества стаков Кровотечения на персонаже"
+
+"scaled_type_damage","Урон"
+"scaled_type_block","Щит"
+"scaled_type_heal","Лечение"
+"scaled_type_energy","Энергию"
+"scaled_type_draw","Добор карт"
+"scaled_type_apply_status","Статус"
+
+"scaled_spend_resource"," Ресурс тратится"
+
+"effect_scaled_value_self","Получить %s (%s) исходя из %s (%s).%s"
+"effect_scaled_value_enemy","Враг получает %s (%s) исходя из %s (%s).%s"
+"effect_scaled_value_all_enemies","Все враги получают %s (%s) исходя из %s (%s).%s"
+"effect_scaled_value","%s (%s) исходя из %s (%s).%s"
+
+"effect_scaled_damage_enemy","Нанести цели (%s) урон исходя из %s (%s).%s"
+"effect_scaled_damage_all_enemies","Нанести всем врагам (%s) урон исходя из %s (%s).%s"
+"effect_scaled_damage_any","Нанести всем в комнате (%s) урон исходя из %s (%s).%s"
+"effect_scaled_damage_self","Нанести себе (%s) урон исходя из %s (%s).%s"
+
+"card_is_burned","🔥 Сгорает"
