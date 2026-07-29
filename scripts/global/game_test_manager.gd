@@ -11,7 +11,6 @@ var current_biome: DataManager.Biome = DataManager.Biome.MOLE_TUNNELS
 var current_room_index: int = 0
 var hand_ui : HandUI = null
 var blood_screen: BloodScreen = null
-# Ссылка на главную сцену (куда добавлять комнаты)
 var game_world: Node = null
 var battle_log: BattleLogUI = null
 var end_turn_button : EndTurnButton = null
@@ -23,8 +22,6 @@ var potion_full_label: Label = null
 var death_ui: DeathUI = null
 var tooltip_canvas: CanvasLayer = null
 var potion_icons: Array[PotionIcon] = []
-# Ссылка на RoomManager (будет доступен как автолоад)
-# RoomManager уже загружен как синглтон
 var is_ending_turn: bool = false
 var gold_display: GoldDisplay = null
 var key_display: KeyDisplay = null
@@ -32,34 +29,44 @@ var bone_display: BoneDisplay = null
 var sub_viewport: SubViewport = null
 var current_tooltip: Tooltip = null
 var hit_effect: HitEffect = null
+
+## Выбранный персонаж для текущего забега
+var selected_character: DataManager.CharacterClass = DataManager.CharacterClass.PENITENT
+
 ## ============================================================
 ## ПУБЛИЧНЫЕ МЕТОДЫ
 ## ============================================================
 
-
-
 func start_test(world_node: Node):
 	print("=== GAME TEST START ===")
 	DataManager.load_sounds()
-		# Устанавливаем русский язык
 	TranslationServer.set_locale("ru")
 	game_world = world_node
+	
+	# Проверяем, открыт ли выбранный персонаж
+	if not ProgressManager.is_class_unlocked(selected_character):
+		printerr("Character not unlocked: ", selected_character, " - using PENITENT as fallback")
+		selected_character = DataManager.CharacterClass.PENITENT
+	
 	_reset_game_state()
-	# Сбрасываем индексы
 	current_room_index = 0
-	# Загружаем данные намерений для биома
 	DataManager.load_biome_enemies(current_biome)
 	
-	# 2. Создаём игрока
+	# Создаём игрока
 	player = PenitentStats.new()
 	BattleManager.set_player(player)
 	print("Player created in start_test: ", player)
 	
+	# Инициализируем забег с выбранным персонажем
+	RunManager.current_character = selected_character
+	RunManager.initialize_run()
+	print("Run initialized with character: ", selected_character, " deck size: ", RunManager.get_player_deck().master_cards.size())
+	
+	# Подписываемся на сигналы
 	SignalManager.hand_ui_created.connect(_on_hand_ui_created)
 	SignalManager.next_room.connect(_on_next_room)
 	SignalManager.show_paths.connect(_on_show_paths)
 	SignalManager.choice_panel_selected.connect(_on_choice_panel_selected)
-	# Подписываемся на сигналы
 	SignalManager.battle_started.connect(_on_battle_started)
 	SignalManager.player_turn_started.connect(_on_player_turn_started)
 	SignalManager.enemy_turn_started.connect(_on_enemy_turn_started)
@@ -69,6 +76,7 @@ func start_test(world_node: Node):
 	SignalManager.add_action_choice.connect(_on_add_action_choice)
 	SignalManager.tooltip_requested.connect(_on_tooltip_requested)
 	SignalManager.hide_tooltip.connect(_on_hide_tooltip)
+	
 	# Сбрасываем менеджеры
 	FloorManager.reset()
 	SoundManager.start_gameplay_playlist()
@@ -78,28 +86,38 @@ func start_test(world_node: Node):
 	_create_gold_display()
 	_create_key_display()
 	_create_bone_display()
-	_create_potion_display()  # 🆕
+	_create_potion_display()
+	
 	for potion in DataManager.get_random_potions(1):
 		RunManager.add_potion(potion)
+	
 	# Отключаем старые сигналы перед подключением
 	if FloorManager.room_selected.is_connected(_on_room_selected):
 		FloorManager.room_selected.disconnect(_on_room_selected)
 	if FloorManager.floor_completed.is_connected(_on_floor_completed):
 		FloorManager.floor_completed.disconnect(_on_floor_completed)
 	
-	# Подключаем сигналы
 	FloorManager.room_selected.connect(_on_room_selected)
 	FloorManager.floor_completed.connect(_on_floor_completed)
 	
-	# Запускаем этаж
 	FloorManager.start_floor()
+
+func select_character(character_class: DataManager.CharacterClass) -> bool:
+	if not ProgressManager.is_class_unlocked(character_class):
+		printerr("Character not unlocked: ", character_class)
+		return false
 	
-	
+	selected_character = character_class
+	print("Character selected: ", selected_character)
+	return true
+
+func get_available_characters() -> Array[DataManager.CharacterClass]:
+	return ProgressManager.unlocked_classes.duplicate()
+
 func _on_hand_ui_created(created_hand_ui: HandUI):
 	if not game_world:
 		return
 	
-	# Если есть старая рука — удаляем
 	if hand_ui:
 		clear_ui()
 	
@@ -108,12 +126,9 @@ func _on_hand_ui_created(created_hand_ui: HandUI):
 	game_world.add_child(canvas_layer)
 	canvas_layer.add_child(created_hand_ui)
 	
-	# Сохраняем ссылку
 	hand_ui = created_hand_ui
 	print("hand_ui saved: ", hand_ui)
-		# Создаём кнопку "Конец хода"
 	_create_end_turn_button()
-
 
 func reset():
 	if current_room_node and is_instance_valid(current_room_node):
@@ -123,34 +138,25 @@ func reset():
 	current_room_index = 0
 	FloorManager.reset()
 
-
 func after_combat_victory():
 	print("=== COMBAT VICTORY, LOADING NEXT ROOM ===")
 	var available_paths = FloorManager.get_available_paths()
 	if not available_paths.is_empty():
-		# Для теста всегда выбираем первый путь (0)
 		FloorManager.select_path(0)
 	else:
 		FloorManager.next_room()
-
 
 ## ============================================================
 ## ПРИВАТНЫЕ МЕТОДЫ
 ## ============================================================
 
-# autoload/game_test_manager.gd
-
 func _on_room_selected(room_node: RoomNode, should_increment_room_index: bool = true, enemies_ids: Array[DataManager.EnemyId] = []):
-	# 🆕 Очищаем пустые CanvasLayer перед добавлением комнаты
 	_clean_empty_canvas_layers()
-	# Сбрасываем состояния
 	_reset_game_state()
 	
-	# Обновляем стиль лога при смене биома
 	if battle_log and current_biome:
 		battle_log.set_biome_style(current_biome)
 	
-	# Находим HandUI (если ещё нет)
 	if not hand_ui:
 		hand_ui = game_world.get_node_or_null("HandUI")
 	
@@ -167,33 +173,26 @@ func _on_room_selected(room_node: RoomNode, should_increment_room_index: bool = 
 		print("Failed to create room")
 		return
 	
-	# Очищаем предыдущую комнату
 	if current_room_node and is_instance_valid(current_room_node):
 		current_room_node.queue_free()
 	
-	# Сохраняем новую комнату
 	current_room_node = room_instance
 	
-	# Добавляем в дерево
 	if current_room_node and not current_room_node.is_inside_tree() and game_world:
 		game_world.add_child(current_room_node)
 		current_room_node.position = DataManager.ROOM_POSITION
 	
-	# 🆕 Увеличиваем индекс только если нужно
 	if should_increment_room_index:
 		current_room_index += 1
 	
 	if current_room_node.room_type == DataManager.RoomType.COMBAT:
 		_create_battle_log()
-		#_create_hit_effect()
-
 
 func _on_floor_completed():
 	print("=== FLOOR COMPLETED ===")
 	current_floor += 1
 	current_room_index = 0
 	FloorManager.start_floor()
-
 
 func _get_room_type_string(room_type: DataManager.RoomType, combat_type: DataManager.CombatType) -> String:
 	match room_type:
@@ -213,22 +212,16 @@ func _get_room_type_string(room_type: DataManager.RoomType, combat_type: DataMan
 			return "OBJECT"
 	return "UNKNOWN"
 
-
 func _create_battle_log():
 	var log_scene = preload("res://scenes/battle_log.tscn")
 	battle_log = log_scene.instantiate() as BattleLogUI
-	battle_log.position = Vector2(1520, 80)  # правый верхний угол
+	battle_log.position = Vector2(1520, 80)
 	battle_log.size = Vector2(350, 500)
-	
-	# Устанавливаем стиль под биом
 	battle_log.set_biome_style(current_biome)
-	
 	game_world.add_child(battle_log)
-
 
 func _on_next_room():
 	FloorManager.next_room()
-
 
 func _on_show_paths(paths: Array):
 	var choice_panel = preload("res://scenes/choice_panel.tscn").instantiate() as ChoicePanel
@@ -236,13 +229,10 @@ func _on_show_paths(paths: Array):
 	game_world.add_child(choice_panel)
 	choice_panel.position = DataManager.ROOM_POSITION + Vector2(0, 300)
 
-
 func _on_choice_panel_selected(path_index: int):
 	FloorManager.select_path(path_index)
 
-
 func clear_ui():
-	# Удаляем руку и её CanvasLayer
 	if hand_ui:
 		var canvas_layer = hand_ui.get_parent()
 		if canvas_layer is CanvasLayer:
@@ -251,69 +241,48 @@ func clear_ui():
 			hand_ui.queue_free()
 		hand_ui = null
 	
-	# Удаляем лог
 	if battle_log:
 		battle_log.queue_free()
 		battle_log = null
-		
-	#if potion_container:
-		#potion_container.queue_free()
-		#potion_container = null
-	#potion_icons.clear()
 	
 	print("UI cleared")
-
 
 func _create_end_turn_button():
 	var button_scene = preload("res://scenes/end_turn_button.tscn")
 	end_turn_button = button_scene.instantiate()
 	
-	# Добавляем в CanvasLayer вместе с рукой
 	var canvas_layer = hand_ui.get_parent()
 	if canvas_layer:
 		canvas_layer.add_child(end_turn_button)
 		end_turn_button.position = DataManager.END_BUTTON_POSITION
 
-
 func _on_battle_started():
 	if end_turn_button:
 		end_turn_button.visible = true
-
 
 func _on_player_turn_started():
 	if end_turn_button:
 		end_turn_button.visible = true
 		end_turn_button.is_ending_turn = false
 
-
 func _on_enemy_turn_started():
 	if end_turn_button:
 		end_turn_button.visible = false
 		end_turn_button.is_ending_turn = true
-
 
 func _on_battle_ended():
 	if end_turn_button:
 		end_turn_button.visible = false
 		end_turn_button.is_ending_turn = false
 
-
 func _create_blood_screen():
 	var screen_scene = preload("res://scenes/blood_screen.tscn")
 	blood_screen = screen_scene.instantiate() as BloodScreen
 	
-	# Добавляем в корень или CanvasLayer
 	var canvas_layer = CanvasLayer.new()
-	canvas_layer.layer = 100  # поверх всего
+	canvas_layer.layer = 100
 	game_world.add_child(canvas_layer)
 	canvas_layer.add_child(blood_screen)
-
-
-#func _on_player_took_damage(damage: int):
-	#if blood_screen:
-		#var intensity = clamp(damage / 20.0, 0.1, 0.6)
-		#blood_screen.flash(intensity)
-
 
 func _create_player_portrait():
 	var portrait_scene = preload("res://scenes/player_portrait.tscn")
@@ -322,17 +291,14 @@ func _create_player_portrait():
 	game_world.add_child(player_portrait)
 	player_portrait.setup(BattleManager.get_player())
 
-
 func _create_energy_display():
 	var energy_scene = preload("res://scenes/energy_display.tscn")
 	energy_display = energy_scene.instantiate() as EnergyDisplay
 	energy_display.position = DataManager.END_BUTTON_POSITION + Vector2(10, +100)
 	game_world.add_child(energy_display)
 
-
 func get_player_portrait() -> PlayerPortrait:
 	return player_portrait
-
 
 func _on_show_reward(reward_panel: RewardPanel):
 	add_reward_panel(reward_panel)
@@ -340,50 +306,39 @@ func _on_show_reward(reward_panel: RewardPanel):
 func add_reward_panel(reward_panel: RewardPanel):
 	clear_ui()
 	if reward_panel and not reward_panel.is_inside_tree():
-		# Добавляем на верхний слой
 		var canvas_layer = CanvasLayer.new()
-		canvas_layer.layer = 200  # поверх всего
+		canvas_layer.layer = 200
 		game_world.add_child(canvas_layer)
 		canvas_layer.add_child(reward_panel)
-		#reward_panel.global_position = DataManager.ROOM_POSITION
-
 
 func _on_add_action_choice(action_choice: Control, title: String, actions: Array[DataManager.ActionType]) -> void:
 	add_action_choice(action_choice, title, actions)
-
 
 func add_action_choice(action_choice: Control, title: String, actions: Array[DataManager.ActionType]) -> void:
 	if not action_choice:
 		return
 	
-	# Сначала добавляем в дерево
 	var canvas_layer = CanvasLayer.new()
 	canvas_layer.layer = 300
 	game_world.add_child(canvas_layer)
 	canvas_layer.add_child(action_choice)
 	action_choice.global_position = DataManager.ROOM_POSITION
-	
-	# 🆕 Теперь вызываем setup (после добавления в дерево)
 	action_choice.setup(title, actions)
-
 
 func _create_gold_display() -> void:
 	gold_display = preload("res://scenes/gold_display.tscn").instantiate() as GoldDisplay
 	game_world.add_child(gold_display)
 	gold_display.global_position = DataManager.COINS_SCREEN_POSITION
 
-
 func _create_key_display() -> void:
 	key_display = preload("res://scenes/key_display.tscn").instantiate() as KeyDisplay
 	game_world.add_child(key_display)
 	key_display.global_position = DataManager.KEYS_SCREEN_POSITION
 
-
 func _create_bone_display() -> void:
 	bone_display = preload("res://scenes/bone_display.tscn").instantiate() as BoneDisplay
 	game_world.add_child(bone_display)
 	bone_display.global_position = DataManager.BONES_SCREEN_POSITION
-
 
 func _clean_empty_canvas_layers() -> void:
 	if not game_world:
@@ -391,7 +346,6 @@ func _clean_empty_canvas_layers() -> void:
 	
 	for child in game_world.get_children():
 		if child is CanvasLayer:
-			# Проверяем, есть ли у CanvasLayer дочерние элементы
 			var has_children = false
 			for sub_child in child.get_children():
 				has_children = true
@@ -400,14 +354,12 @@ func _clean_empty_canvas_layers() -> void:
 			if not has_children:
 				child.queue_free()
 
-
 func _create_potion_display() -> void:
 	potion_container = HBoxContainer.new()
 	potion_container.global_position = DataManager.POTION_CONTAINER_POSITION
 	potion_container.add_theme_constant_override("separation", 10)
 	game_world.add_child(potion_container)
 	
-	# 🆕 Создаём надпись "Инвентарь полон"
 	potion_full_label = Label.new()
 	potion_full_label.text = tr("potion_inventory_full")
 	potion_full_label.add_theme_font_override("font", DataManager.FONT_MAIN)
@@ -428,15 +380,12 @@ func _create_potion_display() -> void:
 	
 	_update_full_label()
 
-
 func _add_potion_icon(potion: PotionResource) -> void:
 	var icon = preload("res://scenes/potion_icon.tscn").instantiate() as PotionIcon
-	#icon.gui_input.connect(_on_potion_icon_clicked.bind(icon))
 	potion_container.add_child(icon)
 	icon.setup(potion)
 	potion_icons.append(icon)
 	icon.update_state()
-	
 
 func _on_potion_added(potion: PotionResource) -> void:
 	_add_potion_icon(potion)
@@ -466,7 +415,6 @@ func _on_potion_used(potion_icon: PotionIcon) -> void:
 			DataManager.EffectTarget.SELF:
 				targets = [player]
 			DataManager.EffectTarget.ENEMY:
-				# Выбираем первого врага (или цель, если есть система выбора)
 				var enemies = BattleManager.get_enemies()
 				if not enemies.is_empty():
 					targets = [enemies[0]]
@@ -483,15 +431,12 @@ func _on_potion_used(potion_icon: PotionIcon) -> void:
 	
 	RunManager.remove_potion(index)
 
-
 func _on_potion_deselect_all() -> void:
 	for icon in potion_icons:
 		icon.deselect()
 
-
 func get_current_room() -> Room:
 	return current_room_node
-
 
 func _on_potion_discarded(potion_icon: PotionIcon) -> void:
 	var index = potion_icons.find(potion_icon)
@@ -501,81 +446,90 @@ func _on_potion_discarded(potion_icon: PotionIcon) -> void:
 	RunManager.remove_potion(index)
 	SignalManager.log_message.emit("Зелье выброшено!")
 
-
 func _update_full_label() -> void:
 	if potion_full_label:
 		potion_full_label.visible = RunManager.get_potions().size() >= DataManager.POTION_MAX_COUNT
 
-
 func restart_run():
 	print("=== RESTART RUN ===")
 	
-	# 1. Очищаем всё игровое состояние
 	_reset_game_state()
 	clear_ui()
 	
-	# 2. Очищаем game_world от всех дочерних объектов
 	for child in game_world.get_children():
 		child.queue_free()
-	_disconnect_all_signals()
-	# 3. Сбрасываем менеджеры
-	BattleManager.reset_battle()
 	
-	# 4. Сбрасываем RunManager
+	_disconnect_all_signals()
+	
+	BattleManager.reset_battle()
 	RunManager.reset_run()
 	
-	# 5. Запускаем забег заново
 	start_test(game_world)
 
 func _disconnect_all_signals():
-	# Отключаем все сигналы, которые могли остаться
-	SignalManager.hand_ui_created.disconnect(_on_hand_ui_created)
-	SignalManager.next_room.disconnect(_on_next_room)
-	SignalManager.show_paths.disconnect(_on_show_paths)
-	SignalManager.choice_panel_selected.disconnect(_on_choice_panel_selected)
-	SignalManager.battle_started.disconnect(_on_battle_started)
-	SignalManager.player_turn_started.disconnect(_on_player_turn_started)
-	SignalManager.enemy_turn_started.disconnect(_on_enemy_turn_started)
-	SignalManager.battle_victory.disconnect(_on_battle_ended)
-	SignalManager.battle_defeat.disconnect(_on_battle_ended)
-	SignalManager.show_reward.disconnect(_on_show_reward)
-	SignalManager.add_action_choice.disconnect(_on_add_action_choice)
-	SignalManager.potion_added.disconnect(_on_potion_added)
-	SignalManager.potion_removed.disconnect(_on_potion_removed)
-	SignalManager.potion_used.disconnect(_on_potion_used)
-	SignalManager.potion_discarded.disconnect(_on_potion_discarded)
-	SignalManager.potion_deselect_all.disconnect(_on_potion_deselect_all)
-	SignalManager.tooltip_requested.disconnect(_on_tooltip_requested)
-	SignalManager.hide_tooltip.disconnect(_on_hide_tooltip)
+	if SignalManager.hand_ui_created.is_connected(_on_hand_ui_created):
+		SignalManager.hand_ui_created.disconnect(_on_hand_ui_created)
+	if SignalManager.next_room.is_connected(_on_next_room):
+		SignalManager.next_room.disconnect(_on_next_room)
+	if SignalManager.show_paths.is_connected(_on_show_paths):
+		SignalManager.show_paths.disconnect(_on_show_paths)
+	if SignalManager.choice_panel_selected.is_connected(_on_choice_panel_selected):
+		SignalManager.choice_panel_selected.disconnect(_on_choice_panel_selected)
+	if SignalManager.battle_started.is_connected(_on_battle_started):
+		SignalManager.battle_started.disconnect(_on_battle_started)
+	if SignalManager.player_turn_started.is_connected(_on_player_turn_started):
+		SignalManager.player_turn_started.disconnect(_on_player_turn_started)
+	if SignalManager.enemy_turn_started.is_connected(_on_enemy_turn_started):
+		SignalManager.enemy_turn_started.disconnect(_on_enemy_turn_started)
+	if SignalManager.battle_victory.is_connected(_on_battle_ended):
+		SignalManager.battle_victory.disconnect(_on_battle_ended)
+	if SignalManager.battle_defeat.is_connected(_on_battle_ended):
+		SignalManager.battle_defeat.disconnect(_on_battle_ended)
+	if SignalManager.show_reward.is_connected(_on_show_reward):
+		SignalManager.show_reward.disconnect(_on_show_reward)
+	if SignalManager.add_action_choice.is_connected(_on_add_action_choice):
+		SignalManager.add_action_choice.disconnect(_on_add_action_choice)
+	if SignalManager.potion_added.is_connected(_on_potion_added):
+		SignalManager.potion_added.disconnect(_on_potion_added)
+	if SignalManager.potion_removed.is_connected(_on_potion_removed):
+		SignalManager.potion_removed.disconnect(_on_potion_removed)
+	if SignalManager.potion_used.is_connected(_on_potion_used):
+		SignalManager.potion_used.disconnect(_on_potion_used)
+	if SignalManager.potion_discarded.is_connected(_on_potion_discarded):
+		SignalManager.potion_discarded.disconnect(_on_potion_discarded)
+	if SignalManager.potion_deselect_all.is_connected(_on_potion_deselect_all):
+		SignalManager.potion_deselect_all.disconnect(_on_potion_deselect_all)
+	if SignalManager.tooltip_requested.is_connected(_on_tooltip_requested):
+		SignalManager.tooltip_requested.disconnect(_on_tooltip_requested)
+	if SignalManager.hide_tooltip.is_connected(_on_hide_tooltip):
+		SignalManager.hide_tooltip.disconnect(_on_hide_tooltip)
 
 func create_death_ui():
 	death_ui = preload("res://scenes/death_ui.tscn").instantiate() as DeathUI
 	game_world.add_child(death_ui)
 	death_ui.global_position = Vector2.ZERO
 
-
 func clear_ui_after_death():
 	clear_ui()
-	potion_container.hide()
-	bone_display.hide()
-	gold_display.hide()
-	key_display.hide()
-
+	if potion_container:
+		potion_container.hide()
+	if bone_display:
+		bone_display.hide()
+	if gold_display:
+		gold_display.hide()
+	if key_display:
+		key_display.hide()
 
 func _reset_game_state():
 	BattleManager.reset_battle()
 	
-	# Очищаем текущую комнату
 	if current_room_node and is_instance_valid(current_room_node):
 		current_room_node.queue_free()
 		current_room_node = null
 	
-	# Очищаем UI
 	clear_ui()
 
-
 func _on_tooltip_requested(tooltip_data: Dictionary, position: Vector2):
-	# 🆕 Удаляем старый тултип, если есть
 	if current_tooltip:
 		current_tooltip.queue_free()
 		current_tooltip = null
@@ -587,13 +541,10 @@ func _on_tooltip_requested(tooltip_data: Dictionary, position: Vector2):
 	
 	var tooltip = preload("res://scenes/tooltip.tscn").instantiate() as Tooltip
 	tooltip_canvas.add_child(tooltip)
-	
 	tooltip.setup(tooltip_data)
 	tooltip.show_at(position)
-	
 	current_tooltip = tooltip
-	
-	
+
 func _on_hide_tooltip():
 	if current_tooltip:
 		current_tooltip.queue_free()

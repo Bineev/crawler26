@@ -73,19 +73,33 @@ func _ready():
 
 
 func initialize_run():
-	# 🆕 Сбрасываем константы до базовых значений
+	# Сбрасываем константы до базовых значений
 	reset_run_constants()
-	player_deck_data = DeckData.new()
-	player_deck_data.master_cards = DataManager.get_starting_deck().duplicate()
 	
-	# 🆕 Устанавливаем стартовые валюты
+	# Создаём новую колоду
+	player_deck_data = DeckData.new()
+	
+	# Получаем стартовую колоду для выбранного персонажа
+	var starting_deck = DeckManager.get_starting_deck(current_character)
+	player_deck_data.master_cards = starting_deck.duplicate()
+	
+	# Устанавливаем стартовые валюты
 	coins = starting_coins
 	bones = starting_bones
 	keys = starting_keys
 	
-	DeckManager._load_cards_data()
-	DeckManager._init_unlocked_cards()
-	# 🆕 Добавляем случайные зелья
+	# Очищаем другие данные забега
+	artifacts.clear()
+	potions.clear()
+	temp_buffs = {
+		"max_energy_buff": 0,
+		"bonus_energy": 0
+	}
+	deck_size_buff_remaining = 0
+	deck_size_bonus = 0
+	idol_curse_remaining = 0
+	is_robber = false
+	
 	print("RunManager initialized with deck size: ", player_deck_data.master_cards.size())
 
 

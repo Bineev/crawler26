@@ -14,6 +14,7 @@ category = 6
 target = 0
 target_stat = 6
 delta = 3
+target_modifier = 4
 metadata/_custom_type_script = "uid://cmra25r1r3ivt"
 
 [resource]

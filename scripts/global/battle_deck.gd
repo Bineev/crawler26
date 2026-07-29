@@ -119,16 +119,25 @@ func play_card(card_ui: CardUI, card_data: CardData, target = null):
 	if index != -1:
 		hand.remove_at(index)
 	
-	if card_data.has_tag(DataManager.CardTag.BURNS):
-		card_ui.queue_free()
-		return
-	
-	discard_pile.append(card_data)
-	SignalManager.card_discarded.emit(card_data)
-	SignalManager.discard_size_changed.emit(discard_pile.size())
-	
+	if not card_data.has_tag(DataManager.CardTag.BURNS):
+		discard_pile.append(card_data)
+		SignalManager.card_discarded.emit(card_data)
+		SignalManager.discard_size_changed.emit(discard_pile.size())
+
 	if hand_ui:
 		hand_ui.remove_card(card_ui)
+		
+	# Выполняем эффекты карты (после анимации)
+	for effect in card_data.effects:
+		EffectExecutor.execute(effect, BattleManager.get_player(), card_ui._get_targets_for_effect(effect, target), {"card": card_ui, "card_data": card_data})
+		# BUG
+		await hand_ui.get_tree().create_timer(0.3).timeout
+	
+	if hand_ui:
+		hand_ui.set_all_cards_input_enabled(true)
+	
+	SignalManager.card_played.emit(card_data)
+	card_ui.queue_free()
 
 
 func sacrifice_card(card_ui: CardUI, card_data: CardData):

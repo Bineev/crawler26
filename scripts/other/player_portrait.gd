@@ -159,7 +159,7 @@ func _animate_double_bar(main_bar: ProgressBar, bg_bar: ProgressBar, target_valu
 	
 	# 2. Базовое время для изменения 100% шкалы
 	var base_damage_time = 0.4  
-	var base_heal_time = 1000    
+	var base_heal_time = 0.5    
 	
 	# 3. Применяем модификатор скорости к итоговому времени
 	var damage_duration = clamp(pct_difference * base_damage_time * tween_speed_modifier, 0.05, 0.3)

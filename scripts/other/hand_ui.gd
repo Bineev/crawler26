@@ -78,7 +78,6 @@ func remove_card(card_ui: CardUI):
 	# Удаляем карту из контейнера
 	if cards_container and card_ui.get_parent() == cards_container:
 		cards_container.remove_child(card_ui)
-		card_ui.queue_free()
 		
 		if is_manual_layout:
 			layout_cards()

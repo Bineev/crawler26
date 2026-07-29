@@ -435,22 +435,12 @@ func play_card(target = null):
 		await animate_to_target(target)  # ← await
 	else:
 		await animate_to_center()        # ← await
-	
-	# Выполняем эффекты карты (после анимации)
-	for effect in card_data.effects:
-		var targets = _get_targets_for_effect(effect, target)
-		EffectExecutor.execute(effect, player_stats, targets, {"card": self, "card_data": card_data})
-	
+
 	# Если карта сожжена — она уже удалится через burn анимацию
 	if state != DataManager.CardState.BURNED:
 		var battle_deck = BattleManager.get_battle_deck()
 		if battle_deck:
 			battle_deck.play_card(self, card_data, target)
-	
-	SignalManager.card_played.emit(card_data)
-	
-	if hand_ui_ref:
-		hand_ui_ref.set_all_cards_input_enabled(true)
 
 
 func _needs_target() -> bool:
@@ -790,7 +780,7 @@ func animate_to_target(target_node: Node2D):
 	current_tween.tween_property(self, "modulate", Color.TRANSPARENT, 0.2)
 	
 	await current_tween.finished
-	queue_free()
+	#queue_free()
 
 
 func animate_to_center():

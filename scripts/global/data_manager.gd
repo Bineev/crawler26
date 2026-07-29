@@ -320,8 +320,7 @@ enum RewardType {
 	CARD_WITHOUT_CHOICE,
 	ARTIFACT,
 	ARTIFACT_WITHOUT_CHOICE,
-	ARTIFACT_ELITE,          # 🆕 элитный артефакт     
-	ARTIFACT_COMBO,          # 🆕 элитный артефакт     
+	ARTIFACT_ELITE,          # 🆕 элитный артефакт         
 	POTION,                  # 🆕 зелье
 	TAKE_DAMAGE,
 	GET_HEAL,
@@ -338,6 +337,7 @@ enum RewardType {
 	CONCRETE_ARTIFACT,
 	CONCRETE_CARD,
 	GET_CONCRETE_BATTLE,  # 🆕 бой с конкретным типом врага
+	ARTIFACT_COMBO,          # 🆕 элитный артефакт 
 }
 
 ## Тип цикла намерений
@@ -1445,33 +1445,6 @@ func get_card(card_id: CardId) -> CardData:
 		load_all_cards()
 	return _cards.get(card_id)
 
-
-func get_starting_deck() -> Array[CardData]:
-	var deck: Array[CardData] = []
-	
-	deck.append(get_card(CardId.BLOOD_TRAIL))
-	deck.append(get_card(CardId.FROZEN_EARTH))
-	deck.append(get_card(CardId.RODENT_AGILITY))
-	deck.append(get_card(CardId.FROZEN_BITE))
-	deck.append(get_card(CardId.BEAST_PULSE))
-	deck.append(get_card(CardId.BLOOD_THREAD))
-	deck.append(get_card(CardId.ROTTEN_CUT))
-	deck.append(get_card(CardId.MOLE_TOSS))
-	deck.append(get_card(CardId.WORM_SPIRIT))
-	deck.append(get_card(CardId.FLESH_RAGE))
-	deck.append(get_card(CardId.TORN_WOUND))
-
-	#deck.append(get_card(CardId.ATONEMENT_STRIKE))
-	#deck.append(get_card(CardId.ATONEMENT_STRIKE))
-	#deck.append(get_card(CardId.ATONEMENT_STRIKE))
-	#deck.append(get_card(CardId.SINFUL_STRIKE))
-	#deck.append(get_card(CardId.SINFUL_STRIKE))
-	#deck.append(get_card(CardId.SINFUL_STRIKE))
-	#deck.append(get_card(CardId.PENITENT_REVELATION))
-	#deck.append(get_card(CardId.ATONEMENT_BARRIER))
-	#deck.append(get_card(CardId.ATONEMENT_BARRIER))
-	
-	return deck
 	
 ## ============================================================
 ## ФОНЫ КАРТ
@@ -1879,8 +1852,18 @@ func remove_shader_from_icon(icon: TextureRect):
 	icon.material = null
 
 
+## Возвращает все карты
 func get_all_cards() -> Dictionary:
+	if not _cards_loaded:
+		load_all_cards()
 	return _cards
+
+
+## Получить все ID карт
+func get_all_card_ids() -> Array[CardId]:
+	if not _cards_loaded:
+		load_all_cards()
+	return _cards.keys()
 
 
 func get_currency_icon(currency_type: CurrencyType) -> Texture2D:

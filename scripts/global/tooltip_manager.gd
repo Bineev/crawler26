@@ -272,7 +272,7 @@ func _modifier_to_description(mod: ModifierEntry) -> String:
 		DataManager.ModifierStat.DAMAGE_DEALT_PERCENT:
 			return tr("passive_modifier_damage_dealt") % [(mod.value - 1.0) * 100]
 		DataManager.ModifierStat.DAMAGE_TAKEN_PERCENT:
-			return tr("passive_modifier_damage_taken") % [(mod.value - 1.0) * 100]
+			return tr("passive_modifier_damage_taken") % [mod.value * 100]
 		DataManager.ModifierStat.ATONEMENT_GAIN_MULTIPLIER:
 			return tr("passive_modifier_atonement") % [(mod.value - 1.0) * 100]
 		_:

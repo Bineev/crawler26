@@ -10,5 +10,6 @@ script = ExtResource("2_mratp")
 id = 1
 name_key = "card_sinful_strike_name"
 description_key = "card_sinful_strike_desc"
+cost = 2
 effects = Array[ExtResource("1_u70qq")]([ExtResource("2_j24b0"), ExtResource("3_u5fds")])
 metadata/_custom_type_script = "uid://badcs22cck6n5"

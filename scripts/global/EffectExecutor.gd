@@ -298,9 +298,8 @@ func _execute_apply_passive(effect: EffectEntry, source, targets: Array) -> void
 
 
 func _execute_modify_stat(effect: EffectEntry, source, targets: Array) -> void:
-	var delta = effect.delta
-	
 	for target in targets:
+		var delta = int(effect.delta * target.get_modifier(effect.target_modifier))
 		if target and target.has_method("modify_flat"):
 			target.modify_flat(effect.target_stat, delta)
 
