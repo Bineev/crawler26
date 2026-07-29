@@ -1217,9 +1217,9 @@ var _enemy_sprites: Dictionary = {}  # "biome_enemy_state" -> Texture2D
 func load_enemy_sprites_for_biome(biome: DataManager.Biome, enemy_data: Array, base_path: String):
 	# Соответствие состояний суффиксам файлов
 	var state_suffix = {
-		EnemyAnimationState.IDLE: "1",
-		EnemyAnimationState.ATTACK: "2",
-		EnemyAnimationState.GET_HIT: "3",
+		EnemyAnimationState.IDLE: "11",
+		EnemyAnimationState.ATTACK: "22",
+		EnemyAnimationState.GET_HIT: "33",
 	}
 	
 	for enemy in enemy_data:

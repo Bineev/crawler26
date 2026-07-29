@@ -526,7 +526,7 @@ func _hit_effect():
 		hit_tween.kill()
 	
 	hit_tween = create_tween()
-	hit_tween.tween_property(shader_material, "shader_parameter/hit_progress", 0.0, 0.5)\
+	hit_tween.tween_property(shader_material, "shader_parameter/hit_progress", 0.0, 0.3)\
 		.set_trans(Tween.TRANS_QUART)\
 		.set_ease(Tween.EASE_OUT)
 	
@@ -758,12 +758,12 @@ func play_debuff_animation():
 	tween.set_parallel(true)
 	
 	# Небольшая пульсация
-	tween.tween_property(self, "scale", Vector2(1.05, 1.05), 0.2).set_ease(Tween.EASE_OUT)
-	tween.tween_property(self, "scale", Vector2(1.0, 1.0), 0.2).set_delay(0.2).set_ease(Tween.EASE_IN)
+	tween.tween_property(self, "scale", Vector2(1.05, 1.05), 0.15).set_ease(Tween.EASE_OUT)
+	tween.tween_property(self, "scale", Vector2(1.0, 1.0), 0.15).set_delay(0.15).set_ease(Tween.EASE_IN)
 	
 	# Лёгкое смещение в сторону
-	tween.tween_property(self, "position", original_position + Vector2(10, 0), 0.15).set_ease(Tween.EASE_OUT)
-	tween.tween_property(self, "position", original_position, 0.15).set_delay(0.15).set_ease(Tween.EASE_IN)
+	tween.tween_property(self, "position", original_position + Vector2(10, 0), 0.1).set_ease(Tween.EASE_OUT)
+	tween.tween_property(self, "position", original_position, 0.1).set_delay(0.1).set_ease(Tween.EASE_IN)
 	
 	await get_tree().create_timer(0.4).timeout
 

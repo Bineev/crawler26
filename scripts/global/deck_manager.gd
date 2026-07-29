@@ -182,6 +182,7 @@ func _get_penitent_starting_deck() -> Array[CardData]:
 	
 	# Защита
 	deck.append(DataManager.get_card(DataManager.CardId.ATONEMENT_BARRIER))
+	deck.append(DataManager.get_card(DataManager.CardId.ATONEMENT_BARRIER))
 	
 	return deck
 
