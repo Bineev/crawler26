@@ -1,6 +1,7 @@
 [gd_scene load_steps=19 format=3 uid="uid://coec2fnqd70g0"]
 
 [ext_resource type="Script" uid="uid://b7y61xslq656g" path="res://scripts/other/card_ui.gd" id="1_d81rb"]
+[ext_resource type="Material" uid="uid://3tj6g0pa2j2k" path="res://shaders/room2.tres" id="2_1yd6c"]
 [ext_resource type="LabelSettings" uid="uid://eu2gkwf45dgn" path="res://styles/label_black_32.tres" id="2_kg30u"]
 [ext_resource type="FontFile" uid="uid://dqwy07f4watts" path="res://fonts/KellySlab-Regular.ttf" id="3_8w5pg"]
 [ext_resource type="FontFile" uid="uid://cfcw32u84nc63" path="res://fonts/RobotoCondensed-VariableFont_wght.ttf" id="4_kg30u"]
@@ -8,8 +9,6 @@
 [ext_resource type="Shader" uid="uid://xlaxko82yrc2" path="res://shaders/card_shader.gdshader" id="5_sy11y"]
 [ext_resource type="Shader" uid="uid://cltqs0v1xgjjb" path="res://shaders/card2_shader.gdshader" id="6_6ligt"]
 [ext_resource type="Shader" uid="uid://nnhafgmukg3v" path="res://shaders/card_burn.gdshader" id="7_8w5pg"]
-
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_we8pq"]
 
 [sub_resource type="LabelSettings" id="LabelSettings_nvopj"]
 line_spacing = 0.0
@@ -59,13 +58,13 @@ shader_parameter/flash_width = 0.15
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_8w5pg"]
 shader = ExtResource("6_6ligt")
-shader_parameter/dirt_color = Color(0.18, 0.12, 0.08, 0.6)
-shader_parameter/grain_intensity = 0.19200000912
-shader_parameter/dirt_amount = 0.74800003553
-shader_parameter/scratch_amount = 0.0990000047025
-shader_parameter/vignette_color = Color(0.019607844, 0.011764706, 0.011764706, 1)
-shader_parameter/darkness_power = 1.3630000647425
-shader_parameter/card_roundness = 0.0570000027075
+shader_parameter/dirt_color = Color(0, 0, 0, 0.5882353)
+shader_parameter/grain_intensity = 0.2000000095
+shader_parameter/dirt_amount = 1.0
+shader_parameter/scratch_amount = 0.050000002375
+shader_parameter/vignette_color = Color(0, 0, 0, 1)
+shader_parameter/darkness_power = 0.6000000285
+shader_parameter/card_roundness = 0.050000002375
 shader_parameter/mouse_offset = Vector2(0, 0)
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_nvopj"]
@@ -84,7 +83,6 @@ offset_right = 234.0
 offset_bottom = 330.0
 
 [node name="CardBackground" type="TextureRect" parent="CardTemplate"]
-material = SubResource("ShaderMaterial_we8pq")
 layout_mode = 2
 mouse_filter = 2
 
@@ -231,6 +229,13 @@ visible = false
 material = SubResource("ShaderMaterial_nvopj")
 layout_mode = 2
 mouse_filter = 2
+
+[node name="ColorRect" type="ColorRect" parent="CardTemplate"]
+visible = false
+material = ExtResource("2_1yd6c")
+layout_mode = 2
+mouse_filter = 2
+color = Color(0, 0, 0, 1)
 
 [node name="ClickArea" type="Area2D" parent="."]
 

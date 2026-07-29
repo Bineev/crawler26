@@ -1,33 +1,15 @@
-[gd_scene load_steps=8 format=3 uid="uid://dcst51dams5bp"]
+[gd_scene load_steps=6 format=3 uid="uid://dcst51dams5bp"]
 
 [ext_resource type="Script" uid="uid://rgrbwlag2ceu" path="res://scripts/other/room.gd" id="1_36trf"]
 [ext_resource type="Shader" uid="uid://cfcs8l2y88blq" path="res://shaders/mood_shader.gdshader" id="2_85yof"]
-[ext_resource type="Shader" uid="uid://b1dptapvctk7b" path="res://shaders/horror_shader.gdshader" id="3_14vil"]
-[ext_resource type="Shader" uid="uid://1kutc6pr0rfa" path="res://shaders/card3_shader.gdshader" id="4_14vil"]
+[ext_resource type="Material" uid="uid://dsw0r8s02nxsn" path="res://shaders/room.tres" id="3_85yof"]
+[ext_resource type="Material" uid="uid://3tj6g0pa2j2k" path="res://shaders/room2.tres" id="4_14vil"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_jxe34"]
 shader = ExtResource("2_85yof")
 shader_parameter/darkness = 0.4
 shader_parameter/vignette_strength = 0.5
 shader_parameter/noise_amount = 0.03
-
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_jn645"]
-shader = ExtResource("3_14vil")
-shader_parameter/grain_amount = 0.05
-shader_parameter/scanline_intensity = 0.2
-shader_parameter/vignette_intensity = 0.4
-shader_parameter/glitch_amount = 0.03
-shader_parameter/glitch_speed = 5.0
-shader_parameter/pulse_speed = 1.5
-shader_parameter/pulse_intensity = 0.1
-shader_parameter/chromatic_amount = 0.002
-
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_qvc4m"]
-shader = ExtResource("4_14vil")
-shader_parameter/vignette_color = Color(0.019607844, 0.011764706, 0.011764706, 0.7058824)
-shader_parameter/darkness_power = 3.0
-shader_parameter/light_radius = 0.3350000159125
-shader_parameter/flicker_speed = 2.000000095
 
 [node name="Room" type="Control"]
 custom_minimum_size = Vector2(1024, 800)
@@ -56,8 +38,9 @@ mouse_filter = 2
 [node name="Content" type="Node2D" parent="."]
 
 [node name="HorrorOverlay" type="ColorRect" parent="."]
+visible = false
 z_index = 1000
-material = SubResource("ShaderMaterial_jn645")
+material = ExtResource("3_85yof")
 custom_minimum_size = Vector2(1024, 800)
 layout_mode = 1
 offset_right = 1024.0
@@ -67,7 +50,7 @@ color = Color(0, 0, 0, 1)
 
 [node name="ShaderLayer" type="ColorRect" parent="."]
 z_index = 1000
-material = SubResource("ShaderMaterial_qvc4m")
+material = ExtResource("4_14vil")
 custom_minimum_size = Vector2(1024, 800)
 layout_mode = 1
 offset_right = 40.0

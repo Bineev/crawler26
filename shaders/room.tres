@@ -1,0 +1,14 @@
+[gd_resource type="ShaderMaterial" load_steps=2 format=3 uid="uid://dsw0r8s02nxsn"]
+
+[ext_resource type="Shader" uid="uid://b1dptapvctk7b" path="res://shaders/horror_shader.gdshader" id="1_qwai0"]
+
+[resource]
+shader = ExtResource("1_qwai0")
+shader_parameter/grain_amount = 0.0400000019
+shader_parameter/scanline_intensity = 0.1750000083125
+shader_parameter/vignette_intensity = 0.0
+shader_parameter/glitch_amount = 0.010000000475
+shader_parameter/glitch_speed = 5.0000002375
+shader_parameter/pulse_speed = 0.0
+shader_parameter/pulse_intensity = 0.10000000475
+shader_parameter/chromatic_amount = 0.0

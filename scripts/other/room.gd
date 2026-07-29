@@ -67,16 +67,17 @@ func _setup_horror_overlay():
 	horror_overlay.anchor_bottom = 1.0
 	horror_overlay.size = Vector2.ZERO
 	
-	var shader_material = ShaderMaterial.new()
+	#var shader_material = ShaderMaterial.new()
+	var shader_material = load("res://shaders/room.tres")
 	var shader = preload("res://shaders/horror_shader.gdshader")
 	shader_material.shader = shader
 	
-	shader_material.set_shader_parameter("grain_amount", 0.1)
-	shader_material.set_shader_parameter("scanline_intensity", 0.1)
-	shader_material.set_shader_parameter("vignette_intensity", 2)
-	shader_material.set_shader_parameter("glitch_amount", 0)
-	shader_material.set_shader_parameter("pulse_intensity", 0.05)
-	shader_material.set_shader_parameter("chromatic_amount", 0)
+	#shader_material.set_shader_parameter("grain_amount", 0.1)
+	#shader_material.set_shader_parameter("scanline_intensity", 0.1)
+	#shader_material.set_shader_parameter("vignette_intensity", 2)
+	#shader_material.set_shader_parameter("glitch_amount", 0)
+	#shader_material.set_shader_parameter("pulse_intensity", 0.05)
+	#shader_material.set_shader_parameter("chromatic_amount", 0)
 	
 	horror_overlay.material = shader_material
 
