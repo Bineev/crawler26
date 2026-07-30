@@ -41,7 +41,7 @@ func setup(potion: PotionResource) -> void:
 	custom_minimum_size = Vector2(64, 64)
 	size = Vector2(64, 64)
 	#DataManager.apply_shader_to_icon(self, "res://shaders/highlight_item2.gdshader", {'hover_intensity' : 1.0})
-	DataManager.apply_shader_overlay(self, "res://shaders/horror_shader.gdshader")
+	#DataManager.apply_shader_overlay(self, "res://shaders/horror_shader.gdshader")
 	# Позиционируем кнопку под зельем
 	use_button.position = Vector2(
 		(size.x - use_button.size.x) / 2,

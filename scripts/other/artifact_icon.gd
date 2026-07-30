@@ -38,7 +38,7 @@ func setup(artifact: ArtifactResource, is_in_reward: bool) -> void:
 	icon.expand_mode = TextureRect.EXPAND_FIT_WIDTH_PROPORTIONAL
 	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	#DataManager.apply_shader_to_icon(icon, "res://shaders/highlight_item.gdshader", {'hover_intensity' : 1.0})
-	DataManager.apply_shader_overlay(icon, "res://shaders/horror_shader.gdshader", {})
+	#DataManager.apply_shader_overlay(icon, "res://shaders/horror_shader.gdshader", {})
 	
 	# 🆕 Подключаем кастомный тултип
 	mouse_entered.connect(_on_mouse_entered)

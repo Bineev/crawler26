@@ -6,7 +6,7 @@ class_name KeyDisplay
 
 func _ready():
 	# TODO: установить иконку ключа
-	key_icon.texture = preload("res://img/icons/currency/keys.png")
+	key_icon.texture = preload("res://img/icons/currency/keys1.png")
 	key_icon.custom_minimum_size = Vector2(32, 32)
 	key_icon.expand_mode = TextureRect.EXPAND_FIT_WIDTH_PROPORTIONAL
 	key_icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED

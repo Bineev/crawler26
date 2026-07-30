@@ -1525,20 +1525,20 @@ func get_card_illustration(card_id: CardId) -> Texture2D:
 
 ## Иконки валют
 const CURRENCY_ICONS: Dictionary = {
-	DataManager.CurrencyType.COIN: preload("res://img/icons/currency/coin.png"),
-	DataManager.CurrencyType.BONE: preload("res://img/icons/currency/bone.png"),
+	DataManager.CurrencyType.COIN: preload("res://img/icons/currency/coin1.png"),
+	DataManager.CurrencyType.BONE: preload("res://img/icons/currency/bone1.png"),
 }
 
 ## Иконки артефактов
 const ARTIFACT_ICONS: Dictionary = {
-	DataManager.ArtifactId.STRANGE_MUSHROOM: preload("res://img/icons/artifacts/strange_mushroom.png"),
-	DataManager.ArtifactId.HEROS_BROOCH: preload("res://img/icons/artifacts/heros_brooch.png"),
-	DataManager.ArtifactId.KINGS_ORDER: preload("res://img/icons/artifacts/kings_order.png"),
-	DataManager.ArtifactId.HEALERS_AMULET: preload("res://img/icons/artifacts/healers_amulet.png"),
-	DataManager.ArtifactId.ABYSS_DUST: preload("res://img/icons/artifacts/abyss_dust.png"),
-	DataManager.ArtifactId.TROLL_BLADE: preload("res://img/icons/artifacts/troll_blade.png"),
-	DataManager.ArtifactId.IMP_BLADE: preload("res://img/icons/artifacts/imp_blade.png"),
-	DataManager.ArtifactId.PLAGUE_AMULET: preload("res://img/icons/artifacts/plague_amulet.png"),
+	DataManager.ArtifactId.STRANGE_MUSHROOM: preload("res://img/icons/artifacts/strange_mushroom1.png"),
+	DataManager.ArtifactId.HEROS_BROOCH: preload("res://img/icons/artifacts/heros_brooch1.png"),
+	DataManager.ArtifactId.KINGS_ORDER: preload("res://img/icons/artifacts/kings_order1.png"),
+	DataManager.ArtifactId.HEALERS_AMULET: preload("res://img/icons/artifacts/healers_amulet1.png"),
+	DataManager.ArtifactId.ABYSS_DUST: preload("res://img/icons/artifacts/abyss_dust1.png"),
+	DataManager.ArtifactId.TROLL_BLADE: preload("res://img/icons/artifacts/troll_blade1.png"),
+	DataManager.ArtifactId.IMP_BLADE: preload("res://img/icons/artifacts/imp_blade1.png"),
+	DataManager.ArtifactId.PLAGUE_AMULET: preload("res://img/icons/artifacts/plague_amulet1.png"),
 }
 
 
@@ -2040,14 +2040,14 @@ func get_random_effect_from_pool(categories: Array) -> EffectEntry:
 
 
 const POTION_ICONS: Dictionary = {
-	DataManager.PotionType.HEAL: preload("res://img/potions/heal_potion.png"),
-	DataManager.PotionType.ENERGY: preload("res://img/potions/energy_potion.png"),
-	DataManager.PotionType.DRAW: preload("res://img/potions/draw_potion.png"),
-	DataManager.PotionType.EXPLOSION: preload("res://img/potions/explosion_potion.png"),
-	DataManager.PotionType.STATUS_CLEANSE: preload("res://img/potions/status_cleanse_potion.png"),
+	DataManager.PotionType.HEAL: preload("res://img/potions/heal_potion1.png"),
+	DataManager.PotionType.ENERGY: preload("res://img/potions/energy_potion1.png"),
+	DataManager.PotionType.DRAW: preload("res://img/potions/draw_potion1.png"),
+	DataManager.PotionType.EXPLOSION: preload("res://img/potions/explosion_potion1.png"),
+	DataManager.PotionType.STATUS_CLEANSE: preload("res://img/potions/status_cleanse_potion1.png"),
 	#DataManager.PotionType.STRENGTH: preload("res://img/potions/strength_potion.png"),
-	DataManager.PotionType.POISON: preload("res://img/potions/poison_potion.png"),
-	DataManager.PotionType.BLOCK: preload("res://img/potions/block_potion.png"),
+	DataManager.PotionType.POISON: preload("res://img/potions/poison_potion1.png"),
+	DataManager.PotionType.BLOCK: preload("res://img/potions/block_potion1.png"),
 }
 
 func get_potion_icon(potion_type: DataManager.PotionType) -> Texture2D:

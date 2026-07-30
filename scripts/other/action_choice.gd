@@ -199,7 +199,7 @@ func _animate_in() -> void:
 	dark_overlay.color.a = 0.0
 	var in_amount: float = 0.8
 	if room_object:
-		in_amount = 0.9
+		in_amount = 0.8
 	var tween = create_tween()
 	await tween.tween_property(dark_overlay, "color:a", in_amount, 1)
 
