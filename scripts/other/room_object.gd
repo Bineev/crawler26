@@ -118,12 +118,12 @@ func setup(type: DataManager.ObjectType, biome: DataManager.Biome, event_res: Ev
 		shadow_sprite.texture = texture
 		shadow_sprite.custom_minimum_size = obj_size
 
-		## 🆕 Создаём копию материала для этого объекта
-		#if shadow_sprite.material:
-			#shadow_sprite.material = shadow_sprite.material.duplicate()
-		#
-		## 🆕 Настраиваем параметры тени
-		#_setup_shadow_parameters(object_type)
+		# 🆕 Создаём копию материала для этого объекта
+		if shadow_sprite.material:
+			shadow_sprite.material = shadow_sprite.material.duplicate()
+		
+		# 🆕 Настраиваем параметры тени
+		_setup_shadow_parameters(object_type)
 	else:
 		# Текстура-заглушка, если не найдена
 		printerr("Object texture not found for type: ", object_type, " biome: ", biome)

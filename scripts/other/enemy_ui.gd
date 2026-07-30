@@ -471,11 +471,11 @@ func _setup_click_area():
 	
 	# Создаём прямоугольную форму
 	var rect_shape = RectangleShape2D.new()
-	rect_shape.size = v_box_container.size
+	rect_shape.size = Vector2(v_box_container.size.x, v_box_container.size.y - 40) 
 	
 	collision_shape.shape = rect_shape
 	#collision_shape.global_position = v_box_container.global_position + v_box_container.size / 4
-	collision_shape.position = v_box_container.size - v_box_container.size / 2
+	collision_shape.position = rect_shape.size -rect_shape.size / 2
 	# Подключаем сигнал клика
 	if not click_area.input_event.is_connected(_on_click_area_input):
 		click_area.input_event.connect(_on_click_area_input)

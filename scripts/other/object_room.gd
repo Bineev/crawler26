@@ -73,13 +73,13 @@ func _add_object_label(object_type: DataManager.ObjectType, title_text: String =
 	var settings = LabelSettings.new()
 	settings.font = DataManager.FONT_HEADERS
 	settings.font_size = 48
-	settings.font_color = DataManager.COLOR_MOLE_TUNNELS_ART_BG_LIGHT2
+	settings.font_color = DataManager.COLOR_MOLE_TUNNELS_ART_BG_LIGHT
 	settings.outline_color = Color.BLACK
 	settings.outline_size = 5
 	
 	label.label_settings = settings
-	#if object_type == DataManager.ObjectType.EVENT or object_type == DataManager.ObjectType.SHOP:
-		#label.add_theme_color_override("font_color", DataManager.COLOR_PENITENT_ART_BG_DARK)
+	if object_type == DataManager.ObjectType.EVENT:
+		label.hide()
 	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	if object_type != DataManager.ObjectType.EVENT:
 		label.text = _get_object_label_text(object_type)

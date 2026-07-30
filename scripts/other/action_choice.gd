@@ -350,7 +350,7 @@ func _show_result_label(text: String, color: Color = Color.WHITE) -> void:
 	
 	# Медленно исчезаем в течение 2 секунд
 	var tween = create_tween()
-	tween.tween_property(label, "modulate", Color(1, 1, 1, 0), 1.5)
+	tween.tween_property(label, "modulate", Color(1, 1, 1, 0), 3)
 	await tween.finished
 	
 	label.queue_free()
@@ -546,7 +546,7 @@ func _generate_shop_items() -> Array[Dictionary]:
 	var items: Array[Dictionary] = []
 	
 	# 2-4 карты
-	var card_count = randi() % 3 + 2  # 2-4
+	var card_count = randi() % 3 + 2
 	var cards = DeckManager.get_cards_by_biome(FloorManager.current_biome, FloorManager.current_path_progress, FloorManager.current_floor, 10)
 	cards.shuffle()
 	for i in range(min(card_count, cards.size())):
@@ -558,7 +558,7 @@ func _generate_shop_items() -> Array[Dictionary]:
 		})
 	
 	# 1-2 артефакта
-	var artifact_count = randi() % 2 + 1  # 1-2
+	var artifact_count = randi() % 2 + 1
 	var artifacts = ArtifactManager.get_random_artifacts(DataManager.ArtifactGrade.NORMAL, 5)
 	for i in range(min(artifact_count, artifacts.size())):
 		var artifact = artifacts[i]
@@ -568,8 +568,17 @@ func _generate_shop_items() -> Array[Dictionary]:
 			"cost_grade": _random_cost_grade(),
 		})
 	
+	# 🆕 Ключи (всегда 1-2 в продаже, в контейнере с артефактами)
+	var key_count = randi() % 2 + 1
+	for i in range(key_count):
+		items.append({
+			"type": "key",
+			"data": null,  # ключ не требует данных
+			"cost_grade": DataManager.CostGrade.NORMAL,
+		})
+	
 	# 2-4 зелья
-	var potion_count = randi() % 3 + 2  # 2-4
+	var potion_count = randi() % 3 + 2
 	var potions = DataManager.get_random_potions(10)
 	for i in range(min(potion_count, potions.size())):
 		var potion = potions[i]

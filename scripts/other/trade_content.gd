@@ -19,6 +19,8 @@ func setup(items: Array[Dictionary]) -> void:
 				_add_card_item(item)
 			"artifact":
 				_add_artifact_item(item)
+			"key":  # 🆕
+				_add_key_item(item)
 			"potion":
 				_add_potion_item(item)
 	
@@ -29,6 +31,7 @@ func setup(items: Array[Dictionary]) -> void:
 	artifacts_container.custom_minimum_size = artifacts_container.size
 	potions_container.custom_minimum_size = potions_container.size
 
+
 func _add_card_item(item: Dictionary) -> void:
 	var container = VBoxContainer.new()
 	container.alignment = BoxContainer.ALIGNMENT_CENTER
@@ -38,19 +41,15 @@ func _add_card_item(item: Dictionary) -> void:
 	card_ui.card_data = item["data"]
 	var card_container = Container.new()
 	card_container.add_child(card_ui)
-	# Сначала добавляем card_ui в container
 	container.add_child(card_container)
-	# Добавляем container в дерево
 	cards_container.add_child(container)
-	# Теперь можно настраивать
+	
 	card_ui.display()
 	card_ui.card_control.scale = Vector2(0.7, 0.7)
 	card_ui.set_reward_state()
 	card_container.custom_minimum_size = card_ui.get_actual_size() * 1.2
 
-	# Получаем иконку монеты и уменьшаем её
 	var coin_icon = DataManager.get_currency_icon(DataManager.CurrencyType.COIN)
-
 	var price = _get_price(item)
 	var buy_button = DataManager.create_button(str(price), DataManager.ButtonType.PRIMARY, coin_icon)
 	buy_button.add_theme_constant_override("icon_max_width", 32)
@@ -59,32 +58,51 @@ func _add_card_item(item: Dictionary) -> void:
 	container.add_child(buy_button)
 	buy_button.focus_mode = Control.FOCUS_NONE
 
+
 func _add_artifact_item(item: Dictionary) -> void:
 	var container = VBoxContainer.new()
 	container.alignment = BoxContainer.ALIGNMENT_CENTER
 	container.add_theme_constant_override("separation", 5)
 	
 	var artifact_icon = load("res://scenes/artifact_icon.tscn").instantiate() as ArtifactIcon
-	
-	# Сначала добавляем artifact_icon в container
 	container.add_child(artifact_icon)
-	
-	# Добавляем container в дерево
 	artifacts_container.add_child(container)
 	
-	# Теперь можно настраивать
 	artifact_icon.setup(item["data"], true)
-	#artifact_icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	
-	# Получаем иконку монеты и уменьшаем её
 	var coin_icon = DataManager.get_currency_icon(DataManager.CurrencyType.COIN)
-
 	var price = _get_price(item)
 	var buy_button = DataManager.create_button(str(price), DataManager.ButtonType.PRIMARY, coin_icon)
 	buy_button.pressed.connect(_on_buy_pressed.bind(item, container))
 	buy_button.set_meta("price", price)
 	container.add_child(buy_button)
 	buy_button.focus_mode = Control.FOCUS_NONE
+
+
+func _add_key_item(item: Dictionary) -> void:
+	var container = VBoxContainer.new()
+	container.alignment = BoxContainer.ALIGNMENT_CENTER
+	container.add_theme_constant_override("separation", 5)
+	container.custom_minimum_size = Vector2(128, 128)
+	
+	# 🆕 Иконка ключа
+	var key_icon = TextureRect.new()
+	key_icon.texture = preload("res://img/icons/currency/keys1.png")  # TODO: добавить иконку ключа
+	key_icon.custom_minimum_size = Vector2(96, 96)
+	key_icon.expand_mode = TextureRect.EXPAND_FIT_WIDTH_PROPORTIONAL
+	key_icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	container.add_child(key_icon)
+	
+	artifacts_container.add_child(container)
+	
+	var coin_icon = DataManager.get_currency_icon(DataManager.CurrencyType.COIN)
+	var price = _get_price(item)
+	var buy_button = DataManager.create_button(str(price), DataManager.ButtonType.PRIMARY, coin_icon)
+	buy_button.pressed.connect(_on_buy_pressed.bind(item, container))
+	buy_button.set_meta("price", price)
+	container.add_child(buy_button)
+	buy_button.focus_mode = Control.FOCUS_NONE
+
 
 func _add_potion_item(item: Dictionary) -> void:
 	var container = VBoxContainer.new()
@@ -92,20 +110,13 @@ func _add_potion_item(item: Dictionary) -> void:
 	container.add_theme_constant_override("separation", 10)
 	
 	var potion_icon = load("res://scenes/potion_icon.tscn").instantiate() as PotionIcon
-	
-	# Сначала добавляем potion_icon в container
 	container.add_child(potion_icon)
-	
-	# Добавляем container в дерево
 	potions_container.add_child(container)
 	
-	# Теперь можно настраивать
 	potion_icon.setup(item["data"])
 	potion_icon.set_interactable(false)
 	
-	# Получаем иконку монеты и уменьшаем её
 	var coin_icon = DataManager.get_currency_icon(DataManager.CurrencyType.COIN)
-
 	var price = _get_price(item)
 	var buy_button = DataManager.create_button(str(price), DataManager.ButtonType.PRIMARY, coin_icon)
 	buy_button.pressed.connect(_on_buy_pressed.bind(item, container))
@@ -113,21 +124,22 @@ func _add_potion_item(item: Dictionary) -> void:
 	container.add_child(buy_button)
 	buy_button.focus_mode = Control.FOCUS_NONE
 
+
 func _get_price(item: Dictionary) -> int:
+	# 🆕 Для ключей своя цена
+	if item["type"] == "key":
+		return RunManager.default_item_cost * 2  # цена как NORMAL
+	
 	var data = item["data"]
 	var grade = DataManager.CostGrade.NORMAL
 	
-	# Если у ресурса есть cost_grade — используем его
 	if data.has_method("get_cost_grade"):
 		grade = data.get_cost_grade()
 	
 	var base_price = int(grade) * RunManager.default_item_cost
-	
-	# 🆕 Добавляем разброс ±20% (от 0.8 до 1.2)
 	var variance = randf_range(0.7, 1.3)
 	var final_price = floor(base_price * variance)
 	
-	# Минимальная цена — 1
 	return max(1, final_price)
 
 
@@ -141,8 +153,10 @@ func _update_buttons() -> void:
 				var price = button.get_meta("price", 0)
 				button.disabled = coins < price
 
+
 func _on_coins_changed(amount: int) -> void:
 	_update_buttons()
+
 
 func _on_buy_pressed(item: Dictionary, container: Control) -> void:
 	if is_processing:
@@ -152,7 +166,7 @@ func _on_buy_pressed(item: Dictionary, container: Control) -> void:
 	var price = _get_price(item)
 	
 	if RunManager.get_coins() < price:
-		SignalManager.log_message.emit("Недостаточно золота!")
+		SignalManager.log_message.emit(tr("shop_not_enough_gold"))
 		is_processing = false
 		return
 	
@@ -161,13 +175,16 @@ func _on_buy_pressed(item: Dictionary, container: Control) -> void:
 	match item["type"]:
 		"card":
 			RunManager.add_card(item["data"])
-			SignalManager.log_message.emit("Куплена карта: %s" % item["data"].get_localized_name())
+			SignalManager.log_message.emit(tr("shop_bought_card") % item["data"].get_localized_name())
 		"artifact":
 			RunManager.add_artifact(item["data"])
-			SignalManager.log_message.emit("Куплен артефакт: %s" % item["data"].get_localized_name())
+			SignalManager.log_message.emit(tr("shop_bought_artifact") % item["data"].get_localized_name())
+		"key":  # 🆕
+			RunManager.add_keys(1)
+			SignalManager.log_message.emit(tr("shop_bought_key"))
 		"potion":
 			RunManager.add_potion(item["data"])
-			SignalManager.log_message.emit("Куплено зелье: %s" % item["data"].get_localized_name())
+			SignalManager.log_message.emit(tr("shop_bought_potion") % item["data"].get_localized_name())
 	
 	container.queue_free()
 	is_processing = false

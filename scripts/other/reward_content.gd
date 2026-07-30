@@ -301,7 +301,7 @@ func _on_item_selected(index: int) -> void:
 	tween_fly.set_parallel(true)
 	tween_fly.tween_property(selected_vbox, "position", final_target, 0.5).set_ease(Tween.EASE_IN)
 	tween_fly.tween_property(selected_vbox, "scale", Vector2(0.8, 0.8), 0.5).set_ease(Tween.EASE_IN)
-	tween_fly.tween_property(selected_vbox, "modulate", Color(1, 1, 1, 0), 0.4)
+	tween_fly.tween_property(selected_vbox, "modulate", Color(1, 1, 1, 0), 0.1)
 	
 	await tween_fly.finished
 	selected_vbox.queue_free()
@@ -851,7 +851,7 @@ func _on_upgrade_card_selected(card_data: CardData, preview_container: Control) 
 
 
 func _on_upgrade_confirm() -> void:
-	if not selected_card or not transformed_card:
+	if not selected_card:
 		return
 	
 	# 🆕 Создаём копию карты с улучшением
@@ -1431,7 +1431,7 @@ func _get_transformed_card_copy(card: CardData) -> CardData:
 	#SignalManager.reward_selected.emit()
 
 func _on_transform_confirm() -> void:
-	if not selected_card:
+	if not selected_card or not transformed_card:
 		return
 	
 	var preview_card = preview_container.get_child(0) if preview_container.get_child_count() > 0 else null
