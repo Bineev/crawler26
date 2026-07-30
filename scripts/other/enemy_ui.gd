@@ -930,6 +930,7 @@ func _apply_freeze_effect_immediate():
 
 
 func remove_freeze_effect():
+	set_animation_state(DataManager.EnemyAnimationState.IDLE)
 	pending_freeze = false
 	
 	if current_shader_priority != DataManager.EnemyShaderPriority.FREEZE:
@@ -1072,6 +1073,7 @@ func _apply_debuff_effect():
 	hit_tween.tween_property(self, "position", target_pos, t_squeeze).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_QUAD)
 	hit_tween.tween_property(shader_material, "shader_parameter/debuff_progress", 1.0, t_squeeze)
 	
+	
 	# ШАГ 2: Кротчайшая пауза
 	hit_tween.chain().tween_interval(t_pause)
 	
@@ -1079,19 +1081,18 @@ func _apply_debuff_effect():
 	var return_card = hit_tween.chain().set_parallel(true)
 	return_card.tween_property(self, "scale", original_scale, t_return).set_ease(Tween.EASE_IN_OUT).set_trans(Tween.TRANS_SINE)
 	return_card.tween_property(self, "position", position, t_return).set_ease(Tween.EASE_IN_OUT).set_trans(Tween.TRANS_SINE)
-	
+	return_card.tween_callback(set_animstate_to_idle).set_delay(t_return)
 	# ШАГ 4: Динамичное исчезновение эффекта скверны
 	hit_tween.chain().tween_property(shader_material, "shader_parameter/debuff_progress", 0.0, t_fade)\
 		.set_trans(Tween.TRANS_QUART)\
 		.set_ease(Tween.EASE_OUT)
 	
 	await hit_tween.finished
-	set_animation_state(DataManager.EnemyAnimationState.IDLE)
 	hit_tween = null
 	
 	if pending_freeze:
 		pending_freeze = false
-		set_animation_state(DataManager.EnemyAnimationState.GET_HIT)
+		#set_animation_state(DataManager.EnemyAnimationState.GET_HIT)
 		_apply_freeze_effect_immediate()
 		return
 	
@@ -1104,6 +1105,10 @@ func _apply_debuff_effect():
 			enemy_sprite.material = null
 	
 	current_shader_priority = DataManager.EnemyShaderPriority.NONE
+
+
+func set_animstate_to_idle():
+	set_animation_state(DataManager.EnemyAnimationState.IDLE)
 
 
 func _on_status_icon_hovered(status_id: DataManager.Status, stacks: int, duration: int, status_data: Dictionary):

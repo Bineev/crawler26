@@ -2125,7 +2125,7 @@ func create_button(text: String, button_type: ButtonType = ButtonType.DEFAULT, i
 	var normal_color = COLOR_MOLE_TUNNELS_ART_BG_LIGHT
 	var hover_color = COLOR_MOLE_TUNNELS_ART_BG_LIGHT
 	var pressed_color = COLOR_MOLE_TUNNELS_ART_BG_LIGHT
-	var disabled_color = COLOR_BONE_LABYRINTH_ART_BG_DARK
+	var disabled_color = COLOR_PENITENT_ART_BG_DARK
 	
 	button.add_theme_color_override("font_color", normal_color)
 	button.add_theme_color_override("font_hover_color", hover_color)
@@ -2162,7 +2162,7 @@ func _get_button_style(button_type: ButtonType, is_active: bool, is_hover: bool 
 	# --- ОБВОДКА ---
 	var border_color: Color
 	if is_disabled:
-		border_color = COLOR_BUTTON_DISABLED_BORDER
+		border_color = COLOR_PENITENT_ART_BG_DARK
 	elif is_active:
 		border_color = COLOR_MOLE_TUNNELS_ART_BG_LIGHT
 	else:
@@ -2235,7 +2235,7 @@ func apply_button_style(button: Button, button_type: ButtonType = ButtonType.DEF
 	var normal_color = COLOR_MOLE_TUNNELS_ART_BG_LIGHT
 	var hover_color = COLOR_MOLE_TUNNELS_ART_BG_LIGHT
 	var pressed_color = COLOR_MOLE_TUNNELS_ART_BG_LIGHT
-	var disabled_color = COLOR_BONE_LABYRINTH_ART_BG_DARK
+	var disabled_color = COLOR_PENITENT_ART_BG_DARK
 	
 	button.add_theme_color_override("font_color", normal_color)
 	button.add_theme_color_override("font_hover_color", hover_color)

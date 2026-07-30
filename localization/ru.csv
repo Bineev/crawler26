@@ -479,3 +479,13 @@ upgrade_card_confirm,Улучшить
 "effect_scaled_damage_self","Нанести себе (%s) урон исходя из %s (%s).%s"
 
 "card_is_burned","🔥 Сгорает"
+
+"object_chest","Сундук"
+"object_shop","Лавка"
+"object_idol","Идол"
+"object_trap","Ловушка"
+"object_cauldron","Котёл"
+"object_torture_rack","Пыточный станок"
+"object_bonfire","Костер"
+"object_event","Событие"
+"object_unknown","Объект"

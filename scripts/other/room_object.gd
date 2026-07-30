@@ -23,7 +23,7 @@ func _ready() -> void:
 	SignalManager.hide_object.connect(_on_hide_object)
 
 
-func setup(type: DataManager.ObjectType, biome: DataManager.Biome) -> void:
+func setup(type: DataManager.ObjectType, biome: DataManager.Biome, event_res: EventResource = null) -> void:
 	object_type = type
 	self.biome = biome
 
@@ -50,17 +50,13 @@ func setup(type: DataManager.ObjectType, biome: DataManager.Biome) -> void:
 		return
 	# 🆕 Логика для EVENT
 	if object_type == DataManager.ObjectType.EVENT:
-		# 🆕 Получаем ресурс события для текущего биома
-		var event_resource = DataManager.get_event_for_biome(biome)
 		#self.texture = DataManager.get_object_texture(DataManager.ObjectType.SHOP, DataManager.Biome.MOLE_TUNNELS)
+		event_data = event_res
 		expand_mode = TextureRect.EXPAND_FIT_WIDTH
 		stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 		set_anchors_preset(Control.PRESET_TOP_LEFT)
 		position = Vector2.ZERO
-		if event_resource:
-			# Сохраняем ресурс в поле
-			event_data = event_resource
-			
+		if event_data:
 			# 🆕 Вместо текстуры — добавляем черный ColorRect на всю комнату
 			var black_overlay = ColorRect.new()
 			black_overlay.color = Color(0, 0, 0, 1)
@@ -91,7 +87,7 @@ func setup(type: DataManager.ObjectType, biome: DataManager.Biome) -> void:
 			event_texture_rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
 			event_texture_rect.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 			
-			var event_texture = DataManager.get_event_texture(event_resource.event_type, biome)
+			var event_texture = DataManager.get_event_texture(event_data.event_type, biome)
 			if event_texture:
 				event_texture_rect.texture = event_texture
 			

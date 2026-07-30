@@ -302,7 +302,7 @@ func _setup_bars():
 	atonement_bar.add_theme_stylebox_override("fill", atonement_fill)
 	# Фон
 	back_atonement_bg = StyleBoxFlat.new()
-	back_atonement_bg.bg_color = DataManager.COLOR_BUTTON_DISABLED_BORDER
+	back_atonement_bg.bg_color = Color.BLACK
 	back_atonement_bg.border_width_bottom = 2
 	back_atonement_bg.border_width_top = 2
 	back_atonement_bg.border_width_left = 2
