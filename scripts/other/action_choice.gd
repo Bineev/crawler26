@@ -21,7 +21,7 @@ func setup(title: String, actions_array: Array[DataManager.ActionType], context:
 	result_timer = Timer.new()
 	add_child(result_timer)
 	result_timer.one_shot = true
-	result_timer.wait_time = 5.0
+	result_timer.wait_time = 3.0
 	
 	title_label.text = title
 	_animate_in()
@@ -129,16 +129,17 @@ func _handle_choice(action: DataManager.ActionType) -> void:
 		_handle_event(action)
 	else:
 		printerr("Unknown action: ", action)
+	SignalManager.hide_room_object_title.emit()
 
 func _handle_use_key() -> void:
 	var success = RunManager.use_key()
 	
 	if success:
-		await _show_result_label("СУНДУК ОТКРЫТ!", DataManager.COLOR_HEAL_LOG)
+		await _show_result_label(tr("result_chest_opened"), DataManager.COLOR_HEAL_LOG)
 		SignalManager.log_message.emit("Ключ использован!")
 		_create_rewards(true, DataManager.ActionType.USE_KEY)
 	else:
-		await _show_result_label("НЕТ КЛЮЧЕЙ!", DataManager.COLOR_PENITENT_ART_BG_DARK)
+		await _show_result_label(tr("result_no_keys"), DataManager.COLOR_PENITENT_ART_BG_DARK)
 		SignalManager.log_message.emit("Нет ключей!")
 		_create_rewards(false, DataManager.ActionType.USE_KEY)
 
@@ -147,17 +148,17 @@ func _handle_break() -> void:
 	var success = randf() < DataManager.CHEST_BREAK_CHANCE
 	
 	if success:
-		await _show_result_label("УСПЕХ!", DataManager.COLOR_HEAL_LOG)
+		await _show_result_label(tr("result_break_success"), DataManager.COLOR_HEAL_LOG)
 		SignalManager.log_message.emit("Сундук взломан!")
 		_create_rewards(true, DataManager.ActionType.BREAK)
 	else:
-		await _show_result_label("НЕУДАЧА!", DataManager.COLOR_PENITENT_ART_BG_DARK)
+		await _show_result_label(tr("result_break_fail"), DataManager.COLOR_PENITENT_ART_BG_DARK)
 		SignalManager.log_message.emit("Взлом не удался!")
 		_create_rewards(false, DataManager.ActionType.BREAK)
 
 
 func _handle_rest() -> void:
-	await _show_result_label(tr("bonfire_rest_result"), DataManager.COLOR_HEAL_LOG)
+	await _show_result_label(tr("result_bonfire_rest"), DataManager.COLOR_HEAL_LOG)
 	
 	var reward_panel = preload("res://scenes/reward_panel.tscn").instantiate() as RewardPanel
 	reward_panel.reward_types = _generate_rewards(DataManager.ActionType.REST, true)
@@ -167,7 +168,7 @@ func _handle_rest() -> void:
 	queue_free()
 
 func _handle_pray() -> void:
-	await _show_result_label(tr("bonfire_pray_result"), DataManager.COLOR_HEAL_LOG)
+	await _show_result_label(tr("result_bonfire_pray"), DataManager.COLOR_HEAL_LOG)
 	
 	# TODO: добавить баф на 3 боевые комнаты (увеличение макс. энергии)
 	var reward_panel = preload("res://scenes/reward_panel.tscn").instantiate() as RewardPanel
@@ -178,7 +179,7 @@ func _handle_pray() -> void:
 	queue_free()
 
 func _handle_sharp_weapon() -> void:
-	await _show_result_label(tr("bonfire_sharp_result"), DataManager.COLOR_HEAL_LOG)
+	await _show_result_label(tr("result_bonfire_sharp"), DataManager.COLOR_HEAL_LOG)
 	
 	var reward_panel = preload("res://scenes/reward_panel.tscn").instantiate() as RewardPanel
 	reward_panel.reward_types = _generate_rewards(DataManager.ActionType.SHARP_WEAPON, true)
@@ -253,6 +254,7 @@ func _generate_rewards(action: DataManager.ActionType, success: bool) -> Array[D
 			else:
 				# Неудача при взломе — урон + ловушка
 				rewards.append(DataManager.RewardType.TAKE_DAMAGE)
+				rewards.append(DataManager.RewardType.GOLD)
 		
 		DataManager.ActionType.PRAY:
 			# Молитва — лечение или благословение
@@ -311,12 +313,23 @@ func _animate_transition_in() -> void:
 
 func _show_result_label(text: String, color: Color = Color.WHITE) -> void:
 	var label = Label.new()
-	label.text = text
-	label.add_theme_font_override("font", DataManager.FONT_HEADERS)
-	label.add_theme_font_size_override("font_size", 60)
-	label.add_theme_color_override("font_color", color)
+	
+	# Создаём LabelSettings с полными настройками
+	var settings = LabelSettings.new()
+	settings.font = DataManager.FONT_HEADERS
+	settings.font_size = 48
+	settings.font_color = DataManager.COLOR_MOLE_TUNNELS_ART_BG_LIGHT2
+	settings.outline_color = Color.BLACK
+	settings.outline_size = 5
+	
+	label.label_settings = settings
+	
+	# 🆕 Настройка переноса текста
+	label.autowrap_mode = TextServer.AUTOWRAP_WORD
 	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	
+	label.text = text
 	
 	# 🆕 Растягиваем на весь размер родителя
 	label.anchor_left = 0.0
@@ -352,20 +365,20 @@ func _handle_make_offering() -> void:
 		# 5-10 костей: кость * 3 золота
 		rewards.append(DataManager.RewardType.GOLD)
 		gold_mod = 3
-		await _show_result_label(tr("idol_offering_small"), DataManager.COLOR_HEAL_LOG)
+		await _show_result_label(tr("result_offer_small"), DataManager.COLOR_HEAL_LOG)
 	elif bones <= 20:
 		# 11-20 костей: случайный артефакт + кость * 4 золота
 		rewards.append(DataManager.RewardType.ARTIFACT_WITHOUT_CHOICE)
 		rewards.append(DataManager.RewardType.GOLD)
 		gold_mod = 4
-		await _show_result_label(tr("idol_offering_medium"), DataManager.COLOR_HEAL_LOG)
+		await _show_result_label(tr("result_offer_medium"), DataManager.COLOR_HEAL_LOG)
 	else:
 		# 20+ костей: артефакт на выбор + кость * 5 золота + бафф на +1 размер руки
 		rewards.append(DataManager.RewardType.ARTIFACT)
 		rewards.append(DataManager.RewardType.GOLD)
 		rewards.append(DataManager.RewardType.DECK_SIZE_BUFF)
 		gold_mod = 5
-		await _show_result_label(tr("idol_offering_great"), DataManager.COLOR_HEAL_LOG)
+		await _show_result_label(tr("result_offer_great"), DataManager.COLOR_HEAL_LOG)
 	
 	# Тратим все кости
 	RunManager.spend_bones(bones)
@@ -379,7 +392,7 @@ func _handle_make_offering() -> void:
 
 
 func _handle_give_blood() -> void:
-	await _show_result_label(tr("idol_blood_result"), DataManager.COLOR_PENITENT_ART_BG_DARK)
+	await _show_result_label(tr("result_blood_offering"), DataManager.COLOR_PENITENT_ART_BG_DARK)
 	
 	var player = BattleManager.get_player()
 	
@@ -396,7 +409,7 @@ func _handle_loot_shrine() -> void:
 	var rewards: Array[DataManager.RewardType] = []
 	var gold_mod : int = 1
 	if success:
-		await _show_result_label(tr("idol_loot_success"), DataManager.COLOR_HEAL_LOG)
+		await _show_result_label(tr("result_loot_success"), DataManager.COLOR_HEAL_LOG)
 		# Выбираем случайную награду из трёх
 		var options = [
 			DataManager.RewardType.CARD_WITHOUT_CHOICE,
@@ -407,7 +420,7 @@ func _handle_loot_shrine() -> void:
 		rewards.append(DataManager.RewardType.GOLD)
 		gold_mod = 3
 	else:
-		await _show_result_label(tr("idol_loot_fail"), DataManager.COLOR_PENITENT_ART_BG_DARK)
+		await _show_result_label(tr("result_loot_fail"), DataManager.COLOR_PENITENT_ART_BG_DARK)
 		rewards = [DataManager.RewardType.GOLD]
 		gold_mod = 2
 		# Дебафф через систему, как у Strange Mushroom
@@ -421,7 +434,7 @@ func _handle_loot_shrine() -> void:
 	queue_free()
 
 func _handle_transform_card() -> void:
-	await _show_result_label(tr("cauldron_transform_title"), DataManager.COLOR_HEAL_LOG)
+	await _show_result_label(tr("result_cauldron_transform"), DataManager.COLOR_HEAL_LOG)
 	
 	var reward_panel = preload("res://scenes/reward_panel.tscn").instantiate() as RewardPanel
 	reward_panel.reward_types = [DataManager.RewardType.TRANSFORM_CARD]
@@ -431,7 +444,7 @@ func _handle_transform_card() -> void:
 
 
 func _handle_brew_potion() -> void:
-	await _show_result_label(tr("cauldron_brew_result"), DataManager.COLOR_HEAL_LOG)
+	await _show_result_label(tr("result_cauldron_brew"), DataManager.COLOR_HEAL_LOG)
 	
 	var reward_panel = preload("res://scenes/reward_panel.tscn").instantiate() as RewardPanel
 	reward_panel.reward_types = [DataManager.RewardType.POTION]
@@ -445,10 +458,10 @@ func _handle_disarm_trap() -> void:
 	var rewards: Array[DataManager.RewardType] = []
 	
 	if success:
-		await _show_result_label(tr("trap_disarm_success"), DataManager.COLOR_HEAL_LOG)
+		await _show_result_label(tr("result_trap_disarm_success"), DataManager.COLOR_HEAL_LOG)
 		rewards = [DataManager.RewardType.GOLD]
 	else:
-		await _show_result_label(tr("trap_disarm_fail"), DataManager.COLOR_PENITENT_ART_BG_DARK)
+		await _show_result_label(tr("result_trap_disarm_fail"), DataManager.COLOR_PENITENT_ART_BG_DARK)
 		rewards = [DataManager.RewardType.TAKE_DAMAGE]
 	
 	var reward_panel = preload("res://scenes/reward_panel.tscn").instantiate() as RewardPanel
@@ -465,10 +478,10 @@ func _handle_search_trap() -> void:
 	var rewards: Array[DataManager.RewardType] = []
 	
 	if success:
-		await _show_result_label(tr("trap_search_success"), DataManager.COLOR_HEAL_LOG)
+		await _show_result_label(tr("result_trap_search_success"), DataManager.COLOR_HEAL_LOG)
 		rewards = [DataManager.RewardType.GOLD, DataManager.RewardType.POTION]
 	else:
-		await _show_result_label(tr("trap_search_fail"), DataManager.COLOR_PENITENT_ART_BG_DARK)
+		await _show_result_label(tr("result_trap_search_fail"), DataManager.COLOR_PENITENT_ART_BG_DARK)
 		rewards = [DataManager.RewardType.TAKE_DAMAGE, DataManager.RewardType.GOLD]
 	
 	var reward_panel = preload("res://scenes/reward_panel.tscn").instantiate() as RewardPanel
@@ -481,7 +494,7 @@ func _handle_search_trap() -> void:
 
 
 func _handle_lose_flesh() -> void:
-	await _show_result_label(tr("rack_lose_flesh_result"), DataManager.COLOR_PENITENT_ART_BG_DARK)
+	await _show_result_label(tr("result_flesh_sacrifice"), DataManager.COLOR_PENITENT_ART_BG_DARK)
 	
 	var reward_panel = preload("res://scenes/reward_panel.tscn").instantiate() as RewardPanel
 	# Сначала урон, потом бафф
@@ -502,10 +515,10 @@ func _handle_craft() -> void:
 	var rewards: Array[DataManager.RewardType] = []
 	
 	if success:
-		await _show_result_label(tr("rack_craft_success"), DataManager.COLOR_HEAL_LOG)
+		await _show_result_label(tr("result_craft_success"), DataManager.COLOR_HEAL_LOG)
 		rewards = [DataManager.RewardType.ARTIFACT_WITHOUT_CHOICE]
 	else:
-		await _show_result_label(tr("rack_craft_fail"), DataManager.COLOR_PENITENT_ART_BG_DARK)
+		await _show_result_label(tr("result_craft_fail"), DataManager.COLOR_PENITENT_ART_BG_DARK)
 		rewards = [DataManager.RewardType.TAKE_DAMAGE, DataManager.RewardType.ARTIFACT_WITHOUT_CHOICE]
 	
 	var reward_panel = preload("res://scenes/reward_panel.tscn").instantiate() as RewardPanel
@@ -517,7 +530,7 @@ func _handle_craft() -> void:
 
 
 func _handle_trade() -> void:
-	await _show_result_label(tr("shop_trade_title"), DataManager.COLOR_HEAL_LOG)
+	await _show_result_label(tr("result_shop_trade"), DataManager.COLOR_HEAL_LOG)
 	
 	# Формируем товары
 	var items = _generate_shop_items()

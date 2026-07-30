@@ -354,7 +354,7 @@ func update_statuses():
 	for status_data in enemy_instance.get_active_statuses_for_ui():
 		var icon = STATUS_ICON_SCENE.instantiate() as StatusIcon
 		status_container.add_child(icon)
-		icon.setup(status_data, DataManager.COLOR_MOLE_TUNNELS_ART_BG_LIGHT2)  # тёмный для врагов
+		icon.setup(status_data, Color.BLACK)  # тёмный для врагов
 		
 		# 🆕 Подключаем тултип
 		icon.mouse_entered.connect(_on_status_icon_hovered.bind(
@@ -379,7 +379,7 @@ func update_passives():
 	for passive_data in enemy_instance.get_active_passives_for_ui():
 		var icon = PASSIVE_ICON_SCENE.instantiate() as PassiveIcon
 		passive_container.add_child(icon)
-		icon.setup(passive_data, DataManager.COLOR_MOLE_TUNNELS_ART_BG_LIGHT2)  # тёмный для врагов)
+		icon.setup(passive_data, Color.BLACK)  # тёмный для врагов)
 		# 🆕 Подключаем тултип
 		# 🆕 Подключаем динамический тултип
 		icon.mouse_entered.connect(_on_passive_icon_hovered.bind(passive_data))

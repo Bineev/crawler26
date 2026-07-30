@@ -441,7 +441,7 @@ func _update_icons(target : Node):
 		
 		var icon = STATUS_ICON_SCENE.instantiate() as StatusIcon
 		status_container.add_child(icon)
-		icon.setup(icon_data, DataManager.COLOR_MOLE_TUNNELS_ART_BG_LIGHT, self)  # светлый для игрока
+		icon.setup(icon_data, DataManager.COLOR_MOLE_TUNNELS_ART_BG_LIGHT2, self)  # светлый для игрока
 		# 🆕 Подключаем тултип
 		icon.mouse_entered.connect(_on_status_icon_hovered.bind(status_id, status_data.stacks, status_data.duration, status_data))
 		icon.mouse_exited.connect(_on_icon_mouse_exited)
@@ -461,7 +461,7 @@ func _update_icons(target : Node):
 		
 		var icon = PASSIVE_ICON_SCENE.instantiate() as PassiveIcon
 		status_container.add_child(icon)
-		icon.setup(icon_data, DataManager.COLOR_MOLE_TUNNELS_ART_BG_LIGHT, self)  # светлый для игрока
+		icon.setup(icon_data, DataManager.COLOR_MOLE_TUNNELS_ART_BG_LIGHT2, self)  # светлый для игрока
 		# 🆕 Подключаем тултип для пассивок
 		icon.mouse_entered.connect(_on_passive_icon_hovered.bind(icon_data))
 		icon.mouse_exited.connect(_on_icon_mouse_exited)

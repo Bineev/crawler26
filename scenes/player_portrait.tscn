@@ -2,8 +2,8 @@
 
 [ext_resource type="Script" uid="uid://cqgirclrqlv2m" path="res://scripts/other/player_portrait.gd" id="1_xpecc"]
 [ext_resource type="Shader" uid="uid://nyqt5rf23ph0" path="res://shaders/comic_shader.gdshader" id="2_icepd"]
-[ext_resource type="Texture2D" uid="uid://ckbmiay4apyet" path="res://img/portraits/penitent_portrait.png" id="2_yotol"]
 [ext_resource type="Shader" uid="uid://1kutc6pr0rfa" path="res://shaders/card3_shader.gdshader" id="3_ge412"]
+[ext_resource type="Texture2D" uid="uid://jvmcqnos84fg" path="res://img/portraits/penitent_portrait1.png" id="3_ocl0p"]
 [ext_resource type="Texture2D" uid="uid://dxg3mcj2iisyi" path="res://img/icons/statuses/shield.png" id="4_eunvh"]
 [ext_resource type="Shader" uid="uid://cfcs8l2y88blq" path="res://shaders/mood_shader.gdshader" id="5_ocl0p"]
 
@@ -57,7 +57,7 @@ alignment = 1
 material = SubResource("ShaderMaterial_eunvh")
 custom_minimum_size = Vector2(360, 360)
 layout_mode = 2
-texture = ExtResource("2_yotol")
+texture = ExtResource("3_ocl0p")
 expand_mode = 3
 stretch_mode = 5
 

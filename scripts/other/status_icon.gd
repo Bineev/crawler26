@@ -5,7 +5,7 @@ class_name StatusIcon
 @onready var stacks_label: Label = $MarginContainer/VBoxContainer/HBoxContainer/StacksLabel
 @onready var duration_label: Label = $MarginContainer/VBoxContainer/HBoxContainer/DurationLabel
 @onready var filler: Control = $MarginContainer/VBoxContainer/HBoxContainer/Filler
-
+@onready var h_box_container: HBoxContainer = $MarginContainer/VBoxContainer/HBoxContainer
 
 var status_id: int
 
@@ -17,31 +17,31 @@ func _setup_labels():
 	# Настройка для стаков
 	stacks_label.add_theme_font_override("font", DataManager.FONT_MAIN)
 	stacks_label.add_theme_font_size_override("font_size", 10)
-	stacks_label.add_theme_color_override("font_color", DataManager.COLOR_MOLE_TUNNELS_ART_BG_LIGHT)
+	stacks_label.add_theme_color_override("font_color", DataManager.COLOR_GRAY_NEAR_BLACK)
 	stacks_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
 	stacks_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	
 	# Настройка для длительности
 	duration_label.add_theme_font_override("font", DataManager.FONT_MAIN)
 	duration_label.add_theme_font_size_override("font_size", 10)
-	duration_label.add_theme_color_override("font_color", DataManager.COLOR_MOLE_TUNNELS_ART_BG_LIGHT)
+	duration_label.add_theme_color_override("font_color", DataManager.COLOR_GRAY_NEAR_BLACK)
 	duration_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	duration_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 
 
 func setup(data: Dictionary, text_color: Color = DataManager.COLOR_PENITENT_ART_BG_DARK, icon_owner = null) -> void:
 	status_id = data["status_id"]
-	
-	# 🆕 Настройка прозрачности самого ColorRect
-	if icon_owner is CardUI:
-		color = Color(1, 1, 1, 0)  # полностью прозрачный
-	else:
-		color = Color(0, 0, 0, 1)  # чёрный фон
+	# BUG для теста
+	## 🆕 Настройка прозрачности самого ColorRect
+	#if icon_owner is CardUI:
+		#color = Color(1, 1, 1, 0)  # полностью прозрачный
+	#else:
+		#color = Color(0, 0, 0, 1)  # чёрный фон
 	
 	icon.texture = data["icon"]
 	custom_minimum_size = Vector2(32, 32)
-	icon.custom_minimum_size = Vector2(16, 16)
-	filler.custom_minimum_size = Vector2(5, 0)
+	icon.custom_minimum_size = Vector2(32, 32)
+	filler.custom_minimum_size = Vector2(10, 0)
 	if icon_owner is CardUI:
 		custom_minimum_size = Vector2(32, 32)
 		icon.custom_minimum_size = Vector2(24, 24)
@@ -50,6 +50,7 @@ func setup(data: Dictionary, text_color: Color = DataManager.COLOR_PENITENT_ART_
 		custom_minimum_size = Vector2(48, 48)
 		icon.custom_minimum_size = Vector2(32, 32)
 		filler.custom_minimum_size = Vector2(10, 0)
+		h_box_container.show()
 	icon.expand_mode = TextureRect.EXPAND_FIT_WIDTH_PROPORTIONAL
 	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	

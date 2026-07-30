@@ -1,15 +1,27 @@
-[gd_scene load_steps=6 format=3 uid="uid://dcst51dams5bp"]
+[gd_scene load_steps=8 format=3 uid="uid://dcst51dams5bp"]
 
 [ext_resource type="Script" uid="uid://rgrbwlag2ceu" path="res://scripts/other/room.gd" id="1_36trf"]
 [ext_resource type="Shader" uid="uid://cfcs8l2y88blq" path="res://shaders/mood_shader.gdshader" id="2_85yof"]
 [ext_resource type="Material" uid="uid://dsw0r8s02nxsn" path="res://shaders/room.tres" id="3_85yof"]
 [ext_resource type="Material" uid="uid://3tj6g0pa2j2k" path="res://shaders/room2.tres" id="4_14vil"]
+[ext_resource type="Shader" uid="uid://cltqs0v1xgjjb" path="res://shaders/card2_shader.gdshader" id="5_jxe34"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_jxe34"]
 shader = ExtResource("2_85yof")
 shader_parameter/darkness = 0.4
 shader_parameter/vignette_strength = 0.5
 shader_parameter/noise_amount = 0.03
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_jn645"]
+shader = ExtResource("5_jxe34")
+shader_parameter/dirt_color = Color(0.2509804, 0.050980393, 0.050980393, 1)
+shader_parameter/grain_intensity = 0.150000007125
+shader_parameter/dirt_amount = 0.050000002375
+shader_parameter/scratch_amount = 0.0
+shader_parameter/vignette_color = Color(0, 0, 0, 1)
+shader_parameter/darkness_power = 0.50000002375
+shader_parameter/card_roundness = 0.0
+shader_parameter/mouse_offset = Vector2(0, 0)
 
 [node name="Room" type="Control"]
 custom_minimum_size = Vector2(1024, 800)
@@ -57,3 +69,11 @@ offset_right = 40.0
 offset_bottom = 40.0
 mouse_filter = 2
 color = Color(0, 0, 0, 1)
+
+[node name="VinnieteOverlay" type="ColorRect" parent="."]
+material = SubResource("ShaderMaterial_jn645")
+custom_minimum_size = Vector2(1024, 800)
+layout_mode = 1
+offset_right = 40.0
+offset_bottom = 40.0
+mouse_filter = 2

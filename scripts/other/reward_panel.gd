@@ -61,6 +61,10 @@ func _create_current_reward():
 	
 	if reward_type == DataManager.RewardType.UPGRADE_CARD or reward_type == DataManager.RewardType.TRANSFORM_CARD or reward_type == DataManager.RewardType.TRADE:
 		center_container.position.y = 0
+	elif reward_type == DataManager.RewardType.CARD_BIOM or reward_type == DataManager.RewardType.CARD_CHARACTER or reward_type == DataManager.RewardType.CARD_WITHOUT_CHOICE or reward_type == DataManager.RewardType.CONCRETE_CARD:
+		center_container.position.y = 200
+	else:
+		center_container.position.y = 300
 	
 	for child in center_container.get_children():
 		child.queue_free()

@@ -58,12 +58,12 @@ shader_parameter/flash_width = 0.15
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_8w5pg"]
 shader = ExtResource("6_6ligt")
-shader_parameter/dirt_color = Color(0, 0, 0, 0.5882353)
+shader_parameter/dirt_color = Color(0, 0, 0, 0.47058824)
 shader_parameter/grain_intensity = 0.2000000095
 shader_parameter/dirt_amount = 1.0
 shader_parameter/scratch_amount = 0.050000002375
 shader_parameter/vignette_color = Color(0, 0, 0, 1)
-shader_parameter/darkness_power = 0.6000000285
+shader_parameter/darkness_power = 1.0000000475
 shader_parameter/card_roundness = 0.050000002375
 shader_parameter/mouse_offset = Vector2(0, 0)
 

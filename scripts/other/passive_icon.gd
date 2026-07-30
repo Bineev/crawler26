@@ -4,6 +4,7 @@ class_name PassiveIcon
 @onready var icon: TextureRect = $MarginContainer/VBoxContainer/TextureRect
 @onready var charges_label: Label = $MarginContainer/VBoxContainer/HBoxContainer/ChargesLabel
 @onready var filler: Control = $MarginContainer/VBoxContainer/HBoxContainer/Filler
+@onready var h_box_container: HBoxContainer = $MarginContainer/VBoxContainer/HBoxContainer
 
 var passive_id: int
 
@@ -23,15 +24,17 @@ func _setup_labels():
 func setup(data: Dictionary, text_color: Color = DataManager.COLOR_PENITENT_ART_BG_DARK, icon_owner = null) -> void:
 	passive_id = data["passive_id"]
 	
-	# 🆕 Настройка прозрачности самого ColorRect
-	if icon_owner is CardUI:
-		color = Color(1, 1, 1, 0)  # полностью прозрачный
-	else:
-		color = Color(0, 0, 0, 1)  # чёрный фон
+	# BUG для теста
+	## 🆕 Настройка прозрачности самого ColorRect
+	#if icon_owner is CardUI:
+		#color = Color(1, 1, 1, 0)  # полностью прозрачный
+	#else:
+		#color = Color(0, 0, 0, 1)  # чёрный фон
 	
 	icon.texture = data["icon"]
 	custom_minimum_size  = Vector2(32, 32)
-	icon.custom_minimum_size = Vector2(16, 16)
+	icon.custom_minimum_size = Vector2(24, 24)
+	#icon.custom_minimum_size = Vector2(16, 16)
 	filler.custom_minimum_size = Vector2(5, 0)
 	if icon_owner is CardUI:
 		custom_minimum_size = Vector2(32, 32)
@@ -41,6 +44,7 @@ func setup(data: Dictionary, text_color: Color = DataManager.COLOR_PENITENT_ART_
 		custom_minimum_size = Vector2(48, 48)
 		icon.custom_minimum_size = Vector2(32, 32)
 		filler.custom_minimum_size = Vector2(10, 0)
+		h_box_container.show()
 	icon.expand_mode = TextureRect.EXPAND_FIT_WIDTH_PROPORTIONAL
 	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	

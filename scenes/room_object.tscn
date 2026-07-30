@@ -5,10 +5,10 @@
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_1q84d"]
 shader = ExtResource("2_1bc1b")
-shader_parameter/shadow_height = 0.2550000121125
-shader_parameter/shadow_width = 1.090000028025
+shader_parameter/shadow_height = 0.630000029925
+shader_parameter/shadow_width = 0.950000021375
 shader_parameter/shadow_skew = 4.7499999933364734e-08
-shader_parameter/vertical_offset = 0.1000000285
+shader_parameter/vertical_offset = 0.09500002826249998
 shader_parameter/shadow_color = Color(0, 0, 0, 0.3137255)
 
 [node name="RoomObject" type="TextureRect"]

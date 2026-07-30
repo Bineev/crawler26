@@ -167,7 +167,11 @@ func get_all_cards_for_biome(biome: DataManager.Biome) -> Array[DataManager.Card
 
 func _get_penitent_starting_deck() -> Array[CardData]:
 	var deck: Array[CardData] = []
-	
+
+	# BUG для теста
+	deck.append(DataManager.get_card(DataManager.CardId.BLOOD_THREAD))
+	deck.append(DataManager.get_card(DataManager.CardId.BLOOD_THREAD))
+
 	# Базовые атаки
 	deck.append(DataManager.get_card(DataManager.CardId.ATONEMENT_STRIKE))
 	deck.append(DataManager.get_card(DataManager.CardId.ATONEMENT_STRIKE))

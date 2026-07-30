@@ -22,6 +22,7 @@ var confirm_button : Button
 var shop_items: Array[Dictionary] = []
 var hover_tween: Tween = null
 var _last_hovered_vbox: Control = null
+var transformed_card: CardData
 
 enum ItemState {
 	IDLE,
@@ -236,54 +237,71 @@ func _on_item_selected(index: int) -> void:
 	
 	selected_index = index
 	
-	# Блокируем все кнопки
+	# Находим выбранный vbox
+	var selected_vbox = rewards_container.get_child(index)
+	
+	# 1. Заголовок исчезает
+	var tween_title = create_tween()
+	tween_title.tween_property(title_label, "modulate", Color(1, 1, 1, 0), 0.2)
+	
+	# 2. Блокируем все кнопки и затемняем их
 	for child in rewards_container.get_children():
 		var button = child.get_child(-1) if child.get_child_count() > 0 else null
 		if button is Button:
 			button.disabled = true
-			button.modulate = Color(0, 0, 0, 0)
+			var tween = create_tween()
+			tween.tween_property(button, "modulate", Color(0.5, 0.5, 0.5, 1), 0.15)
 	
-	# Находим выбранный vbox
-	var selected_vbox = rewards_container.get_child(index)
-	
-	# 1. Заголовок исчезает (быстро)
-	var tween_title = create_tween()
-	tween_title.tween_property(title_label, "modulate", Color(1, 1, 1, 0), 0.15)
-	
-	# 2. Все VBox, кроме выбранного, исчезают (быстро)
+	# 3. Все невыбранные карты разлетаются в стороны
+	var unselected_count = 0
 	for child in rewards_container.get_children():
 		if child != selected_vbox:
+			var direction = 1 if unselected_count % 2 == 0 else -1
+			var fly_x = direction * (randf_range(150, 250))
+			var fly_y = randf_range(-100, 100)
+			
 			var tween = create_tween()
-			tween.tween_property(child, "modulate", Color(1, 1, 1, 0), 0.15)
-			await tween.finished
-			child.queue_free()
+			tween.set_parallel(true)
+			tween.tween_property(child, "position", child.position + Vector2(fly_x, fly_y), 0.3).set_ease(Tween.EASE_IN_OUT)
+			tween.tween_property(child, "modulate", Color(1, 1, 1, 0), 0.3)
+			tween.tween_property(child, "scale", Vector2(0.5, 0.5), 0.3)
+			
+			unselected_count += 1
+			
+			# Удаляем после анимации
+			tween.tween_callback(child.queue_free).set_delay(0.35)
 	
-	# 3. Убираем кнопку у выбранного
+	# 4. Выбранный VBox поднимается и увеличивается
+	var start_pos = selected_vbox.position
+	var hover_pos = Vector2(
+		rewards_container.size.x / 2 - selected_vbox.size.x / 2,
+		selected_vbox.position.y - 60
+	)
+	
+	var tween_hover = create_tween()
+	tween_hover.set_parallel(true)
+	tween_hover.tween_property(selected_vbox, "position", hover_pos, 0.3).set_ease(Tween.EASE_OUT)
+	tween_hover.tween_property(selected_vbox, "scale", Vector2(1.1, 1.1), 0.3).set_ease(Tween.EASE_OUT)
+	
+	# 5. Убираем кнопку у выбранного
 	var button = selected_vbox.get_child(-1) if selected_vbox.get_child_count() > 0 else null
 	if button is Button:
 		button.queue_free()
 	
-	# 4. Выбранный VBox увеличивается и поднимается вверх
-	var start_pos = selected_vbox.position
-	var hover_pos = Vector2(start_pos.x, start_pos.y - 50)
+	# 6. Задержка перед финальной анимацией
+	await get_tree().create_timer(0.4).timeout
 	
-	var tween_hover = create_tween()
-	tween_hover.set_parallel(true)
-	tween_hover.tween_property(selected_vbox, "scale", Vector2(1.2, 1.2), 0.15).set_ease(Tween.EASE_OUT)
-	tween_hover.tween_property(selected_vbox, "position", hover_pos, 0.2).set_ease(Tween.EASE_OUT)
-	
-	await get_tree().create_timer(0.5).timeout  # висит в воздухе 0.5 сек
-	
-	# 5. Улетает вниз и исчезает
-	var target_pos = Vector2(
+	# 7. Карта улетает вверх и исчезает
+	var final_target = Vector2(
 		rewards_container.size.x / 2 - selected_vbox.size.x / 2,
-		rewards_container.size.y + 100
+		-200
 	)
+	
 	var tween_fly = create_tween()
 	tween_fly.set_parallel(true)
-	tween_fly.tween_property(selected_vbox, "position", target_pos, 0.3).set_ease(Tween.EASE_IN)
-	tween_fly.tween_property(selected_vbox, "scale", Vector2(0.5, 0.5), 0.3).set_ease(Tween.EASE_IN)
-	tween_fly.tween_property(selected_vbox, "modulate", Color(1, 1, 1, 0), 0.3)
+	tween_fly.tween_property(selected_vbox, "position", final_target, 0.5).set_ease(Tween.EASE_IN)
+	tween_fly.tween_property(selected_vbox, "scale", Vector2(0.8, 0.8), 0.5).set_ease(Tween.EASE_IN)
+	tween_fly.tween_property(selected_vbox, "modulate", Color(1, 1, 1, 0), 0.4)
 	
 	await tween_fly.finished
 	selected_vbox.queue_free()
@@ -367,7 +385,7 @@ func _setup_card_rewards() -> void:
 		var vbox = VBoxContainer.new()
 		vbox.alignment = BoxContainer.ALIGNMENT_CENTER
 		# 🆕 Добавляем отступы
-		vbox.add_theme_constant_override("separation", 20)
+		vbox.add_theme_constant_override("separation", 50)
 		# Обёртка для карты
 		var card_wrapper = Control.new()
 		card_wrapper.custom_minimum_size = Vector2(
@@ -396,7 +414,7 @@ func _setup_card_without_choice_reward() -> void:
 	
 	var vbox = VBoxContainer.new()
 	vbox.alignment = BoxContainer.ALIGNMENT_CENTER
-	vbox.add_theme_constant_override("separation", 10)
+	vbox.add_theme_constant_override("separation", 50)
 	
 	# Обёртка для карты
 	var card_wrapper = Control.new()
@@ -833,7 +851,7 @@ func _on_upgrade_card_selected(card_data: CardData, preview_container: Control) 
 
 
 func _on_upgrade_confirm() -> void:
-	if not selected_card:
+	if not selected_card or not transformed_card:
 		return
 	
 	# 🆕 Создаём копию карты с улучшением
@@ -1210,7 +1228,7 @@ func _on_transform_card_selected(event: InputEvent, card_data: CardData, wrapper
 		for child in preview_container.get_children():
 			child.queue_free()
 		
-		var transformed_card = _get_transformed_card_copy(card_data)
+		transformed_card = _get_transformed_card_copy(card_data)
 		
 		var card_ui = preload("res://scenes/card.tscn").instantiate() as CardUI
 		card_ui.card_data = transformed_card
@@ -1445,13 +1463,10 @@ func _on_transform_confirm() -> void:
 		if is_instance_valid(preview_card):
 			preview_card.queue_free()
 	
-	# Применяем преобразование к оригинальной карте
-	var transformed = _get_transformed_card_copy(selected_card)
-	
 	var master_cards = RunManager.get_player_deck().master_cards
 	var index = master_cards.find(selected_card)
 	if index != -1:
-		master_cards[index] = transformed
+		master_cards[index] = transformed_card
 	
 	SignalManager.log_message.emit("Карта преобразована: %s" % selected_card.get_localized_name())
 	transform_attempts = 0

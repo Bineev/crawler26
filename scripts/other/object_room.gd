@@ -4,10 +4,14 @@ class_name ObjectRoom
 
 var object_type: DataManager.ObjectType
 var room_object: RoomObject = null
+var label: Label
+@onready var vinniete_overlay: ColorRect = $VinnieteOverlay
+@onready var shader_layer: ColorRect = $ShaderLayer
 
 
 func _ready():
 	super._ready()
+	SignalManager.hide_room_object_title.connect(hide_title)
 
 
 func setup(room_data: Dictionary) -> void:
@@ -35,6 +39,18 @@ func _init_content(room_data: Dictionary) -> void:
 			DataManager.ROOM_HEIGHT - y_offset_from_bottom
 		)
 
+	if object_type == DataManager.ObjectType.EVENT:
+		## Получаем копию материала
+		#var mat = vinniete_overlay.material.duplicate()
+		## Применяем копию к узлу
+		#vinniete_overlay.material = mat
+#
+		## Теперь можно менять параметры
+		#mat.set_shader_parameter("shader_parameter/dirt_amount", 0.0)
+		#mat.set_shader_parameter("shader_parameter/darkness_power", 0.0)
+		vinniete_overlay.hide()
+		horror_overlay.hide()
+
 	var event_resource: EventResource
 	if object_type == DataManager.ObjectType.EVENT:
 		# 🆕 Получаем ресурс события для текущего биома
@@ -51,12 +67,19 @@ func _init_content(room_data: Dictionary) -> void:
 	
 	
 func _add_object_label(object_type: DataManager.ObjectType, title_text: String = '') -> void:
-	var label = Label.new()
-	label.add_theme_font_override("font", DataManager.FONT_HEADERS)
-	label.add_theme_font_size_override("font_size", 48)
-	label.add_theme_color_override("font_color", DataManager.COLOR_MOLE_TUNNELS_ART_BG_LIGHT2)
-	if object_type == DataManager.ObjectType.EVENT or object_type == DataManager.ObjectType.SHOP:
-		label.add_theme_color_override("font_color", DataManager.COLOR_PENITENT_ART_BG_DARK)
+	label = Label.new()
+	
+	# Создаём LabelSettings с полными настройками
+	var settings = LabelSettings.new()
+	settings.font = DataManager.FONT_HEADERS
+	settings.font_size = 48
+	settings.font_color = DataManager.COLOR_MOLE_TUNNELS_ART_BG_LIGHT2
+	settings.outline_color = Color.BLACK
+	settings.outline_size = 5
+	
+	label.label_settings = settings
+	#if object_type == DataManager.ObjectType.EVENT or object_type == DataManager.ObjectType.SHOP:
+		#label.add_theme_color_override("font_color", DataManager.COLOR_PENITENT_ART_BG_DARK)
 	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	if object_type != DataManager.ObjectType.EVENT:
 		label.text = _get_object_label_text(object_type)
@@ -99,3 +122,8 @@ func _get_object_label_text(object_type: DataManager.ObjectType) -> String:
 			return tr("object_event")
 		_:
 			return tr("object_unknown")
+
+
+func hide_title():
+	if label:
+		label.hide()

@@ -45,7 +45,7 @@ func setup(type: DataManager.ObjectType, biome: DataManager.Biome, event_res: Ev
 		
 		# Отключаем клики и подсветку
 		mouse_filter = Control.MOUSE_FILTER_IGNORE
-		await get_tree().create_timer(1.5).timeout
+		await get_tree().create_timer(4).timeout
 		interact()
 		return
 	# 🆕 Логика для EVENT
@@ -117,6 +117,13 @@ func setup(type: DataManager.ObjectType, biome: DataManager.Biome, event_res: Ev
 		self.texture = texture
 		shadow_sprite.texture = texture
 		shadow_sprite.custom_minimum_size = obj_size
+
+		## 🆕 Создаём копию материала для этого объекта
+		#if shadow_sprite.material:
+			#shadow_sprite.material = shadow_sprite.material.duplicate()
+		#
+		## 🆕 Настраиваем параметры тени
+		#_setup_shadow_parameters(object_type)
 	else:
 		# Текстура-заглушка, если не найдена
 		printerr("Object texture not found for type: ", object_type, " biome: ", biome)
@@ -132,6 +139,8 @@ func interact() -> void:
 		return
 	
 	_is_interacting = true
+	
+	SignalManager.hide_room_object_title.emit()
 	
 	# 🆕 Отключаем интерактивность
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -356,3 +365,61 @@ func print_narrative(text: String):
 	
 	# 🆕 Возвращаем label, чтобы на него можно было повесить обработчик клика
 	return narrative_label
+
+
+func _setup_shadow_parameters(object_type: DataManager.ObjectType) -> void:
+	if not shadow_sprite or not shadow_sprite.material:
+		return
+	
+	var mat = shadow_sprite.material
+	if not mat is ShaderMaterial:
+		return
+	
+	match object_type:
+		DataManager.ObjectType.CAULDRON:
+			mat.set_shader_parameter("shadow_height", 0.620)
+			mat.set_shader_parameter("shadow_width", 1.0)
+			mat.set_shader_parameter("shadow_skew", 0.0)
+			mat.set_shader_parameter("vertical_offset", 0.07)
+		
+		DataManager.ObjectType.TRAP:
+			mat.set_shader_parameter("shadow_height", 0.8)
+			mat.set_shader_parameter("shadow_width", 0.9)
+			mat.set_shader_parameter("shadow_skew", 0.0)
+			mat.set_shader_parameter("vertical_offset", 0.09)
+		
+		DataManager.ObjectType.TORTURE_RACK:
+			mat.set_shader_parameter("shadow_height", 0.55)
+			mat.set_shader_parameter("shadow_width", 0.93)
+			mat.set_shader_parameter("shadow_skew", 0.0)
+			mat.set_shader_parameter("vertical_offset", 0.145)
+		
+		DataManager.ObjectType.IDOL:
+			mat.set_shader_parameter("shadow_height", 0.255)
+			mat.set_shader_parameter("shadow_width", 1.09)
+			mat.set_shader_parameter("shadow_skew", 0.0)
+			mat.set_shader_parameter("vertical_offset", 0.1)
+		
+		DataManager.ObjectType.CHEST:
+			# Можно оставить дефолтные или настроить отдельно
+			mat.set_shader_parameter("shadow_height", 0.7)
+			mat.set_shader_parameter("shadow_width", 1.0)
+			mat.set_shader_parameter("shadow_skew", 0.0)
+			mat.set_shader_parameter("vertical_offset", 0.03)
+		
+		DataManager.ObjectType.BONFIRE:
+			mat.set_shader_parameter("shadow_height", 0.63)
+			mat.set_shader_parameter("shadow_width", 0.95)
+			mat.set_shader_parameter("shadow_skew", 0.0)
+			mat.set_shader_parameter("vertical_offset", 0.095)
+		
+		DataManager.ObjectType.SHOP, DataManager.ObjectType.EVENT:
+			# Для этих объектов тень не нужна или другая логика
+			shadow_sprite.visible = false
+		
+		_:
+			# Дефолтные значения
+			mat.set_shader_parameter("shadow_height", 0.35)
+			mat.set_shader_parameter("shadow_width", 0.8)
+			mat.set_shader_parameter("shadow_skew", 0.0)
+			mat.set_shader_parameter("vertical_offset", 0.05)
