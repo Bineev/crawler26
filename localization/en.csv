@@ -103,22 +103,7 @@ msg_not_enough_energy,Not enough energy!
 msg_target_selection,Select target
 msg_victory,Victory!
 msg_defeat,Defeat...
-reward_card_biom_title,Choose a biome card
-reward_card_character_title,Choose a character card
-reward_card_without_choice_title,You received a card
-reward_artifact_title,Choose an artifact
-reward_artifact_without_choice_title,You received an artifact
-reward_artifact_elite_title,Choose an elite artifact
-reward_potion_title,Choose a potion
-reward_take_damage_title,Take damage
-reward_get_heal_title,Heal
-reward_energy_buff_title,Energy increase
-reward_deck_size_buff_title,Deck size increase
 "deck_size_buff_label","+%d hand size"
-reward_gold_title,Gold
-reward_remove_card_title,Remove a card
-reward_upgrade_card_title,Upgrade a card
-reward_add_property_title,Add property
 reward_choose_card,Choose card
 reward_take_card,Take card
 reward_choose_artifact,Choose artifact
@@ -127,8 +112,6 @@ reward_take_gold,Take gold
 reward_take_heal,Heal
 reward_take_damage,Accept
 reward_choose,Choose
-reward_default_title,Choose a reward
-reward_lost_max_hp_title, "Cry"
 artifact_strange_mushroom_name,Strange Mushroom
 artifact_strange_mushroom_desc,"+%d max HP, but start each fight with Poison for %d turns"
 artifact_strange_mushroom_lore,"A strange mushroom found in the depths. It grants power, but demands a price."
@@ -253,8 +236,6 @@ upgrade_card_confirm,Upgrade
 "cauldron_transform_title","Select a card to transform"
 "cauldron_brew_result","Potion brewed!"
 "transform_card_confirm","Transform"
-"reward_transform_card_title","Transform card (%d attempts left)"
-"reward_transform_attempts_zero","All attempts used"
 
 "potion_use","Use"
 "potion_tooltip","Potion\nEffects:"
@@ -300,7 +281,6 @@ upgrade_card_confirm,Upgrade
 "shop_trade_title","Welcome to the shop!"
 "shop_leave","Leave"
 "shop_trade_welcome","Select an item"
-"reward_trade_title","Shop"
 
 "end_turn_button_label", "End turn"
 "button_path_go", "Go"
@@ -515,3 +495,45 @@ upgrade_card_confirm,Upgrade
 "result_bonfire_rest","You feel renewed"
 "result_bonfire_pray","You feel the presence of the gods"
 "result_bonfire_sharp","You feel stronger"
+
+"reward_card_biom_title","Choose a dungeon card"
+"reward_card_character_title","Choose a character card"
+"reward_card_without_choice_title","Take the card"
+"reward_artifact_title","Choose an artifact"
+"reward_artifact_without_choice_title","Take the artifact"
+"reward_artifact_elite_title","Choose an elite artifact"
+"reward_potion_title","Take the potion"
+"reward_take_damage_title","Punishment"
+"reward_get_heal_title","Blessing"
+"reward_energy_buff_title","Accept the blessing"
+"reward_deck_size_buff_title","Accept the blessing"
+"reward_gold_title","Take the gold"
+"reward_remove_card_title","Remove a card"
+"reward_upgrade_card_title","Choose which card to upgrade"
+"reward_add_property_title","Choose a property"
+"reward_default_title","Receive"
+"reward_lost_max_hp_title","Sacrifice"
+"reward_transform_card_title","Transform a card (%d attempts left)"
+"reward_transform_attempts_zero","No attempts left"
+"reward_trade_title","Shop"
+
+"enemy_toxic_imp_name","Toxic Imp"
+"enemy_toxic_imp_desc","A mutated creature combining human and bat features. It feeds on blood, healing itself with every strike."
+
+"enemy_thorny_bloom_name","Thorny Bloom"
+"enemy_thorny_bloom_desc","A humanoid plant growing from toxic slime. Its thorns wound anyone who dares to approach."
+
+"enemy_crested_toad_name","Crested Toad"
+"enemy_crested_toad_desc","A mutated toad with a bony crest. Its skin is covered in poisonous glands."
+
+"enemy_rotting_snail_name","Rotting Snail"
+"enemy_rotting_snail_desc","A mutated mollusk with a rotting shell. Its slime hardens into a protective crust."
+
+"enemy_rotten_porter_name","Rotten Porter"
+"enemy_rotten_porter_desc","An anthropomorphic mass of rotting sludge. Its body pulses, and poisonous slime oozes from its sores."
+
+"enemy_flesh_hound_name","Flesh Hound"
+"enemy_flesh_hound_desc","A mutated hound with a carnivorous flower for a head. Its hunger and fury grow with each turn."
+
+"enemy_master_of_rot_name","Master of Rot"
+"enemy_master_of_rot_desc","A gigantic octopus-like being made of tangled vines and flesh. Every strike against it poisons, wounds, and weakens."

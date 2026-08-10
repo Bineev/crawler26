@@ -33,7 +33,7 @@ func setup(data: Dictionary, text_color: Color = DataManager.COLOR_PENITENT_ART_
 	
 	icon.texture = data["icon"]
 	custom_minimum_size  = Vector2(32, 32)
-	icon.custom_minimum_size = Vector2(24, 24)
+	icon.custom_minimum_size = Vector2(32, 32)
 	#icon.custom_minimum_size = Vector2(16, 16)
 	filler.custom_minimum_size = Vector2(5, 0)
 	if icon_owner is CardUI:

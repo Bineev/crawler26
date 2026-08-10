@@ -193,11 +193,11 @@ func _get_title() -> String:
 			return tr("reward_card_biom_title")
 		DataManager.RewardType.CARD_CHARACTER:
 			return tr("reward_card_character_title")
-		DataManager.RewardType.CARD_WITHOUT_CHOICE:
+		DataManager.RewardType.CARD_WITHOUT_CHOICE, DataManager.RewardType.CONCRETE_CARD:
 			return tr("reward_card_without_choice_title")
 		DataManager.RewardType.ARTIFACT:
 			return tr("reward_artifact_title")
-		DataManager.RewardType.ARTIFACT_WITHOUT_CHOICE:
+		DataManager.RewardType.ARTIFACT_WITHOUT_CHOICE, DataManager.RewardType.CONCRETE_ARTIFACT:
 			return tr("reward_artifact_without_choice_title")
 		DataManager.RewardType.ARTIFACT_ELITE:
 			return tr("reward_artifact_elite_title")

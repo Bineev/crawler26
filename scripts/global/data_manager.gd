@@ -68,10 +68,14 @@ enum EnemyId {
 	MANY_HEADED_MOLE,
 	FUNGAL_MINER,
 	RODENT_MOUND,
-	# Пещеры плоти (позже)
-	# FLESH_...
-	# Костяной лабиринт (позже)
-	# BONE_...
+	# 🆕 Гнилостные Топи (Rotten Marshes)
+	TOXIC_IMP,          # Болотный вампир (человек + летучая мышь)
+	THORNY_BLOOM,       # Шипастая поросль
+	CRESTED_TOAD,       # Гребнистая лягушка
+	ROTTING_SNAIL,      # Улитка распада
+	ROTTEN_PORTER,      # Сгнивший рабочий
+	FLESH_HOUND,        # Гончая-цветок
+	MASTER_OF_ROT,      # Хозяин гнили (босс)
 }
 
 enum BattleState {
@@ -289,7 +293,7 @@ enum SoundType {
 	BLOCK,
 	HEAL,
 	DEATH,
-	
+	APPLY_DEBUFF,
 	# Статусы
 	POISON_TICK,
 	BLEED_TICK,
@@ -303,6 +307,10 @@ enum SoundType {
 	MUSIC_MENU,
 	MUSIC_GAMEPLAY,
 	MUSIC_BOSS,
+	
+	GET_GOLD,
+	GET_POTION,
+	GET_SOMETHING
 }
 
 enum ScaledCompare {
@@ -493,6 +501,7 @@ enum Biome {
 	BONE_LABYRINTH,     # Костяной лабиринт
 	FROZEN_DEPTHS,      # Ледяные глубины (на будущее)
 	MAGMA_CORE,         # Ядро магмы (на будущее)
+	ROTTEN_MARSHES,     # 🆕 Гнилостные Топи
 }
 
 ## Враги Кротовых нор
@@ -577,7 +586,7 @@ const STARTING_ENERGY: int = 3
 const MAX_ENERGY: int = 3
 
 ## === Сломленный (Penitent) ===
-const PENITENT_STARTING_HEALTH: int = 80
+const PENITENT_STARTING_HEALTH: int = 100
 const PENITENT_MAX_ATONEMENT: int = 30
 const PENITENT_ATONEMENT_GAIN_PER_ATTACK: int = 5
 
@@ -1058,7 +1067,14 @@ func load_biome_backgrounds():
 		preload("res://img/backgrounds/mole_tunnels/mole_tunnels_3.png"),
 		preload("res://img/backgrounds/mole_tunnels/mole_tunnels_4.png")
 	]
-	
+	# 🆕 Гнилостные Топи
+	_biome_backgrounds[DataManager.Biome.ROTTEN_MARSHES] = [
+		preload("res://img/backgrounds/rotten_marshes/rotten_marshes_1.png"),
+		preload("res://img/backgrounds/rotten_marshes/rotten_marshes_2.png"),
+		preload("res://img/backgrounds/rotten_marshes/rotten_marshes_3.png"),
+		preload("res://img/backgrounds/rotten_marshes/rotten_marshes_4.png"),
+		preload("res://img/backgrounds/rotten_marshes/rotten_marshes_5.png")
+	]
 	# Пещеры плоти (позже)
 	# _biome_backgrounds[DataManager.Biome.FLESH_CAVES] = [...]
 	
@@ -1102,10 +1118,16 @@ const OBJECT_TEXTURES: Dictionary = {
 		DataManager.ObjectType.BONFIRE: preload("res://img/objects/mole_tunnels/bonfire.png"),
 		DataManager.ObjectType.SHOP: preload("res://img/objects/mole_tunnels/shop2.png"),
 	},
-	# Пещеры плоти (позже)
-	# DataManager.Biome.FLESH_CAVES: { ... },
-	# Костяной лабиринт (позже)
-	# DataManager.Biome.BONE_LABYRINTH: { ... },
+	# 🆕 Гнилостные Топи
+	DataManager.Biome.ROTTEN_MARSHES: {
+		DataManager.ObjectType.CHEST: preload("res://img/objects/mole_tunnels/chest.png"),
+		DataManager.ObjectType.IDOL: preload("res://img/objects/mole_tunnels/idol.png"),
+		DataManager.ObjectType.TRAP: preload("res://img/objects/mole_tunnels/trap.png"),
+		DataManager.ObjectType.CAULDRON: preload("res://img/objects/mole_tunnels/cauldron.png"),
+		DataManager.ObjectType.TORTURE_RACK: preload("res://img/objects/mole_tunnels/torture_rack.png"),
+		DataManager.ObjectType.BONFIRE: preload("res://img/objects/mole_tunnels/bonfire.png"),
+		DataManager.ObjectType.SHOP: preload("res://img/objects/rotten_marshes/shop.png"),
+	}
 }
 
 func get_object_texture(object_type: DataManager.ObjectType, biome: DataManager.Biome) -> Texture2D:
@@ -1243,6 +1265,21 @@ func load_enemy_sprites():
 			{id = DataManager.EnemyId.RODENT_MOUND, folder = "rodent_mound", file = "rodent_mound"},
 		],
 		"res://img/enemies/mole_tunnels/"
+	)
+	
+	# 🆕 Гнилостные Топи
+	load_enemy_sprites_for_biome(
+		DataManager.Biome.ROTTEN_MARSHES,
+		[
+			{id = DataManager.EnemyId.TOXIC_IMP, folder = "toxic_imp", file = "toxic_imp"},
+			{id = DataManager.EnemyId.THORNY_BLOOM, folder = "thorny_bloom", file = "thorny_bloom"},
+			{id = DataManager.EnemyId.CRESTED_TOAD, folder = "crested_toad", file = "crested_toad"},
+			{id = DataManager.EnemyId.ROTTING_SNAIL, folder = "rotting_snail", file = "rotting_snail"},
+			{id = DataManager.EnemyId.ROTTEN_PORTER, folder = "rotten_porter", file = "rotten_porter"},
+			{id = DataManager.EnemyId.FLESH_HOUND, folder = "flesh_hound", file = "flesh_hound"},
+			{id = DataManager.EnemyId.MASTER_OF_ROT, folder = "master_of_rot", file = "master_of_rot"},
+		],
+		"res://img/enemies/rotten_marshes/"
 	)
 
 func _register_enemy_sprite(biome: DataManager.Biome, enemy_id, state: EnemyAnimationState, path: String):
@@ -1455,8 +1492,8 @@ var _card_backgrounds: Dictionary = {}
 func load_card_backgrounds():
 	# Фоны биомов
 	_card_backgrounds["biome_" + str(Biome.MOLE_TUNNELS)] = preload("res://img/cards/backgrounds/mole_tunnels_card_bg.png")
-	
-	# Фоны классов персонажей
+	_card_backgrounds["biome_" + str(Biome.ROTTEN_MARSHES)] = preload("res://img/cards/backgrounds/rotten_marshes_card_bg.png")
+
 	_card_backgrounds["class_" + str(CharacterClass.PENITENT)] = preload("res://img/cards/backgrounds/penitent_card_bg.png")
 
 
@@ -1572,6 +1609,16 @@ const COLOR_MOLE_TUNNELS_ART_BG_LIGHT2: Color = Color("e9dab0ff")     # свет
 const COLOR_FLESH_CAVES_ART_BG_LIGHT: Color = Color("BF6A6A")      # светло-красный
 const COLOR_BONE_LABYRINTH_ART_BG_LIGHT: Color = Color("BFB8A6")   # светло-серый
 
+# === ЦВЕТА БИОМА: ГНИЛОСТНЫЕ ТОПИ ===
+const COLOR_ROTTEN_MARSHES_ART_BG_DARK: Color = Color("1A2A1A")      # тёмно-болотный (зелёный оттенок)
+const COLOR_ROTTEN_MARSHES_ART_BG_LIGHT: Color = Color("6A8A5A")     # светло-болотный (зелёный)
+const COLOR_ROTTEN_MARSHES_ART_BG_PASTEL: Color = Color("9AB88A")    # пастельно-болотный (светло-зелёный)
+const COLOR_ROTTEN_MARSHES_CARD_BG: Color = Color("5A7A4A")          # грязно-болотный (фон карты)
+const COLOR_ROTTEN_MARSHES_ART_BG_PURPLE: Color = Color("5A3A6A")    # фиолетовый (наросты, слизь)
+const COLOR_ROTTEN_MARSHES_ART_BG_PALE_PURPLE: Color = Color("8A7A9E") # бледно-фиолетовый (плоть)
+const COLOR_ROTTEN_MARSHES_ART_BG_DARK_PURPLE: Color = Color("3A2A4A") # тёмно-фиолетовый (глубокие тени)
+const COLOR_ROTTEN_MARSHES_ART_BG_MINT: Color = Color("bfd0b7")      # бледно-мятный (светящиеся грибы, токсичные испарения)
+
 const COLOR_DAMAGE_LOG: Color = Color(1, 0.3, 0.2)
 const COLOR_HEAL_LOG: Color = Color(0.4, 0.8, 0.3)
 
@@ -1671,6 +1718,8 @@ func _get_card_art_background_color_dark(origin: CardOrigin, character_class: Ch
 					return COLOR_FLESH_CAVES_ART_BG_DARK
 				Biome.BONE_LABYRINTH:
 					return COLOR_BONE_LABYRINTH_ART_BG_DARK
+				Biome.ROTTEN_MARSHES:  # 🆕
+					return COLOR_ROTTEN_MARSHES_ART_BG_DARK
 				_:
 					return Color.BLACK
 		
@@ -1700,6 +1749,8 @@ func _get_card_art_background_color_light(origin: CardOrigin, character_class: C
 					return COLOR_FLESH_CAVES_ART_BG_LIGHT
 				Biome.BONE_LABYRINTH:
 					return COLOR_BONE_LABYRINTH_ART_BG_LIGHT
+				Biome.ROTTEN_MARSHES:  # 🆕
+					return COLOR_ROTTEN_MARSHES_ART_BG_LIGHT
 				_:
 					return Color.BLACK
 		
@@ -1751,13 +1802,14 @@ func load_sounds():
 	#_sounds[SoundType.BUTTON_HOVER] = preload("res://audio/sfx/ui/button_hover.wav")
 	
 	# Бой
-	_sounds[SoundType.ENEMY_GET_DAMAGE] = preload("res://sound/DesignedPunch1.wav")
+	_sounds[SoundType.ENEMY_GET_DAMAGE] = preload("res://sound/DesignedPunch4.wav")
 	#_sounds[SoundType.ENEMY_ATTACK] = preload("res://audio/sfx/battle/enemy_attack.wav")
 	_sounds[SoundType.PLAYER_GET_DAMAGE] = preload("res://sound/DesignedPunch4.wav")
 	#_sounds[SoundType.PLAYER_ATTACK] = preload("res://audio/sfx/battle/player_attack.wav")
-	_sounds[SoundType.BLOCK] = preload("res://sound/DesignedPickaxe1.wav")
-	#_sounds[SoundType.HEAL] = preload("res://audio/sfx/battle/heal.wav")
+	_sounds[SoundType.BLOCK] = preload("res://sound/223630__ctcollab__shield-hit-1.wav")
+	_sounds[SoundType.HEAL] = preload("res://sound/140849__garyq__skyrim-heal-start.wav")
 	#_sounds[SoundType.DEATH] = preload("res://audio/sfx/battle/death.wav")
+	_sounds[SoundType.APPLY_DEBUFF] = preload("res://sound/evade.wav")
 	#
 	## Статусы
 	#_sounds[SoundType.POISON_TICK] = preload("res://audio/sfx/status/poison_tick.wav")
@@ -1772,6 +1824,10 @@ func load_sounds():
 	#_sounds[SoundType.MUSIC_MENU] = preload("res://audio/music/menu_theme.ogg")
 	#_sounds[SoundType.MUSIC_GAMEPLAY] = preload("res://audio/music/gameplay_theme.ogg")
 	#_sounds[SoundType.MUSIC_BOSS] = preload("res://audio/music/boss_theme.ogg")
+	_sounds[SoundType.GET_GOLD] = preload("res://sound/270408__littlerobotsoundfactory__pickup_gold_00.wav")
+	_sounds[SoundType.GET_POTION] = preload("res://sound/SmallGlassBottles1.wav")
+	_sounds[SoundType.GET_SOMETHING] = preload("res://sound/PaperDocument1.wav")
+	
 	
 	_sounds_loaded = true
 
@@ -2144,7 +2200,7 @@ func _get_button_style(button_type: ButtonType, is_active: bool, is_hover: bool 
 	if is_disabled:
 		style.bg_color = COLOR_BUTTON_DISABLED_BG
 	elif is_active:
-		style.bg_color = COLOR_GRAY_NEAR_BLACK
+		style.bg_color = COLOR_BONE_LABYRINTH_ART_BG_DARK
 	else:
 		# В зависимости от типа кнопки выбираем фон
 		match button_type:

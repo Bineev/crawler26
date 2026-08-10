@@ -13,6 +13,6 @@ name_key = "passive_shame_name"
 description_key = "passive_shame_desc"
 charge_type = 1
 starting_charges = 2
-trigger = 1
+trigger = 6
 modifiers = Array[ExtResource("2_dhq2r")]([ExtResource("3_3r6n7"), ExtResource("4_mqnsa")])
 metadata/_custom_type_script = "uid://br4ase11y58nd"

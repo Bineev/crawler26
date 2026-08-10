@@ -112,6 +112,9 @@ func get_player_deck() -> DeckData:
 func add_card(card: CardData):
 	if player_deck_data:
 		player_deck_data.master_cards.append(card)
+		
+		# 🆕 Звук получения карты
+		SoundManager.play(null, DataManager.get_sound(DataManager.SoundType.GET_SOMETHING))
 		SignalManager.log_message.emit("Карта добавлена в колоду: %s" % card.get_localized_name())
 
 
@@ -146,6 +149,7 @@ func reset_status_values():
 
 func add_coins(amount: int) -> void:
 	coins += amount
+	SoundManager.play(null, DataManager.get_sound(DataManager.SoundType.GET_GOLD))
 	SignalManager.coins_changed.emit(coins)
 
 func add_bones(amount: int) -> void:
@@ -178,7 +182,10 @@ func add_artifact(artifact: ArtifactResource) -> void:
 	var instance = artifact.duplicate_for_instance()
 	artifacts.append(instance)
 	artifact_counters[instance.id] = 0
-	
+
+	# 🆕 Звук получения артефакта
+	SoundManager.play(null, DataManager.get_sound(DataManager.SoundType.GET_SOMETHING))
+
 	# 🆕 Обрабатываем ONE_TIME триггер сразу при получении
 	_process_one_time_trigger(instance)
 	
@@ -485,6 +492,9 @@ func apply_energy_buff(bonus: int, duration: int) -> void:
 			temp_buffs["bonus_energy"] = max(bonus, old_bonus)
 			temp_buffs["max_energy_buff"] = max(duration, old_duration)
 	
+	# 🆕 Звук получения баффа
+	SoundManager.play(null, DataManager.get_sound(DataManager.SoundType.HEAL))
+	
 	var player = BattleManager.get_player()
 	if player:
 		var current_max = player.get_max_energy()
@@ -557,6 +567,8 @@ func add_potion(potion: PotionResource) -> void:
 		remove_potion(0)
 	
 	potions.append(instance)
+	# 🆕 Звук получения зелья
+	SoundManager.play(null, DataManager.get_sound(DataManager.SoundType.GET_POTION))
 	SignalManager.potion_added.emit(instance)
 
 
@@ -593,7 +605,10 @@ func apply_deck_size_buff(amount: int, duration: int) -> void:
 			# Разные значения — берём максимум бонуса и максимум длительности
 			deck_size_bonus = max(amount, old_amount)
 			deck_size_buff_remaining = max(duration, old_duration)
-	
+
+	# 🆕 Звук получения баффа
+	SoundManager.play(null, DataManager.get_sound(DataManager.SoundType.HEAL))
+
 	var player = BattleManager.get_player()
 	if player:
 		var current_hand_size = player.get_flat(DataManager.FlatStat.HAND_SIZE)
@@ -658,7 +673,7 @@ func reset_run_constants():
 	# === Балансные константы ===
 	starting_hand_size = DataManager.STARTING_HAND_SIZE
 	cards_to_draw_per_turn = DataManager.CARDS_TO_DRAW_PER_TURN
-	max_energy = DataManager.MAX_ENERGY + 5
+	max_energy = DataManager.MAX_ENERGY
 	
 	# === Стартовые валюты ===
 	starting_coins = DataManager.STARTING_COINS

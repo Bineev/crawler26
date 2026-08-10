@@ -103,22 +103,8 @@ msg_not_enough_energy,Недостаточно энергии!
 msg_target_selection,Выберите цель
 msg_victory,Победа!
 msg_defeat,Поражение...
-reward_card_biom_title,Выберите карту биома
-reward_card_character_title,Выберите карту персонажа
-reward_card_without_choice_title,Вы получили карту
-reward_artifact_title,Выберите артефакт
-reward_artifact_without_choice_title,Вы получили артефакт
-reward_artifact_elite_title,Выберите элитный артефакт
-reward_potion_title,Выберите зелье
-reward_take_damage_title,Получить урон
-reward_get_heal_title,Лечение
-reward_energy_buff_title,Увеличение энергии
-reward_deck_size_buff_title,Увеличение руки
+
 "deck_size_buff_label","+%d к размеру руки"
-reward_gold_title,Золото
-reward_remove_card_title,Удалить карту
-reward_upgrade_card_title,Улучшить карту
-reward_add_property_title,Добавить свойство
 reward_choose_card,Выбрать карту
 reward_take_card,Взять карту
 reward_choose_artifact,Выбрать артефакт
@@ -127,8 +113,6 @@ reward_take_gold,Взять золото
 reward_take_heal,Лечиться
 reward_take_damage,Принять
 reward_choose,Выбрать
-reward_default_title,Выберите награду
-reward_lost_max_hp_title, "Примите потерю"
 artifact_strange_mushroom_name,Странный гриб
 artifact_strange_mushroom_desc,"+%d макс. HP, но каждый бой начинается с Ядом на %d хода"
 artifact_strange_mushroom_lore,"Странный гриб, найденный в глубинах. Он даёт силу, но требует платы."
@@ -253,8 +237,6 @@ upgrade_card_confirm,Улучшить
 "cauldron_transform_title","Выберите карту для преобразования"
 "cauldron_brew_result","Зелье сварено!"
 "transform_card_confirm","Преобразовать"
-"reward_transform_card_title","Преобразовать карту (осталось %d попытки)"
-"reward_transform_attempts_zero","Попыток больше нет"
 
 "potion_use","Использовать"
 "potion_tooltip","Зелье\nЭффекты:"
@@ -299,7 +281,7 @@ upgrade_card_confirm,Улучшить
 "shop_trade_title","Лавка открыта для всех"
 "shop_leave","Покинуть"
 "shop_trade_welcome","Выберите товар"
-"reward_trade_title","Лавка"
+
 
 "end_turn_button_label", "Завершить ход"
 "button_path_go", "В путь"
@@ -514,3 +496,45 @@ upgrade_card_confirm,Улучшить
 "result_bonfire_rest","Вы чувствуете прилив сил"
 "result_bonfire_pray","Вы чувствуете присутствие богов"
 "result_bonfire_sharp","Вы чувствуете, что стали сильнее"
+
+reward_card_biom_title,Выберите карту биома
+reward_card_character_title,Выберите карту персонажа
+reward_card_without_choice_title,Вы получили карту
+reward_artifact_title,Выберите артефакт
+reward_artifact_without_choice_title,Вы получили артефакт
+reward_artifact_elite_title,Выберите элитный артефакт
+reward_potion_title,Выберите зелье
+reward_take_damage_title,Получить урон
+reward_get_heal_title,Лечение
+reward_energy_buff_title,Увеличение энергии
+reward_deck_size_buff_title,Увеличение руки
+reward_gold_title,Золото
+reward_remove_card_title,Удалить карту
+reward_upgrade_card_title,Улучшить карту
+reward_add_property_title,Добавить свойство
+reward_default_title,Выберите награду
+reward_lost_max_hp_title, "Примите потерю"
+"reward_transform_card_title","Преобразовать карту (осталось %d попытки)"
+"reward_transform_attempts_zero","Попыток больше нет"
+"reward_trade_title","Лавка"
+
+"enemy_toxic_imp_name","Болотный вампир"
+"enemy_toxic_imp_desc","Мутировавшее существо, сочетающее черты человека и летучей мыши. Питается кровью, восстанавливая силы."
+
+"enemy_thorny_bloom_name","Шипастая поросль"
+"enemy_thorny_bloom_desc","Гуманоидное растение, растущее из токсичной слизи. Его шипы ранят каждого, кто осмелится приблизиться."
+
+"enemy_crested_toad_name","Гребнистая лягушка"
+"enemy_crested_toad_desc","Мутировавшая лягушка с костяным гребнем. Её кожа покрыта ядовитыми железами."
+
+"enemy_rotting_snail_name","Улитка распада"
+"enemy_rotting_snail_desc","Мутировавший моллюск с гнилостной раковиной. Слизь застывает, создавая защитную корку."
+
+"enemy_rotten_porter_name","Сгнивший рабочий"
+"enemy_rotten_porter_desc","Антропоморфная субстанция из гниющей массы. Её тело пульсирует, а из язв сочится ядовитая слизь."
+
+"enemy_flesh_hound_name","Гончая-цветок"
+"enemy_flesh_hound_desc","Мутировавший пёс с хищным цветком вместо головы. С каждым ходом его голод и ярость растут."
+
+"enemy_master_of_rot_name","Хозяин гнили"
+"enemy_master_of_rot_desc","Огромное осьминогоподобное существо из переплетённых лиан и плоти. Каждый удар по нему отравляет, ранит и ослабляет."

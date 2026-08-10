@@ -153,6 +153,8 @@ func add_block(amount: int):
 	if final_block > 0:
 		var shield_status = DataManager.get_status_resource(DataManager.Status.SHIELD)
 		add_status(shield_status, final_block, 1, self)  # на 1 ход
+		# 🆕 Звук получения щита
+		SoundManager.play(null, DataManager.get_sound(DataManager.SoundType.BLOCK))
 
 func take_damage(amount: int, ignore_block: bool = false, attacker: CharacterStats = null, is_direct: bool = true, status_icon: Texture2D = null):    # Проверка на заморозку (если заморожена — урон не проходит)
 	# Сохраняем состояние до применения урона
@@ -179,6 +181,7 @@ func take_damage(amount: int, ignore_block: bool = false, attacker: CharacterSta
 		if shield_stacks >= damage:
 			modify_status_stacks(DataManager.Status.SHIELD, -damage)
 			# TODO отобразить эффект удара в щит
+			SoundManager.play(null, DataManager.get_sound(DataManager.SoundType.BLOCK))
 			if self is EnemyInstance:
 				SignalManager.get_hit_in_shield.emit(self)
 			elif self is PenitentStats:
@@ -264,6 +267,10 @@ func heal(amount: int):
 		return
 	
 	set_flat(DataManager.FlatStat.HEALTH, new_health)
+	
+	# 🆕 Звук лечения
+	SoundManager.play(null, DataManager.get_sound(DataManager.SoundType.HEAL))
+	
 	SignalManager.log_message.emit("%s восстановил %d здоровья" % [get_display_name(), actual_heal])
 	SignalManager.heal_received.emit(self, actual_heal)
 	# Сигнал только для игрока (для UI)
@@ -309,7 +316,9 @@ func add_status(status: StatusResource, value: int, duration: int, caster: Chara
 			stacks = result
 			# Убираем противоположный статус (он уже обработан)
 			remove_status(opposite)
-	
+	# 🆕 Звук применения дебаффа (если статус негативный и цель — враг)
+	if DataManager.is_negative_status(status_id) and self is EnemyInstance:
+		SoundManager.play(null, DataManager.get_sound(DataManager.SoundType.APPLY_DEBUFF))
 	# Проверяем наличие взаимодействия (теперь уже без Burn/Cold)
 	if StatusInteractionManager.has_interaction(self, status_id):
 		StatusInteractionManager.handle_interaction(self, status_id, stacks, dur, status, caster)
