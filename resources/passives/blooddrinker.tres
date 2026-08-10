@@ -1,0 +1,32 @@
+[gd_resource type="Resource" script_class="PassiveResource" load_steps=7 format=3 uid="uid://b0yodg7peusgw"]
+
+[ext_resource type="Script" uid="uid://cmra25r1r3ivt" path="res://resources/res_scripts/effect_entry.gd" id="1_7reop"]
+[ext_resource type="Script" uid="uid://6aell1phtrj4" path="res://scripts/conditions/target_has_bleed.gd" id="2_4hsdu"]
+[ext_resource type="Script" uid="uid://0mjn55jcxdti" path="res://resources/res_scripts/modifier_entry.gd" id="2_88y7g"]
+[ext_resource type="Script" uid="uid://br4ase11y58nd" path="res://resources/res_scripts/passive_resource.gd" id="3_4hsdu"]
+
+[sub_resource type="Resource" id="Resource_djgl3"]
+script = ExtResource("1_7reop")
+category = 2
+target = 0
+base_value = 5
+metadata/_custom_type_script = "uid://cmra25r1r3ivt"
+
+[sub_resource type="Resource" id="Resource_r8xe6"]
+script = ExtResource("1_7reop")
+category = 14
+target = 0
+condition_script = ExtResource("2_4hsdu")
+true_effect = SubResource("Resource_djgl3")
+metadata/_custom_type_script = "uid://cmra25r1r3ivt"
+
+[resource]
+script = ExtResource("3_4hsdu")
+id = 9
+name_key = "passive_blooddrinker_name"
+description_key = "passive_blooddrinker_desc"
+charge_type = 1
+starting_charges = 4
+trigger = 9
+effects = Array[ExtResource("1_7reop")]([SubResource("Resource_r8xe6")])
+metadata/_custom_type_script = "uid://br4ase11y58nd"

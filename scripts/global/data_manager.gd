@@ -191,6 +191,8 @@ enum PassiveTrigger {
 	ON_TURN_END,
 	ON_KILL_ENEMY,
 	ON_STATUS_TICK,
+	ON_DEAL_DIRECT_DAMAGE,  # 🆕
+	ON_TAKE_DIRECT_DAMAGE,    # 🆕 новый
 }
 
 ## Типы эффектов карт
@@ -384,6 +386,10 @@ enum Passive {
 	# Пещеры плоти
 	FLESH_WARD,
 	CRIMSON_FRENZY,
+	SHELL,
+	BLOODDRINKER,
+	THORNS,  # 🆕
+	ROTTING_SHIELD,  # 🆕
 }
 
 ## Все возможные статусы
@@ -978,6 +984,10 @@ const PASSIVE_ICONS: Dictionary = {
 	Passive.FREEZING_GROUND: preload("res://img/icons/passives/freezing_ground.png"),
 	Passive.DENIAL: preload("res://img/icons/passives/denial.png"),
 	Passive.SHAME: preload("res://img/icons/passives/shame.png"),
+	Passive.SHELL: preload("res://img/icons/passives/shell.png"),  # 🆕
+	Passive.BLOODDRINKER: preload("res://img/icons/passives/blooddrinker.png"),  # 🆕
+	Passive.THORNS: preload("res://img/icons/passives/thorns.png"),
+	Passive.ROTTING_SHIELD: preload("res://img/icons/passives/rotting_shield.png"),
 }
 
 
@@ -1050,6 +1060,10 @@ func load_passive_resources():
 	_passive_resources[Passive.FREEZING_GROUND] = load("res://resources/passives/freezing_ground.tres")
 	_passive_resources[Passive.DENIAL] = load("res://resources/passives/denial.tres")
 	_passive_resources[Passive.SHAME] = load("res://resources/passives/shame.tres")
+	_passive_resources[Passive.SHELL] = load("res://resources/passives/shell.tres")
+	_passive_resources[Passive.BLOODDRINKER] = load("res://resources/passives/blooddrinker.tres")
+	_passive_resources[Passive.THORNS] = load("res://resources/passives/thorns.tres")
+	_passive_resources[Passive.ROTTING_SHIELD] = load("res://resources/passives/rotting_shield.tres")
 	
 	_passive_resources_loaded = true
 
@@ -1145,10 +1159,8 @@ func load_biome_enemies(biome: Biome):
 	match biome:
 		Biome.MOLE_TUNNELS:
 			_current_enemies_data = preload("res://data/biomes/mole_tunnels_enemies.gd").new()
-		# Biome.FLESH_CAVES:
-		#     _current_enemies_data = preload("res://data/biomes/flesh_caves_enemies.gd").new()
-		# Biome.BONE_LABYRINTH:
-		#     _current_enemies_data = preload("res://data/biomes/bone_labyrinth_enemies.gd").new()
+		Biome.ROTTEN_MARSHES:  # 🆕
+			_current_enemies_data = preload("res://data/biomes/rotten_marshes_enemies.gd").new()
 
 func get_enemy_intents(enemy_id: int) -> Dictionary:
 	if not _current_enemies_data:

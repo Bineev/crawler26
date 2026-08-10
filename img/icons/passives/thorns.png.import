@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://77tydm4r1ydn"
-path="res://.godot/imported/toxic_imp_11.png-2fab0e1eb0f352e7c5b2fdcd67597a02.ctex"
+uid="uid://dlnneb5be7nlt"
+path="res://.godot/imported/thorns.png-220d0f398adee360f91978359be59ec8.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://img/enemies/rotten_marshes/toxic_imp/toxic_imp_11.png"
-dest_files=["res://.godot/imported/toxic_imp_11.png-2fab0e1eb0f352e7c5b2fdcd67597a02.ctex"]
+source_file="res://img/icons/passives/thorns.png"
+dest_files=["res://.godot/imported/thorns.png-220d0f398adee360f91978359be59ec8.ctex"]
 
 [params]
 

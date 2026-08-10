@@ -538,3 +538,12 @@ reward_lost_max_hp_title, "Примите потерю"
 
 "enemy_master_of_rot_name","Хозяин гнили"
 "enemy_master_of_rot_desc","Огромное осьминогоподобное существо из переплетённых лиан и плоти. Каждый удар по нему отравляет, ранит и ослабляет."
+
+"passive_shell_name","Панцирь"
+"passive_shell_desc","При получении урона накладывает Щит"
+"passive_blooddrinker_name","Кровопийца"
+"passive_blooddrinker_desc","При нанесении прямого урона цели с Кровотечением, восстанавливает здоровье"
+"passive_thorns_name","Шипы"
+"passive_thorns_desc","Атакущий получает урон"
+"passive_rotting_shield_name","Гниющий щит"
+"passive_rotting_shield_desc","При получении прямого урона ослабляет атакующего"

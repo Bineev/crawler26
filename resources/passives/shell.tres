@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="PassiveResource" load_steps=6 format=3 uid="uid://dplc4s5dvvbod"]
+
+[ext_resource type="Script" uid="uid://cmra25r1r3ivt" path="res://resources/res_scripts/effect_entry.gd" id="1_clwr3"]
+[ext_resource type="Script" uid="uid://0mjn55jcxdti" path="res://resources/res_scripts/modifier_entry.gd" id="2_eq6ay"]
+[ext_resource type="Resource" uid="uid://b076hww1idajw" path="res://resources/statuses/shield.tres" id="2_vl210"]
+[ext_resource type="Script" uid="uid://br4ase11y58nd" path="res://resources/res_scripts/passive_resource.gd" id="3_vl210"]
+
+[sub_resource type="Resource" id="Resource_06jfe"]
+script = ExtResource("1_clwr3")
+category = 4
+target = 0
+status = ExtResource("2_vl210")
+value = 5
+metadata/_custom_type_script = "uid://cmra25r1r3ivt"
+
+[resource]
+script = ExtResource("3_vl210")
+id = 8
+name_key = "passive_shell_name"
+description_key = "passive_shell_desc"
+charge_type = 2
+starting_charges = 3
+effects = Array[ExtResource("1_clwr3")]([SubResource("Resource_06jfe")])
+metadata/_custom_type_script = "uid://br4ase11y58nd"

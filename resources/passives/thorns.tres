@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="PassiveResource" load_steps=5 format=3 uid="uid://bh68i1okrq38g"]
+
+[ext_resource type="Script" uid="uid://cmra25r1r3ivt" path="res://resources/res_scripts/effect_entry.gd" id="1_noq8g"]
+[ext_resource type="Script" uid="uid://0mjn55jcxdti" path="res://resources/res_scripts/modifier_entry.gd" id="2_bxh7c"]
+[ext_resource type="Script" uid="uid://br4ase11y58nd" path="res://resources/res_scripts/passive_resource.gd" id="3_fw67w"]
+
+[sub_resource type="Resource" id="Resource_noq8g"]
+script = ExtResource("1_noq8g")
+base_value = 2
+metadata/_custom_type_script = "uid://cmra25r1r3ivt"
+
+[resource]
+script = ExtResource("3_fw67w")
+id = 10
+name_key = "passive_thorns_name"
+description_key = "passive_thorns_desc"
+charge_type = 1
+starting_charges = 3
+effects = Array[ExtResource("1_noq8g")]([SubResource("Resource_noq8g")])
+metadata/_custom_type_script = "uid://br4ase11y58nd"

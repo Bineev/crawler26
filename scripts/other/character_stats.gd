@@ -232,6 +232,14 @@ func take_damage(amount: int, ignore_block: bool = false, attacker: CharacterSta
 				SignalManager.player_took_damage.emit(damage)
 			#SignalManager.player_damage_dealt.emit(damage)
 		modify_flat(DataManager.FlatStat.HEALTH, -damage)
+		
+		# 🆕 Пассивки ON_TAKE_DIRECT_DAMAGE
+		if is_direct and self and self.has_method("_process_passive_triggers"):
+			# Проверяем, жив ли получатель урона
+			if has_method("is_alive") and not is_alive():
+				pass
+			else:
+				self._process_passive_triggers(DataManager.PassiveTrigger.ON_TAKE_DIRECT_DAMAGE, attacker)
 		# Сохраняем состояние после применения урона
 		var health_after = get_health()
 		var percent_after = (float(health_after) / max_health) * 100.0
@@ -239,9 +247,15 @@ func take_damage(amount: int, ignore_block: bool = false, attacker: CharacterSta
 		# 🆕 Обрабатываем артефакты с триггером CONDITIONAL
 		if self is PenitentStats:
 			RunManager.process_health_dropped_below(health_before, health_after, percent_before, percent_after)
-			
+		
 		on_take_damage_gain_resource(damage)
 		_process_passive_triggers(DataManager.PassiveTrigger.ON_TAKE_DAMAGE, attacker)  # ← передаём атакующего, а не урон
+		if damage > 0 and is_direct and attacker and is_instance_valid(attacker) and attacker.has_method("_process_passive_triggers"):
+			# Проверяем, жив ли атакующий (если враг умер от отражённого урона — пассивка не срабатывает)
+			if attacker.has_method("is_alive") and not attacker.is_alive():
+				pass
+			else:
+				attacker._process_passive_triggers(DataManager.PassiveTrigger.ON_DEAL_DIRECT_DAMAGE, self)
 		
 	# Проверка смерти ВСЕГДА, даже если damage == 0
 	if get_health() <= 0:
@@ -681,6 +695,7 @@ func _process_passive_triggers(trigger: DataManager.PassiveTrigger, attacker = n
 					SignalManager.passive_changed.emit(self, passive.id)
 			
 			await Engine.get_main_loop().create_timer(DataManager.STATUS_TRIGGER_DELAY).timeout
+		# BUG Здесь нужно проверить, как уходят чарджи - в некоторых случаях есть баг
 
 ## ============================================================
 ## КОНЕЦ ХОДА
@@ -708,10 +723,10 @@ func process_end_of_turn():
 	# ✅ ШАГ 1: Сначала пассивки ON_TURN_END
 	_process_passive_triggers(DataManager.PassiveTrigger.ON_TURN_END)
 	
-	# 🆕 УМЕНЬШАЕМ ЗАРЯДЫ TURN_BASED ПАССИВОК С ТРИГГЕРОМ ON_TURN_END
+	# 🆕 УМЕНЬШАЕМ ЗАРЯДЫ ВСЕХ TURN_BASED ПАССИВОК В КОНЦЕ ХОДА (КРОМЕ ON_TURN_START)
 	var passives_to_remove = []
 	for passive in active_passives:
-		if passive.charge_type == DataManager.PassiveChargeType.TURN_BASED and passive.trigger == DataManager.PassiveTrigger.ON_TURN_END and passive.current_charges > 0:
+		if passive.charge_type == DataManager.PassiveChargeType.TURN_BASED and passive.trigger != DataManager.PassiveTrigger.ON_TURN_START and passive.current_charges > 0:
 			passive.current_charges -= 1
 			if passive.current_charges <= 0:
 				passives_to_remove.append(passive)
@@ -1108,3 +1123,8 @@ func get_infection_damage() -> int:
 	if status_data and status_data.has("damage_per_stack"):
 		return status_data["damage_per_stack"]
 	return 1
+
+
+## Проверяет, жив ли персонаж
+func is_alive() -> bool:
+	return get_health() > 0

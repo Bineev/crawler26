@@ -537,3 +537,12 @@ upgrade_card_confirm,Upgrade
 
 "enemy_master_of_rot_name","Master of Rot"
 "enemy_master_of_rot_desc","A gigantic octopus-like being made of tangled vines and flesh. Every strike against it poisons, wounds, and weakens."
+
+"passive_shell_name","Shell"
+"passive_shell_desc","When taking damage gain Shield"
+"passive_blooddrinker_name","Blooddrinker"
+"passive_blooddrinker_desc","When dealing direct damage to a target with Bleed, restore health"
+"passive_thorns_name","Thorns"
+"passive_thorns_desc","Attacker takes damage"
+"passive_rotting_shield_name","Rotting Shield"
+"passive_rotting_shield_desc","When taking direct damage, weakens the attacker"

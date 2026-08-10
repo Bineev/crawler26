@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="EnemyResource" load_steps=4 format=3 uid="uid://bvc605vd210i2"]
+
+[ext_resource type="Script" uid="uid://beudtcsu45bk7" path="res://resources/res_scripts/enemy_resource.gd" id="1_w0url"]
+[ext_resource type="Script" uid="uid://br4ase11y58nd" path="res://resources/res_scripts/passive_resource.gd" id="2_ff6tj"]
+[ext_resource type="Resource" uid="uid://cjgmceou5cois" path="res://resources/passives/wrath.tres" id="3_ff6tj"]
+
+[resource]
+script = ExtResource("1_w0url")
+enemy_id = 12
+biome = 5
+name_key = "enemy_flesh_hound_name"
+description_key = "enemy_flesh_hound_desc"
+base_max_health = 60
+starting_passives = Array[ExtResource("2_ff6tj")]([ExtResource("3_ff6tj")])
+metadata/_custom_type_script = "uid://beudtcsu45bk7"
