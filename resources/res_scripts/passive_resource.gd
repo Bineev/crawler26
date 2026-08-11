@@ -61,7 +61,6 @@ var effect_application_counters: Dictionary = {}  # key: EffectEntry.get_instanc
 ## МЕТОДЫ КОПИРОВАНИЯ
 ## ============================================================
 
-## Создаёт копию пассивки для использования на конкретной цели
 func duplicate_for_instance() -> PassiveResource:
 	var instance = PassiveResource.new()
 	
@@ -74,6 +73,9 @@ func duplicate_for_instance() -> PassiveResource:
 	instance.starting_charges = starting_charges
 	instance.trigger = trigger
 	instance.custom_logic_script = custom_logic_script
+	
+	# 🆕 Копируем новые поля
+	instance.deny_status_types = deny_status_types.duplicate()
 	
 	# Копируем эффекты (глубокое копирование)
 	for effect in effects:

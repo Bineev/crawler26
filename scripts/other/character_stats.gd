@@ -461,8 +461,9 @@ func modify_status_stacks(status_id: DataManager.Status, amount: int):
 
 func _apply_status_modifiers(status: StatusResource):
 	# 🆕 Проверяем, есть ли уже такой статус (модификаторы уже применены)
-	if active_statuses.has(status.id):
-		return
+	## BUG (статус уже есть в этот момент)
+	#if active_statuses.has(status.id):
+		#return
 	
 	for mod in status.modifiers:
 		var final_value = mod.value

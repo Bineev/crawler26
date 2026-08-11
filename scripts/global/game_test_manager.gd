@@ -244,6 +244,9 @@ func clear_ui():
 	if battle_log:
 		battle_log.queue_free()
 		battle_log = null
+		
+	# 🆕 Очищаем массив иконок зелий
+	potion_icons.clear()
 	
 	print("UI cleared")
 
@@ -392,16 +395,34 @@ func _on_potion_added(potion: PotionResource) -> void:
 	_update_full_label()
 
 func _on_potion_removed(index: int) -> void:
-	if index < potion_icons.size():
-		var icon = potion_icons[index]
-		potion_icons.remove_at(index)
-		if is_instance_valid(icon):
-			icon.queue_free()
+	# 🆕 Проверяем, что индекс валидный
+	if index < 0 or index >= potion_icons.size():
+		_clean_null_icons()
+		_update_full_label()
+		return
+	
+	var icon = potion_icons[index]
+	potion_icons.remove_at(index)
+	
+	if is_instance_valid(icon):
+		icon.queue_free()
+	
 	_update_full_label()
+
+
+func _clean_null_icons() -> void:
+	var i = 0
+	while i < potion_icons.size():
+		if not is_instance_valid(potion_icons[i]):
+			potion_icons.remove_at(i)
+		else:
+			i += 1
 
 func _on_potion_used(potion_icon: PotionIcon) -> void:
 	var index = potion_icons.find(potion_icon)
 	if index == -1:
+		# 🆕 Если не найден — возможно, уже удалён
+		_clean_null_icons()
 		return
 	
 	var player = BattleManager.get_player()
@@ -431,9 +452,14 @@ func _on_potion_used(potion_icon: PotionIcon) -> void:
 	
 	RunManager.remove_potion(index)
 
+
 func _on_potion_deselect_all() -> void:
+	# 🆕 Сначала очищаем null
+	_clean_null_icons()
+	
 	for icon in potion_icons:
-		icon.deselect()
+		if is_instance_valid(icon):
+			icon.deselect()
 
 func get_current_room() -> Room:
 	return current_room_node
@@ -441,10 +467,12 @@ func get_current_room() -> Room:
 func _on_potion_discarded(potion_icon: PotionIcon) -> void:
 	var index = potion_icons.find(potion_icon)
 	if index == -1:
+		_clean_null_icons()
 		return
 	
 	RunManager.remove_potion(index)
 	SignalManager.log_message.emit("Зелье выброшено!")
+
 
 func _update_full_label() -> void:
 	if potion_full_label:
