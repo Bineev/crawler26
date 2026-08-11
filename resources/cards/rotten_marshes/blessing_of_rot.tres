@@ -1,0 +1,28 @@
+[gd_resource type="Resource" script_class="CardData" load_steps=5 format=3 uid="uid://b2sne742sbs3w"]
+
+[ext_resource type="Script" uid="uid://cmra25r1r3ivt" path="res://resources/res_scripts/effect_entry.gd" id="1_p1xb5"]
+[ext_resource type="Script" uid="uid://ypektwfs51db" path="res://scripts/effects/heal_by_poison_duration.gd" id="2_4juf4"]
+[ext_resource type="Script" uid="uid://badcs22cck6n5" path="res://resources/res_scripts/card_data.gd" id="2_5lwfc"]
+
+[sub_resource type="Resource" id="Resource_r6708"]
+script = ExtResource("1_p1xb5")
+category = 15
+target = 0
+custom_description = "card_blessing_of_rot_desc"
+custom_script = ExtResource("2_4juf4")
+metadata/_custom_type_script = "uid://cmra25r1r3ivt"
+
+[resource]
+script = ExtResource("2_5lwfc")
+id = 30
+is_burned = true
+cost_grade = 5
+origin = 1
+biome = 5
+name_key = "card_blessing_of_rot_name"
+description_key = "card_blessing_of_rot_desc"
+grade = 2
+cost = 3
+effects = Array[ExtResource("1_p1xb5")]([SubResource("Resource_r6708")])
+manual_card_types = Array[int]([4])
+metadata/_custom_type_script = "uid://badcs22cck6n5"

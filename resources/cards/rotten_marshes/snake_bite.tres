@@ -1,0 +1,36 @@
+[gd_resource type="Resource" script_class="CardData" load_steps=8 format=3 uid="uid://cd05qq7mytrb4"]
+
+[ext_resource type="Script" uid="uid://cmra25r1r3ivt" path="res://resources/res_scripts/effect_entry.gd" id="1_54rff"]
+[ext_resource type="Script" uid="uid://badcs22cck6n5" path="res://resources/res_scripts/card_data.gd" id="2_mrpkj"]
+[ext_resource type="Resource" uid="uid://nspyatginler" path="res://resources/statuses/poison.tres" id="2_t1l2w"]
+[ext_resource type="Resource" uid="uid://qfiyvb1u642" path="res://resources/statuses/weakness.tres" id="3_l3gkc"]
+
+[sub_resource type="Resource" id="Resource_oidu8"]
+script = ExtResource("1_54rff")
+base_value = 3
+metadata/_custom_type_script = "uid://cmra25r1r3ivt"
+
+[sub_resource type="Resource" id="Resource_ct6a5"]
+script = ExtResource("1_54rff")
+category = 4
+status = ExtResource("2_t1l2w")
+duration = 3
+metadata/_custom_type_script = "uid://cmra25r1r3ivt"
+
+[sub_resource type="Resource" id="Resource_3kn5a"]
+script = ExtResource("1_54rff")
+category = 4
+status = ExtResource("3_l3gkc")
+duration = 1
+metadata/_custom_type_script = "uid://cmra25r1r3ivt"
+
+[resource]
+script = ExtResource("2_mrpkj")
+id = 28
+origin = 1
+biome = 5
+upgrade_type = 10
+name_key = "card_snake_bite_name"
+description_key = "card_snake_bite_desc"
+effects = Array[ExtResource("1_54rff")]([SubResource("Resource_oidu8"), SubResource("Resource_ct6a5"), SubResource("Resource_3kn5a")])
+metadata/_custom_type_script = "uid://badcs22cck6n5"

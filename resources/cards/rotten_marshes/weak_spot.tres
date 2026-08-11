@@ -1,0 +1,35 @@
+[gd_resource type="Resource" script_class="CardData" load_steps=7 format=3 uid="uid://dqse6hrtwxlew"]
+
+[ext_resource type="Script" uid="uid://cmra25r1r3ivt" path="res://resources/res_scripts/effect_entry.gd" id="1_h3rg7"]
+[ext_resource type="Script" uid="uid://badcs22cck6n5" path="res://resources/res_scripts/card_data.gd" id="2_7wnvs"]
+[ext_resource type="Script" uid="uid://drqdqi1odoior" path="res://scripts/conditions/target_has_weakness.gd" id="2_fm11j"]
+
+[sub_resource type="Resource" id="Resource_j6uaj"]
+script = ExtResource("1_h3rg7")
+base_value = 4
+metadata/_custom_type_script = "uid://cmra25r1r3ivt"
+
+[sub_resource type="Resource" id="Resource_1wmsi"]
+script = ExtResource("1_h3rg7")
+base_value = 8
+metadata/_custom_type_script = "uid://cmra25r1r3ivt"
+
+[sub_resource type="Resource" id="Resource_02832"]
+script = ExtResource("1_h3rg7")
+category = 14
+condition_script = ExtResource("2_fm11j")
+true_effect = SubResource("Resource_1wmsi")
+false_effect = SubResource("Resource_j6uaj")
+metadata/_custom_type_script = "uid://cmra25r1r3ivt"
+
+[resource]
+script = ExtResource("2_7wnvs")
+id = 31
+cost_grade = 4
+origin = 1
+biome = 5
+name_key = "card_weak_spot_name"
+description_key = "card_weak_spot_desc"
+grade = 1
+effects = Array[ExtResource("1_h3rg7")]([SubResource("Resource_02832")])
+metadata/_custom_type_script = "uid://badcs22cck6n5"
