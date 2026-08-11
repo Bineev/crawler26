@@ -21,6 +21,7 @@ func _init():
 
 
 func _init_flat_stats():
+	# BUG - как мету менять? 
 	flats[DataManager.FlatStat.HEALTH] = DataManager.PENITENT_STARTING_HEALTH
 	flats[DataManager.FlatStat.MAX_HEALTH] = DataManager.PENITENT_STARTING_HEALTH
 	flats[DataManager.FlatStat.ENERGY] = RunManager.max_energy

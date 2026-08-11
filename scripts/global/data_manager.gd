@@ -136,6 +136,11 @@ enum ModifierStat {
 	HEALING_RECEIVED_PERCENT,  # +X% получаемого лечения
 	ATONEMENT_GAIN_MULTIPLIER, # множитель получения Искупления
 	DAMAGE_FLAT_BONUS,         # СИЛА (+X к урону)
+	# 🆕 Новые модификаторы
+	DAMAGE_DEALT_DIRECT_PERCENT,   # +X% к прямому урону (карты, атаки)
+	DAMAGE_DEALT_DOT_PERCENT,      # +X% к урону от статусов (DOT)
+	DAMAGE_TAKEN_DIRECT_PERCENT,   # +X% к входящему прямому урону
+	DAMAGE_TAKEN_DOT_PERCENT,      # +X% к входящему урону от статусов (DOT)
 }
 
 enum PotionType {
@@ -193,6 +198,8 @@ enum PassiveTrigger {
 	ON_STATUS_TICK,
 	ON_DEAL_DIRECT_DAMAGE,  # 🆕
 	ON_TAKE_DIRECT_DAMAGE,    # 🆕 новый
+	ON_STATUS_APPLIED_TO_SELF,  # 🆕
+	ON_STATUS_DENIED,  # 🆕 срабатывает при попытке наложения статуса, который блокируется
 }
 
 ## Типы эффектов карт
@@ -374,6 +381,20 @@ enum PassiveChargeType {
 	CONDITIONAL,
 }
 
+enum StatusDenyType {
+	NONE,        # не блокирует ничего
+	ALL,         # блокирует все статусы
+	NEGATIVE,    # блокирует только негативные
+	POSITIVE,    # блокирует только позитивные
+	POISON,
+	BLEED,
+	BURN,
+	COLD,
+	WEAKNESS,
+	VULNERABILITY,
+	# ... можно добавлять любые статусы
+}
+
 ## Все возможные пассивки
 enum Passive {
 	# Кротовые норы
@@ -390,6 +411,7 @@ enum Passive {
 	BLOODDRINKER,
 	THORNS,  # 🆕
 	ROTTING_SHIELD,  # 🆕
+	STEEL_HIDE
 }
 
 ## Все возможные статусы
@@ -988,6 +1010,7 @@ const PASSIVE_ICONS: Dictionary = {
 	Passive.BLOODDRINKER: preload("res://img/icons/passives/blooddrinker.png"),  # 🆕
 	Passive.THORNS: preload("res://img/icons/passives/thorns.png"),
 	Passive.ROTTING_SHIELD: preload("res://img/icons/passives/rotting_shield.png"),
+	Passive.STEEL_HIDE: preload("res://img/icons/passives/steel_hide.png"),
 }
 
 
@@ -1064,6 +1087,7 @@ func load_passive_resources():
 	_passive_resources[Passive.BLOODDRINKER] = load("res://resources/passives/blooddrinker.tres")
 	_passive_resources[Passive.THORNS] = load("res://resources/passives/thorns.tres")
 	_passive_resources[Passive.ROTTING_SHIELD] = load("res://resources/passives/rotting_shield.tres")
+	_passive_resources[Passive.STEEL_HIDE] = load("res://resources/passives/steel_hide.tres")
 	
 	_passive_resources_loaded = true
 

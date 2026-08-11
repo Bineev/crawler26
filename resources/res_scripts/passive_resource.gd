@@ -30,7 +30,8 @@ class_name PassiveResource
 ## Триггер активации
 @export var trigger: DataManager.PassiveTrigger = DataManager.PassiveTrigger.ON_TAKE_DAMAGE
 
-
+## Типы статусов, которые блокирует пассивка (пустой массив = не блокирует)
+@export var deny_status_types: Array[DataManager.StatusDenyType] = []
 ## ============================================================
 ## ЭФФЕКТЫ
 ## ============================================================

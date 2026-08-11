@@ -1,7 +1,6 @@
-[gd_resource type="Resource" script_class="PassiveResource" load_steps=5 format=3 uid="uid://d2d615ax0t482"]
+[gd_resource type="Resource" script_class="PassiveResource" load_steps=4 format=3 uid="uid://d2d615ax0t482"]
 
 [ext_resource type="Script" uid="uid://cmra25r1r3ivt" path="res://resources/res_scripts/effect_entry.gd" id="1_2hlnf"]
-[ext_resource type="Script" uid="uid://trx83eymotcb" path="res://scripts/passives/denial_logic.gd" id="1_4kthn"]
 [ext_resource type="Script" uid="uid://0mjn55jcxdti" path="res://resources/res_scripts/modifier_entry.gd" id="2_4kthn"]
 [ext_resource type="Script" uid="uid://br4ase11y58nd" path="res://resources/res_scripts/passive_resource.gd" id="3_fef0r"]
 
@@ -12,6 +11,6 @@ name_key = "passive_denial_name"
 description_key = "passive_denial_desc"
 charge_type = 2
 starting_charges = 3
-trigger = 3
-custom_logic_script = ExtResource("1_4kthn")
+trigger = 12
+deny_status_types = Array[int]([2])
 metadata/_custom_type_script = "uid://br4ase11y58nd"

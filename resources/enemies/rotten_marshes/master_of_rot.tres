@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="EnemyResource" load_steps=4 format=3 uid="uid://bxxtinaiblxaw"]
+
+[ext_resource type="Script" uid="uid://beudtcsu45bk7" path="res://resources/res_scripts/enemy_resource.gd" id="1_cm1v3"]
+[ext_resource type="Script" uid="uid://br4ase11y58nd" path="res://resources/res_scripts/passive_resource.gd" id="2_r5145"]
+[ext_resource type="Resource" uid="uid://lntkqqqjddd" path="res://resources/passives/steel_hide.tres" id="3_r5145"]
+
+[resource]
+script = ExtResource("1_cm1v3")
+enemy_id = 13
+biome = 5
+size = 3
+name_key = "enemy_master_of_rot_name"
+description_key = "enemy_master_of_rot_desc"
+base_max_health = 140
+starting_passives = Array[ExtResource("2_r5145")]([ExtResource("3_r5145")])
+metadata/_custom_type_script = "uid://beudtcsu45bk7"

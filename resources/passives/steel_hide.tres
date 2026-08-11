@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="PassiveResource" load_steps=5 format=3 uid="uid://lntkqqqjddd"]
+
+[ext_resource type="Script" uid="uid://cmra25r1r3ivt" path="res://resources/res_scripts/effect_entry.gd" id="1_rp80p"]
+[ext_resource type="Script" uid="uid://0mjn55jcxdti" path="res://resources/res_scripts/modifier_entry.gd" id="2_sf8o8"]
+[ext_resource type="Script" uid="uid://br4ase11y58nd" path="res://resources/res_scripts/passive_resource.gd" id="3_liis0"]
+
+[sub_resource type="Resource" id="Resource_rp80p"]
+script = ExtResource("2_sf8o8")
+stat = 8
+value = 0.5
+metadata/_custom_type_script = "uid://0mjn55jcxdti"
+
+[resource]
+script = ExtResource("3_liis0")
+id = 12
+name_key = "passive_steel_hide_name"
+description_key = "passive_steel_hide_desc"
+charge_type = 2
+starting_charges = 5
+trigger = 12
+deny_status_types = Array[int]([2])
+modifiers = Array[ExtResource("2_sf8o8")]([SubResource("Resource_rp80p")])
+metadata/_custom_type_script = "uid://br4ase11y58nd"

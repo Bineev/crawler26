@@ -92,8 +92,8 @@ func _execute_damage(effect: EffectEntry, source, targets: Array, is_direct: boo
 	
 	# Масштабирование от статов (всегда применяется)
 	if effect.stat_multiplier != null and effect.stat_divisor > 0:
-		if source and source.has_method("get_stat"):
-			var stat_value = source.get_stat(effect.stat_multiplier)
+		if source and source.has_method("get_flat"):
+			var stat_value = source.get_flat(effect.stat_multiplier)
 			base_damage += stat_value / effect.stat_divisor
 	
 	# 🆕 Применяем множитель от артефакта ТОЛЬКО для прямого урона
@@ -110,20 +110,41 @@ func _execute_damage(effect: EffectEntry, source, targets: Array, is_direct: boo
 		var final_damage = base_damage
 		var is_self_damage = (source == target)
 		
-		# 🆕 Модификаторы источника применяются ТОЛЬКО если цель НЕ источник
-		# BUG вот тут может быть баг
-		if not is_self_damage and is_direct:
-			if source and source.has_method("get_strength_bonus"):
-				final_damage += source.get_strength_bonus()
-			
-			if source and source.has_method("get_modifier"):
+		# ============================================================
+		# 1. МОДИФИКАТОРЫ ИСТОЧНИКА (применяются только если цель НЕ источник)
+		# ============================================================
+		if not is_self_damage and source and source.has_method("get_modifier"):
+			# Сила (FLAT_BONUS) — только для прямого урона
+			if is_direct:
 				final_damage += source.get_modifier(DataManager.ModifierStat.DAMAGE_FLAT_BONUS)
-				final_damage *= source.get_modifier(DataManager.ModifierStat.DAMAGE_DEALT_PERCENT)
+				
+				# Бонус от статуса STRENGTH — только для прямого урона
+				if source.has_method("get_strength_bonus"):
+					final_damage += source.get_strength_bonus()
+			
+			# Множитель всего исходящего урона (всегда)
+			final_damage *= source.get_modifier(DataManager.ModifierStat.DAMAGE_DEALT_PERCENT)
+			
+			# Множитель исходящего урона в зависимости от типа (прямой / DOT)
+			if is_direct:
+				final_damage *= source.get_modifier(DataManager.ModifierStat.DAMAGE_DEALT_DIRECT_PERCENT)
+			else:
+				final_damage *= source.get_modifier(DataManager.ModifierStat.DAMAGE_DEALT_DOT_PERCENT)
 		
-		# Модификаторы цели всегда применяются (если цель — враг)
+		# ============================================================
+		# 2. МОДИФИКАТОРЫ ЦЕЛИ (применяются всегда)
+		# ============================================================
 		if target.has_method("get_modifier"):
+			# Множитель всего входящего урона (всегда)
 			final_damage *= target.get_modifier(DataManager.ModifierStat.DAMAGE_TAKEN_PERCENT)
-		# возможно, вся цепочка должна быть await
+			
+			# Множитель входящего урона в зависимости от типа (прямой / DOT)
+			if is_direct:
+				final_damage *= target.get_modifier(DataManager.ModifierStat.DAMAGE_TAKEN_DIRECT_PERCENT)
+			else:
+				final_damage *= target.get_modifier(DataManager.ModifierStat.DAMAGE_TAKEN_DOT_PERCENT)
+		
+		# Применяем урон
 		target.take_damage(floor(final_damage), is_ignore_block, source, is_direct, status_icon)
 
 

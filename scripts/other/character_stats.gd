@@ -11,11 +11,10 @@ var flats: Dictionary[DataManager.FlatStat, int] = {
 	DataManager.FlatStat.MAX_HEALTH: 0,
 	DataManager.FlatStat.ENERGY: 0,
 	DataManager.FlatStat.MAX_ENERGY: 0,
-	#DataManager.FlatStat.BLOCK: 0,
-	DataManager.FlatStat.HAND_SIZE: 5,
-	DataManager.FlatStat.DRAW_PER_TURN: 5,
+	DataManager.FlatStat.HAND_SIZE: DataManager.STARTING_HAND_SIZE,
+	DataManager.FlatStat.DRAW_PER_TURN: DataManager.CARDS_TO_DRAW_PER_TURN,
 	DataManager.FlatStat.ATONEMENT: 0,
-	DataManager.FlatStat.MAX_ATONEMENT: 30,
+	DataManager.FlatStat.MAX_ATONEMENT: DataManager.PENITENT_MAX_ATONEMENT,
 }
 
 ## ============================================================
@@ -29,6 +28,12 @@ var modifiers: Dictionary = {
 	DataManager.ModifierStat.HEALING_RECEIVED_PERCENT: 1.0,
 	DataManager.ModifierStat.ATONEMENT_GAIN_MULTIPLIER: 1.0,
 	DataManager.ModifierStat.DAMAGE_FLAT_BONUS: 0,
+	
+	# 🆕 Новые модификаторы
+	DataManager.ModifierStat.DAMAGE_DEALT_DIRECT_PERCENT: 1.0,
+	DataManager.ModifierStat.DAMAGE_DEALT_DOT_PERCENT: 1.0,
+	DataManager.ModifierStat.DAMAGE_TAKEN_DIRECT_PERCENT: 1.0,
+	DataManager.ModifierStat.DAMAGE_TAKEN_DOT_PERCENT: 1.0,
 }
 
 ## ============================================================
@@ -307,7 +312,8 @@ func add_status(status: StatusResource, value: int, duration: int, caster: Chara
 		SignalManager.log_message.emit("%s заморожен! Нельзя наложить статус." % get_display_name())
 		return
 	
-	if _check_denial(status):
+	# 🆕 Проверяем все пассивки на блокировку статусов (вместо _check_denial)
+	if _check_status_denial(status):
 		return
 	
 	if not StatusInteractionManager.can_apply(self, status.id):
@@ -1128,3 +1134,137 @@ func get_infection_damage() -> int:
 ## Проверяет, жив ли персонаж
 func is_alive() -> bool:
 	return get_health() > 0
+
+# === НОВЫЕ МЕТОДЫ ДЛЯ МОДИФИКАТОРОВ ===
+
+## Применяет модификаторы к прямому урону (исходящий)
+func get_direct_damage_dealt_modifier() -> float:
+	return modifiers.get(DataManager.ModifierStat.DAMAGE_DEALT_DIRECT_PERCENT, 1.0)
+
+## Применяет модификаторы к урону от статусов (исходящий)
+func get_dot_damage_dealt_modifier() -> float:
+	return modifiers.get(DataManager.ModifierStat.DAMAGE_DEALT_DOT_PERCENT, 1.0)
+
+## Применяет модификаторы к прямому урону (входящий)
+func get_direct_damage_taken_modifier() -> float:
+	return modifiers.get(DataManager.ModifierStat.DAMAGE_TAKEN_DIRECT_PERCENT, 1.0)
+
+## Применяет модификаторы к урону от статусов (входящий)
+func get_dot_damage_taken_modifier() -> float:
+	return modifiers.get(DataManager.ModifierStat.DAMAGE_TAKEN_DOT_PERCENT, 1.0)
+
+
+func _check_status_denial(status: StatusResource) -> bool:
+	var status_id = status.id
+	var is_negative = DataManager.is_negative_status(status_id)
+	
+	for passive in active_passives:
+		if passive.deny_status_types.is_empty():
+			continue
+		
+		var should_block = false
+		for deny_type in passive.deny_status_types:
+			match deny_type:
+				DataManager.StatusDenyType.ALL:
+					should_block = true
+				DataManager.StatusDenyType.NEGATIVE:
+					if is_negative:
+						should_block = true
+				DataManager.StatusDenyType.POSITIVE:
+					if not is_negative:
+						should_block = true
+				_:
+					if status_id == deny_type:
+						should_block = true
+		
+		if not should_block:
+			continue
+		
+		# Блокируем статус
+		if passive.consume_charge():
+			SignalManager.log_message.emit("%s заблокировал статус %s! (%d зарядов осталось)" % [passive.get_localized_name(), status.get_localized_name(), passive.current_charges])
+			
+			# 🆕 Анимируем иконку пассивки
+			if self is EnemyInstance:
+				var enemy_ui = self.enemy_ui
+				if enemy_ui:
+					var icon = enemy_ui.find_passive_icon(passive.id)
+					if icon:
+						icon.animate()
+			elif self is PenitentStats:
+				var portrait = GameTestManager.get_player_portrait()
+				if portrait:
+					var icon = portrait.find_passive_icon(passive.id)
+					if icon:
+						icon.animate()
+			
+			# Обрабатываем эффекты пассивки (если есть)
+			if not passive.effects.is_empty():
+				var is_enemy = self is EnemyInstance
+				var attacker = null  # для ON_STATUS_DENIED атакующий не определён
+				
+				for effect in passive.effects:
+					var targets = []
+					
+					match effect.target:
+						DataManager.EffectTarget.SELF:
+							targets = [self]
+						
+						DataManager.EffectTarget.ENEMY:
+							if is_enemy:
+								var player = BattleManager.get_player()
+								if player:
+									targets = [player]
+							else:
+								var enemies = BattleManager.get_enemies()
+								if not enemies.is_empty():
+									targets = [enemies[0]]
+						
+						DataManager.EffectTarget.ALL_ENEMIES:
+							if is_enemy:
+								var player = BattleManager.get_player()
+								if player:
+									targets = [player]
+							else:
+								targets = BattleManager.get_enemies()
+						
+						DataManager.EffectTarget.ALL_ALLIES:
+							if is_enemy:
+								targets = BattleManager.get_enemies()
+							else:
+								targets = [self]
+						
+						DataManager.EffectTarget.ANY:
+							if is_enemy:
+								targets = BattleManager.get_enemies()
+								var player = BattleManager.get_player()
+								if player and player not in targets:
+									targets.append(player)
+							else:
+								targets = BattleManager.get_enemies()
+								targets.append(self)
+						
+						_:
+							targets = [self]
+					
+					EffectExecutor.execute(effect, self, targets, {}, passive)
+			
+			# Выполняем кастомную логику, если есть
+			if passive.custom_logic_script:
+				var logic_instance = passive.custom_logic_script.new()
+				if logic_instance.has_method("on_status_denied"):
+					logic_instance.on_status_denied(passive, self, status)
+			
+			# Если заряды кончились — удаляем пассивку
+			if not passive.is_active():
+				remove_passive(passive)
+			
+			# Обновляем UI
+			if self is PenitentStats:
+				SignalManager.player_status_changed.emit(self)
+			elif self is EnemyInstance:
+				SignalManager.passive_changed.emit(self, passive.id)
+			
+			return true
+	
+	return false

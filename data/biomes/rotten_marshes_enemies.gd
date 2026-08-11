@@ -63,4 +63,35 @@ const INTENTS = {
 			[ { "category": DataManager.EffectCategory.APPLY_STATUS, "target": DataManager.EffectTarget.ENEMY, "status": DataManager.Status.POISON, "value": 2, "duration": 3 } ],
 		]
 	},
+	DataManager.EnemyId.MASTER_OF_ROT: {
+		"cycle_type": DataManager.IntentCycleType.SEQUENTIAL,
+		"intents": [
+			# 1 ход - Яд на 5 ходов
+			[ { "category": DataManager.EffectCategory.APPLY_STATUS, "target": DataManager.EffectTarget.ENEMY, "status": DataManager.Status.POISON, "value": 2, "duration": 5 } ],
+			
+			# 2 ход - Щит 5
+			[ { "category": DataManager.EffectCategory.APPLY_STATUS, "target": DataManager.EffectTarget.SELF, "status": DataManager.Status.SHIELD, "value": 5, "duration": 1 } ],
+			
+			# 3 ход - Урон 10
+			[ { "category": DataManager.EffectCategory.DAMAGE, "target": DataManager.EffectTarget.ENEMY, "base_value": 10 } ],
+			
+			# 4 ход - Урон 15
+			[ { "category": DataManager.EffectCategory.DAMAGE, "target": DataManager.EffectTarget.ENEMY, "base_value": 15 } ],
+			
+			# 5 ход - Наложить на себя Rotting Shield (3 заряда)
+			[ { "category": DataManager.EffectCategory.APPLY_PASSIVE, "target": DataManager.EffectTarget.SELF, "passive": preload("res://resources/passives/rotting_shield.tres"), "passive_duration": 3 } ],
+			
+			# 6 ход - Щит 10
+			[ { "category": DataManager.EffectCategory.APPLY_STATUS, "target": DataManager.EffectTarget.SELF, "status": DataManager.Status.SHIELD, "value": 10, "duration": 1 } ],
+			
+			# 7 ход - Урон 10
+			[ { "category": DataManager.EffectCategory.DAMAGE, "target": DataManager.EffectTarget.ENEMY, "base_value": 10 } ],
+			
+			# 8 ход - Наложить на себя Venomous Shield
+			[ { "category": DataManager.EffectCategory.APPLY_PASSIVE, "target": DataManager.EffectTarget.SELF, "passive": preload("res://resources/passives/venomous_shield.tres"), "passive_duration": 0 } ],
+			
+			# 9 ход - Урон 15
+			[ { "category": DataManager.EffectCategory.DAMAGE, "target": DataManager.EffectTarget.ENEMY, "base_value": 15 } ],
+		]
+	}
 }
