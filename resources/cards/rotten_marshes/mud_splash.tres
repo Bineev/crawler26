@@ -1,0 +1,30 @@
+[gd_resource type="Resource" script_class="CardData" load_steps=6 format=3 uid="uid://b2mgv2yta2kap"]
+
+[ext_resource type="Script" uid="uid://cmra25r1r3ivt" path="res://resources/res_scripts/effect_entry.gd" id="1_4bk5r"]
+[ext_resource type="Script" uid="uid://badcs22cck6n5" path="res://resources/res_scripts/card_data.gd" id="2_kljff"]
+[ext_resource type="Script" uid="uid://cm0dxkriebeg8" path="res://scripts/effects/transfer_statuses.gd" id="2_u0mbu"]
+
+[sub_resource type="Resource" id="Resource_lm0kc"]
+script = ExtResource("1_4bk5r")
+base_value = 5
+metadata/_custom_type_script = "uid://cmra25r1r3ivt"
+
+[sub_resource type="Resource" id="Resource_uh70u"]
+script = ExtResource("1_4bk5r")
+category = 15
+custom_description = "effect_transfer_statuses"
+custom_script = ExtResource("2_u0mbu")
+metadata/_custom_type_script = "uid://cmra25r1r3ivt"
+
+[resource]
+script = ExtResource("2_kljff")
+id = 33
+cost_grade = 5
+origin = 1
+biome = 5
+name_key = "card_mud_splash_name"
+description_key = "card_mud_splash_desc"
+grade = 3
+effects = Array[ExtResource("1_4bk5r")]([SubResource("Resource_lm0kc"), SubResource("Resource_uh70u")])
+manual_card_types = Array[int]([0, 6])
+metadata/_custom_type_script = "uid://badcs22cck6n5"

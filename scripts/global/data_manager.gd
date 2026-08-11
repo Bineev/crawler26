@@ -3,7 +3,7 @@ extends Node
 
 ## ============================================================
 ## 1. ОСНОВНЫЕ ПЕРЕЧИСЛЕНИЯ (ENUMS)
-## ============================================================
+## ============================================================card
 
 
 ## ============================================================
@@ -512,6 +512,7 @@ enum CardId {
 	BLESSING_OF_ROT,
 	WEAK_SPOT,  # 🆕
 	BLOOM_OF_CORRUPTION,  # 🆕
+	MUD_SPLASH,
 }
 
 ## Намерения врагов
@@ -1523,6 +1524,7 @@ func load_all_cards():
 	_register_card(CardId.BLESSING_OF_ROT, "res://resources/cards/rotten_marshes/blessing_of_rot.tres")
 	_register_card(CardId.WEAK_SPOT, "res://resources/cards/rotten_marshes/weak_spot.tres")
 	_register_card(CardId.BLOOM_OF_CORRUPTION, "res://resources/cards/rotten_marshes/bloom_of_corruption.tres")
+	_register_card(CardId.MUD_SPLASH, "res://resources/cards/rotten_marshes/mud_splash.tres")
 	
 	_cards_loaded = true
 
@@ -1604,6 +1606,7 @@ func load_card_illustrations():
 	_card_illustrations[CardId.BLESSING_OF_ROT] = preload("res://img/cards/rotten_marshes/blessing_of_rot.png")
 	_card_illustrations[CardId.WEAK_SPOT] = preload("res://img/cards/rotten_marshes/weak_spot.png")
 	_card_illustrations[CardId.BLOOM_OF_CORRUPTION] = preload("res://img/cards/rotten_marshes/bloom_of_corruption.png")
+	_card_illustrations[CardId.MUD_SPLASH] = preload("res://img/cards/rotten_marshes/mud_splash.png")
 	#_card_illustrations[CardId.BLIND_FURY] = preload("res://img/cards/mole_tunnels/blind_fury.png")
 	#_card_illustrations[CardId.SMELL_OF_BLOOD] = preload("res://img/cards/mole_tunnels/smell_of_blood.png")
 	#_card_illustrations[CardId.MOLERAT_HIDE] = preload("res://img/cards/mole_tunnels/molerat_hide.png")

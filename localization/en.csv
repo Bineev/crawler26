@@ -557,3 +557,6 @@ upgrade_card_confirm,Upgrade
 "card_weak_spot_desc","Deal 7 damage if the target is Weakened, otherwise 4 damage."
 "card_bloom_of_corruption_name","Bloom of Corruption"
 "card_bloom_of_corruption_desc","Heal 5 health and gain Venomous Shield (5 charges). Burns."
+"card_mud_splash_name","Mud Splash"
+"card_mud_splash_desc","Deal 5 damage to target. Transfer all your statuses to the target."
+"effect_transfer_statuses","Transfer all statuses to target"
