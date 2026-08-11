@@ -7,7 +7,7 @@ extends Node
 
 var current_room_node: Room = null
 var current_floor: int = 1
-var current_biome: DataManager.Biome = DataManager.Biome.MOLE_TUNNELS
+var current_biome: DataManager.Biome = DataManager.Biome.ROTTEN_MARSHES
 var current_room_index: int = 0
 var hand_ui : HandUI = null
 var blood_screen: BloodScreen = null

@@ -10,5 +10,5 @@ biome = 5
 size = 0
 name_key = "enemy_crested_toad_name"
 description_key = "enemy_crested_toad_desc"
-base_max_health = -280
+base_max_health = 35
 metadata/_custom_type_script = "uid://beudtcsu45bk7"

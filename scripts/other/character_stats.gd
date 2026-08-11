@@ -460,6 +460,10 @@ func modify_status_stacks(status_id: DataManager.Status, amount: int):
 
 
 func _apply_status_modifiers(status: StatusResource):
+	# 🆕 Проверяем, есть ли уже такой статус (модификаторы уже применены)
+	if active_statuses.has(status.id):
+		return
+	
 	for mod in status.modifiers:
 		var final_value = mod.value
 		
@@ -476,7 +480,7 @@ func _apply_status_modifiers(status: StatusResource):
 		
 		match mod.change_type:
 			DataManager.ModifierChangeType.MULTIPLIER:
-				modifiers[mod.stat] = modifiers.get(mod.stat, 1.0) * (1.0 + final_value)
+				modifiers[mod.stat] = modifiers.get(mod.stat, 1.0) + final_value
 			DataManager.ModifierChangeType.PERCENT:
 				modifiers[mod.stat] = modifiers.get(mod.stat, 1.0) + final_value
 			DataManager.ModifierChangeType.FLAT_BONUS:
@@ -499,7 +503,8 @@ func _remove_status_modifiers(status: StatusResource):
 		
 		match mod.change_type:
 			DataManager.ModifierChangeType.MULTIPLIER:
-				modifiers[mod.stat] = modifiers.get(mod.stat, 1.0) / (1.0 + final_value)
+				# 🆕 Вычитание вместо деления
+				modifiers[mod.stat] = modifiers.get(mod.stat, 1.0) - final_value
 			DataManager.ModifierChangeType.PERCENT:
 				modifiers[mod.stat] = modifiers.get(mod.stat, 1.0) - final_value
 			DataManager.ModifierChangeType.FLAT_BONUS:
@@ -524,7 +529,6 @@ func apply_passive(passive: PassiveResource, duration: int = -1):
 	var instance = passive.duplicate_for_instance()
 	instance.init_instance()
 	
-	# Для TURN_BASED используем duration или starting_charges
 	if instance.charge_type == DataManager.PassiveChargeType.TURN_BASED:
 		if duration > 0:
 			instance.current_charges = duration
@@ -533,14 +537,11 @@ func apply_passive(passive: PassiveResource, duration: int = -1):
 	else:
 		instance.current_charges = instance.starting_charges
 	
-	# Проверяем, есть ли уже такая пассивка
 	for existing in active_passives:
 		if existing.id == instance.id:
-			# Для PERMANENT не стакаем
 			if instance.charge_type == DataManager.PassiveChargeType.PERMANENT:
 				return
 			
-			# 🆕 Проверяем, есть ли у эффектов пассивки grow_type
 			var has_growth = false
 			for effect in existing.effects:
 				if effect.grow_type != DataManager.GrowType.NONE:
@@ -548,22 +549,20 @@ func apply_passive(passive: PassiveResource, duration: int = -1):
 					break
 			
 			if has_growth:
-				# Сбрасываем счётчики и значения до дефолтных
 				existing.current_charges += instance.starting_charges
 				existing.effect_application_counters.clear()
-				# Сбрасываем current_value для эффектов
 				for effect in existing.effects:
 					effect.clear_instance_state()
 				SignalManager.player_status_changed.emit(self)
 				return
-			# Складываем заряды
+			
 			existing.current_charges += instance.current_charges
 			SignalManager.player_status_changed.emit(self)
 			return
 	
 	active_passives.append(instance)
 	
-	# 🆕 Применяем модификаторы с учётом RunManager
+	# 🆕 Применяем модификаторы (сложение вместо умножения)
 	for mod in instance.modifiers:
 		var final_value = mod.value
 		
@@ -573,11 +572,11 @@ func apply_passive(passive: PassiveResource, duration: int = -1):
 					final_value = RunManager.shame_damage_taken_multiplier - 1.0
 				elif mod.stat == DataManager.ModifierStat.ATONEMENT_GAIN_MULTIPLIER:
 					final_value = RunManager.shame_atonement_multiplier - 1.0
-			# 🆕 другие пассивки с модификаторами
 		
 		match mod.change_type:
 			DataManager.ModifierChangeType.MULTIPLIER:
-				modifiers[mod.stat] = modifiers.get(mod.stat, 1.0) * (1.0 + final_value)
+				# 🆕 Сложение вместо умножения
+				modifiers[mod.stat] = modifiers.get(mod.stat, 1.0) + final_value
 			DataManager.ModifierChangeType.PERCENT:
 				modifiers[mod.stat] = modifiers.get(mod.stat, 1.0) + final_value
 			DataManager.ModifierChangeType.FLAT_BONUS:
@@ -592,7 +591,7 @@ func remove_passive(passive: PassiveResource):
 	if idx != -1:
 		active_passives.remove_at(idx)
 		
-		# 🆕 Снимаем модификаторы с учётом RunManager
+		# 🆕 Снимаем модификаторы (вычитание вместо деления)
 		for mod in passive.modifiers:
 			var final_value = mod.value
 			
@@ -605,16 +604,16 @@ func remove_passive(passive: PassiveResource):
 			
 			match mod.change_type:
 				DataManager.ModifierChangeType.MULTIPLIER:
-					modifiers[mod.stat] = modifiers.get(mod.stat, 1.0) / (1.0 + final_value)
+					# 🆕 Вычитание вместо деления
+					modifiers[mod.stat] = modifiers.get(mod.stat, 1.0) - final_value
 				DataManager.ModifierChangeType.PERCENT:
 					modifiers[mod.stat] = modifiers.get(mod.stat, 1.0) - final_value
 				DataManager.ModifierChangeType.FLAT_BONUS:
 					modifiers[mod.stat] = modifiers.get(mod.stat, 0.0) - final_value
 		
 		SignalManager.passive_removed.emit(self, passive.id)
-		
 		SignalManager.passive_removed.emit(self, passive.id)
-		print("Passive removed: ", passive.get_localized_name())  # ← отладка
+		print("Passive removed: ", passive.get_localized_name())
 		SignalManager.player_status_changed.emit(self)
 
 

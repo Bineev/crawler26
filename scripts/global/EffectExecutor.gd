@@ -136,6 +136,7 @@ func _execute_damage(effect: EffectEntry, source, targets: Array, is_direct: boo
 		# ============================================================
 		if target.has_method("get_modifier"):
 			# Множитель всего входящего урона (всегда)
+			# BUG
 			final_damage *= target.get_modifier(DataManager.ModifierStat.DAMAGE_TAKEN_PERCENT)
 			
 			# Множитель входящего урона в зависимости от типа (прямой / DOT)

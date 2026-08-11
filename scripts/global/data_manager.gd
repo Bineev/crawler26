@@ -1417,6 +1417,14 @@ func load_enemy_resources():
 	_enemy_resources[EnemyId.MANY_HEADED_MOLE] = load("res://resources/enemies/mole_tunnels/many_headed_mole.tres")
 	_enemy_resources[EnemyId.FUNGAL_MINER] = load("res://resources/enemies/mole_tunnels/fungal_miner.tres")
 	_enemy_resources[EnemyId.RODENT_MOUND] = load("res://resources/enemies/mole_tunnels/rodent_mound.tres")
+	# 🆕 Гнилостные Топи
+	_enemy_resources[EnemyId.TOXIC_IMP] = load("res://resources/enemies/rotten_marshes/toxic_imp.tres")
+	_enemy_resources[EnemyId.THORNY_BLOOM] = load("res://resources/enemies/rotten_marshes/thorny_bloom.tres")
+	_enemy_resources[EnemyId.CRESTED_TOAD] = load("res://resources/enemies/rotten_marshes/crested_toad.tres")
+	_enemy_resources[EnemyId.ROTTING_SNAIL] = load("res://resources/enemies/rotten_marshes/rotting_snail.tres")
+	_enemy_resources[EnemyId.ROTTEN_PORTER] = load("res://resources/enemies/rotten_marshes/rotten_porter.tres")
+	_enemy_resources[EnemyId.FLESH_HOUND] = load("res://resources/enemies/rotten_marshes/flesh_hound.tres")
+	_enemy_resources[EnemyId.MASTER_OF_ROT] = load("res://resources/enemies/rotten_marshes/master_of_rot.tres")
 	
 	_enemy_resources_loaded = true
 

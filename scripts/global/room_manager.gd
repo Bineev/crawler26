@@ -47,9 +47,9 @@ func _create_combat_room(room_node: RoomNode, floor_level: int, biome: DataManag
 			room_index
 		)
 	
-	print("  Creating combat room with ", enemies.size(), " enemies")
-	for enemy in enemies:
-		print("    - ", DataManager.get_enemy_resource_name(enemy.enemy_id))
+	#print("  Creating combat room with ", enemies.size(), " enemies")
+	#for enemy in enemies:
+		#print("    - ", DataManager.get_enemy_resource_name(enemy.enemy_id))
 	
 	var background_texture = DataManager.get_random_background(biome)
 	var room_instance = combat_room_scene.instantiate()
