@@ -1,12 +1,8 @@
-extends Node
-class_name TargetHasWeaknessCondition
+extends Resource
+class_name HasWeaknessCondition
 
-func check(source, targets: Array) -> bool:
-	if targets.is_empty():
-		return false
-	
-	var target = targets[0]
-	if target and target.has_method("has_status"):
-		return target.has_status(DataManager.Status.WEAKNESS)
-	
+func check(source, targets) -> bool:
+	for target in targets:
+		if target.has_status(DataManager.Status.WEAKNESS):
+			return true
 	return false

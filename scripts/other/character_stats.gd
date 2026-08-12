@@ -257,6 +257,7 @@ func take_damage(amount: int, ignore_block: bool = false, attacker: CharacterSta
 		_process_passive_triggers(DataManager.PassiveTrigger.ON_TAKE_DAMAGE, attacker)  # ← передаём атакующего, а не урон
 		if damage > 0 and is_direct and attacker and is_instance_valid(attacker) and attacker.has_method("_process_passive_triggers"):
 			# Проверяем, жив ли атакующий (если враг умер от отражённого урона — пассивка не срабатывает)
+			# BUG 
 			if attacker.has_method("is_alive") and not attacker.is_alive():
 				pass
 			else:
@@ -1268,3 +1269,64 @@ func _check_status_denial(status: StatusResource) -> bool:
 			return true
 	
 	return false
+
+
+func _get_targets_for_effect(effect: EffectEntry, source, targets: Array = []) -> Array:
+	var result: Array = []
+	var is_source_enemy = source is EnemyInstance
+	
+	match effect.target:
+		DataManager.EffectTarget.SELF:
+			result = [source]
+		
+		DataManager.EffectTarget.ENEMY:
+			if is_source_enemy:
+				# Враг атакует игрока
+				if not targets.is_empty() and targets[0] is PenitentStats:
+					result = [targets[0]]
+				else:
+					var player = BattleManager.get_player()
+					if player:
+						result = [player]
+			else:
+				# Игрок атакует врага
+				if not targets.is_empty() and targets[0] is EnemyInstance:
+					result = [targets[0]]
+				else:
+					var enemies = BattleManager.get_enemies()
+					if not enemies.is_empty():
+						result = [enemies[0]]
+		
+		DataManager.EffectTarget.ALL_ENEMIES:
+			if is_source_enemy:
+				# Враг атакует всех врагов (но у игрока один персонаж)
+				var player = BattleManager.get_player()
+				if player:
+					result = [player]
+			else:
+				# Игрок атакует всех врагов
+				result = BattleManager.get_enemies()
+		
+		DataManager.EffectTarget.ALL_ALLIES:
+			if is_source_enemy:
+				# Союзники врага — все враги
+				result = BattleManager.get_enemies()
+			else:
+				# Союзники игрока — сам игрок
+				result = [source]
+		
+		DataManager.EffectTarget.ANY:
+			var all: Array = []
+			var enemies = BattleManager.get_enemies()
+			var player = BattleManager.get_player()
+			
+			if not enemies.is_empty():
+				all.append_array(enemies)
+			if player:
+				all.append(player)
+			result = all
+		
+		_:
+			result = [source]
+	
+	return result

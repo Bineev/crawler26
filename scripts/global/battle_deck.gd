@@ -130,11 +130,14 @@ func play_card(card_ui: CardUI, card_data: CardData, target = null):
 	
 	if hand_ui:
 		hand_ui.set_all_cards_input_enabled(true)
-		
-	# Выполняем эффекты карты (после анимации)
+	
+	# 🆕 Выполняем эффекты карты
+	var player = BattleManager.get_player()
 	for effect in card_data.effects:
-		EffectExecutor.execute(effect, BattleManager.get_player(), card_ui._get_targets_for_effect(effect, target), {"card": card_ui, "card_data": card_data})
-		# BUG
+		# Используем универсальную функцию из CharacterStats
+		var targets = player._get_targets_for_effect(effect, player, [target] if target else [])
+		EffectExecutor.execute(effect, player, targets, {"card": card_ui, "card_data": card_data})
+		
 		if hand_ui:
 			await hand_ui.get_tree().create_timer(0.3).timeout
 	

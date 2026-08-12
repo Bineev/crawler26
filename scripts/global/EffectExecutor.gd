@@ -157,7 +157,7 @@ func _execute_block(effect: EffectEntry, source, targets: Array) -> void:
 			block += source.get_flat(effect.stat_multiplier) / effect.stat_divisor
 	
 	for target in targets:
-		if target.has_method("add_block"):
+		if is_instance_valid(target) and target.has_method("add_block"):
 			target.add_block(block)
 			var target_name = target.get_display_name() if target.has_method("get_display_name") else "Цель"
 			SignalManager.log_message.emit("%s получил %d блока" % [target_name, block])
@@ -171,7 +171,7 @@ func _execute_heal(effect: EffectEntry, source, targets: Array) -> void:
 			heal += source.get_stat(effect.stat_multiplier) / effect.stat_divisor
 	
 	for target in targets:
-		if target.has_method("heal"):
+		if is_instance_valid(target) and target.has_method("heal"):
 			target.heal(heal)
 			var target_name = target.get_display_name() if target.has_method("get_display_name") else "Цель"
 			SignalManager.log_message.emit("%s восстановил %d HP" % [target_name, heal])
@@ -383,9 +383,13 @@ func _execute_conditional(effect: EffectEntry, source, targets: Array, card_info
 	var condition_met = condition_instance.check(source, targets)
 	
 	if condition_met and effect.true_effect:
-		execute(effect.true_effect, source, targets, card_info, passive_context)
+		# 🆕 Пересчитываем targets для true_effect
+		var true_targets = source._get_targets_for_effect(effect.true_effect, source, targets)
+		execute(effect.true_effect, source, true_targets, card_info, passive_context)
 	elif not condition_met and effect.false_effect:
-		execute(effect.false_effect, source, targets, card_info, passive_context)
+		# 🆕 Пересчитываем targets для false_effect
+		var false_targets = source._get_targets_for_effect(effect.false_effect, source, targets)
+		execute(effect.false_effect, source, false_targets, card_info, passive_context)
 
 
 func _execute_custom(effect: EffectEntry, source, targets: Array, card_info: Dictionary = {}, passive_context: PassiveResource = null) -> void:

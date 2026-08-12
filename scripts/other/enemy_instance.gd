@@ -311,44 +311,8 @@ func execute_intent_with_animation(target: CharacterStats):
 	# Выполняем эффекты с правильными целями
 	SignalManager.log_message.emit("%s атакует!" % get_display_name())
 	for effect in current_intent.effects:
-		var targets = _get_targets_for_effect(effect, target)
+		var targets = _get_targets_for_effect(effect, self, [target])
 		EffectExecutor.execute(effect, self, targets)
-
-
-func _get_targets_for_effect(effect: EffectEntry, target: CharacterStats) -> Array:
-	match effect.target:
-		DataManager.EffectTarget.SELF:
-			return [self]
-		
-		DataManager.EffectTarget.ENEMY:
-			# Враг атакует игрока (цель — это игрок)
-			if target:
-				return [target]
-			# Если цели нет — берём игрока из BattleManager
-			var player = BattleManager.get_player()
-			return [player] if player else []
-		
-		DataManager.EffectTarget.ALL_ENEMIES:
-			# ALL_ENEMIES для врага — это игрок (один)
-			var player = BattleManager.get_player()
-			return [player] if player else []
-		
-		DataManager.EffectTarget.ALL_ALLIES:
-			# Союзники врага — все враги (включая себя)
-			return BattleManager.get_enemies()
-		
-		DataManager.EffectTarget.ANY:
-			# Для ANY — если есть цель, берём её, иначе игрока
-			if target:
-				return [target]
-			var player = BattleManager.get_player()
-			return [player] if player else []
-		
-		_:
-			if target:
-				return [target]
-			var player = BattleManager.get_player()
-			return [player] if player else []
 
 
 func _give_bones_on_death() -> void:

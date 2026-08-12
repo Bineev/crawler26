@@ -819,7 +819,7 @@ func _setup_upgrade_card_reward() -> void:
 		card_ui.card_control.scale = Vector2(card_scale, card_scale)
 		card_ui.set_reward_state()
 		
-		card_wrapper.gui_input.connect(_on_card_wrapper_clicked.bind(display_card, card_wrapper, preview_container))
+		card_wrapper.gui_input.connect(_on_card_wrapper_clicked.bind(card_data, display_card, card_wrapper, preview_container))
 	scroll.custom_minimum_size = Vector2(4 * card_size.x * 1.2 + 3 * 20 + 20 , 2 * card_size.y * 1.2 + 20)
 	
 	
@@ -871,7 +871,7 @@ func _on_upgrade_confirm() -> void:
 	SignalManager.reward_selected.emit()
 
 
-func _on_card_wrapper_clicked(event: InputEvent, card_data: CardData, wrapper: Control, preview_container: Control) -> void:
+func _on_card_wrapper_clicked(event: InputEvent, original_card: CardData, card_data: CardData, wrapper: Control, preview_container: Control) -> void:
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
 		# Снимаем выделение со всех обёрток
 		for child in wrapper.get_parent().get_children():
@@ -899,7 +899,7 @@ func _on_card_wrapper_clicked(event: InputEvent, card_data: CardData, wrapper: C
 		card_wrapper.custom_minimum_size = card_ui.get_actual_size() * 1.3
 		
 		# 🆕 Сохраняем оригинальную карту для применения улучшения
-		selected_card = card_data
+		selected_card = original_card
 		
 		# Показываем кнопку подтверждения
 		var confirm_button = preview_container.get_parent().get_child(preview_container.get_parent().get_child_count() - 1)

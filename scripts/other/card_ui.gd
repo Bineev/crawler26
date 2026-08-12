@@ -449,24 +449,6 @@ func _needs_target() -> bool:
 	return false
 
 
-func _get_targets_for_effect(effect: EffectEntry, selected_target) -> Array:
-	match effect.target:
-		DataManager.EffectTarget.SELF:
-			return [BattleManager.get_player()]
-		DataManager.EffectTarget.ENEMY:
-			if selected_target:
-				return [selected_target]
-			var enemies = BattleManager.get_enemies()
-			return [enemies[0]] if enemies.size() > 0 else []
-		DataManager.EffectTarget.ALL_ENEMIES:
-			return BattleManager.get_enemies()
-		DataManager.EffectTarget.ALL_ALLIES:
-			return [BattleManager.get_player()]
-		DataManager.EffectTarget.ANY:
-			return [selected_target] if selected_target else []
-	return []
-
-
 func cancel_selection():
 	if state == DataManager.CardState.SELECTED or state == DataManager.CardState.AIMING:
 		if current_tween:
