@@ -12,7 +12,6 @@ func _ready():
 	use_button.modulate = Color(1, 1, 1, 0)  # 🆕 прозрачный
 	use_button.disabled = true
 	use_button.pressed.connect(_on_use_pressed)
-	
 	add_child(use_button)
 
 	# 🆕 Подписываемся на сигналы хода

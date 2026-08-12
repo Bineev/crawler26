@@ -1,0 +1,34 @@
+[gd_resource type="Resource" script_class="CardData" load_steps=7 format=3 uid="uid://n04cy702xcwe"]
+
+[ext_resource type="Script" uid="uid://cmra25r1r3ivt" path="res://resources/res_scripts/effect_entry.gd" id="1_7w6f8"]
+[ext_resource type="Script" uid="uid://badcs22cck6n5" path="res://resources/res_scripts/card_data.gd" id="2_q0ega"]
+[ext_resource type="Resource" uid="uid://nspyatginler" path="res://resources/statuses/poison.tres" id="2_sr0ja"]
+[ext_resource type="Script" uid="uid://b0hom8bfyg6kc" path="res://scripts/effects/grant_denial_by_enemy_count.gd" id="3_r5dvs"]
+
+[sub_resource type="Resource" id="Resource_40i00"]
+script = ExtResource("1_7w6f8")
+category = 4
+target = 2
+status = ExtResource("2_sr0ja")
+duration = 3
+metadata/_custom_type_script = "uid://cmra25r1r3ivt"
+
+[sub_resource type="Resource" id="Resource_lj0ar"]
+script = ExtResource("1_7w6f8")
+category = 15
+target = 0
+custom_description = "effect_grant_denial_by_enemy_count"
+custom_script = ExtResource("3_r5dvs")
+metadata/_custom_type_script = "uid://cmra25r1r3ivt"
+
+[resource]
+script = ExtResource("2_q0ega")
+id = 36
+cost_grade = 5
+name_key = "card_foul_well_name"
+description_key = "card_foul_well_desc"
+grade = 2
+cost = 2
+effects = Array[ExtResource("1_7w6f8")]([SubResource("Resource_40i00"), SubResource("Resource_lj0ar")])
+manual_card_types = Array[int]([3, 2])
+metadata/_custom_type_script = "uid://badcs22cck6n5"

@@ -1,0 +1,42 @@
+[gd_resource type="Resource" script_class="CardData" load_steps=9 format=3 uid="uid://d3jbh5f63kyci"]
+
+[ext_resource type="Script" uid="uid://cmra25r1r3ivt" path="res://resources/res_scripts/effect_entry.gd" id="1_eknes"]
+[ext_resource type="Script" uid="uid://bvesd0e2o2wvk" path="res://scripts/conditions/target_has_poison.gd" id="2_bwi73"]
+[ext_resource type="Script" uid="uid://badcs22cck6n5" path="res://resources/res_scripts/card_data.gd" id="2_k08gb"]
+[ext_resource type="Resource" uid="uid://b68cda611rabw" path="res://resources/statuses/bleed.tres" id="3_53nqb"]
+[ext_resource type="Resource" uid="uid://nspyatginler" path="res://resources/statuses/poison.tres" id="4_cw5eh"]
+
+[sub_resource type="Resource" id="Resource_br8ew"]
+script = ExtResource("1_eknes")
+category = 4
+status = ExtResource("3_53nqb")
+value = 2
+duration = 2
+metadata/_custom_type_script = "uid://cmra25r1r3ivt"
+
+[sub_resource type="Resource" id="Resource_ewjhh"]
+script = ExtResource("1_eknes")
+category = 14
+condition_script = ExtResource("2_bwi73")
+true_effect = SubResource("Resource_br8ew")
+metadata/_custom_type_script = "uid://cmra25r1r3ivt"
+
+[sub_resource type="Resource" id="Resource_1xiga"]
+script = ExtResource("1_eknes")
+category = 4
+status = ExtResource("4_cw5eh")
+duration = 4
+metadata/_custom_type_script = "uid://cmra25r1r3ivt"
+
+[resource]
+script = ExtResource("2_k08gb")
+id = 34
+cost_grade = 5
+origin = 1
+biome = 5
+name_key = "card_blood_infection_name"
+description_key = "card_blood_infection_desc"
+grade = 1
+effects = Array[ExtResource("1_eknes")]([SubResource("Resource_ewjhh"), SubResource("Resource_1xiga")])
+manual_card_types = Array[int]([3])
+metadata/_custom_type_script = "uid://badcs22cck6n5"

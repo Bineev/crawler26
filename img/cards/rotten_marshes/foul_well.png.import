@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cwnik7nso8qv2"
-path="res://.godot/imported/rotten_marshes_card_bg.png-0e5be7fce1e3c21084bd408a1bb42995.ctex"
+uid="uid://idotp4bivov7"
+path="res://.godot/imported/foul_well.png-42ba3d0803d2bb13d06945a335e00011.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://img/cards/backgrounds/rotten_marshes_card_bg.png"
-dest_files=["res://.godot/imported/rotten_marshes_card_bg.png-0e5be7fce1e3c21084bd408a1bb42995.ctex"]
+source_file="res://img/cards/rotten_marshes/foul_well.png"
+dest_files=["res://.godot/imported/foul_well.png-42ba3d0803d2bb13d06945a335e00011.ctex"]
 
 [params]
 

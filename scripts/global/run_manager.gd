@@ -3,7 +3,7 @@ extends Node
 
 var player_deck_data: DeckData = null
 var current_character: DataManager.CharacterClass = DataManager.CharacterClass.PENITENT
-
+var current_biome: DataManager.Biome = DataManager.Biome.MOLE_TUNNELS
 # === Статусы ===
 var poison_damage_per_stack: int = DataManager.POISON_BASE_DAMAGE_PER_STACK
 var bleed_damage_per_stack: int = DataManager.BLEED_BASE_DAMAGE_PER_STACK

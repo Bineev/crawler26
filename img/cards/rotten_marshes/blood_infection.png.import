@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cwnik7nso8qv2"
-path="res://.godot/imported/rotten_marshes_card_bg.png-0e5be7fce1e3c21084bd408a1bb42995.ctex"
+uid="uid://wiivw70bfwri"
+path="res://.godot/imported/blood_infection.png-5ca1a1faeb1e71413beb4ad705e9e225.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://img/cards/backgrounds/rotten_marshes_card_bg.png"
-dest_files=["res://.godot/imported/rotten_marshes_card_bg.png-0e5be7fce1e3c21084bd408a1bb42995.ctex"]
+source_file="res://img/cards/rotten_marshes/blood_infection.png"
+dest_files=["res://.godot/imported/blood_infection.png-5ca1a1faeb1e71413beb4ad705e9e225.ctex"]
 
 [params]
 

@@ -48,8 +48,11 @@ func start_test(world_node: Node):
 		printerr("Character not unlocked: ", selected_character, " - using PENITENT as fallback")
 		selected_character = DataManager.CharacterClass.PENITENT
 	
+	potion_icons.clear()
 	_reset_game_state()
 	current_room_index = 0
+	# 🆕 Устанавливаем биом
+	set_biome(DataManager.Biome.ROTTEN_MARSHES)  # или MOLE_TUNNELS
 	DataManager.load_biome_enemies(current_biome)
 	
 	# Создаём игрока
@@ -245,8 +248,9 @@ func clear_ui():
 		battle_log.queue_free()
 		battle_log = null
 		
-	# 🆕 Очищаем массив иконок зелий
-	potion_icons.clear()
+	# BUG
+	## 🆕 Очищаем массив иконок зелий
+	#potion_icons.clear()
 	
 	print("UI cleared")
 
@@ -454,8 +458,8 @@ func _on_potion_used(potion_icon: PotionIcon) -> void:
 
 
 func _on_potion_deselect_all() -> void:
-	# 🆕 Сначала очищаем null
-	_clean_null_icons()
+	## 🆕 Сначала очищаем null
+	#_clean_null_icons()
 	
 	for icon in potion_icons:
 		if is_instance_valid(icon):
@@ -577,3 +581,12 @@ func _on_hide_tooltip():
 	if current_tooltip:
 		current_tooltip.queue_free()
 		current_tooltip = null
+
+
+## Устанавливает биом для всего забега
+func set_biome(biome: DataManager.Biome) -> void:
+	current_biome = biome
+	RunManager.current_biome = biome
+	FloorManager.current_biome = biome
+	DataManager.load_biome_enemies(biome)
+	print("Biome set to: ", DataManager.Biome.keys()[biome])

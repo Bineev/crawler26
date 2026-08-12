@@ -47,7 +47,7 @@ func _init_default_progress():
 		unlock_card(card_id)
 	
 	# 2.2 Карты биома Кротовые норы
-	var biome_cards = [
+	var mole_cards = [
 		DataManager.CardId.BLOOD_TRAIL,
 		DataManager.CardId.FROZEN_EARTH,
 		DataManager.CardId.RODENT_AGILITY,
@@ -60,7 +60,23 @@ func _init_default_progress():
 		DataManager.CardId.FLESH_RAGE,
 		DataManager.CardId.TORN_WOUND,
 	]
-	for card_id in biome_cards:
+	for card_id in mole_cards:
+		unlock_card(card_id)
+	
+	# 2.3 🆕 Карты биома Гнилостные Топи
+	var rotten_cards = [
+		DataManager.CardId.SNAKE_BITE,
+		DataManager.CardId.SWAMP_BLAST,
+		DataManager.CardId.BLESSING_OF_ROT,
+		DataManager.CardId.WEAK_SPOT,
+		DataManager.CardId.BLOOM_OF_CORRUPTION,
+		DataManager.CardId.MUD_SPLASH,
+		DataManager.CardId.BLOOD_INFECTION,
+		DataManager.CardId.EPIDEMIC,
+		DataManager.CardId.FOUL_WELL,
+		DataManager.CardId.STING_OF_CORRUPTION,
+	]
+	for card_id in rotten_cards:
 		unlock_card(card_id)
 	
 	# ============================================================

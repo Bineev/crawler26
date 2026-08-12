@@ -513,6 +513,10 @@ enum CardId {
 	WEAK_SPOT,  # 🆕
 	BLOOM_OF_CORRUPTION,  # 🆕
 	MUD_SPLASH,
+	BLOOD_INFECTION,
+	EPIDEMIC,  # 🆕
+	FOUL_WELL,  # 🆕
+	STING_OF_CORRUPTION,  # 🆕
 }
 
 ## Намерения врагов
@@ -1525,6 +1529,10 @@ func load_all_cards():
 	_register_card(CardId.WEAK_SPOT, "res://resources/cards/rotten_marshes/weak_spot.tres")
 	_register_card(CardId.BLOOM_OF_CORRUPTION, "res://resources/cards/rotten_marshes/bloom_of_corruption.tres")
 	_register_card(CardId.MUD_SPLASH, "res://resources/cards/rotten_marshes/mud_splash.tres")
+	_register_card(CardId.BLOOD_INFECTION, "res://resources/cards/rotten_marshes/blood_infection.tres")
+	_register_card(CardId.EPIDEMIC, "res://resources/cards/rotten_marshes/epidemic.tres")
+	_register_card(CardId.FOUL_WELL, "res://resources/cards/rotten_marshes/foul_well.tres")
+	_register_card(CardId.STING_OF_CORRUPTION, "res://resources/cards/rotten_marshes/sting_of_corruption.tres")
 	
 	_cards_loaded = true
 
@@ -1607,6 +1615,10 @@ func load_card_illustrations():
 	_card_illustrations[CardId.WEAK_SPOT] = preload("res://img/cards/rotten_marshes/weak_spot.png")
 	_card_illustrations[CardId.BLOOM_OF_CORRUPTION] = preload("res://img/cards/rotten_marshes/bloom_of_corruption.png")
 	_card_illustrations[CardId.MUD_SPLASH] = preload("res://img/cards/rotten_marshes/mud_splash.png")
+	_card_illustrations[CardId.BLOOD_INFECTION] = preload("res://img/cards/rotten_marshes/blood_infection.png")
+	_card_illustrations[CardId.FOUL_WELL] = preload("res://img/cards/rotten_marshes/foul_well.png")
+	_card_illustrations[CardId.EPIDEMIC] = preload("res://img/cards/rotten_marshes/epidemic.png")  # 🆕
+	_card_illustrations[CardId.STING_OF_CORRUPTION] = preload("res://img/cards/rotten_marshes/sting_of_corruption.png")
 	#_card_illustrations[CardId.BLIND_FURY] = preload("res://img/cards/mole_tunnels/blind_fury.png")
 	#_card_illustrations[CardId.SMELL_OF_BLOOD] = preload("res://img/cards/mole_tunnels/smell_of_blood.png")
 	#_card_illustrations[CardId.MOLERAT_HIDE] = preload("res://img/cards/mole_tunnels/molerat_hide.png")
@@ -1810,7 +1822,7 @@ func _get_card_art_background_color_light(origin: CardOrigin, character_class: C
 				Biome.BONE_LABYRINTH:
 					return COLOR_BONE_LABYRINTH_ART_BG_LIGHT
 				Biome.ROTTEN_MARSHES:  # 🆕
-					return COLOR_ROTTEN_MARSHES_ART_BG_LIGHT
+					return COLOR_ROTTEN_MARSHES_ART_BG_MINT
 				_:
 					return Color.BLACK
 		
@@ -2480,15 +2492,17 @@ func get_glow_color_for_card(card: CardData) -> Color:
 		DataManager.CardOrigin.BIOME:
 			match card.biome:
 				DataManager.Biome.MOLE_TUNNELS:
-					return COLOR_MOLE_TUNNELS_ART_BG_DARK  # e9dab0ff
+					return COLOR_MOLE_TUNNELS_ART_BG_DARK
 				DataManager.Biome.FLESH_CAVES:
-					return COLOR_FLESH_CAVES_ART_BG_LIGHT  # BF6A6A
+					return COLOR_FLESH_CAVES_ART_BG_LIGHT
 				DataManager.Biome.BONE_LABYRINTH:
-					return COLOR_BONE_LABYRINTH_ART_BG_LIGHT  # BFB8A6
+					return COLOR_BONE_LABYRINTH_ART_BG_LIGHT
+				DataManager.Biome.ROTTEN_MARSHES:  # 🆕
+					return COLOR_ROTTEN_MARSHES_ART_BG_DARK
 				DataManager.Biome.FROZEN_DEPTHS:
-					return COLOR_WARRIOR_ART_BG_LIGHT  # 8A8ABF
+					return COLOR_WARRIOR_ART_BG_LIGHT
 				DataManager.Biome.MAGMA_CORE:
-					return COLOR_FLESH_CAVES_ART_BG_DARK  # 400D0D
+					return COLOR_FLESH_CAVES_ART_BG_DARK
 				_:
 					return COLOR_MOLE_TUNNELS_ART_BG_LIGHT2
 		
