@@ -6,10 +6,10 @@ func apply(effect: EffectEntry, source, targets: Array, card_info: Dictionary = 
 		return
 	
 	var target = targets[0]
-	if not target or not target.has_method("take_damage"):
+	if not is_instance_valid(target) or not target.has_method("take_damage"):
 		return
 	
-	if not source or not source.has_method("remove_status"):
+	if not is_instance_valid(source) or not source.has_method("remove_status"):
 		return
 	
 	var total_poison_duration = 0
@@ -17,7 +17,7 @@ func apply(effect: EffectEntry, source, targets: Array, card_info: Dictionary = 
 	# 🔹 1. Собираем POISON со всех врагов
 	var enemies = BattleManager.get_enemies()
 	for enemy in enemies:
-		if not enemy.is_alive():
+		if not is_instance_valid(enemy) or not enemy.is_alive():
 			continue
 		
 		# Проверяем наличие POISON через словарь
@@ -34,7 +34,8 @@ func apply(effect: EffectEntry, source, targets: Array, card_info: Dictionary = 
 	
 	# 🔹 3. Наносим урон, если есть что
 	if total_poison_duration > 0:
-		target.take_damage(total_poison_duration)
-		SignalManager.log_message.emit("Укол скверны: нанесено %d урона" % total_poison_duration)
+		if is_instance_valid(target) and target.has_method("take_damage"):
+			target.take_damage(total_poison_duration)
+			SignalManager.log_message.emit("Укол скверны: нанесено %d урона" % total_poison_duration)
 	else:
 		SignalManager.log_message.emit("Нет яда для поглощения")

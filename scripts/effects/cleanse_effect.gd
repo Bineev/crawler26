@@ -4,6 +4,9 @@ class_name CleanseEffect
 
 static func apply(effect: EffectEntry, source, targets: Array, card_info: Dictionary, passive_context: PassiveResource = null):
 	for target in targets:
+		if not is_instance_valid(target):
+			continue
+		
 		# Снимаем все статусы
 		var statuses = target.active_statuses.keys()
 		for status_id in statuses:

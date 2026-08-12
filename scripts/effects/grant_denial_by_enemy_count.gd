@@ -2,7 +2,7 @@ extends Node
 class_name GrantDenialByEnemyCount
 
 func apply(effect: EffectEntry, source, targets: Array, card_info: Dictionary = {}, passive_context: PassiveResource = null) -> void:
-	if not source:
+	if not is_instance_valid(source):
 		return
 	
 	if not source.has_method("apply_passive"):
@@ -12,7 +12,7 @@ func apply(effect: EffectEntry, source, targets: Array, card_info: Dictionary = 
 	var enemies = BattleManager.get_enemies()
 	var alive_count = 0
 	for enemy in enemies:
-		if enemy.is_alive():
+		if is_instance_valid(enemy) and enemy.is_alive():
 			alive_count += 1
 	
 	if alive_count == 0:

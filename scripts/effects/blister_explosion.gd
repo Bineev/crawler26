@@ -25,7 +25,7 @@ static func apply(effect: EffectEntry, source, targets: Array, card_info: Dictio
 		if player:
 			all_targets.append(player)
 		for target in all_targets:
-			if target != source:
+			if is_instance_valid(target) and target != source:
 				target.take_damage(damage, true)
 	else:
 		# Пузырь уже был сбит — накладываем BURN
@@ -40,6 +40,7 @@ static func apply(effect: EffectEntry, source, targets: Array, card_info: Dictio
 				targets_to_burn = BattleManager.get_enemies()  # враги получают BURN
 			
 			for target in targets_to_burn:
-				target.add_status(burn_status, burn_amount, 2, source)
+				if is_instance_valid(target):
+					target.add_status(burn_status, burn_amount, 2, source)
 			
 			SignalManager.log_message.emit("Чёрный пузырь сбит! %d стаков Горения наложено!" % burn_amount)

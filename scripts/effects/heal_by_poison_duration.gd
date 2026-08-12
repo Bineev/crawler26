@@ -6,7 +6,7 @@ func apply(effect: EffectEntry, source, targets: Array, card_info: Dictionary = 
 		return
 	
 	var target = targets[0]
-	if not target or not target.has_method("remove_status") or not target.has_method("heal"):
+	if not is_instance_valid(target) or not target.has_method("remove_status") or not target.has_method("heal"):
 		return
 	
 	# Проверяем наличие POISON через словарь

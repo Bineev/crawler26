@@ -6,7 +6,7 @@ func apply(effect: EffectEntry, source, targets: Array, card_info: Dictionary = 
 		return
 	
 	var target = targets[0]
-	if not source or not target:
+	if not is_instance_valid(source) or not is_instance_valid(target):
 		return
 	
 	if not source.has_method("remove_status") or not target.has_method("add_status"):
@@ -45,10 +45,12 @@ func apply(effect: EffectEntry, source, targets: Array, card_info: Dictionary = 
 		if not status_resource.is_stacking:
 			stacks = 1
 		
-		target.add_status(status_resource, stacks, duration, source)
-		SignalManager.log_message.emit("Перенесён статус: %s (%d стаков, %d ходов)" % [status_resource.get_localized_name(), stacks, duration])
+		if is_instance_valid(target) and target.has_method("add_status"):
+			target.add_status(status_resource, stacks, duration, source)
+			SignalManager.log_message.emit("Перенесён статус: %s (%d стаков, %d ходов)" % [status_resource.get_localized_name(), stacks, duration])
 		
 		# Снимаем статус с источника
-		source.remove_status(status_info["id"])
+		if is_instance_valid(source) and source.has_method("remove_status"):
+			source.remove_status(status_info["id"])
 	
 	SignalManager.log_message.emit("Все статусы перенесены на цель!")

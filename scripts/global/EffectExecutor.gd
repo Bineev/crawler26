@@ -104,7 +104,7 @@ func _execute_damage(effect: EffectEntry, source, targets: Array, is_direct: boo
 			SignalManager.log_message.emit("Урон увеличен в %dx раз!" % multiplier)
 	
 	for target in targets:
-		if not target or not target.has_method("take_damage"):
+		if not target or not is_instance_valid(target) or not target.has_method("take_damage"):
 			continue
 		
 		var final_damage = base_damage

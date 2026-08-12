@@ -1,6 +1,3 @@
-extends Node
-class_name Epidemic
-
 func apply(effect: EffectEntry, source, targets: Array, card_info: Dictionary = {}, passive_context: PassiveResource = null) -> void:
 	if targets.is_empty():
 		return
@@ -36,9 +33,12 @@ func apply(effect: EffectEntry, source, targets: Array, card_info: Dictionary = 
 		SignalManager.log_message.emit("Нет статусов для распространения")
 		return
 	
-	# Считаем, сколько врагов получит статусы (кроме цели)
+	# Распространяем статусы на других врагов (цель сохраняет статусы)
 	var enemies_affected = 0
 	for enemy in all_enemies:
+		if not is_instance_valid(enemy):
+			continue
+		
 		if enemy == target_enemy:
 			continue
 		
@@ -59,11 +59,7 @@ func apply(effect: EffectEntry, source, targets: Array, card_info: Dictionary = 
 		
 		SignalManager.log_message.emit("Статусы распространены на %s" % enemy.get_display_name())
 	
-	# Если есть цели — снимаем статусы с исходной цели
 	if enemies_affected > 0:
-		for status_info in statuses_to_transfer:
-			target_enemy.remove_status(status_info["id"])
-		
 		SignalManager.log_message.emit("Эпидемия: статусы распространены на %d врагов" % enemies_affected)
 	else:
 		SignalManager.log_message.emit("Нет целей для распространения")
