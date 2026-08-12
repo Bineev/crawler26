@@ -9,10 +9,14 @@ func apply(effect: EffectEntry, source, targets: Array, card_info: Dictionary = 
 	if not source or not target:
 		return
 	
-	if not source.has_method("active_statuses") or not target.has_method("add_status"):
+	if not source.has_method("remove_status") or not target.has_method("add_status"):
 		return
 	
-	# Получаем все статусы с источника
+	# Проверяем наличие статусов через словарь
+	if source.active_statuses.is_empty():
+		SignalManager.log_message.emit("Нет статусов для переноса")
+		return
+	
 	var statuses_to_transfer = []
 	for status_id in source.active_statuses.keys():
 		# Пропускаем SHIELD (он сбрасывается в конце хода)

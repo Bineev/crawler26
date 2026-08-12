@@ -149,6 +149,12 @@ func _get_dynamic_status_description(status_id: DataManager.Status, stacks: int,
 			var percent = stacks * RunManager.cold_effect_percent * 100
 			var threshold = RunManager.cold_freeze_threshold
 			return tr("status_cold_dynamic_desc") % [percent, stacks, duration, threshold]
+		DataManager.Status.WEAKNESS:  # 🆕
+			var percent = (1 - RunManager.weakness_damage_multiplier) * 100
+			return tr("status_weakness_dynamic_desc") % [percent, duration]
+		DataManager.Status.VULNERABILITY:  # 🆕
+			var percent = (RunManager.vulnerability_damage_multiplier - 1) * 100
+			return tr("status_vulnerability_dynamic_desc") % [percent, duration]
 		DataManager.Status.STRENGTH:
 			var bonus = stacks * RunManager.strength_bonus_per_stack
 			return tr("status_strength_dynamic_desc") % [bonus, duration]
@@ -171,9 +177,6 @@ func _get_dynamic_status_description(status_id: DataManager.Status, stacks: int,
 			return tr("status_infection_dynamic_desc") % [damage_per_stack, duration]
 		_:
 			return ""
-		_:
-			return ""
-
 
 # ============================================================
 # ДИНАМИЧЕСКИЕ ПАССИВКИ (для "живых" иконок)

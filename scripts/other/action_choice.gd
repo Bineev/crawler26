@@ -214,10 +214,23 @@ func _create_rewards(success: bool, action: DataManager.ActionType) -> void:
 	var reward_panel = preload("res://scenes/reward_panel.tscn").instantiate() as RewardPanel
 	
 	reward_panel.reward_types = _generate_rewards(action, success)
-	reward_panel.gold_mod = 1
+	
+	# Устанавливаем gold_mod в зависимости от действия и успеха
+	match action:
+		DataManager.ActionType.USE_KEY:
+			if success:
+				reward_panel.gold_mod = 5
+			else:
+				reward_panel.gold_mod = 1
+		DataManager.ActionType.BREAK:
+			if success:
+				reward_panel.gold_mod = 3
+			else:
+				reward_panel.gold_mod = 1
+		_:
+			reward_panel.gold_mod = 1
+	
 	SignalManager.hide_object.emit()
-	#await _animate_in()
-	# 🆕 Отправляем сигнал через SignalManager
 	SignalManager.show_reward.emit(reward_panel)
 	queue_free()
 

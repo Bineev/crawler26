@@ -5,17 +5,19 @@ func apply(effect: EffectEntry, source, targets: Array, card_info: Dictionary = 
 	if targets.is_empty():
 		return
 	
-	# Выбранный враг (цель)
 	var target_enemy = targets[0]
-	if not target_enemy or not target_enemy.has_method("active_statuses"):
+	if not target_enemy or not target_enemy.has_method("remove_status") or not target_enemy.has_method("add_status"):
 		return
 	
-	# Получаем всех врагов в комнате
 	var all_enemies = BattleManager.get_enemies()
 	if all_enemies.is_empty():
 		return
 	
-	# Проверяем, есть ли у цели статусы
+	# Проверяем наличие статусов у цели через словарь
+	if target_enemy.active_statuses.is_empty():
+		SignalManager.log_message.emit("Нет статусов для распространения")
+		return
+	
 	var statuses_to_transfer = []
 	for status_id in target_enemy.active_statuses.keys():
 		# Пропускаем SHIELD (он сбрасывается в конце хода)
@@ -34,16 +36,16 @@ func apply(effect: EffectEntry, source, targets: Array, card_info: Dictionary = 
 		SignalManager.log_message.emit("Нет статусов для распространения")
 		return
 	
-	# Переносим статусы на остальных врагов (кроме цели)
-	var spread_count = 0
+	# Считаем, сколько врагов получит статусы (кроме цели)
+	var enemies_affected = 0
 	for enemy in all_enemies:
-		# Пропускаем цель
 		if enemy == target_enemy:
 			continue
 		
 		if not enemy.is_alive():
 			continue
 		
+		enemies_affected += 1
 		for status_info in statuses_to_transfer:
 			var status_resource = status_info["resource"]
 			var stacks = status_info["stacks"]
@@ -54,15 +56,14 @@ func apply(effect: EffectEntry, source, targets: Array, card_info: Dictionary = 
 				stacks = 1
 			
 			enemy.add_status(status_resource, stacks, duration, source)
-			spread_count += 1
 		
 		SignalManager.log_message.emit("Статусы распространены на %s" % enemy.get_display_name())
 	
-	if spread_count > 0:
-		# 🆕 Снимаем статусы с исходной цели
+	# Если есть цели — снимаем статусы с исходной цели
+	if enemies_affected > 0:
 		for status_info in statuses_to_transfer:
 			target_enemy.remove_status(status_info["id"])
 		
-		SignalManager.log_message.emit("Эпидемия: статусы перенесены на %d врагов" % (spread_count / len(statuses_to_transfer)))
+		SignalManager.log_message.emit("Эпидемия: статусы распространены на %d врагов" % enemies_affected)
 	else:
 		SignalManager.log_message.emit("Нет целей для распространения")

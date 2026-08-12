@@ -9,7 +9,7 @@ func apply(effect: EffectEntry, source, targets: Array, card_info: Dictionary = 
 	if not target or not target.has_method("take_damage"):
 		return
 	
-	if not source or not source.has_method("active_statuses"):
+	if not source or not source.has_method("remove_status"):
 		return
 	
 	var total_poison_duration = 0
@@ -20,17 +20,16 @@ func apply(effect: EffectEntry, source, targets: Array, card_info: Dictionary = 
 		if not enemy.is_alive():
 			continue
 		
+		# Проверяем наличие POISON через словарь
 		if enemy.active_statuses.has(DataManager.Status.POISON):
 			var duration = enemy.active_statuses[DataManager.Status.POISON].duration
 			total_poison_duration += duration
-			# Снимаем POISON
 			enemy.remove_status(DataManager.Status.POISON)
 	
 	# 🔹 2. Собираем POISON с себя
 	if source.active_statuses.has(DataManager.Status.POISON):
 		var duration = source.active_statuses[DataManager.Status.POISON].duration
 		total_poison_duration += duration
-		# Снимаем POISON с себя
 		source.remove_status(DataManager.Status.POISON)
 	
 	# 🔹 3. Наносим урон, если есть что

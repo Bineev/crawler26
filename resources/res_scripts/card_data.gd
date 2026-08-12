@@ -482,6 +482,10 @@ func _get_condition_name(condition_script: Script) -> String:
 			return tr("condition_health_less_than_30")
 		"res://scripts/conditions/no_negative_status.gd":
 			return tr("condition_no_negative_status")
+		"res://scripts/conditions/target_has_weakness.gd":  # 🆕
+			return tr("condition_target_has_weakness")
+		"res://scripts/conditions/target_has_poison.gd":   # 🆕
+			return tr("condition_target_has_poison")
 		_:
 			return tr("condition_unknown")
 

@@ -300,37 +300,60 @@ func _create_intent_item(effect: EffectEntry) -> Control:
 	# Формируем текст и иконку
 	var tooltip_text = ""
 	
-	#TODO
 	match effect.category:
 		DataManager.EffectCategory.DAMAGE:
 			icon.texture = DataManager.get_intent_icon(DataManager.IntentType.ATTACK)
-			# Вычисляем финальный урон с учётом силы
 			var base_damage = effect.base_value
 			var strength_bonus = enemy_instance.get_strength_bonus() if enemy_instance else 0
 			var final_damage = base_damage + strength_bonus
 			value_label.text = str(final_damage)
 			tooltip_text = "Враг собирается атаковать"
+		
 		DataManager.EffectCategory.BLOCK:
 			icon.texture = DataManager.get_intent_icon(DataManager.IntentType.DEFEND)
 			value_label.text = str(effect.base_value)
 			tooltip_text = "Враг собирается защищаться"
+		
 		DataManager.EffectCategory.HEAL:
 			icon.texture = DataManager.get_intent_icon(DataManager.IntentType.HEAL)
 			value_label.text = str(effect.base_value)
 			tooltip_text = "Враг собирается лечиться"
+		
 		DataManager.EffectCategory.APPLY_STATUS:
-			icon.texture = DataManager.get_intent_icon(DataManager.IntentType.DEBUFF)
-			#if effect.status:
-				#value_label.text = "%d %s" % [effect.value, effect.status.get_localized_name()]
-			tooltip_text = "Враг собирается наложить дебафф"
+			# Проверяем, на кого накладывается статус
+			if effect.target == DataManager.EffectTarget.SELF:
+				# На себя
+				if effect.status and DataManager.is_negative_status(effect.status.id):
+					# Негативный статус на себя — дебафф
+					icon.texture = DataManager.get_intent_icon(DataManager.IntentType.DEBUFF)
+					tooltip_text = "Враг собирается наложить дебафф на себя"
+				else:
+					# Позитивный статус на себя — бафф
+					icon.texture = DataManager.get_intent_icon(DataManager.IntentType.BUFF)
+					tooltip_text = "Враг собирается усилить себя"
+					if effect.status:
+						value_label.text = effect.status.get_localized_name()
+			else:
+				# На врага — всегда дебафф
+				icon.texture = DataManager.get_intent_icon(DataManager.IntentType.DEBUFF)
+				tooltip_text = "Враг собирается наложить дебафф"
+				if effect.status:
+					value_label.text = effect.status.get_localized_name()
+		
 		DataManager.EffectCategory.APPLY_PASSIVE:
-			icon.texture = DataManager.get_intent_icon(DataManager.IntentType.BUFF)
-			#if effect.passive:
-				#value_label.text = effect.passive.get_localized_name()
-			tooltip_text = "Враг собирается усилить себя"
+			if effect.target == DataManager.EffectTarget.SELF:
+				icon.texture = DataManager.get_intent_icon(DataManager.IntentType.BUFF)
+				tooltip_text = "Враг собирается усилить себя"
+				if effect.passive:
+					value_label.text = effect.passive.get_localized_name()
+			else:
+				icon.texture = DataManager.get_intent_icon(DataManager.IntentType.DEBUFF)
+				tooltip_text = "Враг собирается наложить дебафф"
+				if effect.passive:
+					value_label.text = effect.passive.get_localized_name()
+		
 		_:
 			icon.texture = DataManager.get_intent_icon(DataManager.IntentType.UNKNOWN)
-			#value_label.text = "?"
 			tooltip_text = "Неизвестное намерение"
 	
 	container.tooltip_text = tooltip_text

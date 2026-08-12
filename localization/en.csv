@@ -71,7 +71,7 @@ passive_regrowth_desc,"Heals increasing amount each turn."
 passive_venomous_shield_name,Venomous Shield
 passive_venomous_shield_desc,"Applies Poison to attacker when hit."
 passive_wrath_name,Wrath
-passive_wrath_desc,"Grants +1 Strength at end of each turn."
+"passive_wrath_desc","At the start of each turn, gain +1 Strength. Strength grows with each activation"
 passive_freezing_ground_name,Freezing Ground
 passive_freezing_ground_desc,"Applies Cold to attacker when hit."
 passive_denial_name,Denial
@@ -183,9 +183,11 @@ upgrade_card_confirm,Upgrade
 
 "condition_has_bleed","target has Bleed"
 "condition_has_cold","has Cold"
-"condition_health_less_than_30","health is below 30"
+"condition_health_less_than_30","health below 30"
 "condition_no_negative_status","target has no negative statuses"
-"condition_unknown","condition is met"
+"condition_target_has_weakness","target has Weakness"
+"condition_target_has_poison","target has Poison"
+"condition_unknown","condition met"
 
 "effect_damage","%s %d damage"
 "effect_block","%s %d block"
@@ -347,6 +349,8 @@ upgrade_card_confirm,Upgrade
 "status_regen_dynamic_desc","Heals %d HP at end of turn. Duration: %d turns."
 "status_shield_dynamic_desc","Absorbs %d damage. Duration: %d turns."
 "status_gangrene_dynamic_desc","Accumulated damage: %d. Triggers on last turn. Duration: %d turns."
+"status_weakness_dynamic_desc","Deals %.0f%% less damage. Duration: %d turns."
+"status_vulnerability_dynamic_desc","Takes %.0f%% more damage. Duration: %d turns."
 
 "passive_trigger_turn_start","At turn start"
 "passive_trigger_turn_end","At turn end"

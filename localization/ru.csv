@@ -71,7 +71,7 @@ passive_regrowth_desc,"Каждый ход лечит на растущую ве
 passive_venomous_shield_name,Ядовитый щит
 passive_venomous_shield_desc,"При получении урона накладывает Яд на атакующего."
 passive_wrath_name,Злость
-passive_wrath_desc,"В конце каждого хода даёт +1 Силы."
+"passive_wrath_desc","В начале хода даёт +1 Силы. Сила растёт с каждым срабатыванием"
 passive_freezing_ground_name,Стылая земля
 passive_freezing_ground_desc,"При получении атаки накладывает Лёд на атакующего."
 passive_denial_name,Отрицание
@@ -186,6 +186,8 @@ upgrade_card_confirm,Улучшить
 "condition_has_cold","есть Холод"
 "condition_health_less_than_30","здоровье ниже 30"
 "condition_no_negative_status","цель не имеет негативных статусов"
+"condition_target_has_weakness","на цели есть Слабость"
+"condition_target_has_poison","на цели есть Яд"
 "condition_unknown","условие выполнено"
 
 "effect_damage","%s %d урон"
@@ -348,6 +350,8 @@ upgrade_card_confirm,Улучшить
 "status_regen_dynamic_desc","Лечит %d HP в конце хода. Длительность: %d ходов."
 "status_shield_dynamic_desc","Поглощает %d урона. Длительность: %d ходов."
 "status_gangrene_dynamic_desc","Накопленный урон: %d. Сработает в последний ход. Длительность: %d ходов."
+"status_weakness_dynamic_desc","Наносит на %.0f%% меньше урона. Длительность: %d ходов."
+"status_vulnerability_dynamic_desc","Получает на %.0f%% больше урона. Длительность: %d ходов."
 
 "passive_trigger_turn_start","В начале хода"
 "passive_trigger_turn_end","В конце хода"
