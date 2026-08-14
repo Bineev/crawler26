@@ -597,3 +597,12 @@ reward_lost_max_hp_title, "Примите потерю"
 "artifact_ring_of_barricade_name","Перстень преграды"
 "artifact_ring_of_barricade_desc","При получении %d или более урона за один удар, даёт %d Щита."
 "artifact_ring_of_barricade_lore","Тяжёлый железный перстень с выгравированным щитом. Говорят, он возводит невидимую стену перед смертельными ударами."
+"artifact_lucky_pick_name","Счастливая отмычка"
+"artifact_lucky_pick_desc","Взлом сундуков всегда успешен и приносит больше монет."
+"artifact_lucky_pick_lore","Тонкая отмычка, которая никогда не подводит. Говорят, она приносит удачу в самых безнадёжных ситуациях."
+
+"result_break_success_lucky","Взлом удался!"
+
+"artifact_insatiable_blade_name","Ненасытный палаш"
+"artifact_insatiable_blade_desc","%d атаки за ход восстанавливают %d здоровья"
+"artifact_insatiable_blade_lore","Древний клинок с глазом на гарде. Он жаждет крови и вознаграждает тех, кто утоляет его голод."

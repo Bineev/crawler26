@@ -16,6 +16,8 @@ var player_burn_damage_per_stack: int = DataManager.BURN_BASE_DAMAGE_PER_STACK
 var player_regen_heal_per_stack: int = DataManager.REGEN_HEAL_PER_STACK
 var player_bleed_duration_bonus: int = 0
 
+var has_lucky_pick: bool = false
+
 var cold_freeze_threshold: int = DataManager.COLD_FREEZE_THRESHOLD
 var cold_effect_percent: float = DataManager.COLD_EFFECT_PERCENT_PER_STACK
 var cold_min_multiplier: float = DataManager.COLD_MIN_EFFECT_MULTIPLIER
@@ -53,6 +55,8 @@ var keys: int = 0
 var is_bleed_poison_interaction_enabled: bool = true   # Bleed + Poison → Мука
 var is_poison_burn_interaction_enabled: bool = false    # Poison + Burn → Взрыв
 var is_bleed_cold_interaction_enabled: bool = false     # Bleed + Cold → Гангрена
+
+var attacks_this_turn: int = 0
 
 ## Массив артефактов, которые есть у игрока в текущем забеге
 var artifacts: Array[ArtifactResource] = []
@@ -109,6 +113,9 @@ func initialize_run():
 	
 	print("RunManager initialized with deck size: ", player_deck_data.master_cards.size())
 
+
+func reset_attacks_counter() -> void:
+	attacks_this_turn = 0
 
 func get_player_deck() -> DeckData:
 	if not player_deck_data:
@@ -700,6 +707,25 @@ func process_artifact_on_status_applied_to_enemy(status_id: DataManager.Status, 
 				pass
 
 
+func process_artifact_on_attack_threshold(player: CharacterStats) -> void:
+	for artifact in artifacts:
+		var trigger_index = artifact.triggers.find(DataManager.ArtifactTrigger.ATTACKS_THRESHOLD)
+		if trigger_index == -1:
+			continue
+		
+		if attacks_this_turn < artifact.attack_threshold:
+			continue
+		
+		if trigger_index < artifact.effects.size():
+			var effect = artifact.effects[trigger_index]
+			EffectExecutor.execute(effect, player, [player])
+			SignalManager.log_message.emit("Артефакт сработал: %s" % artifact.get_localized_name())
+			SignalManager.artifact_triggered.emit(artifact)
+			
+			# Сбрасываем счётчик после активации
+			attacks_this_turn = 0
+
+
 func process_artifact_on_damage_threshold(damage_taken: int) -> void:
 	var player = BattleManager.get_player()
 	if not player:
@@ -739,6 +765,8 @@ func reset_run_constants():
 	
 	# === Бонусы игрока (артефакты) ===
 	player_bleed_duration_bonus = 0  # 🆕
+	
+	has_lucky_pick = false  # 🆕
 
 	cold_freeze_threshold = DataManager.COLD_FREEZE_THRESHOLD
 	cold_effect_percent = DataManager.COLD_EFFECT_PERCENT_PER_STACK

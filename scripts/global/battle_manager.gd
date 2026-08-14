@@ -98,6 +98,9 @@ func start_player_turn():
 	if player and player.has_method("restore_energy"):
 		player.restore_energy()
 
+	# 🆕 Сбрасываем счётчик атак
+	RunManager.reset_attacks_counter()
+
 	# === ОБРАБОТКА ЗАМОРОЗКИ ===
 	var is_frozen = player and player.has_status(DataManager.Status.FROZEN)
 	

@@ -130,7 +130,7 @@ func play_card(card_ui: CardUI, card_data: CardData, target = null):
 	
 	if hand_ui:
 		hand_ui.set_all_cards_input_enabled(true)
-	
+
 	# 🆕 Выполняем эффекты карты
 	var player = BattleManager.get_player()
 	for effect in card_data.effects:
@@ -141,7 +141,11 @@ func play_card(card_ui: CardUI, card_data: CardData, target = null):
 		if hand_ui:
 			await hand_ui.get_tree().create_timer(0.3).timeout
 	
-
+	# 🆕 Проверяем, является ли карта атакой (для артефакта Ненасытный палаш)
+	var card_types = card_data.get_card_types()
+	if card_types.has(DataManager.CardType.ATTACK):
+		RunManager.attacks_this_turn += 1
+		RunManager.process_artifact_on_attack_threshold(player)
 	
 	SignalManager.card_played.emit(card_data)
 	card_ui.queue_free()

@@ -267,6 +267,7 @@ enum ArtifactTrigger {
 	CUSTOM,                # кастомная логика
 	ADD_ACTION_WHEN_APPLY_CONCRETE_STATUS_TO_ENEMY,  # 🆕
 	DAMAGE_THRESHOLD,  # 🆕
+	ATTACKS_THRESHOLD,  # 🆕
 }
 
 ## ID артефактов
@@ -286,6 +287,8 @@ enum ArtifactId {
 	THORN_CROWN,  # 🆕
 	SERRATED_KNUCKLE,  # 🆕
 	RING_OF_BARRICADE,  # 🆕
+	LUCKY_PICK,  # 🆕
+	INSATIABLE_BLADE,  # 🆕
 }
 
 ## ============================================================
@@ -1657,13 +1660,15 @@ const ARTIFACT_ICONS: Dictionary = {
 	DataManager.ArtifactId.TROLL_BLADE: preload("res://img/icons/artifacts/troll_blade1.png"),
 	DataManager.ArtifactId.IMP_BLADE: preload("res://img/icons/artifacts/imp_blade1.png"),
 	DataManager.ArtifactId.PLAGUE_AMULET: preload("res://img/icons/artifacts/plague_amulet1.png"),
-	DataManager.ArtifactId.ARACHNID_BELT: preload("res://img/icons/artifacts/arachnid_belt.png"),  # 🆕
-	DataManager.ArtifactId.RUNIC_HELM: preload("res://img/icons/artifacts/runic_helm.png"),  # 🆕
-	DataManager.ArtifactId.DRAGON_BROOCH: preload("res://img/icons/artifacts/dragon_brooch.png"),  # 🆕
-	DataManager.ArtifactId.RUSTY_NAIL: preload("res://img/icons/artifacts/rusty_nail.png"),  # 🆕
-	DataManager.ArtifactId.THORN_CROWN: preload("res://img/icons/artifacts/thorn_crown.png"),  # 🆕
-	DataManager.ArtifactId.SERRATED_KNUCKLE: preload("res://img/icons/artifacts/serrated_knuckle.png"),  # 🆕
-	#DataManager.ArtifactId.RING_OF_BARRICADE: preload("res://img/icons/artifacts/ring_of_barricade.png"),  # 🆕
+	DataManager.ArtifactId.ARACHNID_BELT: preload("res://img/icons/artifacts/arachnid_belt1.png"),  # 🆕
+	DataManager.ArtifactId.RUNIC_HELM: preload("res://img/icons/artifacts/runic_helm1.png"),  # 🆕
+	DataManager.ArtifactId.DRAGON_BROOCH: preload("res://img/icons/artifacts/dragon_brooch1.png"),  # 🆕
+	DataManager.ArtifactId.RUSTY_NAIL: preload("res://img/icons/artifacts/rusty_nail1.png"),  # 🆕
+	DataManager.ArtifactId.THORN_CROWN: preload("res://img/icons/artifacts/thorn_crown1.png"),  # 🆕
+	DataManager.ArtifactId.SERRATED_KNUCKLE: preload("res://img/icons/artifacts/serrated_knuckle1.png"),  # 🆕
+	DataManager.ArtifactId.RING_OF_BARRICADE: preload("res://img/icons/artifacts/ring_of_barricade1.png"),  # 🆕
+	DataManager.ArtifactId.LUCKY_PICK: preload("res://img/icons/artifacts/lucky_pick1.png"),  # 🆕
+	DataManager.ArtifactId.INSATIABLE_BLADE: preload("res://img/icons/artifacts/insatiable_blade1.png"),  # 🆕
 }
 
 
@@ -2063,6 +2068,10 @@ func get_artifact_name(artifact_id: ArtifactId) -> String:
 			return tr("artifact_serrated_knuckle_name")
 		ArtifactId.RING_OF_BARRICADE:  # 🆕
 			return tr("artifact_ring_of_barricade_name")
+		ArtifactId.LUCKY_PICK:  # 🆕
+			return tr("artifact_lucky_pick_name")
+		ArtifactId.INSATIABLE_BLADE:  # 🆕
+			return tr("artifact_insatiable_blade_name")
 		_:
 			return tr("artifact_unknown_name")
 
@@ -2143,6 +2152,16 @@ func get_artifact_description(artifact_id: ArtifactId) -> String:
 					artifact.effects[0].base_value if artifact.effects.size() > 0 else 10  # щит
 				]
 			return tr("artifact_ring_of_barricade_desc") % [8, 10]  # fallback
+		ArtifactId.LUCKY_PICK:  # 🆕
+			return tr("artifact_lucky_pick_desc")
+		ArtifactId.INSATIABLE_BLADE:  # 🆕
+			var artifact = get_artifact_resource(ArtifactId.INSATIABLE_BLADE)
+			if artifact:
+				return tr("artifact_insatiable_blade_desc") % [
+					artifact.attack_threshold,
+					artifact.effects[0].base_value if artifact.effects.size() > 0 else 3
+				]
+			return tr("artifact_insatiable_blade_desc") % [3, 3]
 		_:
 			return ""
 
@@ -2169,6 +2188,8 @@ func load_artifact_resources() -> void:
 	_artifact_resources[ArtifactId.THORN_CROWN] = load("res://resources/artifacts/thorn_crown.tres")  # 🆕
 	_artifact_resources[ArtifactId.SERRATED_KNUCKLE] = load("res://resources/artifacts/serrated_knuckle.tres")  # 🆕
 	_artifact_resources[ArtifactId.RING_OF_BARRICADE] = load("res://resources/artifacts/ring_of_barricade.tres")  # 🆕
+	_artifact_resources[ArtifactId.LUCKY_PICK] = load("res://resources/artifacts/lucky_pick.tres")  # 🆕
+	_artifact_resources[ArtifactId.INSATIABLE_BLADE] = load("res://resources/artifacts/insatiable_blade.tres")  # 🆕
 	_artifact_resources_loaded = true
 
 func get_random_artifact_by_grade(grade: ArtifactGrade) -> ArtifactResource:

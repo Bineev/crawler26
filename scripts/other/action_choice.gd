@@ -145,16 +145,23 @@ func _handle_use_key() -> void:
 
 
 func _handle_break() -> void:
-	var success = randf() < DataManager.CHEST_BREAK_CHANCE
+	var success = false
 	
-	if success:
-		await _show_result_label(tr("result_break_success"), DataManager.COLOR_HEAL_LOG)
-		SignalManager.log_message.emit("Сундук взломан!")
-		_create_rewards(true, DataManager.ActionType.BREAK)
+	# 🆕 Проверяем, есть ли Счастливая отмычка
+	if RunManager.has_lucky_pick:
+		success = true
+		await _show_result_label(tr("result_break_success_lucky"), DataManager.COLOR_HEAL_LOG)
+		SignalManager.log_message.emit("Сундук взломан с помощью отмычки!")
 	else:
-		await _show_result_label(tr("result_break_fail"), DataManager.COLOR_PENITENT_ART_BG_DARK)
-		SignalManager.log_message.emit("Взлом не удался!")
-		_create_rewards(false, DataManager.ActionType.BREAK)
+		success = randf() < DataManager.CHEST_BREAK_CHANCE
+		if success:
+			await _show_result_label(tr("result_break_success"), DataManager.COLOR_HEAL_LOG)
+			SignalManager.log_message.emit("Сундук взломан!")
+		else:
+			await _show_result_label(tr("result_break_fail"), DataManager.COLOR_PENITENT_ART_BG_DARK)
+			SignalManager.log_message.emit("Взлом не удался!")
+	
+	_create_rewards(success, DataManager.ActionType.BREAK)
 
 
 func _handle_rest() -> void:
@@ -224,7 +231,11 @@ func _create_rewards(success: bool, action: DataManager.ActionType) -> void:
 				reward_panel.gold_mod = 1
 		DataManager.ActionType.BREAK:
 			if success:
-				reward_panel.gold_mod = 3
+				# 🆕 Если есть Счастливая отмычка — gold_mod = 7
+				if RunManager.has_lucky_pick:
+					reward_panel.gold_mod = 7
+				else:
+					reward_panel.gold_mod = 3
 			else:
 				reward_panel.gold_mod = 1
 		_:

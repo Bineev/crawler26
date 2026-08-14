@@ -596,3 +596,12 @@ upgrade_card_confirm,Upgrade
 "artifact_ring_of_barricade_name","Ring of Barricade"
 "artifact_ring_of_barricade_desc","When taking %d or more damage from a single hit, gain %d Shield."
 "artifact_ring_of_barricade_lore","A heavy iron ring with a shield engraved on its face. It is said to raise an invisible wall against mortal blows."
+"artifact_lucky_pick_name","Lucky Pick"
+"artifact_lucky_pick_desc","Lockpicking is always successful and yields more coins."
+"artifact_lucky_pick_lore","A thin pick that never fails. It is said to bring luck in the most hopeless situations."
+
+"result_break_success_lucky","Lockpicked successfully!"
+
+"artifact_insatiable_blade_name","Insatiable Blade"
+"artifact_insatiable_blade_desc","%d attacks in a single turn restore %d health"
+"artifact_insatiable_blade_lore","An ancient blade with an eye on the crossguard. It hungers for blood and rewards those who feed it."
