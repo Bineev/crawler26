@@ -57,7 +57,8 @@ class_name ArtifactResource
 ## Для CONDITIONAL
 @export var condition_script: Script = null # скрипт условия
 
-
+## Статус, который нужно отслеживать (для ADD_ACTION_WHEN_APPLY_CONCRETE_STATUS_TO_ENEMY)
+@export var tracked_status: DataManager.Status = DataManager.Status.POISON
 ## ============================================================
 ## ЭФФЕКТЫ
 ## ============================================================

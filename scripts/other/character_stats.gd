@@ -420,6 +420,11 @@ func _add_status_direct(status: StatusResource, stacks: int, duration: int, cast
 		if status_id == DataManager.Status.SHIELD:
 			SignalManager.shield_recieved.emit(self, stacks)
 	SignalManager.log_message.emit("Наложен %s: %d стаков на %d ходов" % [status.get_localized_name(), stacks, duration])
+	
+	# 🆕 Проверяем артефакты с триггером ADD_ACTION_WHEN_APPLY_CONCRETE_STATUS_TO_ENEMY
+	# (после того, как статус реально наложен)
+	if caster and not caster is EnemyInstance and self is EnemyInstance:
+		RunManager.process_artifact_on_status_applied_to_enemy(status_id, caster)
 
 
 func remove_status(status_id: DataManager.Status):

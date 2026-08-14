@@ -78,19 +78,36 @@ func _generate_default_description() -> String:
 ## @param stacks: int - количество стаков
 ## @param caster: CharacterStats - источник, наложивший статус (для учёта силы)
 func get_tick_value(stacks: int, caster: CharacterStats = null) -> int:
+	# Определяем, кто кастер (по умолчанию — враг)
+	var is_enemy_caster = caster is EnemyInstance
+	
 	match id:
 		DataManager.Status.BLEED:
-			return stacks * RunManager.bleed_damage_per_stack
+			if is_enemy_caster:
+				return stacks * RunManager.bleed_damage_per_stack
+			return stacks * RunManager.player_bleed_damage_per_stack
+		
 		DataManager.Status.POISON:
-			return RunManager.poison_damage_per_stack
+			if is_enemy_caster:
+				return RunManager.poison_damage_per_stack
+			return RunManager.player_poison_damage_per_stack
+		
 		DataManager.Status.BURN:
-			return stacks * RunManager.burn_damage_per_stack
+			if is_enemy_caster:
+				return stacks * RunManager.burn_damage_per_stack
+			return stacks * RunManager.player_burn_damage_per_stack
+		
 		DataManager.Status.REGEN:
-			return stacks * RunManager.regen_heal_per_stack
+			if is_enemy_caster:
+				return stacks * RunManager.regen_heal_per_stack
+			return stacks * RunManager.player_regen_heal_per_stack
+		
 		DataManager.Status.GANGRENE:
 			return stacks
+		
 		DataManager.Status.INFECTION:
 			return effect_per_stack
+		
 		_:
 			return 0
 

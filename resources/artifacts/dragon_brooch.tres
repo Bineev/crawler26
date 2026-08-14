@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="ArtifactResource" load_steps=5 format=3 uid="uid://csewa5e88ay6q"]
+
+[ext_resource type="Script" uid="uid://cmra25r1r3ivt" path="res://resources/res_scripts/effect_entry.gd" id="1_bp77i"]
+[ext_resource type="Script" uid="uid://dxepc28vep34d" path="res://resources/res_scripts/artifact_resource.gd" id="2_3jhpc"]
+[ext_resource type="Resource" uid="uid://lntkqqqjddd" path="res://resources/passives/steel_hide.tres" id="2_5ppym"]
+
+[sub_resource type="Resource" id="Resource_w5b7o"]
+script = ExtResource("1_bp77i")
+category = 5
+target = 0
+passive = ExtResource("2_5ppym")
+passive_duration = 3
+metadata/_custom_type_script = "uid://cmra25r1r3ivt"
+
+[resource]
+script = ExtResource("2_3jhpc")
+id = 10
+triggers = Array[int]([4])
+name_key = "artifact_dragon_brooch_name"
+description_key = "artifact_dragon_brooch_desc"
+lore_key = "artifact_dragon_brooch_lore"
+amount_check_conditional = 50
+is_amount_check_percent = true
+effects = Array[ExtResource("1_bp77i")]([SubResource("Resource_w5b7o")])
+metadata/_custom_type_script = "uid://dxepc28vep34d"

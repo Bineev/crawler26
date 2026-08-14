@@ -265,6 +265,7 @@ enum ArtifactTrigger {
 	HEALTH_DROPPED_BELOW , # срабатывает при выполнении условия
 	CARD_PLAYED_COUNTER,   # срабатывает при розыгрыше N-й карты
 	CUSTOM,                # кастомная логика
+	ADD_ACTION_WHEN_APPLY_CONCRETE_STATUS_TO_ENEMY,  # 🆕
 }
 
 ## ID артефактов
@@ -277,6 +278,9 @@ enum ArtifactId {
 	TROLL_BLADE,  # 🆕
 	IMP_BLADE,  # 🆕 Клинок Импа
 	PLAGUE_AMULET,  # 🆕
+	ARACHNID_BELT,  # 🆕
+	RUNIC_HELM,  # 🆕
+	DRAGON_BROOCH,  # 🆕
 }
 
 ## ============================================================
@@ -1648,6 +1652,9 @@ const ARTIFACT_ICONS: Dictionary = {
 	DataManager.ArtifactId.TROLL_BLADE: preload("res://img/icons/artifacts/troll_blade1.png"),
 	DataManager.ArtifactId.IMP_BLADE: preload("res://img/icons/artifacts/imp_blade1.png"),
 	DataManager.ArtifactId.PLAGUE_AMULET: preload("res://img/icons/artifacts/plague_amulet1.png"),
+	DataManager.ArtifactId.ARACHNID_BELT: preload("res://img/icons/artifacts/arachnid_belt.png"),  # 🆕
+	DataManager.ArtifactId.RUNIC_HELM: preload("res://img/icons/artifacts/runic_helm.png"),  # 🆕
+	#DataManager.ArtifactId.DRAGON_BROOCH: preload("res://img/icons/artifacts/dragon_brooch.png"),  # 🆕
 }
 
 
@@ -2033,6 +2040,12 @@ func get_artifact_name(artifact_id: ArtifactId) -> String:
 			return tr("artifact_imp_blade_name")
 		ArtifactId.PLAGUE_AMULET:  # 🆕
 			return tr("artifact_plague_amulet_name")
+		ArtifactId.ARACHNID_BELT:  # 🆕
+			return tr("artifact_arachnid_belt_name")
+		ArtifactId.RUNIC_HELM:  # 🆕
+			return tr("artifact_runic_helm_name")
+		ArtifactId.DRAGON_BROOCH:  # 🆕
+			return tr("artifact_dragon_brooch_name")
 		_:
 			return tr("artifact_unknown_name")
 
@@ -2066,6 +2079,12 @@ func get_artifact_description(artifact_id: ArtifactId) -> String:
 			return tr("artifact_imp_blade_desc")
 		ArtifactId.PLAGUE_AMULET:  # 🆕
 			return tr("artifact_plague_amulet_desc")
+		ArtifactId.ARACHNID_BELT:  # 🆕
+			return tr("artifact_arachnid_belt_desc")
+		ArtifactId.RUNIC_HELM:  # 🆕
+			return tr("artifact_runic_helm_desc")
+		ArtifactId.DRAGON_BROOCH:  # 🆕
+			return tr("artifact_dragon_brooch_desc")
 		_:
 			return ""
 
@@ -2085,6 +2104,9 @@ func load_artifact_resources() -> void:
 	_artifact_resources[ArtifactId.TROLL_BLADE] = load("res://resources/artifacts/troll_blade.tres")  # 🆕
 	_artifact_resources[ArtifactId.IMP_BLADE] = load("res://resources/artifacts/imp_blade.tres")
 	_artifact_resources[ArtifactId.PLAGUE_AMULET] = load("res://resources/artifacts/plague_amulet.tres")
+	_artifact_resources[ArtifactId.ARACHNID_BELT] = load("res://resources/artifacts/arachnid_belt.tres")  # 🆕
+	_artifact_resources[ArtifactId.RUNIC_HELM] = load("res://resources/artifacts/runic_helm.tres")  # 🆕
+	_artifact_resources[ArtifactId.DRAGON_BROOCH] = load("res://resources/artifacts/dragon_brooch.tres")  # 🆕
 	_artifact_resources_loaded = true
 
 func get_random_artifact_by_grade(grade: ArtifactGrade) -> ArtifactResource:

@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="ArtifactResource" load_steps=4 format=3 uid="uid://cwbf36hl21x6i"]
+
+[ext_resource type="Script" uid="uid://cmra25r1r3ivt" path="res://resources/res_scripts/effect_entry.gd" id="1_ckmru"]
+[ext_resource type="Script" uid="uid://dxepc28vep34d" path="res://resources/res_scripts/artifact_resource.gd" id="2_wdxsm"]
+
+[sub_resource type="Resource" id="Resource_ckmru"]
+script = ExtResource("1_ckmru")
+category = 1
+target = 0
+base_value = 10
+metadata/_custom_type_script = "uid://cmra25r1r3ivt"
+
+[resource]
+script = ExtResource("2_wdxsm")
+id = 9
+triggers = Array[int]([3])
+name_key = "artifact_runic_helm_name"
+description_key = "artifact_runic_helm_desc"
+lore_key = "artifact_runic_helm_lore"
+effects = Array[ExtResource("1_ckmru")]([SubResource("Resource_ckmru")])
+metadata/_custom_type_script = "uid://dxepc28vep34d"

@@ -9,6 +9,12 @@ var poison_damage_per_stack: int = DataManager.POISON_BASE_DAMAGE_PER_STACK
 var bleed_damage_per_stack: int = DataManager.BLEED_BASE_DAMAGE_PER_STACK
 var burn_damage_per_stack: int = DataManager.BURN_BASE_DAMAGE_PER_STACK
 var burn_threshold_stacks: int = DataManager.BURN_THRESHOLD_STACKS
+# === Статусы (для игрока) ===
+var player_poison_damage_per_stack: int = DataManager.POISON_BASE_DAMAGE_PER_STACK
+var player_bleed_damage_per_stack: int = DataManager.BLEED_BASE_DAMAGE_PER_STACK
+var player_burn_damage_per_stack: int = DataManager.BURN_BASE_DAMAGE_PER_STACK
+var player_regen_heal_per_stack: int = DataManager.REGEN_HEAL_PER_STACK
+
 var cold_freeze_threshold: int = DataManager.COLD_FREEZE_THRESHOLD
 var cold_effect_percent: float = DataManager.COLD_EFFECT_PERCENT_PER_STACK
 var cold_min_multiplier: float = DataManager.COLD_MIN_EFFECT_MULTIPLIER
@@ -652,12 +658,45 @@ func reset_run():
 	initialize_run()
 
 
+# autoload/run_manager.gd
+
+func process_artifact_on_status_applied_to_enemy(status_id: DataManager.Status, player: CharacterStats) -> void:
+	for artifact in artifacts:
+		var trigger_index = artifact.triggers.find(DataManager.ArtifactTrigger.ADD_ACTION_WHEN_APPLY_CONCRETE_STATUS_TO_ENEMY)
+		if trigger_index == -1:
+			continue
+		
+		# Проверяем, что статус совпадает с отслеживаемым
+		if artifact.tracked_status != status_id:
+			continue
+		
+		if trigger_index < artifact.effects.size():
+			var effect = artifact.effects[trigger_index]
+			EffectExecutor.execute(effect, player, [player])
+			SignalManager.log_message.emit("Артефакт сработал при наложении статуса: %s" % artifact.get_localized_name())
+			SignalManager.artifact_triggered.emit(artifact)
+			
+			# Если триггер ONE_TIME — удаляем
+			var trigger_type = artifact.triggers[trigger_index]
+			if trigger_type == DataManager.ArtifactTrigger.ADD_ACTION_WHEN_APPLY_CONCRETE_STATUS_TO_ENEMY:
+				# Проверяем, нужно ли удалять триггер после использования
+				# Если артефакт должен сработать только один раз — удаляем
+				# Пока оставляем — срабатывает каждый раз при наложении статуса
+				pass
+
+
 func reset_run_constants():
 	# === Статусы ===
 	poison_damage_per_stack = DataManager.POISON_BASE_DAMAGE_PER_STACK
 	bleed_damage_per_stack = DataManager.BLEED_BASE_DAMAGE_PER_STACK
 	burn_damage_per_stack = DataManager.BURN_BASE_DAMAGE_PER_STACK
 	burn_threshold_stacks = DataManager.BURN_THRESHOLD_STACKS
+	# === Статусы (игрок) ===
+	player_poison_damage_per_stack = DataManager.POISON_BASE_DAMAGE_PER_STACK
+	player_bleed_damage_per_stack = DataManager.BLEED_BASE_DAMAGE_PER_STACK
+	player_burn_damage_per_stack = DataManager.BURN_BASE_DAMAGE_PER_STACK
+	player_regen_heal_per_stack = DataManager.REGEN_HEAL_PER_STACK
+
 	cold_freeze_threshold = DataManager.COLD_FREEZE_THRESHOLD
 	cold_effect_percent = DataManager.COLD_EFFECT_PERCENT_PER_STACK
 	cold_min_multiplier = DataManager.COLD_MIN_EFFECT_MULTIPLIER
