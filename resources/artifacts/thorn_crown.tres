@@ -1,0 +1,30 @@
+[gd_resource type="Resource" script_class="ArtifactResource" load_steps=6 format=3 uid="uid://dchnwi5a3ykxp"]
+
+[ext_resource type="Script" uid="uid://cmra25r1r3ivt" path="res://resources/res_scripts/effect_entry.gd" id="1_qyddr"]
+[ext_resource type="Script" uid="uid://dxepc28vep34d" path="res://resources/res_scripts/artifact_resource.gd" id="2_g4c5v"]
+[ext_resource type="Resource" uid="uid://d2d615ax0t482" path="res://resources/passives/denial.tres" id="2_t15jm"]
+
+[sub_resource type="Resource" id="Resource_qyddr"]
+script = ExtResource("1_qyddr")
+target = 0
+base_value = 3
+metadata/_custom_type_script = "uid://cmra25r1r3ivt"
+
+[sub_resource type="Resource" id="Resource_g4c5v"]
+script = ExtResource("1_qyddr")
+category = 5
+target = 0
+passive = ExtResource("2_t15jm")
+passive_duration = 3
+metadata/_custom_type_script = "uid://cmra25r1r3ivt"
+
+[resource]
+script = ExtResource("2_g4c5v")
+id = 12
+cost_grade = 3
+triggers = Array[int]([3, 3])
+name_key = "artifact_thorn_crown_name"
+description_key = "artifact_thorn_crown_desc"
+lore_key = "artifact_thorn_crown_lore"
+effects = Array[ExtResource("1_qyddr")]([SubResource("Resource_qyddr"), SubResource("Resource_g4c5v")])
+metadata/_custom_type_script = "uid://dxepc28vep34d"

@@ -281,6 +281,8 @@ enum ArtifactId {
 	ARACHNID_BELT,  # 🆕
 	RUNIC_HELM,  # 🆕
 	DRAGON_BROOCH,  # 🆕
+	RUSTY_NAIL,  # 🆕
+	THORN_CROWN,  # 🆕
 }
 
 ## ============================================================
@@ -1654,7 +1656,9 @@ const ARTIFACT_ICONS: Dictionary = {
 	DataManager.ArtifactId.PLAGUE_AMULET: preload("res://img/icons/artifacts/plague_amulet1.png"),
 	DataManager.ArtifactId.ARACHNID_BELT: preload("res://img/icons/artifacts/arachnid_belt.png"),  # 🆕
 	DataManager.ArtifactId.RUNIC_HELM: preload("res://img/icons/artifacts/runic_helm.png"),  # 🆕
-	#DataManager.ArtifactId.DRAGON_BROOCH: preload("res://img/icons/artifacts/dragon_brooch.png"),  # 🆕
+	DataManager.ArtifactId.DRAGON_BROOCH: preload("res://img/icons/artifacts/dragon_brooch.png"),  # 🆕
+	DataManager.ArtifactId.RUSTY_NAIL: preload("res://img/icons/artifacts/rusty_nail.png"),  # 🆕
+	#DataManager.ArtifactId.THORN_CROWN: preload("res://img/icons/artifacts/thorn_crown.png"),  # 🆕
 }
 
 
@@ -2046,6 +2050,10 @@ func get_artifact_name(artifact_id: ArtifactId) -> String:
 			return tr("artifact_runic_helm_name")
 		ArtifactId.DRAGON_BROOCH:  # 🆕
 			return tr("artifact_dragon_brooch_name")
+		ArtifactId.RUSTY_NAIL:  # 🆕
+			return tr("artifact_rusty_nail_name")
+		ArtifactId.THORN_CROWN:  # 🆕
+			return tr("artifact_thorn_crown_name")
 		_:
 			return tr("artifact_unknown_name")
 
@@ -2081,10 +2089,41 @@ func get_artifact_description(artifact_id: ArtifactId) -> String:
 			return tr("artifact_plague_amulet_desc")
 		ArtifactId.ARACHNID_BELT:  # 🆕
 			return tr("artifact_arachnid_belt_desc")
-		ArtifactId.RUNIC_HELM:  # 🆕
-			return tr("artifact_runic_helm_desc")
+		ArtifactId.RUNIC_HELM:
+			var artifact = get_artifact_resource(ArtifactId.RUNIC_HELM)
+			if artifact and artifact.effects.size() > 0:
+				var effect = artifact.effects[0]
+				return tr("artifact_runic_helm_desc") % [
+					effect.base_value  # количество щита
+				]
+			return tr("artifact_runic_helm_desc") % [10]  # fallback
 		ArtifactId.DRAGON_BROOCH:  # 🆕
-			return tr("artifact_dragon_brooch_desc")
+			var artifact = get_artifact_resource(ArtifactId.DRAGON_BROOCH)
+			if artifact:
+				return tr("artifact_dragon_brooch_desc") % [
+					artifact.amount_check_conditional,  # процент здоровья
+					artifact.effects[0].passive.starting_charges if artifact.effects.size() > 0 and artifact.effects[0].passive else 3
+				]
+			return tr("artifact_dragon_brooch_desc") % [50, 3]  # fallback
+		ArtifactId.RUSTY_NAIL:
+			var artifact = get_artifact_resource(ArtifactId.RUSTY_NAIL)
+			if artifact and artifact.effects.size() > 0:
+				var effect = artifact.effects[0]
+				return tr("artifact_rusty_nail_desc") % [
+					effect.value,    # стаки
+					effect.duration  # длительность
+				]
+			return tr("artifact_rusty_nail_desc") % [1, 2]  # fallback
+		ArtifactId.THORN_CROWN:  # 🆕
+			var artifact = get_artifact_resource(ArtifactId.THORN_CROWN)
+			if artifact and artifact.effects.size() >= 2:
+				var damage_effect = artifact.effects[0]
+				var denial_effect = artifact.effects[1]
+				return tr("artifact_thorn_crown_desc") % [
+					damage_effect.base_value,  # урон
+					denial_effect.passive_duration  # заряды Denial
+				]
+			return tr("artifact_thorn_crown_desc") % [3, 3]  # fallback
 		_:
 			return ""
 
@@ -2107,6 +2146,8 @@ func load_artifact_resources() -> void:
 	_artifact_resources[ArtifactId.ARACHNID_BELT] = load("res://resources/artifacts/arachnid_belt.tres")  # 🆕
 	_artifact_resources[ArtifactId.RUNIC_HELM] = load("res://resources/artifacts/runic_helm.tres")  # 🆕
 	_artifact_resources[ArtifactId.DRAGON_BROOCH] = load("res://resources/artifacts/dragon_brooch.tres")  # 🆕
+	_artifact_resources[ArtifactId.RUSTY_NAIL] = load("res://resources/artifacts/rusty_nail.tres")  # 🆕
+	_artifact_resources[ArtifactId.THORN_CROWN] = load("res://resources/artifacts/thorn_crown.tres")  # 🆕
 	_artifact_resources_loaded = true
 
 func get_random_artifact_by_grade(grade: ArtifactGrade) -> ArtifactResource:

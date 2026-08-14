@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="ArtifactResource" load_steps=5 format=3 uid="uid://i108eyu4lrlh"]
+
+[ext_resource type="Script" uid="uid://cmra25r1r3ivt" path="res://resources/res_scripts/effect_entry.gd" id="1_enopd"]
+[ext_resource type="Script" uid="uid://dxepc28vep34d" path="res://resources/res_scripts/artifact_resource.gd" id="2_cugxh"]
+[ext_resource type="Resource" uid="uid://b68cda611rabw" path="res://resources/statuses/bleed.tres" id="2_m42jb"]
+
+[sub_resource type="Resource" id="Resource_ry7tk"]
+script = ExtResource("1_enopd")
+category = 4
+status = ExtResource("2_m42jb")
+duration = 2
+metadata/_custom_type_script = "uid://cmra25r1r3ivt"
+
+[resource]
+script = ExtResource("2_cugxh")
+id = 11
+cost_grade = 5
+triggers = Array[int]([7])
+name_key = "artifact_rusty_nail_name"
+description_key = "artifact_rusty_nail_desc"
+lore_key = "artifact_rusty_nail_lore"
+tracked_status = 4
+effects = Array[ExtResource("1_enopd")]([SubResource("Resource_ry7tk")])
+metadata/_custom_type_script = "uid://dxepc28vep34d"

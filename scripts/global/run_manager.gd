@@ -263,34 +263,48 @@ func _process_one_time_trigger(artifact: ArtifactResource) -> void:
 			print("ONE_TIME эффект артефакта выполнен: ", artifact.get_localized_name())
 
 
-## Обрабатывает артефакты с триггером ON_START_FIGHT
+### Обрабатывает артефакты с триггером ON_START_FIGHT
+#func process_artifacts_on_start_fight() -> void:
+	#var player = BattleManager.get_player()
+	#if not player:
+		#return
+	#
+	#for artifact in artifacts:
+		#var trigger_index = artifact.triggers.find(DataManager.ArtifactTrigger.ON_START_FIGHT)
+		#if trigger_index == -1:
+			#continue
+		#
+		## Проверяем, что есть эффект для этого триггера
+		#if trigger_index < artifact.effects.size():
+			#var effect = artifact.effects[trigger_index]
+			#
+			## Выполняем эффект (источник — игрок)
+			#EffectExecutor.execute(effect, player, [player])
+			#SignalManager.log_message.emit("Артефакт сработал в начале боя: %s" % artifact.get_localized_name())
+			#
+			## Если триггер ONE_TIME уже удалён, а ON_START_FIGHT должен срабатывать каждый бой
+			## Проверяем, нужно ли удалять триггер после использования
+			#var trigger_type = artifact.triggers[trigger_index]
+			#if trigger_type == DataManager.ArtifactTrigger.ON_START_FIGHT:
+				## Оставляем триггер, так как он должен срабатывать каждый бой
+				## Но если артефакт должен сработать только один раз в бою — ничего не делаем
+				#pass
+			#
+			#SignalManager.artifact_triggered.emit(artifact)
+
 func process_artifacts_on_start_fight() -> void:
 	var player = BattleManager.get_player()
 	if not player:
 		return
 	
 	for artifact in artifacts:
-		var trigger_index = artifact.triggers.find(DataManager.ArtifactTrigger.ON_START_FIGHT)
-		if trigger_index == -1:
-			continue
-		
-		# Проверяем, что есть эффект для этого триггера
-		if trigger_index < artifact.effects.size():
-			var effect = artifact.effects[trigger_index]
-			
-			# Выполняем эффект (источник — игрок)
-			EffectExecutor.execute(effect, player, [player])
-			SignalManager.log_message.emit("Артефакт сработал в начале боя: %s" % artifact.get_localized_name())
-			
-			# Если триггер ONE_TIME уже удалён, а ON_START_FIGHT должен срабатывать каждый бой
-			# Проверяем, нужно ли удалять триггер после использования
-			var trigger_type = artifact.triggers[trigger_index]
-			if trigger_type == DataManager.ArtifactTrigger.ON_START_FIGHT:
-				# Оставляем триггер, так как он должен срабатывать каждый бой
-				# Но если артефакт должен сработать только один раз в бою — ничего не делаем
-				pass
-			
-			SignalManager.artifact_triggered.emit(artifact)
+		for i in range(artifact.triggers.size()):
+			if artifact.triggers[i] == DataManager.ArtifactTrigger.ON_START_FIGHT:
+				if i < artifact.effects.size():
+					var effect = artifact.effects[i]
+					EffectExecutor.execute(effect, player, [player])
+					SignalManager.log_message.emit("Артефакт сработал в начале боя: %s" % artifact.get_localized_name())
+					SignalManager.artifact_triggered.emit(artifact)
 
 
 func _on_add_artifact(artifact: ArtifactResource) -> void:
