@@ -238,6 +238,10 @@ func take_damage(amount: int, ignore_block: bool = false, attacker: CharacterSta
 			#SignalManager.player_damage_dealt.emit(damage)
 		modify_flat(DataManager.FlatStat.HEALTH, -damage)
 		
+		# 🆕 Проверяем артефакты с триггером DAMAGE_THRESHOLD
+		if not self is EnemyInstance:
+			RunManager.process_artifact_on_damage_threshold(damage)
+		
 		# 🆕 Пассивки ON_TAKE_DIRECT_DAMAGE
 		if is_direct and self and self.has_method("_process_passive_triggers"):
 			# Проверяем, жив ли получатель урона
@@ -323,6 +327,10 @@ func add_status(status: StatusResource, value: int, duration: int, caster: Chara
 	var status_id = status.id
 	var stacks = value
 	var dur = duration
+
+	# 🆕 Проверяем, если кастер — игрок, а цель — враг, и статус — BLEED
+	if caster and not caster is EnemyInstance and self is EnemyInstance and status_id == DataManager.Status.BLEED:
+		dur += RunManager.player_bleed_duration_bonus
 	
 	# 🆕 Сначала обрабатываем Burn ↔ Cold
 	if status_id == DataManager.Status.BURN or status_id == DataManager.Status.COLD:

@@ -59,6 +59,9 @@ class_name ArtifactResource
 
 ## Статус, который нужно отслеживать (для ADD_ACTION_WHEN_APPLY_CONCRETE_STATUS_TO_ENEMY)
 @export var tracked_status: DataManager.Status = DataManager.Status.POISON
+
+## Для DAMAGE_THRESHOLD — порог урона
+@export var damage_threshold: int = 0
 ## ============================================================
 ## ЭФФЕКТЫ
 ## ============================================================

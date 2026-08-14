@@ -14,6 +14,7 @@ var player_poison_damage_per_stack: int = DataManager.POISON_BASE_DAMAGE_PER_STA
 var player_bleed_damage_per_stack: int = DataManager.BLEED_BASE_DAMAGE_PER_STACK
 var player_burn_damage_per_stack: int = DataManager.BURN_BASE_DAMAGE_PER_STACK
 var player_regen_heal_per_stack: int = DataManager.REGEN_HEAL_PER_STACK
+var player_bleed_duration_bonus: int = 0
 
 var cold_freeze_threshold: int = DataManager.COLD_FREEZE_THRESHOLD
 var cold_effect_percent: float = DataManager.COLD_EFFECT_PERCENT_PER_STACK
@@ -699,6 +700,31 @@ func process_artifact_on_status_applied_to_enemy(status_id: DataManager.Status, 
 				pass
 
 
+func process_artifact_on_damage_threshold(damage_taken: int) -> void:
+	var player = BattleManager.get_player()
+	if not player:
+		return
+	
+	for artifact in artifacts:
+		var trigger_index = artifact.triggers.find(DataManager.ArtifactTrigger.DAMAGE_THRESHOLD)
+		if trigger_index == -1:
+			continue
+		
+		# Проверяем порог
+		if damage_taken < artifact.damage_threshold:
+			continue
+		
+		if trigger_index < artifact.effects.size():
+			var effect = artifact.effects[trigger_index]
+			EffectExecutor.execute(effect, player, [player])
+			SignalManager.log_message.emit("Артефакт сработал: %s" % artifact.get_localized_name())
+			SignalManager.artifact_triggered.emit(artifact)
+			
+			# Проверяем, нужно ли удалить триггер
+			# Если артефакт одноразовый — удаляем
+			# Пока оставляем — срабатывает каждый раз при превышении порога
+
+
 func reset_run_constants():
 	# === Статусы ===
 	poison_damage_per_stack = DataManager.POISON_BASE_DAMAGE_PER_STACK
@@ -710,6 +736,9 @@ func reset_run_constants():
 	player_bleed_damage_per_stack = DataManager.BLEED_BASE_DAMAGE_PER_STACK
 	player_burn_damage_per_stack = DataManager.BURN_BASE_DAMAGE_PER_STACK
 	player_regen_heal_per_stack = DataManager.REGEN_HEAL_PER_STACK
+	
+	# === Бонусы игрока (артефакты) ===
+	player_bleed_duration_bonus = 0  # 🆕
 
 	cold_freeze_threshold = DataManager.COLD_FREEZE_THRESHOLD
 	cold_effect_percent = DataManager.COLD_EFFECT_PERCENT_PER_STACK

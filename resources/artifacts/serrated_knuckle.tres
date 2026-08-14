@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="ArtifactResource" load_steps=5 format=3 uid="uid://cwfqp3vhy070n"]
+
+[ext_resource type="Script" uid="uid://cmra25r1r3ivt" path="res://resources/res_scripts/effect_entry.gd" id="1_74jp6"]
+[ext_resource type="Script" uid="uid://io2jf05u43n6" path="res://scripts/effects/serrated_knuckle.gd" id="2_da84c"]
+[ext_resource type="Script" uid="uid://dxepc28vep34d" path="res://resources/res_scripts/artifact_resource.gd" id="2_gmmo1"]
+
+[sub_resource type="Resource" id="Resource_pm8jj"]
+script = ExtResource("1_74jp6")
+category = 15
+target = 0
+custom_description = "artifact_serrated_knuckle_desc"
+custom_script = ExtResource("2_da84c")
+metadata/_custom_type_script = "uid://cmra25r1r3ivt"
+
+[resource]
+script = ExtResource("2_gmmo1")
+id = 13
+cost_grade = 5
+triggers = Array[int]([6])
+name_key = "artifact_serrated_knuckle_name"
+description_key = "artifact_serrated_knuckle_desc"
+lore_key = "artifact_serrated_knuckle_lore"
+effects = Array[ExtResource("1_74jp6")]([SubResource("Resource_pm8jj")])
+metadata/_custom_type_script = "uid://dxepc28vep34d"

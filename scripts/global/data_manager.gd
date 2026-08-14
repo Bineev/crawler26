@@ -266,6 +266,7 @@ enum ArtifactTrigger {
 	CARD_PLAYED_COUNTER,   # срабатывает при розыгрыше N-й карты
 	CUSTOM,                # кастомная логика
 	ADD_ACTION_WHEN_APPLY_CONCRETE_STATUS_TO_ENEMY,  # 🆕
+	DAMAGE_THRESHOLD,  # 🆕
 }
 
 ## ID артефактов
@@ -283,6 +284,8 @@ enum ArtifactId {
 	DRAGON_BROOCH,  # 🆕
 	RUSTY_NAIL,  # 🆕
 	THORN_CROWN,  # 🆕
+	SERRATED_KNUCKLE,  # 🆕
+	RING_OF_BARRICADE,  # 🆕
 }
 
 ## ============================================================
@@ -1658,7 +1661,9 @@ const ARTIFACT_ICONS: Dictionary = {
 	DataManager.ArtifactId.RUNIC_HELM: preload("res://img/icons/artifacts/runic_helm.png"),  # 🆕
 	DataManager.ArtifactId.DRAGON_BROOCH: preload("res://img/icons/artifacts/dragon_brooch.png"),  # 🆕
 	DataManager.ArtifactId.RUSTY_NAIL: preload("res://img/icons/artifacts/rusty_nail.png"),  # 🆕
-	#DataManager.ArtifactId.THORN_CROWN: preload("res://img/icons/artifacts/thorn_crown.png"),  # 🆕
+	DataManager.ArtifactId.THORN_CROWN: preload("res://img/icons/artifacts/thorn_crown.png"),  # 🆕
+	DataManager.ArtifactId.SERRATED_KNUCKLE: preload("res://img/icons/artifacts/serrated_knuckle.png"),  # 🆕
+	#DataManager.ArtifactId.RING_OF_BARRICADE: preload("res://img/icons/artifacts/ring_of_barricade.png"),  # 🆕
 }
 
 
@@ -2054,6 +2059,10 @@ func get_artifact_name(artifact_id: ArtifactId) -> String:
 			return tr("artifact_rusty_nail_name")
 		ArtifactId.THORN_CROWN:  # 🆕
 			return tr("artifact_thorn_crown_name")
+		ArtifactId.SERRATED_KNUCKLE:  # 🆕
+			return tr("artifact_serrated_knuckle_name")
+		ArtifactId.RING_OF_BARRICADE:  # 🆕
+			return tr("artifact_ring_of_barricade_name")
 		_:
 			return tr("artifact_unknown_name")
 
@@ -2124,6 +2133,16 @@ func get_artifact_description(artifact_id: ArtifactId) -> String:
 					denial_effect.passive_duration  # заряды Denial
 				]
 			return tr("artifact_thorn_crown_desc") % [3, 3]  # fallback
+		ArtifactId.SERRATED_KNUCKLE:  # 🆕
+			return tr("artifact_serrated_knuckle_desc")
+		ArtifactId.RING_OF_BARRICADE:  # 🆕
+			var artifact = get_artifact_resource(ArtifactId.RING_OF_BARRICADE)
+			if artifact:
+				return tr("artifact_ring_of_barricade_desc") % [
+					artifact.damage_threshold,  # порог
+					artifact.effects[0].base_value if artifact.effects.size() > 0 else 10  # щит
+				]
+			return tr("artifact_ring_of_barricade_desc") % [8, 10]  # fallback
 		_:
 			return ""
 
@@ -2148,6 +2167,8 @@ func load_artifact_resources() -> void:
 	_artifact_resources[ArtifactId.DRAGON_BROOCH] = load("res://resources/artifacts/dragon_brooch.tres")  # 🆕
 	_artifact_resources[ArtifactId.RUSTY_NAIL] = load("res://resources/artifacts/rusty_nail.tres")  # 🆕
 	_artifact_resources[ArtifactId.THORN_CROWN] = load("res://resources/artifacts/thorn_crown.tres")  # 🆕
+	_artifact_resources[ArtifactId.SERRATED_KNUCKLE] = load("res://resources/artifacts/serrated_knuckle.tres")  # 🆕
+	_artifact_resources[ArtifactId.RING_OF_BARRICADE] = load("res://resources/artifacts/ring_of_barricade.tres")  # 🆕
 	_artifact_resources_loaded = true
 
 func get_random_artifact_by_grade(grade: ArtifactGrade) -> ArtifactResource:
