@@ -116,6 +116,14 @@ func duplicate_for_instance() -> ArtifactResource:
 	copy.card_count_threshold = card_count_threshold
 	copy.condition_script = condition_script
 	
+	# 🆕 Новые поля
+	copy.is_one_time_conditional = is_one_time_conditional
+	copy.amount_check_conditional = amount_check_conditional
+	copy.is_amount_check_percent = is_amount_check_percent
+	copy.tracked_status = tracked_status
+	copy.damage_threshold = damage_threshold
+	copy.attack_threshold = attack_threshold
+	
 	for effect in effects:
 		copy.effects.append(effect.duplicate_for_instance())
 	

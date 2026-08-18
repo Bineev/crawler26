@@ -550,6 +550,8 @@ upgrade_card_confirm,Upgrade
 "passive_thorns_desc","Attacker takes damage"
 "passive_rotting_shield_name","Rotting Shield"
 "passive_rotting_shield_desc","When taking direct damage, weakens the attacker"
+"passive_steel_hide_name","Steel Hide"
+"passive_steel_hide_desc","Reduces incoming direct damage by 50%. Negative statuses are blocked and consume a charge"
 
 "card_snake_bite_name","Snake Bite"
 "card_snake_bite_desc","Deal 3 damage, poison the target for 3 turns, and weaken it for 1 turn."
@@ -605,3 +607,15 @@ upgrade_card_confirm,Upgrade
 "artifact_insatiable_blade_name","Insatiable Blade"
 "artifact_insatiable_blade_desc","%d attacks in a single turn restore %d health"
 "artifact_insatiable_blade_lore","An ancient blade with an eye on the crossguard. It hungers for blood and rewards those who feed it."
+
+"event_underground_pool_name","Underground Pool"
+"event_underground_pool_narrative","You approach an underground pool. On the surface of the lilac-tinted water, dense vine-like plants grow. Moving closer, you notice a plump purse at the water's edge. The plants sway slightly in the shadows, resembling tentacles of an unknown underwater creature."
+
+"event_underground_pool_grab_success","You take a few steps toward the water. The tentacles writhe hungrily. Suddenly, a swarm of bats bursts from the cave darkness. While the tentacles catch the unfortunate creatures, you manage to grab the purse and retreat."
+"event_underground_pool_grab_fail","You grab the purse, but one of the tentacles catches your leg. It stubbornly pulls you toward the water. You strike several times with your sword before managing to sever the tentacle. Acid splashes from the stump, burning your hand."
+
+"event_underground_pool_distract_success","You pick up some large stones and throw them into the cluster of writhing tendrils. The nearest tentacles catch the projectiles and submerge with a gurgle. The rest cannot reach you — the purse is yours."
+"event_underground_pool_distract_fail","You throw some stones into the water to test the tentacles' reaction, but they remain motionless. Perhaps these are just strange plants. You move to take the loot, but at that moment a chitinous creature rises from the coastal silt."
+
+"event_underground_pool_action_grab","Grab the purse and run"
+"event_underground_pool_action_distract","Distract the tentacles"

@@ -77,6 +77,10 @@ func _get_action_text(action: DataManager.ActionType) -> String:
 			return tr("event_miner_action_search")
 		DataManager.ActionType.EVENT_MINER_HELP:    # 🆕
 			return tr("event_miner_action_help")
+		DataManager.ActionType.EVENT_UNDERGROUND_POOL_GRAB:  # 🆕
+			return tr("event_underground_pool_action_grab")
+		DataManager.ActionType.EVENT_UNDERGROUND_POOL_DISTRACT:  # 🆕
+			return tr("event_underground_pool_action_distract")
 		_:
 			return ""
 

@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="EventResource" load_steps=2 format=3 uid="uid://d4jd6g8t71ot"]
+
+[ext_resource type="Script" uid="uid://ew2p1pg1vq1x" path="res://resources/res_scripts/event_resource.gd" id="1_758og"]
+
+[resource]
+script = ExtResource("1_758og")
+event_type = 1
+name_key = "event_underground_pool_name"
+narrative_key = "event_underground_pool_narrative"
+first_action = 21
+first_action_success_rewards = Array[int]([11])
+first_action_failure_rewards = Array[int]([11, 7])
+first_action_success_key = "event_underground_pool_grab_success"
+first_action_failure_key = "event_underground_pool_grab_fail"
+first_success_gold_mod = 5
+first_failure_gold_mod = 3
+first_failure_damage_mod = 10
+second_action = 22
+second_action_success_rewards = Array[int]([11, 6])
+second_action_failure_rewards = Array[int]([21])
+second_action_success_key = "event_underground_pool_distract_success"
+second_action_failure_key = "event_underground_pool_distract_fail"
+second_success_gold_mod = 3
+second_failure_enemy = 11
+metadata/_custom_type_script = "uid://ew2p1pg1vq1x"

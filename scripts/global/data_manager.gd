@@ -57,6 +57,8 @@ enum ActionType {
 	ROB,
 	EVENT_MINER_SEARCH,   # 🆕
 	EVENT_MINER_HELP,     # 🆕
+	EVENT_UNDERGROUND_POOL_GRAB,   # 🆕
+	EVENT_UNDERGROUND_POOL_DISTRACT, # 🆕
 }
 
 enum EnemyId {
@@ -589,6 +591,7 @@ enum CombatType {
 ## Тип эвента
 enum EventType {
 	MINER,
+	UNDERGROUND_POOL,  # 🆕
 }
 
 ## Тип объекта
@@ -860,8 +863,8 @@ const RACK_MAX_HP_LOST: int = 5
 
 const STARTING_KEYS: int = 1
 
-const EVENT_TEXTURE_SIZE: Vector2 = Vector2(600, 600)
-const EVENT_LABEL_SIZE: Vector2 = Vector2(600, 0)
+const EVENT_TEXTURE_SIZE: Vector2 = Vector2(460, 460)
+const EVENT_LABEL_SIZE: Vector2 = Vector2(700, 0)
 ## ============================================================
 ## НАСТРОЙКИ ПОДБОРА ВРАГОВ
 ## ============================================================
@@ -2483,7 +2486,9 @@ const EVENT_TEXTURES: Dictionary = {
 	DataManager.Biome.MOLE_TUNNELS: {
 		DataManager.EventType.MINER: preload("res://img/events/mole_tunnels/miner.png"),
 	},
-	# ... другие биомы
+	DataManager.Biome.ROTTEN_MARSHES: {  # 🆕
+		DataManager.EventType.UNDERGROUND_POOL: preload("res://img/events/rotten_marshes/underground_pool.png"),
+	},
 }
 
 func get_event_texture(event_type: DataManager.EventType, biome: DataManager.Biome) -> Texture2D:
@@ -2504,6 +2509,10 @@ func load_event_resources() -> void:
 		load("res://resources/events/mole_tunnels/miner.tres"),
 		#load("res://resources/events/mole_tunnels/merchant.tres"),
 		# ... другие события
+	]
+	# 🆕 Гнилостные Топи
+	_event_resources[DataManager.Biome.ROTTEN_MARSHES] = [
+		load("res://resources/events/rotten_marshes/underground_pool.tres"),
 	]
 	
 	_event_resources_loaded = true
