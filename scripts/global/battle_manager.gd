@@ -74,6 +74,8 @@ func start_battle(player_stats: CharacterStats, enemy_instances: Array, battle_d
 	RunManager.process_artifacts_on_start_fight()
 
 	SignalManager.battle_started.emit()
+	# 🆕 Применяем отложенные статусы
+	RunManager.apply_pending_statuses(player_stats)
 	start_player_turn()
 
 

@@ -59,6 +59,8 @@ enum ActionType {
 	EVENT_MINER_HELP,     # 🆕
 	EVENT_UNDERGROUND_POOL_GRAB,   # 🆕
 	EVENT_UNDERGROUND_POOL_DISTRACT, # 🆕
+	EVENT_FLOWER_WATER,   # 🆕
+	EVENT_FLOWER_CUT,     # 🆕
 }
 
 enum EnemyId {
@@ -369,6 +371,8 @@ enum RewardType {
 	CONCRETE_CARD,
 	GET_CONCRETE_BATTLE,  # 🆕 бой с конкретным типом врага
 	ARTIFACT_COMBO,          # 🆕 элитный артефакт 
+	GET_CONCRETE_STATUS,  # 🆕
+	GET_MAX_HEALTH,  # 🆕
 }
 
 ## Тип цикла намерений
@@ -592,6 +596,7 @@ enum CombatType {
 enum EventType {
 	MINER,
 	UNDERGROUND_POOL,  # 🆕
+	FLOWER,  # 🆕
 }
 
 ## Тип объекта
@@ -948,6 +953,9 @@ const ENEMY_Y_OFFSET_FROM_BOTTOM: int = 200  # отступ от нижней г
 
 const sound_delay: int = 50  # задержка между одинаковыми звуками в мс
 const max_sounds: int = 8    # максимальное количество одновременных звуков
+
+
+const BASE_MAX_HEALTH_AMOUNT: int = 10
 ## ============================================================
 ## 6. ВСПОМОГАТЕЛЬНЫЕ МЕТОДЫ
 ## ============================================================
@@ -2488,6 +2496,7 @@ const EVENT_TEXTURES: Dictionary = {
 	},
 	DataManager.Biome.ROTTEN_MARSHES: {  # 🆕
 		DataManager.EventType.UNDERGROUND_POOL: preload("res://img/events/rotten_marshes/underground_pool.png"),
+		DataManager.EventType.FLOWER: preload("res://img/events/rotten_marshes/flower.png"),  # 🆕
 	},
 }
 
@@ -2513,6 +2522,7 @@ func load_event_resources() -> void:
 	# 🆕 Гнилостные Топи
 	_event_resources[DataManager.Biome.ROTTEN_MARSHES] = [
 		load("res://resources/events/rotten_marshes/underground_pool.tres"),
+		load("res://resources/events/rotten_marshes/flower.tres"),  # 🆕
 	]
 	
 	_event_resources_loaded = true

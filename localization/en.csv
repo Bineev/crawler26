@@ -619,3 +619,22 @@ upgrade_card_confirm,Upgrade
 
 "event_underground_pool_action_grab","Grab the purse and run"
 "event_underground_pool_action_distract","Distract the tentacles"
+
+"reward_concrete_status_label","%s"
+"reward_concrete_status_title","Get effect"
+
+"event_flower_name","Flower"
+"event_flower_narrative","You walk through the twilight, wading through miasmatic muck, when you notice a thin ray of light ahead. A flower of wondrous beauty holds its last defense against the darkness. It is dying, but the swamp cannot yet reach it."
+
+"event_flower_water_success","You spend part of your water supply, condemning yourself to thirst. The bud opens, a tear of nectar trickles down the fragile petals. You hold out your palm and manage to catch a few precious drops."
+"event_flower_water_fail","You manage to spill only a few drops at the flower's base, when it begins to bend and blacken. The bud opens like a dying mouth, unleashing a swarm of swamp gnats hungry for human flesh."
+
+"event_flower_cut_success","As you cut the bud, the withering plant crumbles to dust. You take out a vial and fill it with the remnants of nectar from the dead flower."
+"event_flower_cut_fail","You touch the base of the bud with your knife, and at that moment the stem wraps around your arm, digging thorns into your flesh. It takes considerable effort to break free from the predatory plant's grip. You manage to collect the nectar from the bud into a vial."
+
+"event_flower_action_water","Water the flower"
+"event_flower_action_cut","Cut the bud"
+
+"reward_max_health_title","Max Health"
+"reward_max_health_label","+%d max health"
+"reward_take_max_health","Take"

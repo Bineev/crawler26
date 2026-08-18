@@ -23,6 +23,11 @@ var shop_items: Array[Dictionary] = []
 var hover_tween: Tween = null
 var _last_hovered_vbox: Control = null
 var transformed_card: CardData
+## Для GET_CONCRETE_STATUS
+var concrete_status: DataManager.Status = DataManager.Status.POISON
+var concrete_status_stacks: int = 1
+var concrete_status_duration: int = 1
+var max_health_amount: int = 0
 
 enum ItemState {
 	IDLE,
@@ -76,6 +81,10 @@ func setup(type: DataManager.RewardType, items: Array) -> void:
 			_setup_lost_max_hp_reward()
 		DataManager.RewardType.TRADE:
 			_setup_trade_reward()
+		DataManager.RewardType.GET_CONCRETE_STATUS:
+			_setup_concrete_status_reward()
+		DataManager.RewardType.GET_MAX_HEALTH:
+			_setup_max_health_reward()
 
 	# 🆕 Добавляем анимацию наведения для поддерживаемых типов
 	_setup_hover_animation()
@@ -221,12 +230,16 @@ func _get_title() -> String:
 			return tr("reward_add_property_title")
 		DataManager.RewardType.TRANSFORM_CARD:
 			return tr("reward_transform_card_title")
-		DataManager.RewardType.TRADE:  # 🆕
+		DataManager.RewardType.TRADE:
 			return tr("reward_trade_title")
-		DataManager.RewardType.LOST_MAX_HP:  # 🆕
+		DataManager.RewardType.LOST_MAX_HP:
 			return tr("reward_lost_max_hp_title")
-		DataManager.RewardType.GET_BATTLE:  # 🆕
+		DataManager.RewardType.GET_BATTLE:
 			return tr("reward_get_battle_title")
+		DataManager.RewardType.GET_CONCRETE_STATUS:  # 🆕
+			return tr("reward_concrete_status_title")
+		DataManager.RewardType.GET_MAX_HEALTH:
+			return tr("reward_max_health_title")
 		_:
 			return tr("reward_default_title")
 
@@ -376,7 +389,29 @@ func _apply_reward(index: int) -> void:
 				if player.get_health() > new_max:
 					player.set_flat(DataManager.FlatStat.HEALTH, new_max)
 				SignalManager.log_message.emit("Максимальное здоровье уменьшено на %d!" % selected_item)
+		DataManager.RewardType.GET_CONCRETE_STATUS:
+			var player = BattleManager.get_player()
+			if player:
+				RunManager.add_pending_status(
+					concrete_status,
+					concrete_status_stacks,
+					concrete_status_duration
+				)
+				SignalManager.log_message.emit("Статус будет наложен в начале следующего боя: %s" % DataManager.get_status_name(concrete_status))
+		DataManager.RewardType.GET_MAX_HEALTH:
+			var player = BattleManager.get_player()
+			if player:
+				var current_max = player.get_max_health()
+				var current_health = player.get_health()
+				var new_max = current_max + selected_item
 				
+				# Увеличиваем максимальное здоровье
+				player.set_flat(DataManager.FlatStat.MAX_HEALTH, new_max)
+				
+				# 🆕 Также увеличиваем текущее здоровье на ту же величину
+				player.set_flat(DataManager.FlatStat.HEALTH, current_health + selected_item)
+				
+				SignalManager.log_message.emit("Максимальное здоровье увеличено на %d! (текущее здоровье также восстановлено)" % selected_item)
 	SignalManager.reward_selected.emit()
 
 
@@ -1528,3 +1563,76 @@ func _setup_trade_reward() -> void:
 
 func _on_trade_leave_pressed() -> void:
 	SignalManager.reward_selected.emit()
+
+
+func _setup_max_health_reward() -> void:
+	var amount = rewards[0]  # количество HP
+	
+	var vbox = VBoxContainer.new()
+	vbox.alignment = BoxContainer.ALIGNMENT_CENTER
+	vbox.add_theme_constant_override("separation", 20)
+	
+	var hbox = HBoxContainer.new()
+	hbox.alignment = BoxContainer.ALIGNMENT_CENTER
+	hbox.add_theme_constant_override("separation", 15)
+	
+	var icon = TextureRect.new()
+	icon.texture = preload("res://img/icons/intents/buff.png")  # или другая иконка
+	icon.custom_minimum_size = Vector2(64, 64)
+	icon.expand_mode = TextureRect.EXPAND_FIT_WIDTH_PROPORTIONAL
+	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	hbox.add_child(icon)
+	
+	var label = Label.new()
+	label.text = tr("reward_max_health_label") % amount
+	label.add_theme_font_override("font", DataManager.FONT_HEADERS)
+	label.add_theme_font_size_override("font_size", 48)
+	label.add_theme_color_override("font_color", DataManager.COLOR_HEAL_LOG)
+	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	hbox.add_child(label)
+	
+	vbox.add_child(hbox)
+	
+	var button = _create_reward_button("reward_take_max_health", 0)
+	vbox.add_child(button)
+	
+	rewards_container.add_child(vbox)
+
+
+
+func _setup_concrete_status_reward() -> void:
+	var vbox = VBoxContainer.new()
+	vbox.alignment = BoxContainer.ALIGNMENT_CENTER
+	vbox.add_theme_constant_override("separation", 20)
+	
+	var hbox = HBoxContainer.new()
+	hbox.alignment = BoxContainer.ALIGNMENT_CENTER
+	hbox.add_theme_constant_override("separation", 15)
+	
+	var icon = TextureRect.new()
+	icon.texture = DataManager.get_status_icon(concrete_status)
+	icon.custom_minimum_size = Vector2(64, 64)
+	icon.expand_mode = TextureRect.EXPAND_FIT_WIDTH_PROPORTIONAL
+	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	hbox.add_child(icon)
+	
+	var status_label = Label.new()
+	status_label.text = tr("reward_concrete_status_label") % [
+		DataManager.get_status_name(concrete_status),
+		concrete_status_stacks,
+		concrete_status_duration
+	]
+	status_label.add_theme_font_override("font", DataManager.FONT_HEADERS)
+	status_label.add_theme_font_size_override("font_size", 32)
+	status_label.add_theme_color_override("font_color", DataManager.COLOR_MOLE_TUNNELS_ART_BG_LIGHT2)
+	status_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	status_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	hbox.add_child(status_label)
+	
+	vbox.add_child(hbox)
+	
+	var button = _create_reward_button("reward_accept", 0)
+	vbox.add_child(button)
+	
+	rewards_container.add_child(vbox)

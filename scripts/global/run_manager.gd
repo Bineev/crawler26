@@ -74,6 +74,9 @@ var is_robber: bool = false
 var deck_size_buff_remaining: int = 0
 var deck_size_bonus: int = 0
 
+## Отложенные статусы для наложения в начале следующего боя
+var pending_statuses: Array[Dictionary] = []
+
 func _ready():
 	initialize_run()
 	SignalManager.add_artifact.connect(_on_add_artifact)
@@ -121,6 +124,33 @@ func get_player_deck() -> DeckData:
 	if not player_deck_data:
 		initialize_run()
 	return player_deck_data
+
+
+func add_pending_status(status_id: DataManager.Status, stacks: int, duration: int) -> void:
+	pending_statuses.append({
+		"status_id": status_id,
+		"stacks": stacks,
+		"duration": duration,
+	})
+	SignalManager.log_message.emit("Статус будет наложен в начале следующего боя: %s" % DataManager.get_status_name(status_id))
+
+
+func apply_pending_statuses(player: CharacterStats) -> void:
+	if pending_statuses.is_empty():
+		return
+	
+	for status_data in pending_statuses:
+		var status_resource = DataManager.get_status_resource(status_data["status_id"])
+		if status_resource:
+			player.add_status(
+				status_resource,
+				status_data["stacks"],
+				status_data["duration"],
+				player
+			)
+			SignalManager.log_message.emit("Наложен отложенный статус: %s" % status_resource.get_localized_name())
+	
+	pending_statuses.clear()
 
 
 func add_card(card: CardData):

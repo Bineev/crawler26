@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="EventResource" load_steps=2 format=3 uid="uid://bn2mau40m72si"]
+
+[ext_resource type="Script" uid="uid://ew2p1pg1vq1x" path="res://resources/res_scripts/event_resource.gd" id="1_q868o"]
+
+[resource]
+script = ExtResource("1_q868o")
+event_type = 2
+name_key = "event_flower_name"
+narrative_key = "event_flower_narrative"
+first_action = 23
+first_action_success_key = "event_flower_water_success"
+first_action_failure_key = "event_flower_water_fail"
+first_action_success_rewards = Array[int]([23, 24])
+first_action_failure_rewards = Array[int]([7])
+first_success_concrete_status_duration = 2
+first_success_max_health_mod = 2
+second_action_success_key = "event_flower_cut_success"
+second_action_failure_key = "event_flower_cut_fail"
+second_action_success_rewards = Array[int]([6])
+second_action_failure_rewards = Array[int]([7, 6])
+second_failure_damage_mod = 2
+metadata/_custom_type_script = "uid://ew2p1pg1vq1x"

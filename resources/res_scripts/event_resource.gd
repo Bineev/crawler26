@@ -6,12 +6,15 @@ class_name EventResource
 @export var name_key: String = ""
 @export var narrative_key: String = ""
 
-# === ПЕРВОЕ ДЕЙСТВИЕ ===
+# ============================================================
+# ПЕРВОЕ ДЕЙСТВИЕ
+# ============================================================
+
 @export var first_action: DataManager.ActionType = DataManager.ActionType.EVENT_MINER_SEARCH
-@export var first_action_success_rewards: Array[DataManager.RewardType] = []
-@export var first_action_failure_rewards: Array[DataManager.RewardType] = []
 @export var first_action_success_key: String = ""
 @export var first_action_failure_key: String = ""
+@export var first_action_success_rewards: Array[DataManager.RewardType] = []
+@export var first_action_failure_rewards: Array[DataManager.RewardType] = []
 
 # Параметры для наград первого действия (успех)
 @export var first_success_gold_mod: int = 1
@@ -31,12 +34,36 @@ class_name EventResource
 @export var first_failure_choice_count: int = DataManager.REWARD_CHOICE_AMOUNT
 @export var first_failure_buff_amount: int = 1
 
-# === ВТОРОЕ ДЕЙСТВИЕ ===
+# Конкретные ресурсы (первое действие)
+@export var first_success_enemy: DataManager.EnemyId = DataManager.EnemyId.MOLE_MUTANT
+@export var first_failure_enemy: DataManager.EnemyId = DataManager.EnemyId.MOLE_MUTANT
+@export var first_success_concrete_artifact_id: DataManager.ArtifactId = DataManager.ArtifactId.STRANGE_MUSHROOM
+@export var first_failure_concrete_artifact_id: DataManager.ArtifactId = DataManager.ArtifactId.STRANGE_MUSHROOM
+@export var first_success_concrete_card_id: DataManager.CardId = DataManager.CardId.ATONEMENT_STRIKE
+@export var first_failure_concrete_card_id: DataManager.CardId = DataManager.CardId.ATONEMENT_STRIKE
+
+# Конкретный статус (первое действие)
+@export var first_success_concrete_status: DataManager.Status = DataManager.Status.WEAKNESS
+@export var first_success_concrete_status_stacks: int = 1
+@export var first_success_concrete_status_duration: int = 1
+@export var first_failure_concrete_status: DataManager.Status = DataManager.Status.WEAKNESS
+@export var first_failure_concrete_status_stacks: int = 1
+@export var first_failure_concrete_status_duration: int = 1
+
+# Максимальное здоровье (первое действие)
+@export var first_success_max_health_mod: int = 1
+@export var first_failure_max_health_mod: int = 1
+
+
+# ============================================================
+# ВТОРОЕ ДЕЙСТВИЕ
+# ============================================================
+
 @export var second_action: DataManager.ActionType = DataManager.ActionType.EVENT_MINER_HELP
-@export var second_action_success_rewards: Array[DataManager.RewardType] = []
-@export var second_action_failure_rewards: Array[DataManager.RewardType] = []
 @export var second_action_success_key: String = ""
 @export var second_action_failure_key: String = ""
+@export var second_action_success_rewards: Array[DataManager.RewardType] = []
+@export var second_action_failure_rewards: Array[DataManager.RewardType] = []
 
 # Параметры для наград второго действия (успех)
 @export var second_success_gold_mod: int = 1
@@ -56,23 +83,30 @@ class_name EventResource
 @export var second_failure_choice_count: int = DataManager.REWARD_CHOICE_AMOUNT
 @export var second_failure_buff_amount: int = 1
 
-# === КОНКРЕТНЫЕ РЕСУРСЫ И ТИПЫ ВРАГОВ ===
-
-# Первое действие
-@export var first_success_enemy: DataManager.EnemyId = DataManager.EnemyId.MOLE_MUTANT
-@export var first_failure_enemy: DataManager.EnemyId = DataManager.EnemyId.MOLE_MUTANT
-@export var first_success_concrete_artifact_id: DataManager.ArtifactId = DataManager.ArtifactId.STRANGE_MUSHROOM
-@export var first_success_concrete_card_id: DataManager.CardId = DataManager.CardId.ATONEMENT_STRIKE
-@export var first_failure_concrete_artifact_id: DataManager.ArtifactId = DataManager.ArtifactId.STRANGE_MUSHROOM
-@export var first_failure_concrete_card_id: DataManager.CardId = DataManager.CardId.ATONEMENT_STRIKE
-
-# Второе действие
+# Конкретные ресурсы (второе действие)
 @export var second_success_enemy: DataManager.EnemyId = DataManager.EnemyId.MOLE_MUTANT
 @export var second_failure_enemy: DataManager.EnemyId = DataManager.EnemyId.MOLE_MUTANT
 @export var second_success_concrete_artifact_id: DataManager.ArtifactId = DataManager.ArtifactId.STRANGE_MUSHROOM
-@export var second_success_concrete_card_id: DataManager.CardId = DataManager.CardId.ATONEMENT_STRIKE
 @export var second_failure_concrete_artifact_id: DataManager.ArtifactId = DataManager.ArtifactId.STRANGE_MUSHROOM
+@export var second_success_concrete_card_id: DataManager.CardId = DataManager.CardId.ATONEMENT_STRIKE
 @export var second_failure_concrete_card_id: DataManager.CardId = DataManager.CardId.ATONEMENT_STRIKE
+
+# Конкретный статус (второе действие)
+@export var second_success_concrete_status: DataManager.Status = DataManager.Status.WEAKNESS
+@export var second_success_concrete_status_stacks: int = 1
+@export var second_success_concrete_status_duration: int = 1
+@export var second_failure_concrete_status: DataManager.Status = DataManager.Status.WEAKNESS
+@export var second_failure_concrete_status_stacks: int = 1
+@export var second_failure_concrete_status_duration: int = 1
+
+# Максимальное здоровье (второе действие)
+@export var second_success_max_health_mod: int = 1
+@export var second_failure_max_health_mod: int = 1
+
+
+# ============================================================
+# МЕТОДЫ
+# ============================================================
 
 func get_localized_name() -> String:
 	return tr(name_key)
@@ -119,6 +153,10 @@ func get_action_params(action: DataManager.ActionType, success: bool) -> Diction
 		"enemy": DataManager.EnemyId.MOLE_MUTANT,
 		"concrete_artifact_id": DataManager.ArtifactId.STRANGE_MUSHROOM,
 		"concrete_card_id": DataManager.CardId.ATONEMENT_STRIKE,
+		"concrete_status": DataManager.Status.WEAKNESS,
+		"concrete_status_stacks": 1,
+		"concrete_status_duration": 1,
+		"max_health_mod": 1,
 	}
 	
 	params["gold_mod"] = get(prefix + "_" + outcome + "_gold_mod")
@@ -130,5 +168,9 @@ func get_action_params(action: DataManager.ActionType, success: bool) -> Diction
 	params["enemy"] = get(prefix + "_" + outcome + "_enemy")
 	params["concrete_artifact_id"] = get(prefix + "_" + outcome + "_concrete_artifact_id")
 	params["concrete_card_id"] = get(prefix + "_" + outcome + "_concrete_card_id")
+	params["concrete_status"] = get(prefix + "_" + outcome + "_concrete_status")
+	params["concrete_status_stacks"] = get(prefix + "_" + outcome + "_concrete_status_stacks")
+	params["concrete_status_duration"] = get(prefix + "_" + outcome + "_concrete_status_duration")
+	params["max_health_mod"] = get(prefix + "_" + outcome + "_max_health_mod")
 	
 	return params

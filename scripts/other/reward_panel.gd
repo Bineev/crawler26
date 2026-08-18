@@ -15,6 +15,11 @@ var concrete_artifact_id: DataManager.ArtifactId
 var concrete_card_id: DataManager.CardId
 var concrete_enemy: DataManager.EnemyId
 var shop_items: Array[Dictionary] = []
+## Для GET_CONCRETE_STATUS — статус и его параметры
+var concrete_status: DataManager.Status = DataManager.Status.POISON
+var concrete_status_stacks: int = 1
+var concrete_status_duration: int = 1
+var max_health_mod: int = 1  # множитель увеличения макс. здоровья
 
 @onready var dark_overlay: ColorRect = $DarkOverlay
 @onready var center_container: CenterContainer = $CenterContainer
@@ -106,6 +111,10 @@ func _create_current_reward():
 			_create_trade_reward()
 		DataManager.RewardType.GET_BATTLE, DataManager.RewardType.GET_CONCRETE_BATTLE:
 			_create_battle_reward(reward_type)
+		DataManager.RewardType.GET_CONCRETE_STATUS:
+			_create_concrete_status_reward()
+		DataManager.RewardType.GET_MAX_HEALTH:
+			_create_max_health_reward()
 		_:
 			pass
 
@@ -347,6 +356,29 @@ func _create_battle_reward(type: DataManager.RewardType = DataManager.RewardType
 	
 	queue_free()
 
+
+func _create_concrete_status_reward() -> void:
+	var content = preload("res://scenes/reward_content.tscn").instantiate() as RewardContent
+	center_container.add_child(content)
+	
+	# Передаём данные о статусе
+	content.concrete_status = concrete_status
+	content.concrete_status_stacks = concrete_status_stacks
+	content.concrete_status_duration = concrete_status_duration
+	
+	# Настройка контента для отображения
+	content.setup(DataManager.RewardType.GET_CONCRETE_STATUS, [])
+	SignalManager.reward_selected.connect(_on_reward_selected)
+
+
+func _create_max_health_reward() -> void:
+	var amount = DataManager.BASE_MAX_HEALTH_AMOUNT * max_health_mod  # базовое значение 10, умножаем на модификатор
+	
+	var content = preload("res://scenes/reward_content.tscn").instantiate() as RewardContent
+	center_container.add_child(content)
+	content.max_health_amount = amount
+	content.setup(DataManager.RewardType.GET_MAX_HEALTH, [amount])
+	SignalManager.reward_selected.connect(_on_reward_selected)
 
 
 func _on_reward_selected() -> void:
