@@ -93,6 +93,10 @@ func _get_action_text(action: DataManager.ActionType) -> String:
 			return tr("event_danger_behind_action_dialogue")
 		DataManager.ActionType.EVENT_DANGER_ATTACK:     # 🆕
 			return tr("event_danger_behind_action_attack")
+		DataManager.ActionType.EVENT_KROTINI_MOON:   # 🆕
+			return tr("event_leonardo_krotini_action_moon")
+		DataManager.ActionType.EVENT_KROTINI_OPAL:   # 🆕
+			return tr("event_leonardo_krotini_action_opal")
 		_:
 			return ""
 

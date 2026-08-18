@@ -65,6 +65,8 @@ enum ActionType {
 	EVENT_DIAMOND_WEDDING_HUSBAND,   # 🆕
 	EVENT_DANGER_DIALOGUE,   # 🆕
 	EVENT_DANGER_ATTACK,     # 🆕
+	EVENT_KROTINI_MOON,   # 🆕
+	EVENT_KROTINI_OPAL,   # 🆕
 }
 
 enum EnemyId {
@@ -603,6 +605,7 @@ enum EventType {
 	FLOWER,  # 🆕
 	DIAMOND_WEDDING,  # 🆕
 	DANGER_BEHIND,  # 🆕
+	LEONARDO_KROTINI,     # 5 🆕
 }
 
 ## Тип объекта
@@ -2500,6 +2503,7 @@ const EVENT_TEXTURES: Dictionary = {
 	DataManager.Biome.MOLE_TUNNELS: {
 		DataManager.EventType.MINER: preload("res://img/events/mole_tunnels/miner.png"),
 		DataManager.EventType.DANGER_BEHIND: preload("res://img/events/mole_tunnels/danger_behind.png"),  # 🆕
+		DataManager.EventType.LEONARDO_KROTINI: preload("res://img/events/mole_tunnels/leonardo_krotini.png"),  # 🆕
 	},
 	DataManager.Biome.ROTTEN_MARSHES: {  # 🆕
 		DataManager.EventType.UNDERGROUND_POOL: preload("res://img/events/rotten_marshes/underground_pool.png"),
@@ -2525,6 +2529,7 @@ func load_event_resources() -> void:
 	_event_resources[DataManager.Biome.MOLE_TUNNELS] = [
 		load("res://resources/events/mole_tunnels/miner.tres"),
 		load("res://resources/events/mole_tunnels/danger_behind.tres"),  # 🆕
+		load("res://resources/events/mole_tunnels/leonardo_krotini.tres"),  # 🆕
 		#load("res://resources/events/mole_tunnels/merchant.tres"),
 		# ... другие события
 	]

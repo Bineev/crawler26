@@ -662,3 +662,15 @@ upgrade_card_confirm,Upgrade
 
 "event_danger_behind_action_dialogue","Engage in dialogue"
 "event_danger_behind_action_attack","Destroy the danger"
+
+"event_leonardo_krotini_name","Leonardo Krotini"
+"event_leonardo_krotini_narrative","You find an abandoned alchemical laboratory. A mad rat with a monocle is in charge. He bustles about, constantly pouring from one vessel to another. \"I propose a wager, colleague?\" he addresses you, \"For this mixture, would Moon Eye or Cat's Opal be better?\""
+
+"event_leonardo_krotini_moon_success","\"Immaculate-r-r-ly cor-r-r-rect!\" the rat-alchemist bursts with joy. He hops around happily, stuffing useful and useless things into your pockets. \"Now begone! Don't disturb my work!\" he says and turns away decisively."
+"event_leonardo_krotini_moon_fail","The rat-alchemist immediately forgets about you and begins working at the table. He places a flask on the fire, pours powder from a jar, and runs out of the cave. A moment later, an explosion shatters half the flasks. You take a few surviving vessels with you."
+
+"event_leonardo_krotini_opal_success","\"I bet on Moon Eye!\" The rat-alchemist dashes around the lab with a flask, constantly adding, adjusting, and sprinkling. Finally, he places the vessel on the fire, but nothing happens. \"A bet is a bet,\" the rat notes philosophically, handing you a handful of coins."
+"event_leonardo_krotini_opal_fail","The rat-alchemist grins and begins his work. He grinds the stone, distills the solution, and brings it to temperature. The room fills with a pungent smell. \"Endur-r-re, colleague,\" he hands you a vessel of liquid, \"The exper-r-riments will be paid for.\""
+
+"event_leonardo_krotini_action_moon","Moon Eye"
+"event_leonardo_krotini_action_opal","Cat's Opal"
