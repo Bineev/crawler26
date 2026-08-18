@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="EventResource" load_steps=2 format=3 uid="uid://biwnsk3wo5twf"]
+
+[ext_resource type="Script" uid="uid://ew2p1pg1vq1x" path="res://resources/res_scripts/event_resource.gd" id="1_4ahlh"]
+
+[resource]
+script = ExtResource("1_4ahlh")
+event_type = 4
+name_key = "event_danger_behind_name"
+narrative_key = "event_danger_behind_narrative"
+first_action = 27
+first_action_success_key = "event_danger_behind_dialogue_success"
+first_action_failure_key = "event_danger_behind_dialogue_fail"
+first_action_success_rewards = Array[int]([19])
+first_action_failure_rewards = Array[int]([21])
+first_failure_enemy = 4
+first_success_concrete_artifact_id = 11
+second_action = 28
+second_action_success_key = "event_danger_behind_attack_success"
+second_action_failure_key = "event_danger_behind_attack_fail"
+second_action_success_rewards = Array[int]([2, 6])
+second_action_failure_rewards = Array[int]([23, 11])
+second_failure_gold_mod = 2
+second_failure_concrete_status = 1
+second_failure_concrete_status_duration = 3
+metadata/_custom_type_script = "uid://ew2p1pg1vq1x"

@@ -21,7 +21,7 @@ func setup(title: String, actions_array: Array[DataManager.ActionType], context:
 	result_timer = Timer.new()
 	add_child(result_timer)
 	result_timer.one_shot = true
-	result_timer.wait_time = 3.0
+	result_timer.wait_time = 5.0
 	
 	title_label.text = title
 	_animate_in()
@@ -81,6 +81,18 @@ func _get_action_text(action: DataManager.ActionType) -> String:
 			return tr("event_underground_pool_action_grab")
 		DataManager.ActionType.EVENT_UNDERGROUND_POOL_DISTRACT:  # 🆕
 			return tr("event_underground_pool_action_distract")
+		DataManager.ActionType.EVENT_FLOWER_WATER:  # 🆕
+			return tr("event_flower_action_water")
+		DataManager.ActionType.EVENT_FLOWER_CUT:    # 🆕
+			return tr("event_flower_action_cut")
+		DataManager.ActionType.EVENT_DIAMOND_WEDDING_WIFE:      # 🆕
+			return tr("event_diamond_wedding_action_wife")
+		DataManager.ActionType.EVENT_DIAMOND_WEDDING_HUSBAND:   # 🆕
+			return tr("event_diamond_wedding_action_husband")
+		DataManager.ActionType.EVENT_DANGER_DIALOGUE:   # 🆕
+			return tr("event_danger_behind_action_dialogue")
+		DataManager.ActionType.EVENT_DANGER_ATTACK:     # 🆕
+			return tr("event_danger_behind_action_attack")
 		_:
 			return ""
 

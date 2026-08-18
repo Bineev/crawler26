@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="EventResource" load_steps=2 format=3 uid="uid://dpnrwceei6gsd"]
+
+[ext_resource type="Script" uid="uid://ew2p1pg1vq1x" path="res://resources/res_scripts/event_resource.gd" id="1_y7w0h"]
+
+[resource]
+script = ExtResource("1_y7w0h")
+event_type = 3
+name_key = "event_diamond_wedding_name"
+narrative_key = "event_diamond_wedding_narrative"
+first_action = 25
+first_action_success_key = "event_diamond_wedding_wife_success"
+first_action_failure_key = "event_diamond_wedding_wife_fail"
+first_action_success_rewards = Array[int]([6, 6])
+first_action_failure_rewards = Array[int]([7, 4])
+first_failure_damage_mod = 2
+second_action = 26
+second_action_success_key = "event_diamond_wedding_husband_success"
+second_action_failure_key = "event_diamond_wedding_husband_fail"
+second_action_success_rewards = Array[int]([2, 11])
+second_action_failure_rewards = Array[int]([7, 11])
+second_success_gold_mod = 3
+second_failure_damage_mod = 2
+metadata/_custom_type_script = "uid://ew2p1pg1vq1x"

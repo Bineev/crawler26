@@ -61,6 +61,10 @@ enum ActionType {
 	EVENT_UNDERGROUND_POOL_DISTRACT, # 🆕
 	EVENT_FLOWER_WATER,   # 🆕
 	EVENT_FLOWER_CUT,     # 🆕
+	EVENT_DIAMOND_WEDDING_WIFE,      # 🆕
+	EVENT_DIAMOND_WEDDING_HUSBAND,   # 🆕
+	EVENT_DANGER_DIALOGUE,   # 🆕
+	EVENT_DANGER_ATTACK,     # 🆕
 }
 
 enum EnemyId {
@@ -597,6 +601,8 @@ enum EventType {
 	MINER,
 	UNDERGROUND_POOL,  # 🆕
 	FLOWER,  # 🆕
+	DIAMOND_WEDDING,  # 🆕
+	DANGER_BEHIND,  # 🆕
 }
 
 ## Тип объекта
@@ -2493,10 +2499,12 @@ func apply_button_style(button: Button, button_type: ButtonType = ButtonType.DEF
 const EVENT_TEXTURES: Dictionary = {
 	DataManager.Biome.MOLE_TUNNELS: {
 		DataManager.EventType.MINER: preload("res://img/events/mole_tunnels/miner.png"),
+		DataManager.EventType.DANGER_BEHIND: preload("res://img/events/mole_tunnels/danger_behind.png"),  # 🆕
 	},
 	DataManager.Biome.ROTTEN_MARSHES: {  # 🆕
 		DataManager.EventType.UNDERGROUND_POOL: preload("res://img/events/rotten_marshes/underground_pool.png"),
 		DataManager.EventType.FLOWER: preload("res://img/events/rotten_marshes/flower.png"),  # 🆕
+		DataManager.EventType.DIAMOND_WEDDING: preload("res://img/events/rotten_marshes/diamond_wedding.png"),  # 🆕
 	},
 }
 
@@ -2516,6 +2524,7 @@ func load_event_resources() -> void:
 	# Пока заглушка
 	_event_resources[DataManager.Biome.MOLE_TUNNELS] = [
 		load("res://resources/events/mole_tunnels/miner.tres"),
+		load("res://resources/events/mole_tunnels/danger_behind.tres"),  # 🆕
 		#load("res://resources/events/mole_tunnels/merchant.tres"),
 		# ... другие события
 	]
@@ -2523,6 +2532,8 @@ func load_event_resources() -> void:
 	_event_resources[DataManager.Biome.ROTTEN_MARSHES] = [
 		load("res://resources/events/rotten_marshes/underground_pool.tres"),
 		load("res://resources/events/rotten_marshes/flower.tres"),  # 🆕
+		load("res://resources/events/rotten_marshes/diamond_wedding.tres"),  # 🆕
+	
 	]
 	
 	_event_resources_loaded = true

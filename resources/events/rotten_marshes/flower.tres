@@ -14,6 +14,7 @@ first_action_success_rewards = Array[int]([23, 24])
 first_action_failure_rewards = Array[int]([7])
 first_success_concrete_status_duration = 2
 first_success_max_health_mod = 2
+second_action = 24
 second_action_success_key = "event_flower_cut_success"
 second_action_failure_key = "event_flower_cut_fail"
 second_action_success_rewards = Array[int]([6])

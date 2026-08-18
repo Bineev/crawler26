@@ -638,3 +638,27 @@ upgrade_card_confirm,Upgrade
 "reward_max_health_title","Max Health"
 "reward_max_health_label","+%d max health"
 "reward_take_max_health","Take"
+
+"event_diamond_wedding_name","Diamond Wedding"
+"event_diamond_wedding_narrative","You enter a cave turned into a dwelling. The swamp has long since claimed this place, and the former inhabitants have become swamp spirits. \"Look at yourself, you've turned into a wine barrel!\" the wife screeches. \"And you've turned into a toad!\" the husband replies. It's time to settle this eternal argument."
+
+"event_diamond_wedding_wife_success","You tell the husband that wine brings joy but drains strength. He looks at you bewildered, then at himself. \"Maybe I did have a bit too much,\" he says and reaches toward a shelf of vials. \"Take them, I won't be needing them anyway.\""
+"event_diamond_wedding_wife_fail","You tell the husband that righteousness is the only key to eternal life, and wine is a demon's weapon. \"Live with that witch,\" he nods at his wife, \"That's where the demon's weapon is!\" The wife shrieks angrily, sending things flying off the shelves. Something hits you in the forehead."
+
+"event_diamond_wedding_husband_success","You look at the shrewish woman who won't stop screeching. \"You've suffered enough in this world, sir. Rest in peace,\" you tell the husband. The man nods gratefully and dissolves. \"Where?!\" the wife shrieks and vanishes after him. Now nothing stands between you and searching the dwelling."
+"event_diamond_wedding_husband_fail","\"A good wife shouldn't behave like that,\" you tell the woman, \"At least repent on the other side.\" The woman turns her head and glares at you. \"And who do you think you are?!\" She grabs the first thing at hand and throws it at you. Luckily, it turns out to be a handful of coins."
+
+"event_diamond_wedding_action_wife","Wife is right"
+"event_diamond_wedding_action_husband","Husband is always right"
+
+"event_danger_behind_name","Danger Behind"
+"event_danger_behind_narrative","In the corner of the cave, you notice several rodents rummaging through a sack. The blight hasn't fully claimed them, but it has granted them intelligence. One of the rodents turns to you and hisses threateningly. \"Hush, K-r-r-rotus,\" says a larger rodent, \"A good person won't harm us.\""
+
+"event_danger_behind_dialogue_success","\"How many of you sentient ones are left?\" you ask. \"None at all, sir-r-r,\" the rodent replies, bowing its head, \"The pack devours its own children. The fewer mad ones, the better our br-r-rother's chances.\" It hands you an object."
+"event_danger_behind_dialogue_fail","\"I can't imagine how you manage to survive in this place,\" you say. \"Well, sir-r-r,\" the rodent chuckles, \"One has to make some comp-r-romises with one's conscience!\" A gigantic shadow looms over you."
+
+"event_danger_behind_attack_success","Krotus dives into a hole. Moments later, a war cry echoes from deep underground. The rodents snicker. You leap at the treacherous creatures, taking off several heads with a single blow, grab the sack of supplies, and vanish into the shadows."
+"event_danger_behind_attack_fail","You refuse to leave danger behind. Casting aside doubt, you draw your sword and leap into battle. The rodents are small but cunning. Before you finish off all the enemies, you receive numerous small bites. Luckily, the sack contains some loot."
+
+"event_danger_behind_action_dialogue","Engage in dialogue"
+"event_danger_behind_action_attack","Destroy the danger"
