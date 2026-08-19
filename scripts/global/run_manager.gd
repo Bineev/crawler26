@@ -31,8 +31,8 @@ var shame_atonement_multiplier: float = DataManager.SHAME_ATONEMENT_MULTIPLIER
 var frozen_energy_loss: int = DataManager.FROZEN_ENERGY_LOSS
 var infection_bleed_multiplier: int = DataManager.INFECTION_BLEED_MULTIPLIER
 # === Балансные константы ===
-var starting_hand_size: int = DataManager.STARTING_HAND_SIZE
-var cards_to_draw_per_turn: int = DataManager.CARDS_TO_DRAW_PER_TURN
+var starting_hand_size: int = DataManager.STARTING_HAND_SIZE + 5
+var cards_to_draw_per_turn: int = DataManager.CARDS_TO_DRAW_PER_TURN + 5
 var max_energy: int = DataManager.MAX_ENERGY
 
 # === Ресурсы ===
@@ -811,7 +811,7 @@ func reset_run_constants():
 	frozen_energy_loss = DataManager.FROZEN_ENERGY_LOSS
 	infection_bleed_multiplier = DataManager.INFECTION_BLEED_MULTIPLIER
 	# === Балансные константы ===
-	starting_hand_size = DataManager.STARTING_HAND_SIZE
+	starting_hand_size = DataManager.STARTING_HAND_SIZE + 10
 	cards_to_draw_per_turn = DataManager.CARDS_TO_DRAW_PER_TURN
 	max_energy = DataManager.MAX_ENERGY
 	

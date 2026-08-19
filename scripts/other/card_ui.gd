@@ -4,7 +4,7 @@ class_name CardUI
 
 #enum CardState { IDLE, HOVERED, SELECTED, AIMING, PLAYED, BURNED }
 var state: DataManager.CardState = DataManager.CardState.IDLE
-
+var is_animating: bool = false
 ## ============================================================
 ## ССЫЛКИ НА НОДЫ
 ## ============================================================
@@ -475,9 +475,10 @@ func confirm_target(target):
 ## АНИМАЦИИ
 ## ============================================================
 func _on_mouse_entered():
+	if is_animating:
+		return
 	if state == DataManager.CardState.IDLE:
 		state = DataManager.CardState.HOVERED
-		print('go hovered')
 		
 		SoundManager.play(null, DataManager.get_sound(DataManager.SoundType.CARD_HOVER))
 		
@@ -487,24 +488,58 @@ func _on_mouse_entered():
 		
 		var tween = create_tween()
 		tween.set_parallel(true)
+		
+		# Увеличение карты
 		tween.tween_property(self, "scale", Vector2(CARD_SCALE_HOVER, CARD_SCALE_HOVER), 0.1)
 		
-		var screen_center_x = get_viewport().get_visible_rect().size.x / 2
-		var card_center_x = global_position.x + (get_card_size().x / 2)
-		var offset_to_center = (screen_center_x - card_center_x) * DataManager.CARD_HOVER_CENTER_FORCE
-		tween.tween_property(self, "position", original_position + Vector2(offset_to_center, -DataManager.CARD_HOVER_RAISE), 0.1)
+		# Компенсация смещения влево
+		var scale_delta = CARD_SCALE_HOVER - 1.0
+		var card_width = get_card_size().x
+		var offset_x = -(card_width * scale_delta) / 2
 		
-		z_index = 10
+		# 🆕 Добавляем дополнительное смещение влево
+		offset_x += DataManager.CARD_HOVER_EXTRA_OFFSET
+		
+		tween.tween_property(self, "position", original_position + Vector2(offset_x, -DataManager.CARD_HOVER_RAISE), 0.1)
+		
+		z_index = 100
 		current_tween = tween
 		
 		if hand_ui_ref:
 			hand_ui_ref.try_set_hovered_card(self)
-
-
+#func _on_mouse_entered():
+	## 🆕 Если карта анимируется — игнорируем
+	#if is_animating:
+		#return
+	#if state == DataManager.CardState.IDLE:
+		#state = DataManager.CardState.HOVERED
+		#print('go hovered')
+		#
+		#SoundManager.play(null, DataManager.get_sound(DataManager.SoundType.CARD_HOVER))
+		#
+		#if current_tween:
+			#current_tween.kill()
+			#current_tween = null
+		#
+		#var tween = create_tween()
+		#tween.set_parallel(true)
+		#tween.tween_property(self, "scale", Vector2(CARD_SCALE_HOVER, CARD_SCALE_HOVER), 0.1)
+		#
+		#var screen_center_x = get_viewport().get_visible_rect().size.x / 2
+		#var card_center_x = global_position.x + (get_card_size().x / 2)
+		#var offset_to_center = (screen_center_x - card_center_x) * DataManager.CARD_HOVER_CENTER_FORCE
+		#tween.tween_property(self, "position", original_position + Vector2(offset_to_center, -DataManager.CARD_HOVER_RAISE), 0.1)
+		#
+		#z_index = 10
+		#current_tween = tween
+		#
+		#if hand_ui_ref:
+			#hand_ui_ref.try_set_hovered_card(self)
 func _on_mouse_exited():
+	if is_animating:
+		return
 	if state == DataManager.CardState.HOVERED:
 		state = DataManager.CardState.IDLE
-		print('go idle')
 		
 		if current_tween:
 			current_tween.kill()
@@ -514,11 +549,35 @@ func _on_mouse_exited():
 		tween.set_parallel(true)
 		tween.tween_property(self, "scale", original_scale, 0.1)
 		tween.tween_property(self, "position", original_position, 0.1)
-		tween.tween_callback(func(): z_index = original_z_index)
+		tween.tween_callback(func(): 
+			z_index = original_z_index
+		)
 		current_tween = tween
 		
 		if hand_ui_ref:
 			hand_ui_ref.clear_hovered_card(self)
+
+#func _on_mouse_exited():
+	## 🆕 Если карта анимируется — игнорируем
+	#if is_animating:
+		#return
+	#if state == DataManager.CardState.HOVERED:
+		#state = DataManager.CardState.IDLE
+		#print('go idle')
+		#
+		#if current_tween:
+			#current_tween.kill()
+			#current_tween = null
+		#
+		#var tween = create_tween()
+		#tween.set_parallel(true)
+		#tween.tween_property(self, "scale", original_scale, 0.1)
+		#tween.tween_property(self, "position", original_position, 0.1)
+		#tween.tween_callback(func(): z_index = original_z_index)
+		#current_tween = tween
+		#
+		#if hand_ui_ref:
+			#hand_ui_ref.clear_hovered_card(self)
 
 
 func _move_to_center():
@@ -769,13 +828,13 @@ func animate_to_center():
 
 
 func play_appear_animation(target_position: Vector2, delay: float = 0.0):
+	is_animating = true  # 🆕 Блокируем наведение
 	# Стартовая позиция: сбоку от экрана (справа)
 	var start_pos = Vector2(2200, target_position.y)
 	position = start_pos
 	scale = Vector2(0.7, 0.7)
 	modulate = Color(1, 1, 1, 1)
 
-	# Ставим карту поверх всех во время анимации
 	z_index = 100
 	z_as_relative = false
 	
@@ -785,7 +844,6 @@ func play_appear_animation(target_position: Vector2, delay: float = 0.0):
 	var tween = create_tween()
 	tween.set_parallel(true)
 	
-	# Летим к цели
 	tween.tween_property(self, "position", target_position, 0.25).set_ease(Tween.EASE_OUT)
 	tween.tween_property(self, "scale", Vector2(1, 1), 0.2).set_ease(Tween.EASE_OUT)
 	tween.tween_property(self, "position", target_position + Vector2(0, -8), 0.02).set_delay(0.23)
@@ -793,10 +851,13 @@ func play_appear_animation(target_position: Vector2, delay: float = 0.0):
 	
 	await tween.finished
 
-	# Возвращаем правильный z_index
 	z_index = original_z_index
 	z_as_relative = false
-
+	
+	# 🆕 Сохраняем целевую позицию как оригинальную
+	original_position = target_position
+	original_scale = Vector2(1, 1)
+	is_animating = false  # 🆕 Разрешаем наведение
 #func move_to_position(target_position: Vector2, delay: float = 0.0):
 	#if delay > 0:
 		#await get_tree().create_timer(delay).timeout
@@ -809,6 +870,7 @@ func play_appear_animation(target_position: Vector2, delay: float = 0.0):
 
 
 func move_to_position(target_position: Vector2, delay: float = 0.0):
+	is_animating = true  # 🆕 Блокируем наведение
 	if delay > 0:
 		await get_tree().create_timer(delay).timeout
 	
@@ -817,6 +879,7 @@ func move_to_position(target_position: Vector2, delay: float = 0.0):
 	
 	await tween.finished
 	original_position = target_position
+	is_animating = false  # 🆕 Разрешаем наведение
 
 
 func fly_away_left(delay: float = 0.0):

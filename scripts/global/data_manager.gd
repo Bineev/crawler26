@@ -652,7 +652,6 @@ const STARTING_HAND_SIZE: int = 5
 const CARDS_TO_DRAW_PER_TURN: int = 5
 const STARTING_ENERGY: int = 3
 const MAX_ENERGY: int = 3
-
 ## === Сломленный (Penitent) ===
 const PENITENT_STARTING_HEALTH: int = 200
 const PENITENT_MAX_ATONEMENT: int = 30
@@ -780,10 +779,27 @@ const CARD_SCALE_NORMAL: float = 1.0
 const CARD_SCALE_IN_HAND: float = 1
 const CARD_SCALE_HOVER: float = 1.2
 const CARD_HOVER_RAISE: int = 130  # высота подъёма при наведении
-const CARD_HOVER_CENTER_FORCE: float = 0.02 # сила притяжения к центру (0-1)
+const CARD_HOVER_CENTER_FORCE: float = 0 # сила притяжения к центру (0-1)
+#const CARD_HOVER_CENTER_FORCE: float = 0.02 # сила притяжения к центру (0-1)
 const CARD_HAND_WIDTH: int = int(CARD_BASE_WIDTH * CARD_SCALE_IN_HAND)
 const CARD_HAND_HEIGHT: int = int(CARD_BASE_HEIGHT * CARD_SCALE_IN_HAND)
+## Дополнительное смещение влево при наведении (в пикселях)
+const CARD_HOVER_EXTRA_OFFSET: int = -20
+## ============================================================
+## НАСТРОЙКИ РУКИ (HAND)
+## ============================================================
+
+## Базовый отступ между картами в руке (отрицательное значение = наложение)
 const CARD_SPACING_IN_HAND: int = -60
+
+## Базовая точка отсчёта для динамического сжатия (количество карт, с которого начинается сжатие)
+const CARD_SPACING_BASE_COUNT: int = 5
+
+## Множитель динамического сжатия (чем больше, тем сильнее сжимаются карты при увеличении их количества)
+const CARD_SPACING_COMPRESSION_FACTOR: float = 0.13
+
+## Минимальный отступ между картами (в процентах от ширины карты, 0.7 = 70%)
+const CARD_MIN_SPACING_RATIO: float = 0.7
 
 
 ## Настройки артефактов (временные значения для тестов)
