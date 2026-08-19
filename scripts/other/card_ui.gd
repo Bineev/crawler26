@@ -187,6 +187,28 @@ func fill_left_icons():
 
 
 func _collect_left_icons_from_effects(effects: Array[EffectEntry], items: Array[Dictionary]):
+	# 🆕 1. Сначала собираем ручные иконки
+	# Ручные статусы
+	for status_id in card_data.manual_status_icons:
+		var icon = DataManager.get_status_icon(status_id)
+		if icon:
+			items.append({
+				"texture": icon,
+				"is_status": true,
+				"id": status_id
+			})
+	
+	# Ручные пассивки
+	for passive_id in card_data.manual_passive_icons:
+		var icon = DataManager.get_passive_icon(passive_id)
+		if icon:
+			items.append({
+				"texture": icon,
+				"is_status": false,
+				"id": passive_id
+			})
+	
+	# 🆕 2. Затем парсим эффекты
 	for effect in effects:
 		match effect.category:
 			DataManager.EffectCategory.APPLY_STATUS:
@@ -212,7 +234,7 @@ func _collect_left_icons_from_effects(effects: Array[EffectEntry], items: Array[
 					_collect_left_icons_from_effects([effect.true_effect], items)
 				if effect.false_effect:
 					_collect_left_icons_from_effects([effect.false_effect], items)
-			DataManager.EffectCategory.BLOCK:  # 🆕
+			DataManager.EffectCategory.BLOCK:
 				var icon = DataManager.get_status_icon(DataManager.Status.SHIELD)
 				if icon:
 					items.append({

@@ -25,7 +25,7 @@ shader_parameter/card_roundness = 0.0
 shader_parameter/mouse_offset = Vector2(0, 0)
 
 [node name="BattleLog" type="PanelContainer"]
-custom_minimum_size = Vector2(350, 500)
+custom_minimum_size = Vector2(350, 350)
 offset_right = 40.0
 offset_bottom = 40.0
 script = ExtResource("1_kgo2m")

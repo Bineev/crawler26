@@ -673,3 +673,25 @@ upgrade_card_confirm,Upgrade
 
 "event_leonardo_krotini_action_moon","Moon Eye"
 "event_leonardo_krotini_action_opal","Cat's Opal"
+
+"intent_desc_attack","Enemy is going to attack"
+"intent_desc_defend","Enemy is going to defend"
+
+"intent_desc_heal_self","Enemy is going to heal itself"
+"intent_desc_heal_allies","Enemy is going to heal allies"
+"intent_desc_heal_enemy","Enemy is going to heal an enemy"
+"intent_desc_heal_unknown","Enemy is going to heal someone"
+
+"intent_desc_debuff_self","Enemy is going to debuff itself"
+"intent_desc_debuff_enemy","Enemy is going to debuff you"
+"intent_desc_debuff_all_enemies","Enemy is going to debuff all enemies"
+"intent_desc_debuff_all_allies","Enemy is going to debuff all allies"
+"intent_desc_debuff_any","Enemy is going to debuff everyone"
+
+"intent_desc_buff_self","Enemy is going to buff itself"
+"intent_desc_buff_enemy","Enemy is going to buff an enemy"
+"intent_desc_buff_all_enemies","Enemy is going to buff all enemies"
+"intent_desc_buff_all_allies","Enemy is going to buff all allies"
+"intent_desc_buff_any","Enemy is going to buff everyone"
+
+"intent_desc_unknown","Unknown intention"

@@ -219,7 +219,7 @@ func _create_battle_log():
 	var log_scene = preload("res://scenes/battle_log.tscn")
 	battle_log = log_scene.instantiate() as BattleLogUI
 	battle_log.position = Vector2(1520, 80)
-	battle_log.size = Vector2(350, 500)
+	battle_log.size = Vector2(350, 350)
 	battle_log.set_biome_style(current_biome)
 	game_world.add_child(battle_log)
 
@@ -301,7 +301,7 @@ func _create_player_portrait():
 func _create_energy_display():
 	var energy_scene = preload("res://scenes/energy_display.tscn")
 	energy_display = energy_scene.instantiate() as EnergyDisplay
-	energy_display.position = DataManager.END_BUTTON_POSITION + Vector2(10, +100)
+	energy_display.position = DataManager.END_BUTTON_POSITION + Vector2(10, 70)
 	game_world.add_child(energy_display)
 
 func get_player_portrait() -> PlayerPortrait:

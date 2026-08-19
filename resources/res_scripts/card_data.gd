@@ -55,6 +55,15 @@ class_name CardData
 @export var effects: Array[EffectEntry] = []
 
 ## ============================================================
+## РУЧНЫЕ ИКОНКИ (для кастомных эффектов)
+## ============================================================
+
+## Статусы, которые нужно отобразить на карте (ручное указание)
+@export var manual_status_icons: Array[DataManager.Status] = []
+
+## Пассивки, которые нужно отобразить на карте (ручное указание)
+@export var manual_passive_icons: Array[DataManager.Passive] = []
+## ============================================================
 ## ВИЗУАЛЬНЫЕ ПАРАМЕТРЫ
 ## ============================================================
 
@@ -246,7 +255,9 @@ func duplicate_for_instance() -> CardData:
 	copy.cost = cost
 	copy.overlay_type = overlay_type
 	copy.manual_card_types = manual_card_types.duplicate()
-	
+	# 🆕 Копируем ручные иконки
+	copy.manual_status_icons = manual_status_icons.duplicate()
+	copy.manual_passive_icons = manual_passive_icons.duplicate()
 	# 🆕 Добавляем новые поля
 	copy.upgrade_type = upgrade_type
 	copy.is_can_upgrade = is_can_upgrade

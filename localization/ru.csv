@@ -680,3 +680,25 @@ reward_lost_max_hp_title, "Примите потерю"
 
 "event_leonardo_krotini_action_moon","Лунный глаз"
 "event_leonardo_krotini_action_opal","Кошачий опал"
+
+"intent_desc_attack","Враг собирается атаковать"
+"intent_desc_defend","Враг собирается защищаться"
+
+"intent_desc_heal_self","Враг собирается вылечить себя"
+"intent_desc_heal_allies","Враг собирается вылечить союзников"
+"intent_desc_heal_enemy","Враг собирается вылечить врага"
+"intent_desc_heal_unknown","Враг собирается вылечить кого-то"
+
+"intent_desc_debuff_self","Враг собирается ослабить себя"
+"intent_desc_debuff_enemy","Враг собирается ослабить вас"
+"intent_desc_debuff_all_enemies","Враг собирается ослабить всех врагов"
+"intent_desc_debuff_all_allies","Враг собирается ослабить всех союзников"
+"intent_desc_debuff_any","Враг собирается ослабить всех"
+
+"intent_desc_buff_self","Враг собирается усилить себя"
+"intent_desc_buff_enemy","Враг собирается усилить врага"
+"intent_desc_buff_all_enemies","Враг собирается усилить всех врагов"
+"intent_desc_buff_all_allies","Враг собирается усилить всех союзников"
+"intent_desc_buff_any","Враг собирается усилить всех"
+
+"intent_desc_unknown","Неизвестное намерение"

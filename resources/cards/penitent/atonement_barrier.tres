@@ -11,4 +11,6 @@ name_key = "card_atonement_barrier_name"
 description_key = "card_atonement_barrier_desc"
 cost = 2
 effects = Array[ExtResource("1_bsmbx")]([ExtResource("3_4kxsk")])
+manual_status_icons = Array[int]([8])
+manual_card_types = Array[int]([2, 5])
 metadata/_custom_type_script = "uid://badcs22cck6n5"

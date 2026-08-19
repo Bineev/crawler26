@@ -472,3 +472,96 @@ func _get_blister_data() -> Dictionary:
 	# Получаем данные о текущем блистере (нужно передавать извне)
 	# Пока заглушка
 	return {"current_health": 0, "duration": 0}
+
+
+func request_intent_tooltip(effect: EffectEntry, position: Vector2):
+	var data = _build_intent_tooltip_data(effect)
+	SignalManager.tooltip_requested.emit(data, position)
+
+
+func _build_intent_tooltip_data(effect: EffectEntry) -> Dictionary:
+	return {
+		"icon": null,  # 🆕 без иконки
+		"title": "",   # 🆕 без заголовка
+		"description": _get_intent_description(effect),
+	}
+
+func _get_intent_title(effect: EffectEntry) -> String:
+	match effect.category:
+		DataManager.EffectCategory.DAMAGE:
+			return tr("intent_damage_title")
+		DataManager.EffectCategory.BLOCK:
+			return tr("intent_block_title")
+		DataManager.EffectCategory.HEAL:
+			return tr("intent_heal_title")
+		DataManager.EffectCategory.APPLY_STATUS:
+			return tr("intent_debuff_title")
+		DataManager.EffectCategory.APPLY_PASSIVE:
+			return tr("intent_buff_title")
+		_:
+			return tr("intent_unknown_title")
+
+
+func _get_intent_description(effect: EffectEntry) -> String:
+	match effect.category:
+		DataManager.EffectCategory.DAMAGE:
+			return tr("intent_desc_attack")
+		
+		DataManager.EffectCategory.BLOCK:
+			return tr("intent_desc_defend")
+		
+		DataManager.EffectCategory.HEAL:
+			match effect.target:
+				DataManager.EffectTarget.SELF:
+					return tr("intent_desc_heal_self")
+				DataManager.EffectTarget.ALL_ALLIES:
+					return tr("intent_desc_heal_allies")
+				DataManager.EffectTarget.ENEMY:
+					return tr("intent_desc_heal_enemy")
+				_:
+					return tr("intent_desc_heal_unknown")
+		
+		DataManager.EffectCategory.APPLY_STATUS:
+			var is_negative = effect.status and DataManager.is_negative_status(effect.status.id)
+			match effect.target:
+				DataManager.EffectTarget.SELF:
+					if is_negative:
+						return tr("intent_desc_debuff_self")
+					else:
+						return tr("intent_desc_buff_self")
+				DataManager.EffectTarget.ENEMY:
+					if is_negative:
+						return tr("intent_desc_debuff_enemy")
+					else:
+						return tr("intent_desc_buff_enemy")
+				DataManager.EffectTarget.ALL_ENEMIES:
+					if is_negative:
+						return tr("intent_desc_debuff_all_enemies")
+					else:
+						return tr("intent_desc_buff_all_enemies")
+				DataManager.EffectTarget.ALL_ALLIES:
+					if is_negative:
+						return tr("intent_desc_debuff_all_allies")
+					else:
+						return tr("intent_desc_buff_all_allies")
+				DataManager.EffectTarget.ANY:
+					if is_negative:
+						return tr("intent_desc_debuff_any")
+					else:
+						return tr("intent_desc_buff_any")
+				_:
+					return tr("intent_desc_unknown")
+		
+		DataManager.EffectCategory.APPLY_PASSIVE:
+			match effect.target:
+				DataManager.EffectTarget.SELF:
+					return tr("intent_desc_buff_self")
+				DataManager.EffectTarget.ALL_ALLIES:
+					return tr("intent_desc_buff_allies")
+				DataManager.EffectTarget.ENEMY:
+					return tr("intent_desc_buff_enemy")
+				_:
+					return tr("intent_desc_unknown")
+		
+		_:
+			return tr("intent_desc_unknown")

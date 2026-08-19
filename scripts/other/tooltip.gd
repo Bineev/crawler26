@@ -21,15 +21,24 @@ func setup(data: Dictionary) -> void:
 	footer.hide()
 	
 	await get_tree().process_frame
+	
+	# 🆕 Проверяем, есть ли заголовок или иконка
+	var has_header = false
+	
 	# Иконка
 	if data.has("icon") and data["icon"]:
 		icon.texture = data["icon"]
 		icon.visible = true
+		has_header = true
 	
 	# Заголовок
 	if data.has("title") and not data["title"].is_empty():
 		title.text = data["title"]
 		title.visible = true
+		has_header = true
+	
+	# 🆕 Скрываем header, если нет иконки и заголовка
+	header.visible = has_header
 	
 	# Описание
 	if data.has("description") and not data["description"].is_empty():

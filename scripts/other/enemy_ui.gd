@@ -69,7 +69,10 @@ func setup(enemy: EnemyInstance):
 	_setup_health_bar()  # ← добавить
 	update_display()
 	living_container.custom_minimum_size = enemy_instance.resource.get_size_pixels()
-	
+	# 🆕 Поднимаем z_index для UI элементов
+	status_container.z_index = 10
+	passive_container.z_index = 10
+	health_bar.z_index = 10
 	# Поднимаем врага выше дыма
 	#living_container.z_index = 10
 	#living_container.z_as_relative = false
@@ -292,71 +295,68 @@ func _create_intent_item(effect: EffectEntry) -> Control:
 	DataManager.apply_shader_overlay(icon, "res://shaders/card3_shader.gdshader")
 	
 	var value_label = Label.new()
-	value_label.add_theme_font_size_override("font_size", 20)
-	value_label.add_theme_font_override("font", DataManager.FONT_HEADERS)
-	value_label.add_theme_color_override("font_color", DataManager.COLOR_MOLE_TUNNELS_ART_BG_LIGHT)
+
+	# 🆕 Создаём LabelSettings с обводкой
+	var label_settings = LabelSettings.new()
+	label_settings.font = DataManager.FONT_HEADERS
+	label_settings.font_size = 20
+	label_settings.font_color = DataManager.COLOR_MOLE_TUNNELS_ART_BG_LIGHT
+	label_settings.outline_color = Color(0, 0, 0, 0.8)
+	label_settings.outline_size = 2
+
+	value_label.label_settings = label_settings
 	value_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	
-	# Формируем текст и иконку
-	var tooltip_text = ""
-	
+
 	match effect.category:
 		DataManager.EffectCategory.DAMAGE:
 			icon.texture = DataManager.get_intent_icon(DataManager.IntentType.ATTACK)
 			var base_damage = effect.base_value
-			var strength_bonus = enemy_instance.get_strength_bonus() if enemy_instance else 0
-			var final_damage = base_damage + strength_bonus
+			#var strength_bonus = enemy_instance.get_strength_bonus() if enemy_instance else 0
+			#var final_damage = base_damage + strength_bonus
+			var final_damage = base_damage
 			value_label.text = str(final_damage)
-			tooltip_text = "Враг собирается атаковать"
 		
 		DataManager.EffectCategory.BLOCK:
 			icon.texture = DataManager.get_intent_icon(DataManager.IntentType.DEFEND)
 			value_label.text = str(effect.base_value)
-			tooltip_text = "Враг собирается защищаться"
 		
 		DataManager.EffectCategory.HEAL:
 			icon.texture = DataManager.get_intent_icon(DataManager.IntentType.HEAL)
 			value_label.text = str(effect.base_value)
-			tooltip_text = "Враг собирается лечиться"
 		
 		DataManager.EffectCategory.APPLY_STATUS:
-			# Проверяем, на кого накладывается статус
-			if effect.target == DataManager.EffectTarget.SELF:
-				# На себя
+			# 🆕 Проверяем, на кого накладывается статус (себя или союзников)
+			if effect.target == DataManager.EffectTarget.SELF or effect.target == DataManager.EffectTarget.ALL_ALLIES:
 				if effect.status and DataManager.is_negative_status(effect.status.id):
-					# Негативный статус на себя — дебафф
+					# Негативный статус на себя/союзников — дебафф
 					icon.texture = DataManager.get_intent_icon(DataManager.IntentType.DEBUFF)
-					tooltip_text = "Враг собирается наложить дебафф на себя"
 				else:
-					# Позитивный статус на себя — бафф
+					# Позитивный статус на себя/союзников — бафф
 					icon.texture = DataManager.get_intent_icon(DataManager.IntentType.BUFF)
-					tooltip_text = "Враг собирается усилить себя"
 					if effect.status:
 						value_label.text = effect.status.get_localized_name()
 			else:
 				# На врага — всегда дебафф
 				icon.texture = DataManager.get_intent_icon(DataManager.IntentType.DEBUFF)
-				tooltip_text = "Враг собирается наложить дебафф"
 				if effect.status:
 					value_label.text = effect.status.get_localized_name()
 		
 		DataManager.EffectCategory.APPLY_PASSIVE:
 			if effect.target == DataManager.EffectTarget.SELF:
 				icon.texture = DataManager.get_intent_icon(DataManager.IntentType.BUFF)
-				tooltip_text = "Враг собирается усилить себя"
 				if effect.passive:
 					value_label.text = effect.passive.get_localized_name()
 			else:
 				icon.texture = DataManager.get_intent_icon(DataManager.IntentType.DEBUFF)
-				tooltip_text = "Враг собирается наложить дебафф"
 				if effect.passive:
 					value_label.text = effect.passive.get_localized_name()
 		
 		_:
 			icon.texture = DataManager.get_intent_icon(DataManager.IntentType.UNKNOWN)
-			tooltip_text = "Неизвестное намерение"
 	
-	container.tooltip_text = tooltip_text
+	# 🆕 Добавляем обработчики для кастомного тултипа
+	container.mouse_entered.connect(_on_intent_mouse_entered.bind(effect, container))
+	container.mouse_exited.connect(_on_intent_mouse_exited)
 	
 	container.add_child(value_label)
 	container.add_child(icon)
@@ -827,7 +827,7 @@ func _setup_health_bar():
 	# Текст
 	health_label.add_theme_color_override("font_color", DataManager.COLOR_MOLE_TUNNELS_ART_BG_LIGHT)
 	health_label.add_theme_font_override("font", DataManager.FONT_MAIN)
-	health_label.add_theme_font_size_override("font_size", 14)
+	health_label.add_theme_font_size_override("font_size", 18)
 	health_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	health_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	
@@ -859,7 +859,7 @@ func _setup_health_bar():
 	back_health_heal_fill.border_color = DataManager.COLOR_MOLE_TUNNELS_ART_BG_LIGHT
 	
 	# Высота бара
-	health_bar.custom_minimum_size = Vector2(0, 24)
+	health_bar.custom_minimum_size = Vector2(0, 32)
 
 
 func play_appear_animation() -> void:
@@ -1231,3 +1231,11 @@ func set_animation_state(state: DataManager.EnemyAnimationState):
 		enemy_sprite.texture = sprite
 		enemy_sprite_copy.texture = sprite
 		highlight_sprite.texture = sprite
+
+
+func _on_intent_mouse_entered(effect: EffectEntry, container: Control):
+	var pos = container.get_global_mouse_position()
+	TooltipManager.request_intent_tooltip(effect, pos)
+
+func _on_intent_mouse_exited():
+	SignalManager.hide_tooltip.emit()

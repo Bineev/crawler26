@@ -880,10 +880,10 @@ const FROZEN_ENERGY_LOSS: int = 2
 const MAX_HAND_SIZE: int = 5
 
 
-const COINS_SCREEN_POSITION: Vector2 = Vector2(1520, 600)
-const KEYS_SCREEN_POSITION: Vector2 = Vector2(1620, 600)
-const BONES_SCREEN_POSITION: Vector2 = Vector2(1720, 600)
-const POTION_CONTAINER_POSITION: Vector2 = Vector2(1520, 700)
+const COINS_SCREEN_POSITION: Vector2 = Vector2(1520, 450)
+const KEYS_SCREEN_POSITION: Vector2 = Vector2(1620, 450)
+const BONES_SCREEN_POSITION: Vector2 = Vector2(1720, 450)
+const POTION_CONTAINER_POSITION: Vector2 = Vector2(1520, 550)
 
 const MIN_BONES_FOR_IDOL: int = 5
 const IDOL_DAMAGE: int = 3
@@ -967,7 +967,7 @@ const ROOM_HEIGHT: int = 800
 const ROOM_CENTER_X: int = ROOM_WIDTH / 2  # 512
 const ROOM_CENTER_Y: int = ROOM_HEIGHT / 2  # 400
 const ROOM_POSITION: Vector2 = Vector2(448, 0)
-const END_BUTTON_POSITION: Vector2 = Vector2(1600, 860)
+const END_BUTTON_POSITION: Vector2 = Vector2(1600, 680)
 ## ============================================================
 ## РАЗМЕРЫ ВРАГОВ
 ## ============================================================
