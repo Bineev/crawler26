@@ -70,9 +70,9 @@ func setup(enemy: EnemyInstance):
 	update_display()
 	living_container.custom_minimum_size = enemy_instance.resource.get_size_pixels()
 	# 🆕 Поднимаем z_index для UI элементов
-	status_container.z_index = 10
-	passive_container.z_index = 10
-	health_bar.z_index = 10
+	#status_container.z_index += 10
+	#passive_container.z_index += 10
+	#health_bar.z_index += 10
 	# Поднимаем врага выше дыма
 	#living_container.z_index = 10
 	#living_container.z_as_relative = false

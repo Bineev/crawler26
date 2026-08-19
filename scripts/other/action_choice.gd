@@ -14,6 +14,7 @@ var result_label: Label = null
 @onready var buttons_container: HBoxContainer = $DarkOverlay/CenterContainer/VBoxContainer/ButtonsContainer
 
 func setup(title: String, actions_array: Array[DataManager.ActionType], context: Node = null, data: Dictionary = {}) -> void:
+	scale *= DataManager.SCALE_FACTOR
 	actions = actions_array
 	action_data = data
 	context_object = context
@@ -225,9 +226,9 @@ func _handle_search() -> void:
 
 func _animate_in() -> void:
 	dark_overlay.color.a = 0.0
-	var in_amount: float = 0.8
+	var in_amount: float = 0.5
 	if room_object:
-		in_amount = 0.8
+		in_amount = 0.5
 	var tween = create_tween()
 	await tween.tween_property(dark_overlay, "color:a", in_amount, 1)
 

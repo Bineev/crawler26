@@ -230,7 +230,7 @@ func _on_show_paths(paths: Array):
 	var choice_panel = preload("res://scenes/choice_panel.tscn").instantiate() as ChoicePanel
 	choice_panel.setup(paths)
 	game_world.add_child(choice_panel)
-	choice_panel.position = DataManager.ROOM_POSITION + Vector2(0, 300)
+	choice_panel.position = DataManager.ROOM_POSITION + Vector2(0, 300) * DataManager.SCALE_FACTOR
 
 func _on_choice_panel_selected(path_index: int):
 	FloorManager.select_path(path_index)
@@ -329,7 +329,7 @@ func add_action_choice(action_choice: Control, title: String, actions: Array[Dat
 	canvas_layer.layer = 300
 	game_world.add_child(canvas_layer)
 	canvas_layer.add_child(action_choice)
-	action_choice.global_position = DataManager.ROOM_POSITION
+	action_choice.global_position = DataManager.ROOM_POSITION * DataManager.SCALE_FACTOR
 	action_choice.setup(title, actions)
 
 func _create_gold_display() -> void:

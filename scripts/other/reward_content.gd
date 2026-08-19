@@ -41,6 +41,8 @@ var item_tweens: Dictionary = {}  # key: Control (vbox), value: { "tween": Tween
 @onready var rewards_container: HBoxContainer = $HBoxContainer
 
 func setup(type: DataManager.RewardType, items: Array) -> void:
+	scale *= DataManager.SCALE_FACTOR
+
 	reward_type = type
 	rewards = items
 	selected_index = -1

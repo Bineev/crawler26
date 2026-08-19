@@ -27,6 +27,9 @@ var max_health_mod: int = 1  # множитель увеличения макс.
 
 func _ready():
 	# Начальное состояние: AfterDarkOverlay полностью прозрачный
+	scale *= DataManager.SCALE_FACTOR
+	#dark_overlay.custom_minimum_size *= DataManager.SCALE_FACTOR
+	#after_dark_overlay.custom_minimum_size *= DataManager.SCALE_FACTOR
 	after_dark_overlay.color.a = 0.0
 	await _animate_in()
 	show_rewards()

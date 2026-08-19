@@ -5,6 +5,7 @@ class_name ChoicePanel
 var options: Array[Array] = []
 
 func setup(paths: Array[Array]):
+	scale *= DataManager.SCALE_FACTOR
 	options = paths
 	var buttons_container = $VBoxContainer/ButtonsContainer
 	var title = $VBoxContainer/Title
