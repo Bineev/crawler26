@@ -4,11 +4,18 @@
 [ext_resource type="Material" uid="uid://dhsk786qi07v2" path="res://shaders/slash_enemy_mat.tres" id="2_nd71p"]
 [ext_resource type="Script" uid="uid://dbu228uyi8gs" path="res://scripts/other/sub_viewport_container.gd" id="4_7ddre"]
 
-[node name="TestScene" type="Node2D"]
+[node name="TestScene" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 script = ExtResource("1_g7g4h")
 
 [node name="ColorRect" type="ColorRect" parent="."]
 custom_minimum_size = Vector2(5000, 5000)
+layout_mode = 0
 offset_left = -1690.0
 offset_top = -1191.0
 offset_right = 3310.0
@@ -18,9 +25,14 @@ color = Color(0, 0, 0, 1)
 
 [node name="SubViewportContainer" type="SubViewportContainer" parent="."]
 material = ExtResource("2_nd71p")
-offset_right = 1920.0
-offset_bottom = 1080.0
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 focus_mode = 0
+stretch = true
 script = ExtResource("4_7ddre")
 enemy_hit_duration = 0.3
 

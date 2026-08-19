@@ -5,6 +5,7 @@ class_name BoneDisplay
 @onready var bone_icon: TextureRect = $BoneIcon
 
 func _ready():
+	scale *= DataManager.SCALE_FACTOR
 	bone_icon.texture = DataManager.get_currency_icon(DataManager.CurrencyType.BONE)
 	bone_icon.custom_minimum_size = Vector2(32, 32)
 	bone_icon.expand_mode = TextureRect.EXPAND_FIT_WIDTH_PROPORTIONAL

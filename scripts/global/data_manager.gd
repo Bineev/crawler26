@@ -1,6 +1,16 @@
 # data_manager.gd
 extends Node
 
+func get_scale_factor() -> float:
+	var base_size = Vector2(1920, 1080)  # или из Project Settings
+	var viewport_size = DisplayServer.screen_get_size()
+	var scale_factor
+	scale_factor = viewport_size.y / base_size.y
+	if base_size.y == viewport_size.y:
+		scale_factor = 1
+	return scale_factor
+	
+var SCALE_FACTOR = get_scale_factor()
 ## ============================================================
 ## 1. ОСНОВНЫЕ ПЕРЕЧИСЛЕНИЯ (ENUMS)
 ## ============================================================card

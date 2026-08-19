@@ -5,6 +5,7 @@ class_name KeyDisplay
 @onready var key_icon: TextureRect = $KeyIcon
 
 func _ready():
+	scale *= DataManager.SCALE_FACTOR
 	# TODO: установить иконку ключа
 	key_icon.texture = preload("res://img/icons/currency/keys1.png")
 	key_icon.custom_minimum_size = Vector2(32, 32)

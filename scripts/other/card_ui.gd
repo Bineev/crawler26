@@ -872,7 +872,6 @@ func play_appear_animation(target_position: Vector2, delay: float = 0.0):
 	tween.tween_property(self, "position", target_position, 0.02).set_delay(0.25)
 	
 	await tween.finished
-
 	z_index = original_z_index
 	z_as_relative = false
 	
@@ -880,6 +879,7 @@ func play_appear_animation(target_position: Vector2, delay: float = 0.0):
 	original_position = target_position
 	original_scale = Vector2(1, 1)
 	is_animating = false  # 🆕 Разрешаем наведение
+
 #func move_to_position(target_position: Vector2, delay: float = 0.0):
 	#if delay > 0:
 		#await get_tree().create_timer(delay).timeout
@@ -901,7 +901,7 @@ func move_to_position(target_position: Vector2, delay: float = 0.0):
 	
 	await tween.finished
 	original_position = target_position
-	is_animating = false  # 🆕 Разрешаем наведение
+	is_animating = false  # 🆕 Разрешаем наведениеOR
 
 
 func fly_away_left(delay: float = 0.0):

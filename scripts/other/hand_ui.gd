@@ -21,7 +21,7 @@ func _ready():
 	if not cards_container:
 		print("ERROR: CardsContainer not found!")
 	is_manual_layout = true
-	
+	cards_container.scale *= DataManager.SCALE_FACTOR
 	SignalManager.target_selection_requested.connect(_on_target_selection_requested)
 	SignalManager.target_selected.connect(_on_target_selected)
 	SignalManager.target_selection_cancelled.connect(_on_target_selection_cancelled)
@@ -97,15 +97,19 @@ func _calculate_card_positions() -> Array[Vector2]:
 	
 	var positions: Array[Vector2] = []
 	
+	var scale_factor = DataManager.SCALE_FACTOR
+	
+	# 🆕 Все размеры в базовой системе координат (1920×1080)
+	var base_size = Vector2(1920, 1080)
+	
 	var card_width = DataManager.CARD_BASE_WIDTH * DataManager.CARD_SCALE_IN_HAND
 	var card_height = DataManager.CARD_BASE_HEIGHT * DataManager.CARD_SCALE_IN_HAND
-	var screen_size = get_viewport().get_visible_rect().size
 	
 	var spacing = _calculate_card_spacing(card_count)
 	
 	var total_width = card_width * card_count + spacing * (card_count - 1)
-	var start_x = (screen_size.x - total_width) / 2
-	var base_y = screen_size.y - card_height - DataManager.CARD_HAND_Y_OFFSET
+	var start_x = (base_size.x - total_width) / 2
+	var base_y = base_size.y - card_height - DataManager.CARD_HAND_Y_OFFSET
 	var arc_height = 40.0
 	
 	for i in range(card_count):
@@ -130,15 +134,17 @@ func layout_cards():
 	if card_count == 0:
 		return
 	
+	# 🆕 Используем базовое разрешение
+	var base_size = Vector2(1920, 1080)
+	
 	var card_width = DataManager.CARD_BASE_WIDTH * DataManager.CARD_SCALE_IN_HAND
 	var card_height = DataManager.CARD_BASE_HEIGHT * DataManager.CARD_SCALE_IN_HAND
-	var screen_size = get_viewport().get_visible_rect().size
 	
 	var spacing = _calculate_card_spacing(card_count)
 	
 	var total_width = card_width * card_count + spacing * (card_count - 1)
-	var start_x = (screen_size.x - total_width) / 2
-	var base_y = screen_size.y - card_height - DataManager.CARD_HAND_Y_OFFSET
+	var start_x = (base_size.x - total_width) / 2
+	var base_y = base_size.y - card_height - DataManager.CARD_HAND_Y_OFFSET
 	var arc_height = 40.0
 	
 	for i in range(card_count):

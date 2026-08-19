@@ -71,7 +71,7 @@ func _ready() -> void:
 
 func setup(stats: CharacterStats):
 	player_stats = stats
-	
+	scale *= DataManager.SCALE_FACTOR
 	_setup_bars()
 	
 	SignalManager.health_changed.connect(_on_health_changed)

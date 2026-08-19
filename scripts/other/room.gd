@@ -15,6 +15,7 @@ var current_floor: int = 1
 var current_biome: DataManager.Biome = DataManager.Biome.MOLE_TUNNELS
 
 func _ready():
+	scale *= DataManager.SCALE_FACTOR
 	background = $Background
 	content = $Content
 	dark_overlay = $DarkOverlay

@@ -3,6 +3,7 @@ extends Label
 class_name EnergyDisplay
 
 func _ready():
+	scale *= DataManager.SCALE_FACTOR
 	_setup_style()
 	
 	SignalManager.energy_changed.connect(_on_energy_changed)

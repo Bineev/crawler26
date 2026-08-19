@@ -5,6 +5,7 @@ class_name GoldDisplay
 @onready var coins_icon: TextureRect = $CoinsIcon
 
 func _ready():
+	scale *= DataManager.SCALE_FACTOR
 	coins_icon.texture = DataManager.get_currency_icon(DataManager.CurrencyType.COIN)
 	coins_icon.custom_minimum_size = Vector2(32, 32)
 	coins_icon.expand_mode = TextureRect.EXPAND_FIT_WIDTH_PROPORTIONAL

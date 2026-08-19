@@ -5,6 +5,7 @@ class_name EndTurnButton
 var is_ending_turn: bool = false
 
 func _ready():
+	scale *= DataManager.SCALE_FACTOR
 	text = tr("end_turn_button_label")
 	DataManager.apply_button_style(self, DataManager.ButtonType.PRIMARY)
 	

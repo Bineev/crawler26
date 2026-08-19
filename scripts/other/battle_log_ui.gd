@@ -10,6 +10,7 @@ var max_log_entries: int = 50
 
 
 func _ready():
+	scale *= DataManager.SCALE_FACTOR
 	margin_container = $MarginContainer
 	if margin_container:
 		var vbox = margin_container.get_node("VBoxContainer")
