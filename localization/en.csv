@@ -341,7 +341,7 @@ upgrade_card_confirm,Upgrade
 "status_frozen_desc","Frozen. Skips turn. Takes 50%% less damage."
 "status_gangrene_desc","Deals all damage at once on the last turn."
 
-"status_poison_dynamic_desc","Deals %d damage at turn start. Duration: %d turns."
+"status_poison_dynamic_desc","Deals %d damage. Duration: %d turns. Healing reduced by %.0f%%."
 "status_bleed_dynamic_desc","Deals %d × %d at turn start. Duration: %d turns."
 "status_burn_dynamic_desc","Deals %d × %d at turn start. Duration: %d turns. Explodes at %d stacks."
 "status_cold_dynamic_desc","Reduces direct damage by %.1f%%. Stacks: %d. Duration: %d turns. Freezes at %d stacks."
@@ -369,9 +369,9 @@ upgrade_card_confirm,Upgrade
 "passive_modifier_damage_dealt","+%.0f%% damage dealt"
 "passive_modifier_damage_taken","+%.0f%% damage taken"
 "passive_modifier_atonement","+%.0f%% Atonement gained"
-"passive_charges_turn_based","Charges: %d (turns)"
-"passive_charges_usage_based","Charges: %d (uses)"
-"passive_charges_conditional","Charges: %d (conditional)"
+"passive_charges_turn_based","Duration: %d turns"
+"passive_charges_usage_based","Charges: %d"
+"passive_charges_conditional","Charges: %d"
 "passive_effect_apply_gangrene","Applies gangrene with %d stacks for %d turns"
 
 "target_self","to self"
@@ -608,6 +608,12 @@ upgrade_card_confirm,Upgrade
 "artifact_insatiable_blade_desc","%d attacks in a single turn restore %d health"
 "artifact_insatiable_blade_lore","An ancient blade with an eye on the crossguard. It hungers for blood and rewards those who feed it."
 
+"reward_max_health_title","Max Health"
+"reward_max_health_label","+%d max health"
+"reward_take_max_health","Take"
+"reward_concrete_status_label","%s"
+"reward_concrete_status_title","Get effect"
+
 "event_underground_pool_name","Underground Pool"
 "event_underground_pool_narrative","You approach an underground pool. On the surface of the lilac-tinted water, dense vine-like plants grow. Moving closer, you notice a plump purse at the water's edge. The plants sway slightly in the shadows, resembling tentacles of an unknown underwater creature."
 
@@ -619,9 +625,6 @@ upgrade_card_confirm,Upgrade
 
 "event_underground_pool_action_grab","Grab the purse and run"
 "event_underground_pool_action_distract","Distract the tentacles"
-
-"reward_concrete_status_label","%s"
-"reward_concrete_status_title","Get effect"
 
 "event_flower_name","Flower"
 "event_flower_narrative","You walk through the twilight, wading through miasmatic muck, when you notice a thin ray of light ahead. A flower of wondrous beauty holds its last defense against the darkness. It is dying, but the swamp cannot yet reach it."
@@ -635,27 +638,23 @@ upgrade_card_confirm,Upgrade
 "event_flower_action_water","Water the flower"
 "event_flower_action_cut","Cut the bud"
 
-"reward_max_health_title","Max Health"
-"reward_max_health_label","+%d max health"
-"reward_take_max_health","Take"
-
 "event_diamond_wedding_name","Diamond Wedding"
-"event_diamond_wedding_narrative","You enter a cave turned into a dwelling. The swamp has long since claimed this place, and the former inhabitants have become swamp spirits. \"Look at yourself, you've turned into a wine barrel!\" the wife screeches. \"And you've turned into a toad!\" the husband replies. It's time to settle this eternal argument."
+"event_diamond_wedding_narrative","You enter a cave turned into a dwelling. The swamp has long since claimed this place, and the former inhabitants have become swamp spirits. 'Look at yourself, you've turned into a wine barrel!' the wife screeches. 'And you've turned into a toad!' the husband replies. It's time to settle this eternal argument."
 
-"event_diamond_wedding_wife_success","You tell the husband that wine brings joy but drains strength. He looks at you bewildered, then at himself. \"Maybe I did have a bit too much,\" he says and reaches toward a shelf of vials. \"Take them, I won't be needing them anyway.\""
-"event_diamond_wedding_wife_fail","You tell the husband that righteousness is the only key to eternal life, and wine is a demon's weapon. \"Live with that witch,\" he nods at his wife, \"That's where the demon's weapon is!\" The wife shrieks angrily, sending things flying off the shelves. Something hits you in the forehead."
+"event_diamond_wedding_wife_success","You tell the husband that wine brings joy but drains strength. He looks at you bewildered, then at himself. 'Maybe I did have a bit too much,' he says and reaches toward a shelf of vials. 'Take them, I won't be needing them anyway.'"
+"event_diamond_wedding_wife_fail","You tell the husband that righteousness is the only key to eternal life, and wine is a demon's weapon. 'Live with that witch,' he nods at his wife, 'That's where the demon's weapon is!' The wife shrieks angrily, sending things flying off the shelves. Something hits you in the forehead."
 
-"event_diamond_wedding_husband_success","You look at the shrewish woman who won't stop screeching. \"You've suffered enough in this world, sir. Rest in peace,\" you tell the husband. The man nods gratefully and dissolves. \"Where?!\" the wife shrieks and vanishes after him. Now nothing stands between you and searching the dwelling."
-"event_diamond_wedding_husband_fail","\"A good wife shouldn't behave like that,\" you tell the woman, \"At least repent on the other side.\" The woman turns her head and glares at you. \"And who do you think you are?!\" She grabs the first thing at hand and throws it at you. Luckily, it turns out to be a handful of coins."
+"event_diamond_wedding_husband_success","You look at the shrewish woman who won't stop screeching. 'You've suffered enough in this world, sir. Rest in peace,' you tell the husband. The man nods gratefully and dissolves. 'Where?!' the wife shrieks and vanishes after him. Now nothing stands between you and searching the dwelling."
+"event_diamond_wedding_husband_fail","'A good wife shouldn't behave like that,' you tell the woman, 'At least repent on the other side.' The woman turns her head and glares at you. 'And who do you think you are?!' She grabs the first thing at hand and throws it at you. Luckily, it turns out to be a handful of coins."
 
 "event_diamond_wedding_action_wife","Wife is right"
 "event_diamond_wedding_action_husband","Husband is always right"
 
 "event_danger_behind_name","Danger Behind"
-"event_danger_behind_narrative","In the corner of the cave, you notice several rodents rummaging through a sack. The blight hasn't fully claimed them, but it has granted them intelligence. One of the rodents turns to you and hisses threateningly. \"Hush, K-r-r-rotus,\" says a larger rodent, \"A good person won't harm us.\""
+"event_danger_behind_narrative","In the corner of the cave, you notice several rodents rummaging through a sack. The blight hasn't fully claimed them, but it has granted them intelligence. One of the rodents turns to you and hisses threateningly. 'Hush, K-r-r-rotus,' says a larger rodent, 'A good person won't harm us.'"
 
-"event_danger_behind_dialogue_success","\"How many of you sentient ones are left?\" you ask. \"None at all, sir-r-r,\" the rodent replies, bowing its head, \"The pack devours its own children. The fewer mad ones, the better our br-r-rother's chances.\" It hands you an object."
-"event_danger_behind_dialogue_fail","\"I can't imagine how you manage to survive in this place,\" you say. \"Well, sir-r-r,\" the rodent chuckles, \"One has to make some comp-r-romises with one's conscience!\" A gigantic shadow looms over you."
+"event_danger_behind_dialogue_success","'How many of you sentient ones are left?' you ask. 'None at all, sir-r-r,' the rodent replies, bowing its head, 'The pack devours its own children. The fewer mad ones, the better our br-r-rother's chances.' It hands you an object."
+"event_danger_behind_dialogue_fail","'I can't imagine how you manage to survive in this place,' you say. 'Well, sir-r-r,' the rodent chuckles, 'One has to make some comp-r-romises with one's conscience!' A gigantic shadow looms over you."
 
 "event_danger_behind_attack_success","Krotus dives into a hole. Moments later, a war cry echoes from deep underground. The rodents snicker. You leap at the treacherous creatures, taking off several heads with a single blow, grab the sack of supplies, and vanish into the shadows."
 "event_danger_behind_attack_fail","You refuse to leave danger behind. Casting aside doubt, you draw your sword and leap into battle. The rodents are small but cunning. Before you finish off all the enemies, you receive numerous small bites. Luckily, the sack contains some loot."
@@ -664,13 +663,13 @@ upgrade_card_confirm,Upgrade
 "event_danger_behind_action_attack","Destroy the danger"
 
 "event_leonardo_krotini_name","Leonardo Krotini"
-"event_leonardo_krotini_narrative","You find an abandoned alchemical laboratory. A mad rat with a monocle is in charge. He bustles about, constantly pouring from one vessel to another. \"I propose a wager, colleague?\" he addresses you, \"For this mixture, would Moon Eye or Cat's Opal be better?\""
+"event_leonardo_krotini_narrative","You find an abandoned alchemical laboratory. A mad rat with a monocle is in charge. He bustles about, constantly pouring from one vessel to another. 'I propose a wager, colleague?' he addresses you, 'For this mixture, would Moon Eye or Cat's Opal be better?'"
 
-"event_leonardo_krotini_moon_success","\"Immaculate-r-r-ly cor-r-r-rect!\" the rat-alchemist bursts with joy. He hops around happily, stuffing useful and useless things into your pockets. \"Now begone! Don't disturb my work!\" he says and turns away decisively."
+"event_leonardo_krotini_moon_success","'Immaculate-r-r-ly cor-r-r-rect!' the rat-alchemist bursts with joy. He hops around happily, stuffing useful and useless things into your pockets. 'Now begone! Don't disturb my work!' he says and turns away decisively."
 "event_leonardo_krotini_moon_fail","The rat-alchemist immediately forgets about you and begins working at the table. He places a flask on the fire, pours powder from a jar, and runs out of the cave. A moment later, an explosion shatters half the flasks. You take a few surviving vessels with you."
 
-"event_leonardo_krotini_opal_success","\"I bet on Moon Eye!\" The rat-alchemist dashes around the lab with a flask, constantly adding, adjusting, and sprinkling. Finally, he places the vessel on the fire, but nothing happens. \"A bet is a bet,\" the rat notes philosophically, handing you a handful of coins."
-"event_leonardo_krotini_opal_fail","The rat-alchemist grins and begins his work. He grinds the stone, distills the solution, and brings it to temperature. The room fills with a pungent smell. \"Endur-r-re, colleague,\" he hands you a vessel of liquid, \"The exper-r-riments will be paid for.\""
+"event_leonardo_krotini_opal_success","'I bet on Moon Eye!' The rat-alchemist dashes around the lab with a flask, constantly adding, adjusting, and sprinkling. Finally, he places the vessel on the fire, but nothing happens. 'A bet is a bet,' the rat notes philosophically, handing you a handful of coins."
+"event_leonardo_krotini_opal_fail","The rat-alchemist grins and begins his work. He grinds the stone, distills the solution, and brings it to temperature. The room fills with a pungent smell. 'Endur-r-re, colleague,' he hands you a vessel of liquid, 'The exper-r-riments will be paid for.'"
 
 "event_leonardo_krotini_action_moon","Moon Eye"
 "event_leonardo_krotini_action_opal","Cat's Opal"

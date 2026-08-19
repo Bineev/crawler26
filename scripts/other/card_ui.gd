@@ -897,7 +897,6 @@ func fly_away_left(delay: float = 0.0):
 	await tween.finished
 	queue_free()
 
-
 func set_highlight(enabled: bool):
 	if is_highlighted == enabled:
 		return
@@ -905,20 +904,36 @@ func set_highlight(enabled: bool):
 	is_highlighted = enabled
 	
 	if enabled:
-		# Сохраняем оригинальную позицию
-		#original_position = position
+		# 🆕 Ждём завершения текущего твина подъёма
+		if current_tween and current_tween.is_running():
+			await current_tween.finished
 		
-		# Применяем шейдер подсветки
 		_apply_highlight_shader(true)
-		
-		# Запускаем раскачивание
 		_start_bobbing()
 	else:
-		# Останавливаем раскачивание
 		_stop_bobbing()
-		
-		# Убираем шейдер
 		_apply_highlight_shader(false)
+#func set_highlight(enabled: bool):
+	#if is_highlighted == enabled:
+		#return
+	#
+	#is_highlighted = enabled
+	#
+	#if enabled:
+		## Сохраняем оригинальную позицию
+		##original_position = position
+		#
+		## Применяем шейдер подсветки
+		#_apply_highlight_shader(true)
+		#
+		## Запускаем раскачивание
+		#_start_bobbing()
+	#else:
+		## Останавливаем раскачивание
+		#_stop_bobbing()
+		#
+		## Убираем шейдер
+		#_apply_highlight_shader(false)
 
 
 func _start_bobbing():

@@ -25,10 +25,12 @@ func apply(effect: EffectEntry, source, targets: Array, card_info: Dictionary = 
 		printerr("Denial passive not found!")
 		return
 	
-	# Применяем Denial с количеством зарядов = количество врагов
+	# 🆕 Создаём копию и меняем starting_charges
 	var denial_instance = denial_resource.duplicate_for_instance()
-	denial_instance.init_instance()
-	denial_instance.current_charges = alive_count
+	denial_instance.starting_charges = alive_count  # ← меняем starting_charges
+	denial_instance.init_instance()  # ← теперь current_charges = alive_count
+	
+	source.apply_passive(denial_instance)
 	
 	source.apply_passive(denial_instance)
 	

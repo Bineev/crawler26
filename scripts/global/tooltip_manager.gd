@@ -136,7 +136,8 @@ func _get_dynamic_status_description(status_id: DataManager.Status, stacks: int,
 	match status_id:
 		DataManager.Status.POISON:
 			var damage = stacks * RunManager.poison_damage_per_stack
-			return tr("status_poison_dynamic_desc") % [damage, duration]
+			var healing_reduction = RunManager.poison_healing_reduction * 100
+			return tr("status_poison_dynamic_desc") % [damage, duration, healing_reduction]
 		DataManager.Status.BLEED:
 			var damage_per_stack = RunManager.bleed_damage_per_stack
 			return tr("status_bleed_dynamic_desc") % [damage_per_stack, stacks, duration]
@@ -186,27 +187,43 @@ func request_dynamic_passive_tooltip(passive_data: Dictionary, position: Vector2
 	var data = _build_dynamic_passive_tooltip_data(passive_data)
 	SignalManager.tooltip_requested.emit(data, position)
 
+
 func _build_dynamic_passive_tooltip_data(passive_data: Dictionary) -> Dictionary:
 	var passive = passive_data["passive"]
 	
-	# 🆕 Статическое описание (из ресурса)
+	# Статическое описание (из ресурса)
 	var static_desc = passive.get_localized_description()
 	
-	# 🆕 Динамическое описание (триггеры, эффекты, модификаторы)
-	var dynamic_desc = _get_dynamic_passive_description(passive)
+	# 🆕 Динамическая информация о зарядах/длительности
 	var charges_info = _get_passive_charges_info(passive)
-	# 🆕 Если есть заряды — добавляем их в additional_info
-	var additional = dynamic_desc
-	if not charges_info.is_empty():
-		if not additional.is_empty():
-			additional += "\n"
-		additional += charges_info
+	
 	return {
 		"icon": passive_data["icon"],
 		"title": passive_data["name"],
-		"description": static_desc,  # статическое описание
-		"additional_info": additional,  # динамическое описание (триггеры, эффекты)
+		"description": static_desc,
+		"additional_info": charges_info,  # только информация о зарядах
 	}
+#func _build_dynamic_passive_tooltip_data(passive_data: Dictionary) -> Dictionary:
+	#var passive = passive_data["passive"]
+	#
+	## 🆕 Статическое описание (из ресурса)
+	#var static_desc = passive.get_localized_description()
+	#
+	## 🆕 Динамическое описание (триггеры, эффекты, модификаторы)
+	#var dynamic_desc = _get_dynamic_passive_description(passive)
+	#var charges_info = _get_passive_charges_info(passive)
+	## 🆕 Если есть заряды — добавляем их в additional_info
+	#var additional = dynamic_desc
+	#if not charges_info.is_empty():
+		#if not additional.is_empty():
+			#additional += "\n"
+		#additional += charges_info
+	#return {
+		#"icon": passive_data["icon"],
+		#"title": passive_data["name"],
+		#"description": static_desc,  # статическое описание
+		#"additional_info": additional,  # динамическое описание (триггеры, эффекты)
+	#}
 
 func _get_dynamic_passive_description(passive: PassiveResource) -> String:
 	var parts: Array[String] = []
@@ -281,6 +298,7 @@ func _modifier_to_description(mod: ModifierEntry) -> String:
 		_:
 			return ""
 
+
 func _get_passive_charges_info(passive: PassiveResource) -> String:
 	if not passive.has_charges():
 		return ""
@@ -294,7 +312,20 @@ func _get_passive_charges_info(passive: PassiveResource) -> String:
 			return tr("passive_charges_conditional") % passive.current_charges
 		_:
 			return ""
-	return ""
+#func _get_passive_charges_info(passive: PassiveResource) -> String:
+	#if not passive.has_charges():
+		#return ""
+	#
+	#match passive.charge_type:
+		#DataManager.PassiveChargeType.TURN_BASED:
+			#return tr("passive_charges_turn_based") % passive.current_charges
+		#DataManager.PassiveChargeType.USAGE_BASED:
+			#return tr("passive_charges_usage_based") % passive.current_charges
+		#DataManager.PassiveChargeType.CONDITIONAL:
+			#return tr("passive_charges_conditional") % passive.current_charges
+		#_:
+			#return ""
+	#return ""
 
 
 func _get_effect_value(effect: EffectEntry) -> int:
