@@ -1,6 +1,24 @@
 # autoload/progress_manager.gd
 extends Node
 
+## ============================================================
+## БИОМЫ (доступные для выбора)
+## ============================================================
+
+## Все доступные биомы в игре
+var all_biomes: Array[DataManager.Biome] = [
+	DataManager.Biome.MOLE_TUNNELS,
+	DataManager.Biome.ROTTEN_MARSHES,
+	# DataManager.Biome.FLESH_CAVES,  # позже
+	# DataManager.Biome.BONE_LABYRINTH,  # позже
+]
+
+## Текущие доступные биомы для выбора (копия, будет изменяться)
+var available_biomes: Array[DataManager.Biome] = []
+
+## Выбранный биом (для текущего забега)
+var selected_biome: DataManager.Biome = DataManager.Biome.MOLE_TUNNELS
+
 ## Открытые классы персонажей
 var unlocked_classes: Array[DataManager.CharacterClass] = []
 
@@ -23,6 +41,40 @@ var total_defeats: int = 0
 
 func _ready():
 	_init_default_progress()
+	reset_available_biomes()
+
+
+func reset_available_biomes():
+	available_biomes = all_biomes.duplicate()
+
+
+func get_random_biomes(count: int = 2) -> Array[DataManager.Biome]:
+	var pool = available_biomes.duplicate()
+	pool.shuffle()
+	
+	var result: Array[DataManager.Biome] = []
+	for i in range(min(count, pool.size())):
+		result.append(pool[i])
+	
+	return result
+
+
+func select_biome(biome: DataManager.Biome) -> bool:
+	if biome not in available_biomes:
+		return false
+	
+	available_biomes.erase(biome)
+	selected_biome = biome
+	return true
+
+
+func is_biome_available(biome: DataManager.Biome) -> bool:
+	return biome in available_biomes
+
+
+func get_biome_count() -> int:
+	return available_biomes.size()
+
 
 func _init_default_progress():
 	# ============================================================

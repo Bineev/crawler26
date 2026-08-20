@@ -1228,7 +1228,7 @@ const OBJECT_TEXTURES: Dictionary = {
 	# 🆕 Гнилостные Топи
 	DataManager.Biome.ROTTEN_MARSHES: {
 		DataManager.ObjectType.CHEST: preload("res://img/objects/mole_tunnels/chest.png"),
-		DataManager.ObjectType.IDOL: preload("res://img/objects/mole_tunnels/idol.png"),
+		DataManager.ObjectType.IDOL: preload("res://img/objects/rotten_marshes/idol.png"),
 		DataManager.ObjectType.TRAP: preload("res://img/objects/mole_tunnels/trap.png"),
 		DataManager.ObjectType.CAULDRON: preload("res://img/objects/mole_tunnels/cauldron.png"),
 		DataManager.ObjectType.TORTURE_RACK: preload("res://img/objects/mole_tunnels/torture_rack.png"),
@@ -2674,3 +2674,35 @@ func get_glow_color_for_card(card: CardData) -> Color:
 		
 		_:
 			return COLOR_PENITENT_ART_BG_LIGHT
+
+
+func get_biome_name(biome: Biome) -> String:
+	match biome:
+		Biome.MOLE_TUNNELS:
+			return tr("biome_mole_tunnels_name")
+		Biome.ROTTEN_MARSHES:
+			return tr("biome_rotten_marshes_name")
+		Biome.FLESH_CAVES:
+			return tr("biome_flesh_caves_name")
+		Biome.BONE_LABYRINTH:
+			return tr("biome_bone_labyrinth_name")
+		_:
+			return "Unknown Biome"
+
+func get_biome_description(biome: Biome) -> String:
+	match biome:
+		Biome.MOLE_TUNNELS:
+			return tr("biome_mole_tunnels_desc")
+		Biome.ROTTEN_MARSHES:
+			return tr("biome_rotten_marshes_desc")
+		_:
+			return ""
+
+func get_biome_preview(biome: Biome) -> Texture2D:
+	match biome:
+		Biome.MOLE_TUNNELS:
+			return preload("res://img/ui/biome_previews/mole_tunnels_preview.png")
+		Biome.ROTTEN_MARSHES:
+			return preload("res://img/ui/biome_previews/rotten_marshes_preview.png")
+		_:
+			return null

@@ -37,6 +37,107 @@ var selected_character: DataManager.CharacterClass = DataManager.CharacterClass.
 ## ПУБЛИЧНЫЕ МЕТОДЫ
 ## ============================================================
 
+func prepare_game_initialization(world_node: Node) -> void:
+	game_world = world_node
+	DataManager.load_sounds()
+	TranslationServer.set_locale("ru")
+	
+	# Подписываемся на сигналы
+	SignalManager.hand_ui_created.connect(_on_hand_ui_created)
+	SignalManager.next_room.connect(_on_next_room)
+	SignalManager.show_paths.connect(_on_show_paths)
+	SignalManager.choice_panel_selected.connect(_on_choice_panel_selected)
+	SignalManager.battle_started.connect(_on_battle_started)
+	SignalManager.player_turn_started.connect(_on_player_turn_started)
+	SignalManager.enemy_turn_started.connect(_on_enemy_turn_started)
+	SignalManager.battle_victory.connect(_on_battle_ended)
+	SignalManager.battle_defeat.connect(_on_battle_ended)
+	SignalManager.show_reward.connect(_on_show_reward)
+	SignalManager.add_action_choice.connect(_on_add_action_choice)
+	SignalManager.tooltip_requested.connect(_on_tooltip_requested)
+	SignalManager.hide_tooltip.connect(_on_hide_tooltip)
+
+
+func create_character(character_class: DataManager.CharacterClass) -> void:
+	# Проверяем, открыт ли персонаж
+	if not ProgressManager.is_class_unlocked(character_class):
+		printerr("Character not unlocked: ", character_class, " - using PENITENT as fallback")
+		character_class = DataManager.CharacterClass.PENITENT
+	
+	selected_character = character_class
+	
+	# Создаём игрока
+	player = PenitentStats.new()
+	BattleManager.set_player(player)
+	print("Player created: ", player)
+	
+	RunManager.current_character = selected_character
+
+
+func initialize_new_run() -> void:
+	# Очищаем состояние
+	_reset_game_state()
+	
+	# Устанавливаем дефолтные значения
+	current_floor = 0
+	current_room_index = 0
+	
+	# Инициализируем забег
+	RunManager.initialize_run()
+	
+
+
+func start_new_biome() -> void:
+	print("=== START NEW BIOME ===")
+	
+	# Поднимаем этаж
+	current_floor += 1
+	
+	# Очищаем этаж
+	_reset_game_state()
+	
+	# 🆕 Сбрасываем FloorManager
+	FloorManager.reset()
+	
+	# Устанавливаем этаж для FloorManager
+	FloorManager.current_floor = current_floor
+	
+	# Загружаем данные намерений для биома
+	DataManager.load_biome_enemies(current_biome)
+	
+	# Запускаем музыку
+	SoundManager.start_gameplay_playlist()
+	
+	# Создаём UI элементы (если их нет)
+	if not blood_screen:
+		_create_blood_screen()
+	if not player_portrait:
+		_create_player_portrait()
+	if not gold_display:
+		_create_gold_display()
+	if not key_display:
+		_create_key_display()
+	if not bone_display:
+		_create_bone_display()
+	if not potion_container:
+		_create_potion_display()
+	
+	# Добавляем стартовое зелье
+	for potion in DataManager.get_random_potions(1):
+		RunManager.add_potion(potion)
+	
+	# Отключаем старые сигналы перед подключением
+	if FloorManager.room_selected.is_connected(_on_room_selected):
+		FloorManager.room_selected.disconnect(_on_room_selected)
+	if FloorManager.floor_completed.is_connected(_on_floor_completed):
+		FloorManager.floor_completed.disconnect(_on_floor_completed)
+	
+	FloorManager.room_selected.connect(_on_room_selected)
+	FloorManager.floor_completed.connect(_on_floor_completed)
+	
+	# Запускаем этаж
+	FloorManager.start_floor()
+
 func start_test(world_node: Node):
 	print("=== GAME TEST START ===")
 	DataManager.load_sounds()
@@ -52,7 +153,6 @@ func start_test(world_node: Node):
 	_reset_game_state()
 	current_room_index = 0
 	# 🆕 Устанавливаем биом
-	set_biome(DataManager.Biome.ROTTEN_MARSHES)  # или MOLE_TUNNELS
 	DataManager.load_biome_enemies(current_biome)
 	
 	# Создаём игрока
@@ -584,10 +684,14 @@ func _on_hide_tooltip():
 		current_tooltip = null
 
 
-## Устанавливает биом для всего забега
+# Устанавливает биом и обновляет все зависимости
 func set_biome(biome: DataManager.Biome) -> void:
 	current_biome = biome
 	RunManager.current_biome = biome
 	FloorManager.current_biome = biome
 	DataManager.load_biome_enemies(biome)
+	
+	# Удаляем биом из доступных в ProgressManager
+	ProgressManager.select_biome(biome)
+	
 	print("Biome set to: ", DataManager.Biome.keys()[biome])

@@ -695,3 +695,12 @@ upgrade_card_confirm,Upgrade
 "intent_desc_buff_any","Enemy is going to buff everyone"
 
 "intent_desc_unknown","Unknown intention"
+
+"biome_choice_title","Choose your path"
+"biome_choice_select","SET FORTH"
+
+"biome_mole_tunnels_name","Mole Tunnels"
+"biome_mole_tunnels_desc","The path leads into lightless mines where the air is thick with fungal rot. Packs of cunning beasts stalk the darkness, and the clang of picks still echoes from the depths."
+
+"biome_rotten_marshes_name","Rotten Marshes"
+"biome_rotten_marshes_desc","The path leads into a swamp where the mire itself has gained consciousness. The water does not reflect — it absorbs, and horrors of rotting flesh emerge from the fog."

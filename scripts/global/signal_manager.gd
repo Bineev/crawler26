@@ -161,3 +161,5 @@ signal something_get_debuff(target: CharacterStats)
 signal tooltip_requested(tooltip_data: Dictionary, position: Vector2)
 signal hide_tooltip()
 signal hide_room_object_title()
+
+signal start_biome()
