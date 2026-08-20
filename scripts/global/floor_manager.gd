@@ -272,37 +272,27 @@ func is_boss_room(room_index: int) -> bool:
 
 
 func process_next():
-	print("=== process_next ===")
-	print("current_path_progress: ", current_path_progress)
-	print("all_rooms size: ", all_rooms.size())
-	print("current_segment_index: ", current_segment_index)
-	print("all_paths size: ", all_paths.size())
-	
-	# 1. Увеличиваем прогресс пути
 	current_path_progress += 1
 	
-	# 2. Проверяем, есть ли комнаты в all_rooms
 	if current_path_progress < all_rooms.size():
-		# Есть следующая комната — загружаем
 		current_room_index = current_path_progress
 		_load_current_room()
 		return
 	
-	# 3. Комнаты в пути закончились — переходим к следующему сегменту
-	# current_segment_index уже указывает на следующий сегмент,
-	# потому что мы увеличили его при выборе пути
-	current_path_progress = all_rooms.size()  # сохраняем как есть
-	
-	# 4. Проверяем, есть ли следующий сегмент
 	if current_segment_index < all_paths.size():
-		# Есть развилка — показываем выбор
 		var available_paths = all_paths[current_segment_index]
 		SignalManager.show_paths.emit(available_paths)
 	else:
-		# Нет больше сегментов — босс
-		_start_boss_fight()
+		# 🆕 Если босс уже был — завершаем биом
+		if boss_generated:
+			_on_biome_completed()
+		else:
+			_start_boss_fight()
 
 
+func _on_biome_completed() -> void:
+	print("=== BIOME COMPLETED ===")
+	SignalManager.show_next_biome_choice.emit()
 
 #func _generate_all_segments() -> void:
 	#var rooms_per_path = DataManager.FLOOR_ROOMS_PER_PATH * DataManager.FLOOR_VISIBLE_ROOMS

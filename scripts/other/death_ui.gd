@@ -83,5 +83,5 @@ func _on_lobby_pressed():
 	queue_free()
 
 func _on_retry_pressed():
-	GameTestManager.restart_run()
+	SignalManager.restart_run_requested.emit()
 	queue_free()

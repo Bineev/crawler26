@@ -663,7 +663,7 @@ const CARDS_TO_DRAW_PER_TURN: int = 5
 const STARTING_ENERGY: int = 3
 const MAX_ENERGY: int = 3
 ## === Сломленный (Penitent) ===
-const PENITENT_STARTING_HEALTH: int = 200
+const PENITENT_STARTING_HEALTH: int = 1
 const PENITENT_MAX_ATONEMENT: int = 30
 const PENITENT_ATONEMENT_GAIN_PER_ATTACK: int = 5
 

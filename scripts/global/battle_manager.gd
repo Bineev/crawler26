@@ -71,7 +71,7 @@ func start_battle(player_stats: CharacterStats, enemy_instances: Array, battle_d
 	# НЕ вызываем update_hand повторно! Карты уже отрисованы в draw_initial_hand
 
 	# 🆕 Обрабатываем артефакты с триггером ON_START_FIGHT
-	RunManager.process_artifacts_on_start_fight()
+	#RunManager.process_artifacts_on_start_fight()
 
 	SignalManager.battle_started.emit()
 	# 🆕 Применяем отложенные статусы
@@ -132,7 +132,9 @@ func start_player_turn():
 	# Тик статусов игрока (только если не заморожен)
 	if player:
 		await player.process_start_of_turn()
-	
+
+	if turn_counter == 1:
+		RunManager.process_artifacts_on_start_fight()
 	# 🆕 Выбираем намерения только если это НЕ первый ход
 	if turn_counter > 1:
 		for enemy in enemies:

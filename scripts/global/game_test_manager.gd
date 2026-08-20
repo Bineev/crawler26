@@ -56,6 +56,19 @@ func prepare_game_initialization(world_node: Node) -> void:
 	SignalManager.add_action_choice.connect(_on_add_action_choice)
 	SignalManager.tooltip_requested.connect(_on_tooltip_requested)
 	SignalManager.hide_tooltip.connect(_on_hide_tooltip)
+	SignalManager.potion_added.connect(_on_potion_added)
+	SignalManager.potion_removed.connect(_on_potion_removed)
+	SignalManager.potion_used.connect(_on_potion_used)
+	SignalManager.potion_discarded.connect(_on_potion_discarded)
+	SignalManager.potion_deselect_all.connect(_on_potion_deselect_all)
+	# Отключаем старые сигналы перед подключением
+	if FloorManager.room_selected.is_connected(_on_room_selected):
+		FloorManager.room_selected.disconnect(_on_room_selected)
+	if FloorManager.floor_completed.is_connected(_on_floor_completed):
+		FloorManager.floor_completed.disconnect(_on_floor_completed)
+	
+	FloorManager.room_selected.connect(_on_room_selected)
+	FloorManager.floor_completed.connect(_on_floor_completed)
 
 
 func create_character(character_class: DataManager.CharacterClass) -> void:
@@ -76,6 +89,7 @@ func create_character(character_class: DataManager.CharacterClass) -> void:
 
 func initialize_new_run() -> void:
 	# Очищаем состояние
+	potion_icons.clear()
 	_reset_game_state()
 	
 	# Устанавливаем дефолтные значения
@@ -92,7 +106,7 @@ func start_new_biome() -> void:
 	
 	# Поднимаем этаж
 	current_floor += 1
-	
+	current_room_index = 0
 	# Очищаем этаж
 	_reset_game_state()
 	
@@ -125,15 +139,6 @@ func start_new_biome() -> void:
 	# Добавляем стартовое зелье
 	for potion in DataManager.get_random_potions(1):
 		RunManager.add_potion(potion)
-	
-	# Отключаем старые сигналы перед подключением
-	if FloorManager.room_selected.is_connected(_on_room_selected):
-		FloorManager.room_selected.disconnect(_on_room_selected)
-	if FloorManager.floor_completed.is_connected(_on_floor_completed):
-		FloorManager.floor_completed.disconnect(_on_floor_completed)
-	
-	FloorManager.room_selected.connect(_on_room_selected)
-	FloorManager.floor_completed.connect(_on_floor_completed)
 	
 	# Запускаем этаж
 	FloorManager.start_floor()
@@ -179,6 +184,7 @@ func start_test(world_node: Node):
 	SignalManager.add_action_choice.connect(_on_add_action_choice)
 	SignalManager.tooltip_requested.connect(_on_tooltip_requested)
 	SignalManager.hide_tooltip.connect(_on_hide_tooltip)
+
 	
 	# Сбрасываем менеджеры
 	FloorManager.reset()
@@ -476,12 +482,6 @@ func _create_potion_display() -> void:
 	potion_full_label.global_position = DataManager.POTION_CONTAINER_POSITION + Vector2(110, 90)
 	potion_full_label.visible = false
 	game_world.add_child(potion_full_label)
-	
-	SignalManager.potion_added.connect(_on_potion_added)
-	SignalManager.potion_removed.connect(_on_potion_removed)
-	SignalManager.potion_used.connect(_on_potion_used)
-	SignalManager.potion_discarded.connect(_on_potion_discarded)
-	SignalManager.potion_deselect_all.connect(_on_potion_deselect_all)
 	
 	for potion in RunManager.get_potions():
 		_add_potion_icon(potion)

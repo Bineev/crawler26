@@ -163,3 +163,6 @@ signal hide_tooltip()
 signal hide_room_object_title()
 
 signal start_biome()
+signal show_next_biome_choice()
+
+signal restart_run_requested()

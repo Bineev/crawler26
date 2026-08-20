@@ -18,6 +18,10 @@ func _ready():
 	SignalManager.player_took_damage.connect(play_slash_effect)
 	SignalManager.enemy_get_attack.connect(play_enemy_get_hit_effect)
 	SignalManager.something_get_debuff.connect(play_get_debuff_effect)
+	# 🆕 Подписываемся на сигнал перезапуска
+	SignalManager.restart_run_requested.connect(_on_restart_run_requested)
+	# 🆕 Подписываемся на сигнал завершения биома
+	SignalManager.show_next_biome_choice.connect(_on_show_next_biome_choice)
 	
 	# Инициализируем игру
 	GameTestManager.prepare_game_initialization($SubViewportContainer/SubViewport/GameWorld)
@@ -99,3 +103,39 @@ func is_16_9() -> bool:
 	var aspect = float(screen_size.x) / float(screen_size.y)
 	# 16:9 = 1.777...
 	return abs(aspect - 16.0 / 9.0) < 0.01
+
+
+func _on_restart_run_requested():
+	# 🆕 Сбрасываем доступные биомы
+	ProgressManager.reset_available_biomes()
+	# Очищаем GameWorld
+	var game_world = $SubViewportContainer/SubViewport/GameWorld
+	for child in game_world.get_children():
+		child.queue_free()
+	BattleManager.reset_battle()
+	RunManager.reset_run()
+	
+	# Очищаем UI в GameTestManager
+	GameTestManager.clear_ui()
+	
+	# Создаём персонажа заново
+	GameTestManager.create_character(DataManager.CharacterClass.PENITENT)
+	
+	# Инициализируем новый забег
+	GameTestManager.initialize_new_run()
+	
+	# Показываем выбор биома
+	_load_biomes_choice()
+
+
+func _on_show_next_biome_choice():
+	# Очищаем GameWorld
+	var game_world = $SubViewportContainer/SubViewport/GameWorld
+	for child in game_world.get_children():
+		child.queue_free()
+	BattleManager.reset_battle()
+	# Очищаем UI
+	GameTestManager.clear_ui()
+	
+	# Показываем выбор следующего биома
+	_load_biomes_choice()
