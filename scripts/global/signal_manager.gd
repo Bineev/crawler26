@@ -166,3 +166,10 @@ signal start_biome()
 signal show_next_biome_choice()
 
 signal restart_run_requested()
+## ============================================================
+## ГЛАВНОЕ МЕНЮ
+## ============================================================
+
+signal start_game_requested()
+signal settings_requested()
+signal exit_requested()

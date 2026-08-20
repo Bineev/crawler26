@@ -11,6 +11,7 @@ var biome_buttons: Array[Control] = []
 
 
 func _ready():
+	scale *= DataManager.SCALE_FACTOR
 	_setup_ui()
 
 

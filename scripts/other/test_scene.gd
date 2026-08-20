@@ -22,14 +22,39 @@ func _ready():
 	SignalManager.restart_run_requested.connect(_on_restart_run_requested)
 	# 🆕 Подписываемся на сигнал завершения биома
 	SignalManager.show_next_biome_choice.connect(_on_show_next_biome_choice)
+	# 🆕 Подписываемся на сигнал запуска игры из главного меню
+	SignalManager.start_game_requested.connect(_on_start_game_requested)
 	
 	# Инициализируем игру
 	GameTestManager.prepare_game_initialization($SubViewportContainer/SubViewport/GameWorld)
+	show_main_menu()
+
+
+func _on_start_game_requested():
+	start_new_run()
+
+func show_main_menu():
+	# Очищаем GameWorld
+	var game_world = $SubViewportContainer/SubViewport/GameWorld
+	for child in game_world.get_children():
+		child.queue_free()
 	
+	# Очищаем UI
+	GameTestManager.clear_ui()
+	
+	# Загружаем сцену главного меню
+	var menu_scene = load("res://scenes/main_menu.tscn")
+	var menu_instance = menu_scene.instantiate()
+	game_world.add_child(menu_instance)
+
+
+func start_new_run():
 	# Создаём персонажа
 	GameTestManager.create_character(DataManager.CharacterClass.PENITENT)
+	
 	# Инициализируем новый забег
 	GameTestManager.initialize_new_run()
+	
 	# Загружаем сцену выбора биома
 	_load_biomes_choice()
 
