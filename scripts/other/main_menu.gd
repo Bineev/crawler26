@@ -6,6 +6,11 @@ class_name MainMenu
 @onready var title_label: Label = $CenterContainer/VBoxContainer/Title
 @onready var texture_rect: TextureRect = $CenterContainer/VBoxContainer/TextureRect
 @onready var buttons_container: VBoxContainer = $CenterContainer/VBoxContainer/ButtonsContainer
+@onready var language_container: VBoxContainer = $CenterContainer/VBoxContainer/LanguageContainer
+@onready var language_label: Label = $CenterContainer/VBoxContainer/LanguageContainer/LanguageLabel
+@onready var language_option: OptionButton = $CenterContainer/VBoxContainer/LanguageContainer/LanguageOption
+
+var is_enter_animation_finished: bool = false
 
 func _ready():
 	scale *= DataManager.SCALE_FACTOR
@@ -39,15 +44,37 @@ func _setup_ui():
 	buttons_container.add_child(start_button)
 	buttons_container.add_child(settings_button)
 	buttons_container.add_child(exit_button)
+	# Настройка языка
+	language_label.text = tr("main_menu_language")
+	language_label.add_theme_font_override("font", DataManager.FONT_HEADERS)
+	language_label.add_theme_font_size_override("font_size", 20)
+	language_label.add_theme_color_override("font_color", DataManager.COLOR_MOLE_TUNNELS_ART_BG_LIGHT)
+	language_label.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	
+	language_option.add_item("English")
+	language_option.add_item("Русский")
+	language_option.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	
+	# Устанавливаем текущий язык
+	var current_locale = TranslationServer.get_locale()
+	match current_locale:
+		"en":
+			language_option.selected = 0
+		"ru":
+			language_option.selected = 1
+		_:
+			language_option.selected = 0
 	# Подписываемся на нажатия
 	start_button.pressed.connect(_on_start_pressed)
 	settings_button.pressed.connect(_on_settings_pressed)
 	exit_button.pressed.connect(_on_exit_pressed)
+	language_option.item_selected.connect(_on_language_changed)
 	# Кнопки изначально отключены (пока анимация)
 	for button in buttons_container.get_children():
 		if button is Button:
 			button.disabled = true
+	# 🆕 Также отключаем выбор языка
+	language_option.disabled = true
 
 
 func _play_enter_animation():
@@ -55,7 +82,7 @@ func _play_enter_animation():
 	# Название и кнопки скрыты
 	title_label.modulate = Color(1, 1, 1, 0)
 	buttons_container.modulate = Color(1, 1, 1, 0)
-	
+	language_container.modulate = Color(1, 1, 1, 0)  # 🆕 скрываем выбор языка
 	# Отключаем кнопки пока идёт анимация
 	for button in buttons_container.get_children():
 		if button is Button:
@@ -89,19 +116,43 @@ func _play_enter_animation():
 	tween.tween_callback(_show_buttons)
 	
 	await tween.finished
-
+	is_enter_animation_finished = true
 
 func _show_buttons():
 	# Кнопки появляются мгновенно
 	buttons_container.modulate = Color(1, 1, 1, 1)
-	
+	language_container.modulate = Color(1, 1, 1, 1)  # 🆕 показываем выбор языка
 	for button in buttons_container.get_children():
 		if button is Button:
 			button.disabled = false
-
+	# 🆕 Включаем выбор языка
+	language_option.disabled = false
 
 func _connect_signals():
 	pass
+	
+	
+func _on_language_changed(index: int):
+	match index:
+		0:
+			TranslationServer.set_locale("en")
+		1:
+			TranslationServer.set_locale("ru")
+	
+	# Обновляем все тексты в меню
+	title_label.text = tr("main_menu_title")
+	language_label.text = tr("main_menu_language")
+	
+	# Обновляем кнопки
+	for child in buttons_container.get_children():
+		if child is Button:
+			match child.text:
+				"В путь", "Set forth":
+					child.text = tr("main_menu_start")
+				"Настройки", "Settings":
+					child.text = tr("main_menu_settings")
+				"Выход", "Exit":
+					child.text = tr("main_menu_exit")
 
 
 func _on_start_pressed():
@@ -109,6 +160,8 @@ func _on_start_pressed():
 	#queue_free()
 
 func _on_settings_pressed():
+	if not is_enter_animation_finished:
+		return
 	SignalManager.settings_requested.emit()
 
 func _on_exit_pressed():

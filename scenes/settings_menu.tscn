@@ -1,0 +1,79 @@
+[gd_scene load_steps=3 format=3 uid="uid://lj5hnuhq6hcs"]
+
+[ext_resource type="Script" uid="uid://c78cki3ar8br6" path="res://scripts/other/settings_menu.gd" id="1_05p07"]
+[ext_resource type="Material" uid="uid://3tj6g0pa2j2k" path="res://shaders/room2.tres" id="2_cr101"]
+
+[node name="SettingsMenu" type="Control"]
+custom_minimum_size = Vector2(1920, 1080)
+layout_mode = 3
+anchors_preset = 0
+offset_right = 1920.0
+offset_bottom = 1080.0
+script = ExtResource("1_05p07")
+
+[node name="CenterContainer" type="CenterContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Panel" type="Panel" parent="CenterContainer"]
+layout_mode = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="CenterContainer/Panel"]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer/Panel/MarginContainer"]
+layout_mode = 2
+alignment = 1
+
+[node name="Title" type="Label" parent="CenterContainer/Panel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="BackButton" type="Button" parent="CenterContainer/Panel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="MusicContainer" type="VBoxContainer" parent="CenterContainer/Panel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="MusicLabel" type="Label" parent="CenterContainer/Panel/MarginContainer/VBoxContainer/MusicContainer"]
+layout_mode = 2
+
+[node name="MusicSlider" type="HSlider" parent="CenterContainer/Panel/MarginContainer/VBoxContainer/MusicContainer"]
+layout_mode = 2
+
+[node name="SFXContainer" type="VBoxContainer" parent="CenterContainer/Panel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="SFXLabel" type="Label" parent="CenterContainer/Panel/MarginContainer/VBoxContainer/SFXContainer"]
+layout_mode = 2
+
+[node name="SFXSlider" type="HSlider" parent="CenterContainer/Panel/MarginContainer/VBoxContainer/SFXContainer"]
+layout_mode = 2
+
+[node name="MenuButton" type="Button" parent="CenterContainer/Panel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="LanguageContainer" type="VBoxContainer" parent="CenterContainer/Panel/MarginContainer/VBoxContainer"]
+visible = false
+layout_mode = 2
+
+[node name="LanguageLabel" type="Label" parent="CenterContainer/Panel/MarginContainer/VBoxContainer/LanguageContainer"]
+layout_mode = 2
+
+[node name="LanguageOption" type="OptionButton" parent="CenterContainer/Panel/MarginContainer/VBoxContainer/LanguageContainer"]
+layout_mode = 2
+
+[node name="ColorRect" type="ColorRect" parent="CenterContainer/Panel"]
+material = ExtResource("2_cr101")
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2

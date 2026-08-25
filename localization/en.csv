@@ -709,3 +709,10 @@ upgrade_card_confirm,Upgrade
 "main_menu_start","Set forth"
 "main_menu_settings","Settings"
 "main_menu_exit","Exit"
+
+"settings_title","Settings"
+"settings_back","Back"
+"settings_music","Music"
+"settings_sfx","SFX"
+"settings_menu_button","To Menu"
+"main_menu_language","Language"

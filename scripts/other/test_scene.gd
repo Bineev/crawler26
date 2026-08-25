@@ -26,9 +26,85 @@ func _ready():
 	# 🆕 Подписываемся на сигнал запуска игры из главного меню
 	SignalManager.start_game_requested.connect(_on_start_game_requested)
 	SignalManager.exit_requested.connect(_on_exit_requested)
+	SignalManager.settings_requested.connect(_on_settings_requested)
+	SignalManager.exit_to_menu_requested.connect(_on_exit_to_menu_requested)
+	SignalManager.settings_closed.connect(_on_settings_closed)
 	
 	# Инициализируем игру
 	GameTestManager.prepare_game_initialization($SubViewportContainer/SubViewport/GameWorld)
+	show_main_menu()
+
+
+func _on_settings_closed():
+	close_options()
+
+
+func _input(event: InputEvent):
+	if event.is_action_pressed("options"):
+		# Проверяем, не в процессе ли анимации меню
+		if _is_main_menu_animating():
+			return
+		
+		if settings_menu_is_open():
+			close_options()
+		else:
+			_on_settings_requested()
+
+
+func _is_main_menu_animating() -> bool:
+	var game_world = $SubViewportContainer/SubViewport/GameWorld
+	for child in game_world.get_children():
+		if child is MainMenu:
+			return not child.is_enter_animation_finished
+	return false
+
+
+func settings_menu_is_open() -> bool:
+	var game_world = $SubViewportContainer/SubViewport/GameWorld
+	for child in game_world.get_children():
+		if child is SettingsMenu and child.is_open:
+			return true
+	return false
+
+
+
+func _on_settings_requested():
+	var context = SettingsMenu.OpenContext.MAIN_MENU
+	
+	var game_world = $SubViewportContainer/SubViewport/GameWorld
+	var has_main_menu = false
+	var has_biome_choice = false
+	
+	for child in game_world.get_children():
+		if child is MainMenu:
+			has_main_menu = true
+			child.hide()
+		elif child is BiomeChoice:
+			has_biome_choice = true
+			child.hide()
+	
+	if has_main_menu:
+		context = SettingsMenu.OpenContext.MAIN_MENU
+	elif has_biome_choice:
+		context = SettingsMenu.OpenContext.BIOME_CHOICE
+	else:
+		context = SettingsMenu.OpenContext.GAMEPLAY
+	
+	show_options(context)
+
+
+func _on_exit_to_menu_requested():
+	close_options()
+	
+	# Очищаем GameWorld
+	var game_world = $SubViewportContainer/SubViewport/GameWorld
+	for child in game_world.get_children():
+		child.queue_free()
+	
+	# Очищаем UI
+	GameTestManager.clear_ui()
+	
+	# Показываем главное меню
 	show_main_menu()
 
 
@@ -223,3 +299,31 @@ func _fade_out_and_start():
 	tween2.tween_property(fade, "color:a", 0.0, 1)
 	await tween2.finished
 	fade.queue_free()
+
+
+func show_options(context: int):
+	var game_world = $SubViewportContainer/SubViewport/GameWorld
+	var settings_menu = null
+	
+	for child in game_world.get_children():
+		if child is SettingsMenu:
+			settings_menu = child
+			break
+	
+	if not settings_menu:
+		var menu_scene = load("res://scenes/settings_menu.tscn")
+		settings_menu = menu_scene.instantiate()
+		game_world.add_child(settings_menu)
+	
+	settings_menu.open(context)
+
+
+func close_options():
+	var game_world = $SubViewportContainer/SubViewport/GameWorld
+	for child in game_world.get_children():
+		if child is SettingsMenu:
+			child.close()
+		elif child is MainMenu:
+			child.show()
+		elif child is BiomeChoice:
+			child.show()

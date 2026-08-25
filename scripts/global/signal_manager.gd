@@ -171,5 +171,12 @@ signal restart_run_requested()
 ## ============================================================
 
 signal start_game_requested()
-signal settings_requested()
 signal exit_requested()
+
+## ============================================================
+## НАСТРОЙКИ
+## ============================================================
+
+signal settings_requested()
+signal settings_closed()
+signal exit_to_menu_requested()
