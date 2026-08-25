@@ -29,6 +29,8 @@ func _ready():
 	SignalManager.settings_requested.connect(_on_settings_requested)
 	SignalManager.exit_to_menu_requested.connect(_on_exit_to_menu_requested)
 	SignalManager.settings_closed.connect(_on_settings_closed)
+	SignalManager.load_game_requested.connect(_on_load_game_requested)
+	SignalManager.loaded_save_with_run.connect(_on_loaded_save_with_run)
 	
 	# Инициализируем игру
 	GameTestManager.prepare_game_initialization($SubViewportContainer/SubViewport/GameWorld)
@@ -49,6 +51,10 @@ func _input(event: InputEvent):
 			close_options()
 		else:
 			_on_settings_requested()
+
+
+func _on_load_game_requested():
+	SaveManager.load_and_apply_save()
 
 
 func _is_main_menu_animating() -> bool:
@@ -125,8 +131,6 @@ func show_main_menu():
 	var menu_scene = load("res://scenes/main_menu.tscn")
 	menu_instance = menu_scene.instantiate()
 	game_world.add_child(menu_instance)
-
-
 
 
 func start_new_run():
@@ -327,3 +331,42 @@ func close_options():
 			child.show()
 		elif child is BiomeChoice:
 			child.show()
+
+
+func _on_loaded_save_with_run():
+	_fade_and_load_current_run()
+
+
+func _fade_and_load_current_run():
+	var fade = ColorRect.new()
+	fade.color = Color(0, 0, 0, 0)
+	fade.anchor_left = 0.0
+	fade.anchor_right = 1.0
+	fade.anchor_top = 0.0
+	fade.anchor_bottom = 1.0
+	fade.z_index = 1000
+	fade.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(fade)
+	
+	var tween = create_tween()
+	tween.tween_property(fade, "color:a", 1.0, 1)
+	await tween.finished
+	
+	# Удаляем главное меню (если есть)
+	if menu_instance:
+		menu_instance.queue_free()
+		menu_instance = null
+	
+	# Очищаем GameWorld
+	var game_world = $SubViewportContainer/SubViewport/GameWorld
+	for child in game_world.get_children():
+		child.queue_free()
+	
+	# Загружаем текущий забег из сохранения
+	GameTestManager.load_current_run()
+	
+	# Оттемняем
+	var tween2 = create_tween()
+	tween2.tween_property(fade, "color:a", 0.0, 1)
+	await tween2.finished
+	fade.queue_free()

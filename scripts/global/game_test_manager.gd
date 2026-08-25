@@ -641,6 +641,9 @@ func create_death_ui():
 	death_ui = preload("res://scenes/death_ui.tscn").instantiate() as DeathUI
 	game_world.add_child(death_ui)
 	death_ui.global_position = Vector2.ZERO
+	
+	# 🆕 Сохраняем игру с флагом is_run_ended = true
+	SaveManager.save_game_with_run_ended()
 
 func clear_ui_after_death():
 	clear_ui()
@@ -695,3 +698,46 @@ func set_biome(biome: DataManager.Biome) -> void:
 	ProgressManager.select_biome(biome)
 	
 	print("Biome set to: ", DataManager.Biome.keys()[biome])
+
+
+func load_current_run() -> void:
+	print("=== LOAD CURRENT RUN ===")
+	
+	# 1. Игрок уже создан в restore_player()
+	var player = BattleManager.get_player()
+	if not player:
+		printerr("CRITICAL: No player found after restore!")
+		return
+	
+	# 2. Загружаем данные намерений для биома
+	DataManager.load_biome_enemies(current_biome)
+	
+	# 3. Очищаем UI
+	clear_ui()
+	
+	# 4. Создаём UI элементы
+	_create_blood_screen()
+	_create_player_portrait()
+	_create_gold_display()
+	_create_key_display()
+	_create_bone_display()
+	_create_potion_display()
+	
+	# 5. Подключаем сигналы FloorManager
+	if FloorManager.room_selected.is_connected(_on_room_selected):
+		FloorManager.room_selected.disconnect(_on_room_selected)
+	if FloorManager.floor_completed.is_connected(_on_floor_completed):
+		FloorManager.floor_completed.disconnect(_on_floor_completed)
+	
+	FloorManager.room_selected.connect(_on_room_selected)
+	FloorManager.floor_completed.connect(_on_floor_completed)
+	
+	# 6. Загружаем сохранённую комнату
+	var room_index = current_room_index
+	if room_index < FloorManager.all_rooms.size() and room_index >= 0:
+		var room_node = FloorManager.all_rooms[room_index]
+		room_node.is_visited = true
+		_on_room_selected(room_node, false)
+	else:
+		printerr("Room index invalid, starting new biome...")
+		start_new_biome()

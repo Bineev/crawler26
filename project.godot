@@ -28,9 +28,9 @@ RoomManager="*res://scripts/global/room_manager.gd"
 ProgressManager="*res://scripts/global/progress_manager.gd"
 DeckManager="*res://scripts/global/deck_manager.gd"
 ArtifactManager="*res://scripts/global/artifact_manager.gd"
-SaveManager="*res://scripts/global/save_manager.gd"
 TooltipManager="*res://scripts/global/tooltip_manager.gd"
 RunManager="*res://scripts/global/run_manager.gd"
+SaveManager="*res://scripts/global/save_manager.gd"
 GameTestManager="*res://scripts/global/game_test_manager.gd"
 
 [display]

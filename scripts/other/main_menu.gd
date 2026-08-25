@@ -156,7 +156,10 @@ func _on_language_changed(index: int):
 
 
 func _on_start_pressed():
-	SignalManager.start_game_requested.emit()
+	if SaveManager.has_save():
+		SignalManager.load_game_requested.emit()
+	else:
+		SignalManager.start_game_requested.emit()
 	#queue_free()
 
 func _on_settings_pressed():

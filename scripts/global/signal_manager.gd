@@ -180,3 +180,5 @@ signal exit_requested()
 signal settings_requested()
 signal settings_closed()
 signal exit_to_menu_requested()
+signal load_game_requested()
+signal loaded_save_with_run()  # 🆕

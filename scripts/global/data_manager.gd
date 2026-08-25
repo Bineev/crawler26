@@ -2324,7 +2324,6 @@ const POTION_ICONS: Dictionary = {
 	DataManager.PotionType.DRAW: preload("res://img/potions/draw_potion1.png"),
 	DataManager.PotionType.EXPLOSION: preload("res://img/potions/explosion_potion1.png"),
 	DataManager.PotionType.STATUS_CLEANSE: preload("res://img/potions/status_cleanse_potion1.png"),
-	#DataManager.PotionType.STRENGTH: preload("res://img/potions/strength_potion.png"),
 	DataManager.PotionType.POISON: preload("res://img/potions/poison_potion1.png"),
 	DataManager.PotionType.BLOCK: preload("res://img/potions/block_potion1.png"),
 }
@@ -2333,28 +2332,38 @@ func get_potion_icon(potion_type: DataManager.PotionType) -> Texture2D:
 	return POTION_ICONS.get(potion_type, null)
 
 
-var _potion_resources: Dictionary = {}
+var _potion_resources: Dictionary = {}  # PotionType -> PotionResource
 var _potion_resources_loaded: bool = false
 
 func load_potion_resources() -> void:
 	if _potion_resources_loaded:
 		return
 	
-	_potion_resources["heal_potion"] = load("res://resources/potions/heal_potion.tres")
-	_potion_resources["energy_potion"] = load("res://resources/potions/energy_potion.tres")
-	_potion_resources["draw_potion"] = load("res://resources/potions/draw_potion.tres")
-	_potion_resources["explosion_potion"] = load("res://resources/potions/explosion_potion.tres")
-	_potion_resources["cleanse_potion"] = load("res://resources/potions/cleanse_potion.tres")
-	_potion_resources["poison_potion"] = load("res://resources/potions/poison_potion.tres")
-	_potion_resources["block_potion"] = load("res://resources/potions/block_potion.tres")
+	_potion_resources[DataManager.PotionType.HEAL] = load("res://resources/potions/heal_potion.tres")
+	_potion_resources[DataManager.PotionType.ENERGY] = load("res://resources/potions/energy_potion.tres")
+	_potion_resources[DataManager.PotionType.DRAW] = load("res://resources/potions/draw_potion.tres")
+	_potion_resources[DataManager.PotionType.EXPLOSION] = load("res://resources/potions/explosion_potion.tres")
+	_potion_resources[DataManager.PotionType.STATUS_CLEANSE] = load("res://resources/potions/cleanse_potion.tres")
+	_potion_resources[DataManager.PotionType.POISON] = load("res://resources/potions/poison_potion.tres")
+	_potion_resources[DataManager.PotionType.BLOCK] = load("res://resources/potions/block_potion.tres")
 	
 	_potion_resources_loaded = true
 
-func get_potion_resource(potion_id: String) -> PotionResource:
+func get_potion_resource_by_type(potion_type: DataManager.PotionType) -> PotionResource:
 	if not _potion_resources_loaded:
 		load_potion_resources()
-	return _potion_resources.get(potion_id, null)
+	return _potion_resources.get(potion_type, null)
 
+func get_potion_resource_by_id(potion_id: String) -> PotionResource:
+	if not _potion_resources_loaded:
+		load_potion_resources()
+	
+	# Ищем по ключу (для обратной совместимости)
+	for key in _potion_resources.keys():
+		var resource = _potion_resources[key]
+		if resource.resource_path == potion_id or resource.resource_path.get_file() == potion_id:
+			return resource
+	return null
 
 func get_random_potions(count: int) -> Array[PotionResource]:
 	if not _potion_resources_loaded:
@@ -2363,7 +2372,6 @@ func get_random_potions(count: int) -> Array[PotionResource]:
 	var result: Array[PotionResource] = []
 	var potion_list = _potion_resources.values()
 	
-	# Перемешиваем массив
 	potion_list.shuffle()
 	
 	for i in range(min(count, potion_list.size())):
