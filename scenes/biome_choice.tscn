@@ -1,6 +1,7 @@
-[gd_scene load_steps=2 format=3 uid="uid://vdok87k42aoh"]
+[gd_scene load_steps=3 format=3 uid="uid://vdok87k42aoh"]
 
 [ext_resource type="Script" uid="uid://7u2xly7n1jxu" path="res://scripts/other/biome_choice.gd" id="1_q2box"]
+[ext_resource type="Material" uid="uid://3tj6g0pa2j2k" path="res://shaders/room2.tres" id="2_53rq2"]
 
 [node name="BiomeChoice" type="Control"]
 custom_minimum_size = Vector2(1920, 1080)
@@ -29,3 +30,13 @@ layout_mode = 2
 [node name="HBoxContainer" type="HBoxContainer" parent="CenterContainer/VBoxContainer"]
 layout_mode = 2
 theme_override_constants/separation = 50
+
+[node name="ColorRect" type="ColorRect" parent="."]
+material = ExtResource("2_53rq2")
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2

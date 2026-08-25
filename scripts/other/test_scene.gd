@@ -3,6 +3,7 @@
 
 extends Control
 
+var menu_instance: MainMenu
 var is_other_effect_played: bool = false
 
 func _ready():
@@ -24,6 +25,7 @@ func _ready():
 	SignalManager.show_next_biome_choice.connect(_on_show_next_biome_choice)
 	# 🆕 Подписываемся на сигнал запуска игры из главного меню
 	SignalManager.start_game_requested.connect(_on_start_game_requested)
+	SignalManager.exit_requested.connect(_on_exit_requested)
 	
 	# Инициализируем игру
 	GameTestManager.prepare_game_initialization($SubViewportContainer/SubViewport/GameWorld)
@@ -31,7 +33,8 @@ func _ready():
 
 
 func _on_start_game_requested():
-	start_new_run()
+	_fade_out_and_start()
+
 
 func show_main_menu():
 	# Очищаем GameWorld
@@ -44,8 +47,10 @@ func show_main_menu():
 	
 	# Загружаем сцену главного меню
 	var menu_scene = load("res://scenes/main_menu.tscn")
-	var menu_instance = menu_scene.instantiate()
+	menu_instance = menu_scene.instantiate()
 	game_world.add_child(menu_instance)
+
+
 
 
 func start_new_run():
@@ -131,6 +136,20 @@ func is_16_9() -> bool:
 
 
 func _on_restart_run_requested():
+	
+	var fade = ColorRect.new()
+	fade.color = Color(0, 0, 0, 0)
+	fade.anchor_left = 0.0
+	fade.anchor_right = 1.0
+	fade.anchor_top = 0.0
+	fade.anchor_bottom = 1.0
+	fade.z_index = 1000
+	fade.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(fade)
+	
+	var tween = create_tween()
+	tween.tween_property(fade, "color:a", 1.0, 0.5)
+	await tween.finished
 	# 🆕 Сбрасываем доступные биомы
 	ProgressManager.reset_available_biomes()
 	# Очищаем GameWorld
@@ -151,6 +170,10 @@ func _on_restart_run_requested():
 	
 	# Показываем выбор биома
 	_load_biomes_choice()
+	var tween2 = create_tween()
+	tween2.tween_property(fade, "color:a", 0.0, 0.5)
+	await tween2.finished
+	fade.queue_free()
 
 
 func _on_show_next_biome_choice():
@@ -164,3 +187,39 @@ func _on_show_next_biome_choice():
 	
 	# Показываем выбор следующего биома
 	_load_biomes_choice()
+
+
+func _on_exit_requested():
+	get_tree().quit()
+
+
+func _fade_out_and_start():
+	# Создаём оверлей затемнения
+	var fade = ColorRect.new()
+	fade.color = Color(0, 0, 0, 0)
+	fade.anchor_left = 0.0
+	fade.anchor_right = 1.0
+	fade.anchor_top = 0.0
+	fade.anchor_bottom = 1.0
+	fade.z_index = 1000
+	fade.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(fade)
+	
+	var tween = create_tween()
+	tween.tween_property(fade, "color:a", 1.0, 1)
+	await tween.finished
+	menu_instance.queue_free()
+	menu_instance = null
+	# Удаляем главное меню
+	var game_world = $SubViewportContainer/SubViewport/GameWorld
+	for child in game_world.get_children():
+		child.queue_free()
+	
+	# Запускаем новый забег (создаёт персонажа и показывает выбор биома)
+	start_new_run()
+	
+	# Оттемняем
+	var tween2 = create_tween()
+	tween2.tween_property(fade, "color:a", 0.0, 1)
+	await tween2.finished
+	fade.queue_free()

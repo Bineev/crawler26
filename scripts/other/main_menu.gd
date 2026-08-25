@@ -8,15 +8,18 @@ class_name MainMenu
 @onready var buttons_container: VBoxContainer = $CenterContainer/VBoxContainer/ButtonsContainer
 
 func _ready():
+	scale *= DataManager.SCALE_FACTOR
 	_setup_ui()
 	_connect_signals()
+	# 🆕 Запускаем анимацию появления
+	_play_enter_animation()
 
 
 func _setup_ui():
 	# Настройка заголовка
 	title_label.text = tr("main_menu_title")
 	title_label.add_theme_font_override("font", DataManager.FONT_HEADERS)
-	title_label.add_theme_font_size_override("font_size", 72)
+	title_label.add_theme_font_size_override("font_size", 100)
 	title_label.add_theme_color_override("font_color", DataManager.COLOR_PENITENT_ART_BG_DARK)
 	title_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	
@@ -41,6 +44,60 @@ func _setup_ui():
 	start_button.pressed.connect(_on_start_pressed)
 	settings_button.pressed.connect(_on_settings_pressed)
 	exit_button.pressed.connect(_on_exit_pressed)
+	# Кнопки изначально отключены (пока анимация)
+	for button in buttons_container.get_children():
+		if button is Button:
+			button.disabled = true
+
+
+func _play_enter_animation():
+	# Арт виден сразу (текстура уже есть)
+	# Название и кнопки скрыты
+	title_label.modulate = Color(1, 1, 1, 0)
+	buttons_container.modulate = Color(1, 1, 1, 0)
+	
+	# Отключаем кнопки пока идёт анимация
+	for button in buttons_container.get_children():
+		if button is Button:
+			button.disabled = true
+	
+	var tween = create_tween()
+	
+	# Шаг 1: Постепенное появление арта (оттемнение) — 2 секунды
+	var parent = get_parent()
+	if parent and parent is ColorRect:
+		tween.tween_property(parent, "color:a", 0.0, 2.0)
+	else:
+		# Если родитель не ColorRect, создаём свой оверлей
+		var fade_overlay = ColorRect.new()
+		fade_overlay.color = Color(0, 0, 0, 1)
+		fade_overlay.anchor_left = 0.0
+		fade_overlay.anchor_right = 1.0
+		fade_overlay.anchor_top = 0.0
+		fade_overlay.anchor_bottom = 1.0
+		fade_overlay.z_index = 999
+		add_child(fade_overlay)
+		tween.tween_property(fade_overlay, "color:a", 0.0, 2.0)
+		tween.tween_callback(fade_overlay.queue_free)
+	
+	# Шаг 2: Появление названия после оттемнения
+	tween.tween_interval(0.3)
+	tween.tween_property(title_label, "modulate", Color(1, 1, 1, 1), 0.5)
+	
+	# Шаг 3: Появление кнопок через 1 секунду после названия
+	tween.tween_interval(1.0)
+	tween.tween_callback(_show_buttons)
+	
+	await tween.finished
+
+
+func _show_buttons():
+	# Кнопки появляются мгновенно
+	buttons_container.modulate = Color(1, 1, 1, 1)
+	
+	for button in buttons_container.get_children():
+		if button is Button:
+			button.disabled = false
 
 
 func _connect_signals():
@@ -49,7 +106,7 @@ func _connect_signals():
 
 func _on_start_pressed():
 	SignalManager.start_game_requested.emit()
-	queue_free()
+	#queue_free()
 
 func _on_settings_pressed():
 	SignalManager.settings_requested.emit()

@@ -1,8 +1,9 @@
-[gd_scene load_steps=4 format=3 uid="uid://dce7gaqkprp2"]
+[gd_scene load_steps=5 format=3 uid="uid://dce7gaqkprp2"]
 
 [ext_resource type="Script" uid="uid://buu2cfsosj6xh" path="res://scripts/other/main_menu.gd" id="1_l6cm7"]
 [ext_resource type="Material" uid="uid://1mcuhw0pon23" path="res://shaders/player_portrait.tres" id="2_bqqt6"]
 [ext_resource type="Texture2D" uid="uid://jvmcqnos84fg" path="res://img/portraits/penitent_portrait1.png" id="2_ekxnf"]
+[ext_resource type="Material" uid="uid://3tj6g0pa2j2k" path="res://shaders/room2.tres" id="4_wu84c"]
 
 [node name="MainMenu" type="Control"]
 custom_minimum_size = Vector2(1920, 1080)
@@ -26,10 +27,23 @@ theme_override_constants/separation = 50
 material = ExtResource("2_bqqt6")
 layout_mode = 2
 texture = ExtResource("2_ekxnf")
+stretch_mode = 5
 
 [node name="Title" type="Label" parent="CenterContainer/VBoxContainer"]
 layout_mode = 2
 
 [node name="ButtonsContainer" type="VBoxContainer" parent="CenterContainer/VBoxContainer"]
 layout_mode = 2
+size_flags_horizontal = 4
 theme_override_constants/separation = 20
+alignment = 1
+
+[node name="ColorRect" type="ColorRect" parent="."]
+material = ExtResource("4_wu84c")
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2

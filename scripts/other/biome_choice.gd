@@ -99,8 +99,23 @@ func _on_preview_clicked(event: InputEvent, preview: TextureRect, biome: DataMan
 		
 		await tween.finished
 		
-		# 🆕 Устанавливаем биом через GameTestManager
+		# 🆕 Создаём затемнение
+		var fade = ColorRect.new()
+		fade.color = Color(0, 0, 0, 0)
+		fade.anchor_left = 0.0
+		fade.anchor_right = 1.0
+		fade.anchor_top = 0.0
+		fade.anchor_bottom = 1.0
+		fade.z_index = 1000
+		fade.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		add_child(fade)
+		
+		var fade_tween = create_tween()
+		fade_tween.tween_property(fade, "color:a", 1.0, 0.5)
+		await fade_tween.finished
+		
+		# Устанавливаем биом
 		GameTestManager.set_biome(biome)
 		
-		# 🆕 Отправляем сигнал StartBiome
+		# Отправляем сигнал
 		SignalManager.start_biome.emit()
