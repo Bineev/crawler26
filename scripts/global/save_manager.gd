@@ -329,6 +329,10 @@ func _collect_effects(effects: Array) -> Array:
 		if not effect.custom_description.is_empty():
 			effect_copy["custom_description"] = effect.custom_description
 		
+		# 🆕 СОХРАНЯЕМ СКРИПТ УСЛОВИЯ (для CONDITIONAL эффектов)
+		if effect.condition_script:
+			effect_copy["condition_script_path"] = effect.condition_script.resource_path
+		
 		# Если есть статус
 		if effect.status:
 			effect_copy["status_id"] = effect.status.id
@@ -682,10 +686,10 @@ func _restore_deck(deck_cards_data: Array) -> void:
 		deck.master_cards.append(card)
 
 
-# BUG: кастомные эффекты
 func _restore_effect(effect_entry: Dictionary) -> EffectEntry:
 	var effect = EffectEntry.new()
 	
+	# === БАЗОВЫЕ ПОЛЯ ===
 	effect.category = int(effect_entry.get("category", 0))
 	effect.target = int(effect_entry.get("target", DataManager.EffectTarget.ENEMY))
 	effect.base_value = int(effect_entry.get("base_value", 0))
@@ -696,8 +700,6 @@ func _restore_effect(effect_entry: Dictionary) -> EffectEntry:
 	effect.is_direct_damage = bool(effect_entry.get("is_direct_damage", true))
 	effect.stat_multiplier = int(effect_entry.get("stat_multiplier", 0))
 	effect.stat_divisor = int(effect_entry.get("stat_divisor", 10))
-	effect.scaled_values = effect_entry.get("scaled_values", [0, 0, 0, 0]).duplicate()
-	effect.scaled_thresholds = effect_entry.get("scaled_thresholds", [0, 0, 0, 0]).duplicate()
 	effect.scaled_type = int(effect_entry.get("scaled_type", 0))
 	effect.scaled_resource = int(effect_entry.get("scaled_resource", 0))
 	effect.scaled_compare = int(effect_entry.get("scaled_compare", 0))
@@ -717,7 +719,21 @@ func _restore_effect(effect_entry: Dictionary) -> EffectEntry:
 	effect.grow_target = int(effect_entry.get("grow_target", 0))
 	effect.passive_duration = int(effect_entry.get("passive_duration", 0))
 	
-	# 🆕 ВОССТАНАВЛИВАЕМ КАСТОМНЫЙ СКРИПТ
+	# === ВОССТАНАВЛИВАЕМ SCALED_VALUES (ОЧИЩАЕМ И ЗАПОЛНЯЕМ) ===
+	var new_scaled_values = effect_entry.get("scaled_values", [0, 0, 0, 0])
+	if new_scaled_values is Array:
+		effect.scaled_values.clear()
+		for val in new_scaled_values:
+			effect.scaled_values.append(int(val))
+	
+	# === ВОССТАНАВЛИВАЕМ SCALED_THRESHOLDS (ОЧИЩАЕМ И ЗАПОЛНЯЕМ) ===
+	var new_scaled_thresholds = effect_entry.get("scaled_thresholds", [0, 0, 0, 0])
+	if new_scaled_thresholds is Array:
+		effect.scaled_thresholds.clear()
+		for val in new_scaled_thresholds:
+			effect.scaled_thresholds.append(int(val))
+	
+	# === ВОССТАНАВЛИВАЕМ КАСТОМНЫЙ СКРИПТ ===
 	var custom_script_path = effect_entry.get("custom_script_path", "")
 	if not custom_script_path.is_empty():
 		var script = load(custom_script_path)
@@ -726,22 +742,34 @@ func _restore_effect(effect_entry: Dictionary) -> EffectEntry:
 		else:
 			printerr("Failed to load custom script: ", custom_script_path)
 	
-	# 🆕 ВОССТАНАВЛИВАЕМ КАСТОМНОЕ ОПИСАНИЕ
+	# === ВОССТАНАВЛИВАЕМ СКРИПТ УСЛОВИЯ (для CONDITIONAL) ===
+	var condition_script_path = effect_entry.get("condition_script_path", "")
+	if not condition_script_path.is_empty():
+		var script = load(condition_script_path)
+		if script:
+			effect.condition_script = script
+		else:
+			printerr("Failed to load condition script: ", condition_script_path)
+	
+	# === ВОССТАНАВЛИВАЕМ КАСТОМНОЕ ОПИСАНИЕ ===
 	if effect_entry.has("custom_description"):
 		effect.custom_description = effect_entry.get("custom_description", "")
 	
+	# === ВОССТАНАВЛИВАЕМ STATUS ===
 	if effect_entry.has("status_id"):
 		var status_id = int(effect_entry.get("status_id"))
 		var status_resource = DataManager.get_status_resource(status_id)
 		if status_resource:
 			effect.status = status_resource
 	
+	# === ВОССТАНАВЛИВАЕМ PASSIVE ===
 	if effect_entry.has("passive_id"):
 		var passive_id = int(effect_entry.get("passive_id"))
 		var passive_resource = DataManager.get_passive_resource(passive_id)
 		if passive_resource:
 			effect.passive = passive_resource
 	
+	# === ВОССТАНАВЛИВАЕМ УСЛОВНЫЕ ЭФФЕКТЫ ===
 	if effect.category == DataManager.EffectCategory.CONDITIONAL:
 		if effect_entry.has("true_effect"):
 			var true_effect_data = effect_entry.get("true_effect")

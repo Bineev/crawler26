@@ -7,6 +7,8 @@ enum OpenContext {
 	GAMEPLAY,
 }
 
+const SETTINGS_FILE := "user://settings.cfg"
+
 var open_context: OpenContext = OpenContext.MAIN_MENU
 var is_open: bool = false
 
@@ -32,12 +34,11 @@ func _ready():
 	scale *= DataManager.SCALE_FACTOR
 	_setup_ui()
 	_connect_signals()
+	_load_volume_settings()
 	hide()
 
 
 func _setup_ui():
-	# 🆕 Устанавливаем минимальный размер панели
-	#panel.custom_minimum_size = Vector2(400, 600)
 	# Заголовок
 	title_label.text = tr("settings_title")
 	title_label.add_theme_font_override("font", DataManager.FONT_HEADERS)
@@ -59,8 +60,7 @@ func _setup_ui():
 	
 	music_slider.min_value = 0.0
 	music_slider.max_value = 1.0
-	music_slider.step = 0.05
-	music_slider.value = 0.8
+	music_slider.step = 0.01
 	music_slider.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	
 	# Звуки SFX
@@ -72,8 +72,7 @@ func _setup_ui():
 	
 	sfx_slider.min_value = 0.0
 	sfx_slider.max_value = 1.0
-	sfx_slider.step = 0.05
-	sfx_slider.value = 0.8
+	sfx_slider.step = 0.01
 	sfx_slider.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	
 	# Кнопка "В меню" (по умолчанию скрыта)
@@ -122,6 +121,7 @@ func _setup_ui():
 			language_option.selected = 1
 		_:
 			language_option.selected = 0
+	
 	# Отступы между элементами VBox
 	vbox.add_theme_constant_override("separation", 20)
 	await get_tree().process_frame
@@ -136,6 +136,68 @@ func _connect_signals():
 	language_option.item_selected.connect(_on_language_changed)
 
 
+func _load_volume_settings():
+	var config = ConfigFile.new()
+	var err = config.load(SETTINGS_FILE)
+	
+	var music_volume = 0.8
+	var sfx_volume = 0.8
+	var language = "en"
+	
+	if err == OK:
+		music_volume = config.get_value("audio", "music_volume", 0.8)
+		sfx_volume = config.get_value("audio", "sfx_volume", 0.8)
+		language = config.get_value("locale", "language", "en")
+	
+	music_slider.value = music_volume
+	sfx_slider.value = sfx_volume
+	
+	_set_bus_volume("Music", music_volume)
+	_set_bus_volume("SFX", sfx_volume)
+	
+	match language:
+		"en":
+			language_option.selected = 0
+		"ru":
+			language_option.selected = 1
+		_:
+			language_option.selected = 0
+	TranslationServer.set_locale(language)
+
+
+func _save_settings():
+	var config = ConfigFile.new()
+	
+	config.set_value("audio", "music_volume", music_slider.value)
+	config.set_value("audio", "sfx_volume", sfx_slider.value)
+	
+	var lang = "en"
+	match language_option.selected:
+		0:
+			lang = "en"
+		1:
+			lang = "ru"
+	config.set_value("locale", "language", lang)
+	
+	config.save(SETTINGS_FILE)
+
+
+func _set_bus_volume(bus_name: String, value: float):
+	var bus_index = AudioServer.get_bus_index(bus_name)
+	if bus_index != -1:
+		var db = linear_to_db(value)
+		AudioServer.set_bus_volume_db(bus_index, db)
+
+
+func _on_music_changed(value: float):
+	_set_bus_volume("Music", value)
+	_save_settings()
+
+
+func _on_sfx_changed(value: float):
+	_set_bus_volume("SFX", value)
+	_save_settings()
+
 
 func _on_language_changed(index: int):
 	match index:
@@ -143,19 +205,20 @@ func _on_language_changed(index: int):
 			TranslationServer.set_locale("en")
 		1:
 			TranslationServer.set_locale("ru")
+	_save_settings()
 
 
 func open(context: OpenContext = OpenContext.MAIN_MENU):
 	open_context = context
 	
-	# Показываем/скрываем кнопку "В меню" в зависимости от контекста
 	match context:
 		OpenContext.MAIN_MENU:
 			menu_button.hide()
 		OpenContext.BIOME_CHOICE, OpenContext.GAMEPLAY:
 			menu_button.show()
 	
-	# Анимация появления
+	_load_volume_settings()
+	
 	modulate = Color(1, 1, 1, 0)
 	show()
 	var tween = create_tween()
@@ -175,17 +238,6 @@ func _on_back_pressed():
 	SignalManager.settings_closed.emit()
 
 
-func _on_music_changed(value: float):
-	# TODO: применить громкость музыки
-	print("Music volume: ", value)
-
-
-func _on_sfx_changed(value: float):
-	# TODO: применить громкость SFX
-	print("SFX volume: ", value)
-
-
 func _on_menu_pressed():
 	close()
-	# TODO: отправить сигнал для выхода в меню
 	SignalManager.exit_to_menu_requested.emit()

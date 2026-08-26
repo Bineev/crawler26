@@ -8,6 +8,7 @@ script = ExtResource("2_87a3d")
 id = 3
 name_key = "status_cold_name"
 description_key = "status_cold_desc"
+is_ticking = true
 is_stacking = true
 max_stacks = 25
 effect_per_stack = 0.01

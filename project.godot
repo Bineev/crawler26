@@ -14,6 +14,11 @@ config/name="comic_crawler"
 run/main_scene="uid://u2sxbx2tb14b"
 config/features=PackedStringArray("4.5", "Forward Plus")
 
+[audio]
+
+volume/music_volume=0.48
+volume/sfx_volume=1.0
+
 [autoload]
 
 DataManager="*res://scripts/global/data_manager.gd"
