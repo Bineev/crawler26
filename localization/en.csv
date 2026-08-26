@@ -716,3 +716,12 @@ upgrade_card_confirm,Upgrade
 "settings_sfx","SFX"
 "settings_menu_button","To Menu"
 "main_menu_language","Language"
+
+"condition_target_has_negative_statuses","target has more than 2 negative statuses"
+"card_black_envy_name","Black Envy"
+"card_black_envy_desc","Deal 7 damage. If the target has more than 2 negative statuses, gain 10 Atonement."
+"card_time_to_die_name","Time to Die"
+"card_time_to_die_desc","Deal 15 damage to all enemies and yourself. Heal 8 health for each enemy killed."
+"card_bitter_vengeance_name","Bitter Vengeance"
+"card_bitter_vengeance_desc","Deal damage to an enemy equal to your current Atonement."
+"effect_bitter_vengeance","Atonement damage"

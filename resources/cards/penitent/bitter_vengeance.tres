@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="CardData" load_steps=5 format=3 uid="uid://dyxdalsdgydtv"]
+
+[ext_resource type="Script" uid="uid://cmra25r1r3ivt" path="res://resources/res_scripts/effect_entry.gd" id="1_3w8r6"]
+[ext_resource type="Script" uid="uid://d0trsuibf78s0" path="res://scripts/effects/bitter_vengeance.gd" id="2_nvppu"]
+[ext_resource type="Script" uid="uid://badcs22cck6n5" path="res://resources/res_scripts/card_data.gd" id="2_sda8e"]
+
+[sub_resource type="Resource" id="Resource_ejemg"]
+script = ExtResource("1_3w8r6")
+category = 15
+custom_description = "card_bitter_vengeance_desc"
+custom_script = ExtResource("2_nvppu")
+metadata/_custom_type_script = "uid://cmra25r1r3ivt"
+
+[resource]
+script = ExtResource("2_sda8e")
+id = 40
+is_burned = true
+cost_grade = 6
+name_key = "card_bitter_vengeance_name"
+description_key = "card_bitter_vengeance_desc"
+grade = 3
+cost = 3
+effects = Array[ExtResource("1_3w8r6")]([SubResource("Resource_ejemg")])
+metadata/_custom_type_script = "uid://badcs22cck6n5"

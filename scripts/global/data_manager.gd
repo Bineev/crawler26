@@ -551,6 +551,11 @@ enum CardId {
 	EPIDEMIC,  # 🆕
 	FOUL_WELL,  # 🆕
 	STING_OF_CORRUPTION,  # 🆕
+	
+	# сломленный
+	BLACK_ENVY,  # 🆕
+	TIME_TO_DIE,  # 🆕
+	BITTER_VENGEANCE,  # 🆕
 }
 
 ## Намерения врагов
@@ -663,7 +668,7 @@ const CARDS_TO_DRAW_PER_TURN: int = 5
 const STARTING_ENERGY: int = 3
 const MAX_ENERGY: int = 3
 ## === Сломленный (Penitent) ===
-const PENITENT_STARTING_HEALTH: int = 1
+const PENITENT_STARTING_HEALTH: int = 120
 const PENITENT_MAX_ATONEMENT: int = 30
 const PENITENT_ATONEMENT_GAIN_PER_ATTACK: int = 5
 
@@ -811,7 +816,12 @@ const CARD_SPACING_COMPRESSION_FACTOR: float = 0.13
 ## Минимальный отступ между картами (в процентах от ширины карты, 0.7 = 70%)
 const CARD_MIN_SPACING_RATIO: float = 0.7
 
+## ============================================================
+## КАРТА: ВРЕМЯ УМИРАТЬ
+## ============================================================
 
+const TIME_TO_DIE_DAMAGE: int = 15
+const TIME_TO_DIE_HEAL_PER_KILL: int = 8
 ## Настройки артефактов (временные значения для тестов)
 const ARTIFACT_STRANGE_MUSHROOM_HP_BONUS: int = 10
 const ARTIFACT_STRANGE_MUSHROOM_POISON_DURATION: int = 2
@@ -1591,6 +1601,10 @@ func load_all_cards():
 	_register_card(CardId.EPIDEMIC, "res://resources/cards/rotten_marshes/epidemic.tres")
 	_register_card(CardId.FOUL_WELL, "res://resources/cards/rotten_marshes/foul_well.tres")
 	_register_card(CardId.STING_OF_CORRUPTION, "res://resources/cards/rotten_marshes/sting_of_corruption.tres")
+	# penitent
+	_register_card(CardId.BLACK_ENVY, "res://resources/cards/penitent/black_envy.tres")
+	_register_card(CardId.TIME_TO_DIE, "res://resources/cards/penitent/time_to_die.tres")
+	_register_card(CardId.BITTER_VENGEANCE, "res://resources/cards/penitent/bitter_vengeance.tres")
 	
 	_cards_loaded = true
 
@@ -1682,7 +1696,10 @@ func load_card_illustrations():
 	#_card_illustrations[CardId.MOLERAT_HIDE] = preload("res://img/cards/mole_tunnels/molerat_hide.png")
 	#_card_illustrations[CardId.TUNNEL_AMBUSH] = preload("res://img/cards/mole_tunnels/tunnel_ambush.png")
 	#_card_illustrations[CardId.BLOODLETTING] = preload("res://img/cards/mole_tunnels/bloodletting.png")
-
+	# penitent
+	_card_illustrations[CardId.BLACK_ENVY] = preload("res://img/cards/penitent/black_envy.png")
+	_card_illustrations[CardId.TIME_TO_DIE] = preload("res://img/cards/penitent/time_to_die.png")
+	_card_illustrations[CardId.BITTER_VENGEANCE] = preload("res://img/cards/penitent/bitter_vengeance.png")
 
 func get_card_illustration(card_id: CardId) -> Texture2D:
 	if _card_illustrations.is_empty():

@@ -295,8 +295,39 @@ func _collect_effects(effects: Array) -> Array:
 			"duration": effect.duration,
 			"amount": effect.amount,
 			"delta": effect.delta,
-			# Добавляем все необходимые поля для полного восстановления
+			# 🆕 Добавляем поддержку кастомных эффектов
+			"is_direct_damage": effect.is_direct_damage,
+			"stat_multiplier": effect.stat_multiplier,
+			"stat_divisor": effect.stat_divisor,
+			"scaled_values": effect.scaled_values.duplicate(),
+			"scaled_thresholds": effect.scaled_thresholds.duplicate(),
+			"scaled_type": effect.scaled_type,
+			"scaled_resource": effect.scaled_resource,
+			"scaled_compare": effect.scaled_compare,
+			"scaled_spend_resource": effect.scaled_spend_resource,
+			"from_stat": effect.from_stat,
+			"to_stat": effect.to_stat,
+			"conversion_ratio": effect.conversion_ratio,
+			"convert_from_status": effect.convert_from_status,
+			"convert_to_stat": effect.convert_to_stat,
+			"convert_conversion_ratio": effect.convert_conversion_ratio,
+			"target_stat": effect.target_stat,
+			"target_modifier": effect.target_modifier,
+			"delta_percent": effect.delta_percent,
+			"modifier_duration": effect.modifier_duration,
+			"grow_type": effect.grow_type,
+			"grow_value": effect.grow_value,
+			"grow_target": effect.grow_target,
+			"passive_duration": effect.passive_duration,
 		}
+		
+		# 🆕 СОХРАНЯЕМ КАСТОМНЫЙ СКРИПТ
+		if effect.custom_script:
+			effect_copy["custom_script_path"] = effect.custom_script.resource_path
+		
+		# 🆕 СОХРАНЯЕМ КАСТОМНОЕ ОПИСАНИЕ
+		if not effect.custom_description.is_empty():
+			effect_copy["custom_description"] = effect.custom_description
 		
 		# Если есть статус
 		if effect.status:
@@ -305,7 +336,6 @@ func _collect_effects(effects: Array) -> Array:
 		# Если есть пассивка
 		if effect.passive:
 			effect_copy["passive_id"] = effect.passive.id
-			effect_copy["passive_duration"] = effect.passive_duration
 		
 		# Если условный эффект
 		if effect.category == DataManager.EffectCategory.CONDITIONAL:
@@ -652,10 +682,10 @@ func _restore_deck(deck_cards_data: Array) -> void:
 		deck.master_cards.append(card)
 
 
+# BUG: кастомные эффекты
 func _restore_effect(effect_entry: Dictionary) -> EffectEntry:
 	var effect = EffectEntry.new()
 	
-	# 🆕 int()
 	effect.category = int(effect_entry.get("category", 0))
 	effect.target = int(effect_entry.get("target", DataManager.EffectTarget.ENEMY))
 	effect.base_value = int(effect_entry.get("base_value", 0))
@@ -663,6 +693,42 @@ func _restore_effect(effect_entry: Dictionary) -> EffectEntry:
 	effect.duration = int(effect_entry.get("duration", 0))
 	effect.amount = int(effect_entry.get("amount", 0))
 	effect.delta = int(effect_entry.get("delta", 0))
+	effect.is_direct_damage = bool(effect_entry.get("is_direct_damage", true))
+	effect.stat_multiplier = int(effect_entry.get("stat_multiplier", 0))
+	effect.stat_divisor = int(effect_entry.get("stat_divisor", 10))
+	effect.scaled_values = effect_entry.get("scaled_values", [0, 0, 0, 0]).duplicate()
+	effect.scaled_thresholds = effect_entry.get("scaled_thresholds", [0, 0, 0, 0]).duplicate()
+	effect.scaled_type = int(effect_entry.get("scaled_type", 0))
+	effect.scaled_resource = int(effect_entry.get("scaled_resource", 0))
+	effect.scaled_compare = int(effect_entry.get("scaled_compare", 0))
+	effect.scaled_spend_resource = bool(effect_entry.get("scaled_spend_resource", false))
+	effect.from_stat = int(effect_entry.get("from_stat", 0))
+	effect.to_stat = int(effect_entry.get("to_stat", 0))
+	effect.conversion_ratio = float(effect_entry.get("conversion_ratio", 1.0))
+	effect.convert_from_status = int(effect_entry.get("convert_from_status", 0))
+	effect.convert_to_stat = int(effect_entry.get("convert_to_stat", 0))
+	effect.convert_conversion_ratio = float(effect_entry.get("convert_conversion_ratio", 1.0))
+	effect.target_stat = int(effect_entry.get("target_stat", 0))
+	effect.target_modifier = int(effect_entry.get("target_modifier", 0))
+	effect.delta_percent = float(effect_entry.get("delta_percent", 0.0))
+	effect.modifier_duration = int(effect_entry.get("modifier_duration", 0))
+	effect.grow_type = int(effect_entry.get("grow_type", 0))
+	effect.grow_value = int(effect_entry.get("grow_value", 1))
+	effect.grow_target = int(effect_entry.get("grow_target", 0))
+	effect.passive_duration = int(effect_entry.get("passive_duration", 0))
+	
+	# 🆕 ВОССТАНАВЛИВАЕМ КАСТОМНЫЙ СКРИПТ
+	var custom_script_path = effect_entry.get("custom_script_path", "")
+	if not custom_script_path.is_empty():
+		var script = load(custom_script_path)
+		if script:
+			effect.custom_script = script
+		else:
+			printerr("Failed to load custom script: ", custom_script_path)
+	
+	# 🆕 ВОССТАНАВЛИВАЕМ КАСТОМНОЕ ОПИСАНИЕ
+	if effect_entry.has("custom_description"):
+		effect.custom_description = effect_entry.get("custom_description", "")
 	
 	if effect_entry.has("status_id"):
 		var status_id = int(effect_entry.get("status_id"))
@@ -675,14 +741,15 @@ func _restore_effect(effect_entry: Dictionary) -> EffectEntry:
 		var passive_resource = DataManager.get_passive_resource(passive_id)
 		if passive_resource:
 			effect.passive = passive_resource
-			effect.passive_duration = int(effect_entry.get("passive_duration", 0))
 	
 	if effect.category == DataManager.EffectCategory.CONDITIONAL:
 		if effect_entry.has("true_effect"):
 			var true_effect_data = effect_entry.get("true_effect")
-			effect.true_effect = _restore_effect(true_effect_data)
+			if true_effect_data is Dictionary:
+				effect.true_effect = _restore_effect(true_effect_data)
 		if effect_entry.has("false_effect"):
 			var false_effect_data = effect_entry.get("false_effect")
-			effect.false_effect = _restore_effect(false_effect_data)
+			if false_effect_data is Dictionary:
+				effect.false_effect = _restore_effect(false_effect_data)
 	
 	return effect

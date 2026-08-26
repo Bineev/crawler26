@@ -175,6 +175,9 @@ func _get_penitent_starting_deck() -> Array[CardData]:
 	
 	# Базовые атаки (сильные)
 	deck.append(DataManager.get_card(DataManager.CardId.SINFUL_STRIKE))
+	deck.append(DataManager.get_card(DataManager.CardId.BLACK_ENVY))
+	deck.append(DataManager.get_card(DataManager.CardId.TIME_TO_DIE))
+	deck.append(DataManager.get_card(DataManager.CardId.BITTER_VENGEANCE))
 	
 	# Утилити
 	deck.append(DataManager.get_card(DataManager.CardId.PENITENT_REVELATION))

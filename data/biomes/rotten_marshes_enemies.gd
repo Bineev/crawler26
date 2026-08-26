@@ -79,7 +79,8 @@ const INTENTS = {
 			[ { "category": DataManager.EffectCategory.DAMAGE, "target": DataManager.EffectTarget.ENEMY, "base_value": 15 } ],
 			
 			# 5 ход - Наложить на себя Rotting Shield (3 заряда)
-			[ { "category": DataManager.EffectCategory.APPLY_PASSIVE, "target": DataManager.EffectTarget.SELF, "passive": preload("res://resources/passives/rotting_shield.tres"), "passive_duration": 3 } ],
+			# 🆕 ИСПРАВЛЕНО: используем ID вместо preload
+			[ { "category": DataManager.EffectCategory.APPLY_PASSIVE, "target": DataManager.EffectTarget.SELF, "passive": DataManager.Passive.ROTTING_SHIELD, "passive_duration": 3 } ],
 			
 			# 6 ход - Щит 10
 			[ { "category": DataManager.EffectCategory.APPLY_STATUS, "target": DataManager.EffectTarget.SELF, "status": DataManager.Status.SHIELD, "value": 10, "duration": 1 } ],
@@ -88,7 +89,8 @@ const INTENTS = {
 			[ { "category": DataManager.EffectCategory.DAMAGE, "target": DataManager.EffectTarget.ENEMY, "base_value": 10 } ],
 			
 			# 8 ход - Наложить на себя Venomous Shield
-			[ { "category": DataManager.EffectCategory.APPLY_PASSIVE, "target": DataManager.EffectTarget.SELF, "passive": preload("res://resources/passives/venomous_shield.tres"), "passive_duration": 0 } ],
+			# 🆕 ИСПРАВЛЕНО: используем ID вместо preload
+			[ { "category": DataManager.EffectCategory.APPLY_PASSIVE, "target": DataManager.EffectTarget.SELF, "passive": DataManager.Passive.VENOMOUS_SHIELD, "passive_duration": 0 } ],
 			
 			# 9 ход - Урон 15
 			[ { "category": DataManager.EffectCategory.DAMAGE, "target": DataManager.EffectTarget.ENEMY, "base_value": 15 } ],

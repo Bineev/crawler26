@@ -106,6 +106,7 @@ func _create_intent_from_data(data: Array) -> IntentEntry:
 				effect.status = DataManager.get_status_by_enum(status_id)
 				effect.value = effect_data.get("value", 1)
 				effect.duration = effect_data.get("duration", 0)
+			# BUG
 			DataManager.EffectCategory.APPLY_PASSIVE:
 				var passive_id = effect_data.get("passive", 0)
 				effect.passive = DataManager.get_passive_by_enum(passive_id)
