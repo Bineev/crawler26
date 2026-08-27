@@ -556,6 +556,9 @@ enum CardId {
 	BLACK_ENVY,  # 🆕
 	TIME_TO_DIE,  # 🆕
 	BITTER_VENGEANCE,  # 🆕
+	PURE_THOUGHTS,  # 🆕 Чистые помыслы
+	BLIND_VENGEANCE,  # 🆕 Слепая месть
+	GRIP_OF_DESPAIR,  # 🆕 Хватка отчаяния
 }
 
 ## Намерения врагов
@@ -1605,6 +1608,9 @@ func load_all_cards():
 	_register_card(CardId.BLACK_ENVY, "res://resources/cards/penitent/black_envy.tres")
 	_register_card(CardId.TIME_TO_DIE, "res://resources/cards/penitent/time_to_die.tres")
 	_register_card(CardId.BITTER_VENGEANCE, "res://resources/cards/penitent/bitter_vengeance.tres")
+	_register_card(CardId.PURE_THOUGHTS, "res://resources/cards/penitent/pure_thoughts.tres")
+	_register_card(CardId.BLIND_VENGEANCE, "res://resources/cards/penitent/blind_vengeance.tres")
+	_register_card(CardId.GRIP_OF_DESPAIR, "res://resources/cards/penitent/grip_of_despair.tres")
 	
 	_cards_loaded = true
 
@@ -1700,6 +1706,9 @@ func load_card_illustrations():
 	_card_illustrations[CardId.BLACK_ENVY] = preload("res://img/cards/penitent/black_envy.png")
 	_card_illustrations[CardId.TIME_TO_DIE] = preload("res://img/cards/penitent/time_to_die.png")
 	_card_illustrations[CardId.BITTER_VENGEANCE] = preload("res://img/cards/penitent/bitter_vengeance.png")
+	_card_illustrations[CardId.PURE_THOUGHTS] = preload("res://img/cards/penitent/pure_thoughts.png")
+	_card_illustrations[CardId.BLIND_VENGEANCE] = preload("res://img/cards/penitent/blind_vengeance.png")
+	_card_illustrations[CardId.GRIP_OF_DESPAIR] = preload("res://img/cards/penitent/grip_of_despair.png")
 
 func get_card_illustration(card_id: CardId) -> Texture2D:
 	if _card_illustrations.is_empty():

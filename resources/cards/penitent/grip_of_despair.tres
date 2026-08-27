@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="CardData" load_steps=5 format=3 uid="uid://bpkq660m6alqd"]
+
+[ext_resource type="Script" uid="uid://cmra25r1r3ivt" path="res://resources/res_scripts/effect_entry.gd" id="1_vlpc7"]
+[ext_resource type="Script" uid="uid://badcs22cck6n5" path="res://resources/res_scripts/card_data.gd" id="2_k8hmj"]
+[ext_resource type="Script" uid="uid://hne6kyye87m" path="res://scripts/effects/grip_of_despair.gd" id="2_n51oi"]
+
+[sub_resource type="Resource" id="Resource_wfr7f"]
+script = ExtResource("1_vlpc7")
+category = 15
+custom_description = "card_grip_of_despair_desc"
+custom_script = ExtResource("2_n51oi")
+metadata/_custom_type_script = "uid://cmra25r1r3ivt"
+
+[resource]
+script = ExtResource("2_k8hmj")
+id = 43
+cost_grade = 4
+name_key = "card_grip_of_despair_name"
+description_key = "card_grip_of_despair_desc"
+grade = 2
+cost = 2
+effects = Array[ExtResource("1_vlpc7")]([SubResource("Resource_wfr7f")])
+metadata/_custom_type_script = "uid://badcs22cck6n5"

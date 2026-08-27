@@ -1,0 +1,37 @@
+[gd_resource type="Resource" script_class="CardData" load_steps=7 format=3 uid="uid://bkiopprxv2qr1"]
+
+[ext_resource type="Script" uid="uid://cmra25r1r3ivt" path="res://resources/res_scripts/effect_entry.gd" id="1_qb867"]
+[ext_resource type="Script" uid="uid://bl8mikafxfqyb" path="res://scripts/conditions/atonement_equals_zero.gd" id="2_7n10t"]
+[ext_resource type="Script" uid="uid://badcs22cck6n5" path="res://resources/res_scripts/card_data.gd" id="2_e6dky"]
+
+[sub_resource type="Resource" id="Resource_fep4h"]
+script = ExtResource("1_qb867")
+category = 1
+target = 0
+base_value = 7
+metadata/_custom_type_script = "uid://cmra25r1r3ivt"
+
+[sub_resource type="Resource" id="Resource_fbyvh"]
+script = ExtResource("1_qb867")
+category = 2
+target = 0
+base_value = 7
+metadata/_custom_type_script = "uid://cmra25r1r3ivt"
+
+[sub_resource type="Resource" id="Resource_yh3oa"]
+script = ExtResource("1_qb867")
+category = 14
+target = 0
+condition_script = ExtResource("2_7n10t")
+true_effect = SubResource("Resource_fbyvh")
+metadata/_custom_type_script = "uid://cmra25r1r3ivt"
+
+[resource]
+script = ExtResource("2_e6dky")
+id = 41
+cost_grade = 4
+name_key = "card_pure_thoughts_name"
+description_key = "card_pure_thoughts_desc"
+grade = 1
+effects = Array[ExtResource("1_qb867")]([SubResource("Resource_fep4h"), SubResource("Resource_yh3oa")])
+metadata/_custom_type_script = "uid://badcs22cck6n5"

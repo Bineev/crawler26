@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="CardData" load_steps=5 format=3 uid="uid://jn4b7wxu5uhe"]
+
+[ext_resource type="Script" uid="uid://cmra25r1r3ivt" path="res://resources/res_scripts/effect_entry.gd" id="1_bihv8"]
+[ext_resource type="Script" uid="uid://badcs22cck6n5" path="res://resources/res_scripts/card_data.gd" id="2_4jkhp"]
+[ext_resource type="Script" uid="uid://dm8jfjkjnfma2" path="res://scripts/effects/blind_vengeance.gd" id="2_yaugg"]
+
+[sub_resource type="Resource" id="Resource_6sa47"]
+script = ExtResource("1_bihv8")
+category = 15
+custom_description = "card_blind_vengeance_desc"
+custom_script = ExtResource("2_yaugg")
+metadata/_custom_type_script = "uid://cmra25r1r3ivt"
+
+[resource]
+script = ExtResource("2_4jkhp")
+id = 42
+cost_grade = 5
+upgrade_type = 4
+name_key = "card_blind_vengeance_name"
+description_key = "card_blind_vengeance_desc"
+grade = 3
+cost = 2
+effects = Array[ExtResource("1_bihv8")]([SubResource("Resource_6sa47")])
+manual_card_types = Array[int]([0, 5])
+metadata/_custom_type_script = "uid://badcs22cck6n5"

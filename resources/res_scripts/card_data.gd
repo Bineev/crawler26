@@ -499,6 +499,8 @@ func _get_condition_name(condition_script: Script) -> String:
 			return tr("condition_target_has_poison")
 		"res://scripts/conditions/target_has_negative_statuses.gd":  # 🆕
 			return tr("condition_target_has_negative_statuses")
+		"res://scripts/conditions/atonement_equals_zero.gd":
+			return tr("condition_atonement_equals_zero")
 		_:
 			return tr("condition_unknown")
 
