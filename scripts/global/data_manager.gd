@@ -559,6 +559,7 @@ enum CardId {
 	PURE_THOUGHTS,  # 🆕 Чистые помыслы
 	BLIND_VENGEANCE,  # 🆕 Слепая месть
 	GRIP_OF_DESPAIR,  # 🆕 Хватка отчаяния
+	FORGIVENESS,  # 🆕 Прощение
 }
 
 ## Намерения врагов
@@ -1611,6 +1612,7 @@ func load_all_cards():
 	_register_card(CardId.PURE_THOUGHTS, "res://resources/cards/penitent/pure_thoughts.tres")
 	_register_card(CardId.BLIND_VENGEANCE, "res://resources/cards/penitent/blind_vengeance.tres")
 	_register_card(CardId.GRIP_OF_DESPAIR, "res://resources/cards/penitent/grip_of_despair.tres")
+	_register_card(CardId.FORGIVENESS, "res://resources/cards/penitent/forgiveness.tres")
 	
 	_cards_loaded = true
 
@@ -1709,6 +1711,7 @@ func load_card_illustrations():
 	_card_illustrations[CardId.PURE_THOUGHTS] = preload("res://img/cards/penitent/pure_thoughts.png")
 	_card_illustrations[CardId.BLIND_VENGEANCE] = preload("res://img/cards/penitent/blind_vengeance.png")
 	_card_illustrations[CardId.GRIP_OF_DESPAIR] = preload("res://img/cards/penitent/grip_of_despair.png")
+	_card_illustrations[CardId.FORGIVENESS] = preload("res://img/cards/penitent/forgiveness.png")
 
 func get_card_illustration(card_id: CardId) -> Texture2D:
 	if _card_illustrations.is_empty():

@@ -100,6 +100,7 @@ func _init_default_progress():
 		DataManager.CardId.PURE_THOUGHTS,  # 🆕
 		DataManager.CardId.BLIND_VENGEANCE,  # 🆕
 		DataManager.CardId.GRIP_OF_DESPAIR,  # 🆕
+		DataManager.CardId.FORGIVENESS,  # 🆕
 	]
 	for card_id in penitent_cards:
 		unlock_card(card_id)

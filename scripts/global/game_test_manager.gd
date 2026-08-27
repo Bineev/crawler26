@@ -91,6 +91,7 @@ func initialize_new_run() -> void:
 	# Очищаем состояние
 	potion_icons.clear()
 	_reset_game_state()
+	ProgressManager.reset_available_biomes()
 	
 	# Устанавливаем дефолтные значения
 	current_floor = 0

@@ -8,9 +8,11 @@ enum OpenContext {
 }
 
 const SETTINGS_FILE := "user://settings.cfg"
+const SAVE_FILE := "user://savegame.save"  # 🆕 Добавляем константу
 
 var open_context: OpenContext = OpenContext.MAIN_MENU
 var is_open: bool = false
+var reset_confirm_mode: bool = false
 
 @onready var center_container: CenterContainer = $CenterContainer
 @onready var panel: Panel = $CenterContainer/Panel
@@ -28,6 +30,8 @@ var is_open: bool = false
 @onready var language_container: VBoxContainer = $CenterContainer/Panel/MarginContainer/VBoxContainer/LanguageContainer
 @onready var language_label: Label = $CenterContainer/Panel/MarginContainer/VBoxContainer/LanguageContainer/LanguageLabel
 @onready var language_option: OptionButton = $CenterContainer/Panel/MarginContainer/VBoxContainer/LanguageContainer/LanguageOption
+# 🆕 Кнопка сброса прогресса
+@onready var reset_button: Button = $CenterContainer/Panel/MarginContainer/VBoxContainer/ResetButton
 
 
 func _ready():
@@ -101,6 +105,12 @@ func _setup_ui():
 	margin_container.add_theme_constant_override("margin_top", 40)
 	margin_container.add_theme_constant_override("margin_bottom", 40)
 	
+	# 🆕 Кнопка "Сбросить прогресс" (по умолчанию скрыта)
+	reset_button.text = tr("settings_reset_progress")
+	DataManager.apply_button_style(reset_button, DataManager.ButtonType.DANGER)
+	reset_button.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	reset_button.hide()
+	
 	# Язык
 	language_label.text = tr("settings_language")
 	language_label.add_theme_font_override("font", DataManager.FONT_HEADERS)
@@ -134,6 +144,8 @@ func _connect_signals():
 	sfx_slider.value_changed.connect(_on_sfx_changed)
 	menu_button.pressed.connect(_on_menu_pressed)
 	language_option.item_selected.connect(_on_language_changed)
+	# 🆕 Подключаем сигнал кнопки сброса
+	reset_button.pressed.connect(_on_reset_pressed)
 
 
 func _load_volume_settings():
@@ -211,11 +223,21 @@ func _on_language_changed(index: int):
 func open(context: OpenContext = OpenContext.MAIN_MENU):
 	open_context = context
 	
+	reset_confirm_mode = false
+	
 	match context:
 		OpenContext.MAIN_MENU:
 			menu_button.hide()
+			# Показываем кнопку сброса только если есть файл сохранения
+			if FileAccess.file_exists(SAVE_FILE):
+				reset_button.show()
+				reset_button.text = tr("settings_reset_progress")
+				reset_button.modulate = Color(1, 1, 1, 1)
+			else:
+				reset_button.hide()
 		OpenContext.BIOME_CHOICE, OpenContext.GAMEPLAY:
 			menu_button.show()
+			reset_button.hide()
 	
 	_load_volume_settings()
 	
@@ -232,6 +254,7 @@ func close():
 	await tween.finished
 	hide()
 	is_open = false
+	reset_confirm_mode = false
 
 
 func _on_back_pressed():
@@ -241,3 +264,30 @@ func _on_back_pressed():
 func _on_menu_pressed():
 	close()
 	SignalManager.exit_to_menu_requested.emit()
+
+
+# 🆕 Обработчик кнопки сброса прогресса
+func _on_reset_pressed():
+	if not reset_confirm_mode:
+		# Первый клик — переключаем в режим подтверждения
+		reset_confirm_mode = true
+		reset_button.text = tr("settings_reset_confirm")
+		reset_button.modulate = Color(1, 0.3, 0.2, 1)  # Красноватый оттенок
+	else:
+		# Второй клик — подтверждение сброса
+		_reset_progress()
+
+
+func _reset_progress():
+	# Удаляем файл сохранения (прогресс)
+	if FileAccess.file_exists(SAVE_FILE):
+		DirAccess.remove_absolute(SAVE_FILE)
+		print("Save file deleted: ", SAVE_FILE)
+	
+	# 🆕 Скрываем кнопку, но НЕ закрываем настройки
+	reset_button.hide()
+	
+	# Сбрасываем режим подтверждения
+	reset_confirm_mode = false
+	
+	print("Progress reset successfully!")

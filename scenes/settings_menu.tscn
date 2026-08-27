@@ -68,6 +68,9 @@ layout_mode = 2
 [node name="LanguageOption" type="OptionButton" parent="CenterContainer/Panel/MarginContainer/VBoxContainer/LanguageContainer"]
 layout_mode = 2
 
+[node name="ResetButton" type="Button" parent="CenterContainer/Panel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
 [node name="ColorRect" type="ColorRect" parent="CenterContainer/Panel"]
 material = ExtResource("2_cr101")
 layout_mode = 1

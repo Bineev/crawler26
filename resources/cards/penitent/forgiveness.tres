@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="CardData" load_steps=4 format=3 uid="uid://cfou7afcc6oig"]
+
+[ext_resource type="Script" uid="uid://cmra25r1r3ivt" path="res://resources/res_scripts/effect_entry.gd" id="1_1tme8"]
+[ext_resource type="Script" uid="uid://badcs22cck6n5" path="res://resources/res_scripts/card_data.gd" id="2_1hidg"]
+
+[sub_resource type="Resource" id="Resource_1tme8"]
+script = ExtResource("1_1tme8")
+category = 3
+target = 0
+scaled_values = Array[int]([8, 12, 15])
+scaled_thresholds = Array[int]([0, 15, 30])
+scaled_type = 2
+scaled_spend_resource = true
+metadata/_custom_type_script = "uid://cmra25r1r3ivt"
+
+[resource]
+script = ExtResource("2_1hidg")
+id = 44
+is_burned = true
+cost_grade = 6
+name_key = "card_forgiveness_name"
+description_key = "card_forgiveness_desc"
+grade = 4
+cost = 3
+effects = Array[ExtResource("1_1tme8")]([SubResource("Resource_1tme8")])
+manual_card_types = Array[int]([4, 5])
+metadata/_custom_type_script = "uid://badcs22cck6n5"
