@@ -256,6 +256,7 @@ func _collect_floor_manager_data() -> Dictionary:
 		"current_path_index": FloorManager.current_path_index,
 		"current_path_progress": FloorManager.current_path_progress,
 		"current_segment_index": FloorManager.current_segment_index,
+		"current_room_index": GameTestManager.current_room_index,  # 🆕
 		"boss_generated": FloorManager.boss_generated,
 		"current_floor": FloorManager.current_floor,
 		"current_biome": FloorManager.current_biome,
@@ -591,6 +592,11 @@ func restore_game_state(game_state_data: Dictionary) -> void:
 	FloorManager.boss_generated = bool(floor_data.get("boss_generated", false))
 	FloorManager.current_floor = int(floor_data.get("current_floor", 1))
 	FloorManager.current_biome = int(floor_data.get("current_biome", DataManager.Biome.MOLE_TUNNELS))
+
+	# 🆕 Восстанавливаем current_room_index в обоих местах
+	var room_index = int(floor_data.get("current_room_index", 0))
+	GameTestManager.current_room_index = room_index
+	FloorManager.current_room_index = room_index  # ← СИНХРОНИЗИРУЕМ
 	
 	# Восстанавливаем all_rooms
 	FloorManager.all_rooms.clear()

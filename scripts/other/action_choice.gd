@@ -587,43 +587,112 @@ func _handle_trade() -> void:
 	SignalManager.show_reward.emit(reward_panel)
 	queue_free()
 
+
 func _generate_shop_items() -> Array[Dictionary]:
 	var items: Array[Dictionary] = []
+	var player = BattleManager.get_player()
 	
-	# 2-4 карты
-	var card_count = randi() % 3 + 2
-	var cards = DeckManager.get_cards_by_biome(FloorManager.current_biome, FloorManager.current_path_progress, FloorManager.current_floor, 10)
-	cards.shuffle()
-	for i in range(min(card_count, cards.size())):
-		var card = cards[i]
+	# ============================================================
+	# 1. КАРТЫ (всегда 4)
+	# ============================================================
+	
+	# 1.1 Две карты текущего биома
+	var biome_cards = DeckManager.get_cards_by_biome(
+		FloorManager.current_biome,
+		FloorManager.current_path_progress,
+		FloorManager.current_floor,
+		10
+	)
+	biome_cards.shuffle()
+	var added_biome = 0
+	for card in biome_cards:
+		if added_biome >= 2:
+			break
 		items.append({
 			"type": "card",
 			"data": card,
 			"cost_grade": _random_cost_grade(),
 		})
+		added_biome += 1
 	
-	# 1-2 артефакта
-	var artifact_count = randi() % 2 + 1
-	var artifacts = ArtifactManager.get_random_artifacts(DataManager.ArtifactGrade.NORMAL, 5)
-	for i in range(min(artifact_count, artifacts.size())):
-		var artifact = artifacts[i]
+	# 1.2 Одна карта из случайного биома (не текущего)
+	# 🆕 Берём биомы из ProgressManager, а не из DataManager
+	var other_biomes = []
+	for biome in ProgressManager.all_biomes:
+		if biome != FloorManager.current_biome:
+			other_biomes.append(biome)
+	
+	if not other_biomes.is_empty():
+		var random_biome = other_biomes[randi() % other_biomes.size()]
+		var other_cards = DeckManager.get_cards_by_biome(
+			random_biome,
+			FloorManager.current_path_progress,
+			FloorManager.current_floor,
+			10
+		)
+		other_cards.shuffle()
+		if not other_cards.is_empty():
+			items.append({
+				"type": "card",
+				"data": other_cards[0],
+				"cost_grade": _random_cost_grade(),
+			})
+	
+	# 1.3 Одна карта персонажа
+	var character_cards = DeckManager.get_cards_by_character(
+		RunManager.current_character,
+		FloorManager.current_path_progress,
+		FloorManager.current_floor,
+		10
+	)
+	character_cards.shuffle()
+	if not character_cards.is_empty():
+		items.append({
+			"type": "card",
+			"data": character_cards[0],
+			"cost_grade": _random_cost_grade(),
+		})
+	
+	# ============================================================
+	# 2. АРТЕФАКТЫ (2-3 штуки, без дублей)
+	# ============================================================
+	
+	var artifact_count = randi() % 2 + 2
+	var existing_ids: Array[DataManager.ArtifactId] = []
+	for artifact in RunManager.artifacts:
+		existing_ids.append(artifact.id)
+	
+	var all_artifacts = ArtifactManager.get_random_artifacts(DataManager.ArtifactGrade.NORMAL, 10)
+	var filtered_artifacts: Array[ArtifactResource] = []
+	for artifact in all_artifacts:
+		if artifact.id not in existing_ids:
+			filtered_artifacts.append(artifact)
+	
+	for i in range(min(artifact_count, filtered_artifacts.size())):
+		var artifact = filtered_artifacts[i]
 		items.append({
 			"type": "artifact",
 			"data": artifact,
 			"cost_grade": _random_cost_grade(),
 		})
 	
-	# 🆕 Ключи (всегда 1-2 в продаже, в контейнере с артефактами)
+	# ============================================================
+	# 3. КЛЮЧИ (всегда 1-2)
+	# ============================================================
+	
 	var key_count = randi() % 2 + 1
 	for i in range(key_count):
 		items.append({
 			"type": "key",
-			"data": null,  # ключ не требует данных
+			"data": null,
 			"cost_grade": DataManager.CostGrade.NORMAL,
 		})
 	
-	# 2-4 зелья
-	var potion_count = randi() % 3 + 2
+	# ============================================================
+	# 4. ЗЕЛЬЯ (всегда 2-3)
+	# ============================================================
+	
+	var potion_count = randi() % 2 + 2
 	var potions = DataManager.get_random_potions(10)
 	for i in range(min(potion_count, potions.size())):
 		var potion = potions[i]

@@ -83,12 +83,12 @@ func _add_key_item(item: Dictionary) -> void:
 	var container = VBoxContainer.new()
 	container.alignment = BoxContainer.ALIGNMENT_CENTER
 	container.add_theme_constant_override("separation", 5)
-	container.custom_minimum_size = Vector2(128, 128)
+	#container.custom_minimum_size = Vector2(128, 128)
 	
 	# 🆕 Иконка ключа
 	var key_icon = TextureRect.new()
 	key_icon.texture = preload("res://img/icons/currency/keys1.png")  # TODO: добавить иконку ключа
-	key_icon.custom_minimum_size = Vector2(96, 96)
+	key_icon.custom_minimum_size = Vector2(128, 128)
 	key_icon.expand_mode = TextureRect.EXPAND_FIT_WIDTH_PROPORTIONAL
 	key_icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	container.add_child(key_icon)
