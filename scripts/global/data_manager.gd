@@ -662,7 +662,7 @@ enum RoomReveal {
 const FLOOR_ROOMS_PER_PATH: int = 3           # комнат в одном пути
 const FLOOR_VISIBLE_ROOMS: int = 3            # видимых комнат в пути
 const FLOOR_PATHS_COUNT: int = 2              # количество путей на развилке
-const FLOOR_SEGMENTS_BEFORE_BOSS: int = 3     # сегментов (развилок) до босса
+const FLOOR_SEGMENTS_BEFORE_BOSS: int = 4     # сегментов (развилок) до босса
 ## ============================================================
 ## 2. БАЛАНСНЫЕ КОНСТАНТЫ
 ## ============================================================

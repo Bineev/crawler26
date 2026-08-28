@@ -537,26 +537,33 @@ func apply_energy_buff(bonus: int, duration: int) -> void:
 	var old_bonus = temp_buffs["bonus_energy"]
 	var old_duration = temp_buffs["max_energy_buff"]
 	
+	# 1. Обновляем temp_buffs
 	if old_bonus == 0:
-		# Если баффа нет — просто применяем
 		temp_buffs["bonus_energy"] = bonus
 		temp_buffs["max_energy_buff"] = duration
 	else:
 		if bonus == old_bonus:
-			# Одинаковые значения — суммируем длительность
 			temp_buffs["max_energy_buff"] = old_duration + duration
 		else:
-			# Разные значения — берём максимум бонуса и максимум длительности
 			temp_buffs["bonus_energy"] = max(bonus, old_bonus)
 			temp_buffs["max_energy_buff"] = max(duration, old_duration)
 	
-	# 🆕 Звук получения баффа
 	SoundManager.play(null, DataManager.get_sound(DataManager.SoundType.HEAL))
 	
 	var player = BattleManager.get_player()
 	if player:
 		var current_max = player.get_max_energy()
-		var new_max = DataManager.MAX_ENERGY + temp_buffs["bonus_energy"]
+		
+		# 🆕 Определяем базу для расчёта
+		var base_max: int
+		if old_bonus == 0:
+			# Если баффа не было — берём текущее значение (может уже быть изменено артефактами)
+			base_max = current_max
+		else:
+			# Если бафф уже был — откатываем временный бонус и прибавляем новый
+			base_max = DataManager.MAX_ENERGY + old_bonus
+		
+		var new_max = base_max + bonus
 		player.set_flat(DataManager.FlatStat.MAX_ENERGY, new_max)
 		player.restore_energy()
 		SignalManager.log_message.emit("Максимальная энергия: +%d на %d боёв!" % [temp_buffs["bonus_energy"], temp_buffs["max_energy_buff"]])
@@ -609,7 +616,48 @@ func apply_idol_curse_to_player(player: CharacterStats) -> void:
 			if bleed_status:
 				player.add_status(bleed_status, 2, 3, player)
 				SignalManager.log_message.emit("Проклятие идола: Кровотечение!")
-		# TODO: другие биомы
+		
+		DataManager.Biome.ROTTEN_MARSHES:
+			# 🆕 Проклятие Гнилостных Топей — Яд
+			var poison_status = DataManager.get_status_resource(DataManager.Status.POISON)
+			if poison_status:
+				player.add_status(poison_status, 1, 4, player)
+				SignalManager.log_message.emit("Проклятие идола: Яд!")
+		
+		DataManager.Biome.FLESH_CAVES:
+			# 🆕 Проклятие Пещер Плоти — Кровотечение + Слабость (позже)
+			var bleed_status = DataManager.get_status_resource(DataManager.Status.BLEED)
+			var weakness_status = DataManager.get_status_resource(DataManager.Status.WEAKNESS)
+			if bleed_status:
+				player.add_status(bleed_status, 3, 3, player)
+			if weakness_status:
+				player.add_status(weakness_status, 1, 2, player)
+			SignalManager.log_message.emit("Проклятие идола: Кровотечение + Слабость!")
+		
+		DataManager.Biome.BONE_LABYRINTH:
+			# 🆕 Проклятие Костяного Лабиринта — Холод (позже)
+			var cold_status = DataManager.get_status_resource(DataManager.Status.COLD)
+			if cold_status:
+				player.add_status(cold_status, 4, 3, player)
+				SignalManager.log_message.emit("Проклятие идола: Холод!")
+		
+		DataManager.Biome.FROZEN_DEPTHS:
+			# 🆕 Проклятие Ледяных Глубин — Холод + Заморозка (позже)
+			var cold_status = DataManager.get_status_resource(DataManager.Status.COLD)
+			if cold_status:
+				player.add_status(cold_status, 5, 3, player)
+				SignalManager.log_message.emit("Проклятие идола: Холод!")
+		
+		DataManager.Biome.MAGMA_CORE:
+			# 🆕 Проклятие Ядра Магмы — Горение (позже)
+			var burn_status = DataManager.get_status_resource(DataManager.Status.BURN)
+			if burn_status:
+				player.add_status(burn_status, 2, 4, player)
+				SignalManager.log_message.emit("Проклятие идола: Горение!")
+		
+		_:
+			# 🆕 Fallback для неизвестных биомов
+			SignalManager.log_message.emit("Проклятие идола: неизвестный биом %s" % DataManager.Biome.keys()[idol_curse_biome])
 	
 	idol_curse_remaining -= 1
 
@@ -651,29 +699,35 @@ func apply_deck_size_buff(amount: int, duration: int) -> void:
 	var old_amount = deck_size_bonus
 	var old_duration = deck_size_buff_remaining
 	
+	# 1. Обновляем deck_size_bonus и deck_size_buff_remaining
 	if old_amount == 0:
-		# Если баффа нет — просто применяем
 		deck_size_bonus = amount
 		deck_size_buff_remaining = duration
 	else:
 		if amount == old_amount:
-			# Одинаковые значения — суммируем длительность
 			deck_size_buff_remaining = old_duration + duration
 		else:
-			# Разные значения — берём максимум бонуса и максимум длительности
 			deck_size_bonus = max(amount, old_amount)
 			deck_size_buff_remaining = max(duration, old_duration)
-
-	# 🆕 Звук получения баффа
+	
 	SoundManager.play(null, DataManager.get_sound(DataManager.SoundType.HEAL))
-
+	
 	var player = BattleManager.get_player()
 	if player:
 		var current_hand_size = player.get_flat(DataManager.FlatStat.HAND_SIZE)
-		var new_hand_size = DataManager.STARTING_HAND_SIZE + deck_size_bonus
+		
+		# 🆕 Определяем базу для расчёта
+		var base_size: int
+		if old_amount == 0:
+			# Если баффа не было — берём текущее значение (может уже быть изменено артефактами)
+			base_size = current_hand_size
+		else:
+			# Если бафф уже был — откатываем временный бонус и прибавляем новый
+			base_size = DataManager.STARTING_HAND_SIZE + old_amount
+		
+		var new_hand_size = base_size + amount
 		player.set_flat(DataManager.FlatStat.HAND_SIZE, new_hand_size)
 		SignalManager.log_message.emit("Размер руки: +%d на %d боёв!" % [deck_size_bonus, deck_size_buff_remaining])
-
 
 
 func decrement_deck_size_buff() -> void:
@@ -686,8 +740,13 @@ func decrement_deck_size_buff() -> void:
 		var player = BattleManager.get_player()
 		if player:
 			var current_hand_size = player.get_flat(DataManager.FlatStat.HAND_SIZE)
-			player.set_flat(DataManager.FlatStat.HAND_SIZE, current_hand_size - deck_size_bonus)
-			SignalManager.log_message.emit("Бафф размера руки закончился!")
+			var bonus_to_remove = deck_size_bonus
+			
+			# 🆕 Защита: не даём уйти меньше базового размера
+			var new_hand_size = max(current_hand_size - bonus_to_remove, DataManager.STARTING_HAND_SIZE)
+			player.set_flat(DataManager.FlatStat.HAND_SIZE, new_hand_size)
+			SignalManager.log_message.emit("Бафф размера руки закончился! Размер руки: %d" % new_hand_size)
+		
 		deck_size_bonus = 0
 
 
