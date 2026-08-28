@@ -133,7 +133,7 @@ layout_mode = 2
 
 [node name="ArtifactContainer" type="GridContainer" parent="VBoxContainer"]
 layout_mode = 2
-columns = 6
+columns = 5
 
 [node name="ColorRect" type="ColorRect" parent="."]
 material = SubResource("ShaderMaterial_icepd")

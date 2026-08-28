@@ -284,7 +284,7 @@ func show_rewards() -> void:
 func exit_room() -> void:
 	await _close_room_animation()
 	# 🆕 Сохраняем игру после выхода из комнаты
-	SaveManager.save_game()
+	#SaveManager.save_game()
 	GameTestManager.clear_ui()
 	FloorManager.process_next()
 	queue_free()

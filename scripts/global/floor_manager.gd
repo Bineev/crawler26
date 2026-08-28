@@ -24,7 +24,27 @@ var current_segment_index: int = 0  # текущий сегмент (разви�
 # Флаг, нужно ли генерировать босса
 var boss_generated: bool = false
 
+## Паттерны для генерации сегментов
+const PATTERNS_FIRST = [
+	{ "pattern": ["object", "combat", "object"], "weight": 40 },
+	{ "pattern": ["elite", "object", "object"], "weight": 30 },
+	{ "pattern": ["object", "elite", "object"], "weight": 30 },
+]
 
+const PATTERNS_MIDDLE = [
+	{ "pattern": ["object", "combat", "combat"], "weight": 50 },
+	{ "pattern": ["object", "elite", "combat"], "weight": 25 },
+	{ "pattern": ["object", "elite", "elite"], "weight": 15 },
+	{ "pattern": ["object", "elite", "object"], "weight": 7 },
+	{ "pattern": ["object", "combat", "object"], "weight": 3 },
+]
+
+const PATTERNS_LAST = [
+	{ "pattern": ["object", "combat", "bonfire"], "weight": 40 },
+	{ "pattern": ["object", "elite", "bonfire"], "weight": 30 },
+	{ "pattern": ["combat", "combat", "bonfire"], "weight": 20 },
+	{ "pattern": ["combat", "elite", "bonfire"], "weight": 10 },
+]
 ## ============================================================
 ## ТОЧКА ВХОДА
 ## ============================================================
@@ -374,107 +394,107 @@ func _on_biome_completed() -> void:
 		#
 		#all_paths.append(segment_paths)
 
-
-func _generate_all_segments() -> void:
-	var rooms_per_path = DataManager.FLOOR_ROOMS_PER_PATH * DataManager.FLOOR_VISIBLE_ROOMS
-	var room_pool: Array[RoomNode] = []
-	
-	# Добавляем бои
-	var total_battles = DataManager.CONSECUTIVE_BATTLES_COUNT * DataManager.FLOOR_SEGMENTS_BEFORE_BOSS * 2  # ×2 для двух путей
-	
-	for i in range(total_battles):
-		var combat_type = DataManager.CombatType.NORMAL
-		if i % 3 == 2:
-			combat_type = DataManager.CombatType.ELITE
-		if current_floor >= 3 and i % 3 == 1:
-			combat_type = DataManager.CombatType.ELITE
-		if current_floor >= 5 and i % 2 == 0:
-			combat_type = DataManager.CombatType.ELITE
-		
-		room_pool.append(_create_room_node(DataManager.RoomType.COMBAT, combat_type))
-	
-	# Добавляем объекты (для ОБОИХ путей)
-	for i in range(DataManager.SHOPS_ON_FLOOR_COUNT):
-		room_pool.append(_create_room_node(DataManager.RoomType.OBJECT, DataManager.CombatType.NORMAL, DataManager.ObjectType.SHOP))
-	
-	for i in range(DataManager.EVENTS_ON_FLOOR_COUNT):
-		room_pool.append(_create_room_node(DataManager.RoomType.OBJECT, DataManager.CombatType.NORMAL, DataManager.ObjectType.EVENT))
-	
-	for i in range(DataManager.CHESTS_ON_FLOOR_COUNT):
-		room_pool.append(_create_room_node(DataManager.RoomType.OBJECT, DataManager.CombatType.NORMAL, DataManager.ObjectType.CHEST))
-	
-	for i in range(DataManager.TRAPS_ON_FLOOR_COUNT):
-		room_pool.append(_create_room_node(DataManager.RoomType.OBJECT, DataManager.CombatType.NORMAL, DataManager.ObjectType.TRAP))
-	
-	for i in range(DataManager.BONFIRES_ON_FLOOR_COUNT):
-		room_pool.append(_create_room_node(DataManager.RoomType.OBJECT, DataManager.CombatType.NORMAL, DataManager.ObjectType.BONFIRE))
-	
-	for i in range(DataManager.IDOLS_ON_FLOOR_COUNT):
-		room_pool.append(_create_room_node(DataManager.RoomType.OBJECT, DataManager.CombatType.NORMAL, DataManager.ObjectType.IDOL))
-	
-	for i in range(DataManager.TORTURE_RACK_ON_FLOOR_COUNT):
-		room_pool.append(_create_room_node(DataManager.RoomType.OBJECT, DataManager.CombatType.NORMAL, DataManager.ObjectType.TORTURE_RACK))
-	
-	for i in range(DataManager.CAULDRONS_ON_FLOOR_COUNT):
-		room_pool.append(_create_room_node(DataManager.RoomType.OBJECT, DataManager.CombatType.NORMAL, DataManager.ObjectType.CAULDRON))
-	
-	# Перемешиваем пул
-	room_pool.shuffle()
-	
-	# Распределяем по двум путям (ЧЕРЕДУЯ)
-	var path1: Array[RoomNode] = []
-	var path2: Array[RoomNode] = []
-	
-	var battle_counter1 = 0
-	var battle_counter2 = 0
-	
-	for room in room_pool:
-		# Определяем, в какой путь положить комнату
-		if room.room_type == DataManager.RoomType.COMBAT:
-			# Бои чередуем между путями, но не даём превысить CONSECUTIVE_BATTLES_COUNT
-			if battle_counter1 <= battle_counter2 and battle_counter1 < DataManager.CONSECUTIVE_BATTLES_COUNT:
-				path1.append(room)
-				battle_counter1 += 1
-				battle_counter2 = 0
-			elif battle_counter2 < DataManager.CONSECUTIVE_BATTLES_COUNT:
-				path2.append(room)
-				battle_counter2 += 1
-				battle_counter1 = 0
-			else:
-				# Если оба пути достигли лимита — сбрасываем
-				battle_counter1 = 0
-				battle_counter2 = 0
-				path1.append(room)
-				battle_counter1 += 1
-		else:
-			# Объекты — просто чередуем
-			if path1.size() <= path2.size():
-				path1.append(room)
-			else:
-				path2.append(room)
-	
-	# Дополняем пути до нужной длины
-	while path1.size() < rooms_per_path:
-		path1.append(_create_room_node(DataManager.RoomType.COMBAT, DataManager.CombatType.NORMAL))
-	while path2.size() < rooms_per_path:
-		path2.append(_create_room_node(DataManager.RoomType.COMBAT, DataManager.CombatType.NORMAL))
-	
-	# Разбиваем на сегменты и записываем в all_paths
-	all_paths.clear()
-	for segment in range(DataManager.FLOOR_SEGMENTS_BEFORE_BOSS):
-		var start_idx = segment * DataManager.FLOOR_VISIBLE_ROOMS
-		var end_idx = start_idx + DataManager.FLOOR_VISIBLE_ROOMS
-		
-		var segment_paths: Array[Array] = [
-			path1.slice(start_idx, end_idx),
-			path2.slice(start_idx, end_idx)
-		]
-		
-		for path in segment_paths:
-			for i in range(path.size()):
-				path[i].is_revealed = (i < DataManager.FLOOR_VISIBLE_ROOMS - randi_range(0, 2))
-		
-		all_paths.append(segment_paths)
+## старый рабочий, но не очень правильный генератор этажа
+#func _generate_all_segments() -> void:
+	#var rooms_per_path = DataManager.FLOOR_ROOMS_PER_PATH * DataManager.FLOOR_VISIBLE_ROOMS
+	#var room_pool: Array[RoomNode] = []
+	#
+	## Добавляем бои
+	#var total_battles = DataManager.CONSECUTIVE_BATTLES_COUNT * DataManager.FLOOR_SEGMENTS_BEFORE_BOSS * 2  # ×2 для двух путей
+	#
+	#for i in range(total_battles):
+		#var combat_type = DataManager.CombatType.NORMAL
+		#if i % 3 == 2:
+			#combat_type = DataManager.CombatType.ELITE
+		#if current_floor >= 3 and i % 3 == 1:
+			#combat_type = DataManager.CombatType.ELITE
+		#if current_floor >= 5 and i % 2 == 0:
+			#combat_type = DataManager.CombatType.ELITE
+		#
+		#room_pool.append(_create_room_node(DataManager.RoomType.COMBAT, combat_type))
+	#
+	## Добавляем объекты (для ОБОИХ путей)
+	#for i in range(DataManager.SHOPS_ON_FLOOR_COUNT):
+		#room_pool.append(_create_room_node(DataManager.RoomType.OBJECT, DataManager.CombatType.NORMAL, DataManager.ObjectType.SHOP))
+	#
+	#for i in range(DataManager.EVENTS_ON_FLOOR_COUNT):
+		#room_pool.append(_create_room_node(DataManager.RoomType.OBJECT, DataManager.CombatType.NORMAL, DataManager.ObjectType.EVENT))
+	#
+	#for i in range(DataManager.CHESTS_ON_FLOOR_COUNT):
+		#room_pool.append(_create_room_node(DataManager.RoomType.OBJECT, DataManager.CombatType.NORMAL, DataManager.ObjectType.CHEST))
+	#
+	#for i in range(DataManager.TRAPS_ON_FLOOR_COUNT):
+		#room_pool.append(_create_room_node(DataManager.RoomType.OBJECT, DataManager.CombatType.NORMAL, DataManager.ObjectType.TRAP))
+	#
+	#for i in range(DataManager.BONFIRES_ON_FLOOR_COUNT):
+		#room_pool.append(_create_room_node(DataManager.RoomType.OBJECT, DataManager.CombatType.NORMAL, DataManager.ObjectType.BONFIRE))
+	#
+	#for i in range(DataManager.IDOLS_ON_FLOOR_COUNT):
+		#room_pool.append(_create_room_node(DataManager.RoomType.OBJECT, DataManager.CombatType.NORMAL, DataManager.ObjectType.IDOL))
+	#
+	#for i in range(DataManager.TORTURE_RACK_ON_FLOOR_COUNT):
+		#room_pool.append(_create_room_node(DataManager.RoomType.OBJECT, DataManager.CombatType.NORMAL, DataManager.ObjectType.TORTURE_RACK))
+	#
+	#for i in range(DataManager.CAULDRONS_ON_FLOOR_COUNT):
+		#room_pool.append(_create_room_node(DataManager.RoomType.OBJECT, DataManager.CombatType.NORMAL, DataManager.ObjectType.CAULDRON))
+	#
+	## Перемешиваем пул
+	#room_pool.shuffle()
+	#
+	## Распределяем по двум путям (ЧЕРЕДУЯ)
+	#var path1: Array[RoomNode] = []
+	#var path2: Array[RoomNode] = []
+	#
+	#var battle_counter1 = 0
+	#var battle_counter2 = 0
+	#
+	#for room in room_pool:
+		## Определяем, в какой путь положить комнату
+		#if room.room_type == DataManager.RoomType.COMBAT:
+			## Бои чередуем между путями, но не даём превысить CONSECUTIVE_BATTLES_COUNT
+			#if battle_counter1 <= battle_counter2 and battle_counter1 < DataManager.CONSECUTIVE_BATTLES_COUNT:
+				#path1.append(room)
+				#battle_counter1 += 1
+				#battle_counter2 = 0
+			#elif battle_counter2 < DataManager.CONSECUTIVE_BATTLES_COUNT:
+				#path2.append(room)
+				#battle_counter2 += 1
+				#battle_counter1 = 0
+			#else:
+				## Если оба пути достигли лимита — сбрасываем
+				#battle_counter1 = 0
+				#battle_counter2 = 0
+				#path1.append(room)
+				#battle_counter1 += 1
+		#else:
+			## Объекты — просто чередуем
+			#if path1.size() <= path2.size():
+				#path1.append(room)
+			#else:
+				#path2.append(room)
+	#
+	## Дополняем пути до нужной длины
+	#while path1.size() < rooms_per_path:
+		#path1.append(_create_room_node(DataManager.RoomType.COMBAT, DataManager.CombatType.NORMAL))
+	#while path2.size() < rooms_per_path:
+		#path2.append(_create_room_node(DataManager.RoomType.COMBAT, DataManager.CombatType.NORMAL))
+	#
+	## Разбиваем на сегменты и записываем в all_paths
+	#all_paths.clear()
+	#for segment in range(DataManager.FLOOR_SEGMENTS_BEFORE_BOSS):
+		#var start_idx = segment * DataManager.FLOOR_VISIBLE_ROOMS
+		#var end_idx = start_idx + DataManager.FLOOR_VISIBLE_ROOMS
+		#
+		#var segment_paths: Array[Array] = [
+			#path1.slice(start_idx, end_idx),
+			#path2.slice(start_idx, end_idx)
+		#]
+		#
+		#for path in segment_paths:
+			#for i in range(path.size()):
+				#path[i].is_revealed = (i < DataManager.FLOOR_VISIBLE_ROOMS - randi_range(0, 2))
+		#
+		#all_paths.append(segment_paths)
 
 func _create_room_node(room_type: DataManager.RoomType, combat_type: DataManager.CombatType = DataManager.CombatType.NORMAL, object_type: DataManager.ObjectType = DataManager.ObjectType.CHEST, is_revealed: bool = true) -> RoomNode:
 	var room_node = RoomNode.new()
@@ -485,3 +505,300 @@ func _create_room_node(room_type: DataManager.RoomType, combat_type: DataManager
 		"is_revealed": is_revealed
 	})
 	return room_node
+
+# ============================================================
+# ВСПОМОГАТЕЛЬНЫЕ МЕТОДЫ
+# ============================================================
+
+## Выбирает паттерн случайно с учётом весов
+func _select_pattern_by_weight(patterns: Array) -> Array:
+	var total_weight = 0
+	for p in patterns:
+		total_weight += p["weight"]
+	
+	var roll = randi() % total_weight
+	var accumulated = 0
+	for p in patterns:
+		accumulated += p["weight"]
+		if roll < accumulated:
+			return p["pattern"]
+	
+	return patterns[0]["pattern"]
+
+
+## Получает паттерн для сегмента в зависимости от его позиции
+func _get_pattern_for_segment(seg_idx: int, total_segments: int) -> Array:
+	var is_first = (seg_idx == 0)
+	var is_last = (seg_idx == total_segments - 1)
+	
+	if is_first:
+		return _select_pattern_by_weight(PATTERNS_FIRST)
+	elif is_last:
+		return _select_pattern_by_weight(PATTERNS_LAST)
+	else:
+		return _select_pattern_by_weight(PATTERNS_MIDDLE)
+
+
+## Создаёт комнату по типу из паттерна (без объекта)
+func _create_room_from_pattern_type(pattern_type: String, object_type: DataManager.ObjectType = DataManager.ObjectType.CHEST) -> RoomNode:
+	match pattern_type:
+		"combat":
+			return _create_room_node(DataManager.RoomType.COMBAT, DataManager.CombatType.NORMAL)
+		"elite":
+			return _create_room_node(DataManager.RoomType.COMBAT, DataManager.CombatType.ELITE)
+		"bonfire":
+			return _create_room_node(DataManager.RoomType.OBJECT, DataManager.CombatType.NORMAL, DataManager.ObjectType.BONFIRE)
+		"object":
+			return _create_room_node(DataManager.RoomType.OBJECT, DataManager.CombatType.NORMAL, object_type)
+		_:
+			return _create_room_node(DataManager.RoomType.COMBAT, DataManager.CombatType.NORMAL)
+
+
+# ============================================================
+# ВЫБОР ОБЪЕКТОВ
+# ============================================================
+
+func _get_available_objects_for_segment(seg_idx: int, used_objects: Array[DataManager.ObjectType]) -> Array[DataManager.ObjectType]:
+	var available: Array[DataManager.ObjectType] = []
+	
+	var all_objects = [
+		DataManager.ObjectType.CHEST,
+		DataManager.ObjectType.EVENT,
+		DataManager.ObjectType.IDOL,
+		DataManager.ObjectType.TRAP,
+		DataManager.ObjectType.CAULDRON,
+		DataManager.ObjectType.TORTURE_RACK,
+	]
+	
+	# Магазин — только со 2-го сегмента
+	if seg_idx >= 1:
+		all_objects.append(DataManager.ObjectType.SHOP)
+	
+	# Привал — только со 2-го сегмента (кроме последнего, где он ставится отдельно)
+	if seg_idx >= 1 and seg_idx < DataManager.FLOOR_SEGMENTS_BEFORE_BOSS - 1:
+		all_objects.append(DataManager.ObjectType.BONFIRE)
+	
+	# Убираем использованные объекты
+	for obj in all_objects:
+		if obj not in used_objects:
+			available.append(obj)
+	
+	return available
+
+
+## Выбирает случайный объект из доступных
+func _select_random_object(available: Array[DataManager.ObjectType]) -> DataManager.ObjectType:
+	if available.is_empty():
+		# Если все объекты использованы — возвращаем сундук как fallback
+		return DataManager.ObjectType.CHEST
+	
+	return available[randi() % available.size()]
+
+
+## Обновляет список использованных объектов
+func _update_used_objects(used_objects: Array[DataManager.ObjectType], path_objects: Array[DataManager.ObjectType]) -> Array[DataManager.ObjectType]:
+	var result = used_objects.duplicate()
+	for obj in path_objects:
+		if obj not in result:
+			result.append(obj)
+	return result
+
+
+# ============================================================
+# ГЕНЕРАЦИЯ ПУТЕЙ
+# ============================================================
+
+## Генерирует паттерны для всех сегментов
+func _generate_segment_patterns(total_segments: int) -> Array:
+	var segment_patterns: Array = []
+	
+	for seg_idx in range(total_segments):
+		var pattern = _get_pattern_for_segment(seg_idx, total_segments)
+		segment_patterns.append(pattern)
+	
+	return segment_patterns
+
+
+## Создаёт путь из паттернов с выбором объектов
+func _build_path_from_patterns(segment_patterns: Array, seg_idx_offset: int, used_objects: Array[DataManager.ObjectType]) -> Array[RoomNode]:
+	var path: Array[RoomNode] = []
+	var local_used = used_objects.duplicate()
+	
+	for seg_idx in range(segment_patterns.size()):
+		var pattern = segment_patterns[seg_idx]
+		var actual_seg_idx = seg_idx_offset + seg_idx
+		var is_last_segment = (actual_seg_idx == segment_patterns.size() - 1)
+		
+		for pattern_type in pattern:
+			if pattern_type == "object":
+				# Выбираем объект
+				var available = _get_available_objects_for_segment(actual_seg_idx, local_used)
+				var object_type = _select_random_object(available)
+				
+				# Добавляем в список использованных
+				if object_type not in local_used:
+					local_used.append(object_type)
+				
+				var room = _create_room_from_pattern_type(pattern_type, object_type)
+				path.append(room)
+			else:
+				var room = _create_room_from_pattern_type(pattern_type)
+				path.append(room)
+	
+	return path
+
+
+func _generate_two_paths(total_segments: int) -> Array:
+	var segment_patterns = _generate_segment_patterns(total_segments)
+	
+	# Путь А
+	var used_objects_a: Array[DataManager.ObjectType] = []
+	var path_a = _build_path_from_patterns(segment_patterns, 0, used_objects_a)
+	
+	# Путь Б
+	var used_objects_b = used_objects_a.duplicate()
+	var path_b = _build_path_from_patterns(segment_patterns, 0, used_objects_b)
+	
+	# Применяем перемешивание к каждому сегменту в обоих путях
+	var rooms_per_segment = DataManager.FLOOR_ROOMS_PER_PATH
+	
+	for seg_idx in range(total_segments):
+		var start_idx = seg_idx * rooms_per_segment
+		var end_idx = start_idx + rooms_per_segment
+		
+		var segment_a = path_a.slice(start_idx, end_idx)
+		var shuffled_a = _shuffle_object_in_segment(segment_a)
+		for i in range(shuffled_a.size()):
+			path_a[start_idx + i] = shuffled_a[i]
+		
+		var segment_b = path_b.slice(start_idx, end_idx)
+		var shuffled_b = _shuffle_object_in_segment(segment_b)
+		for i in range(shuffled_b.size()):
+			path_b[start_idx + i] = shuffled_b[i]
+	
+	# 🆕 Сегмент 2 (индекс 1) — обязательный магазин и привал в КОНЦЕ
+	var seg2_start = 1 * rooms_per_segment
+	var seg2_end = seg2_start + rooms_per_segment
+	var last_pos_in_seg2 = seg2_end - 1
+	
+	# Путь А: магазин в конце
+	var shop_room = _create_room_node(DataManager.RoomType.OBJECT, DataManager.CombatType.NORMAL, DataManager.ObjectType.SHOP)
+	path_a[last_pos_in_seg2] = shop_room
+	
+	# Путь Б: привал в конце
+	var bonfire_room = _create_room_node(DataManager.RoomType.OBJECT, DataManager.CombatType.NORMAL, DataManager.ObjectType.BONFIRE)
+	path_b[last_pos_in_seg2] = bonfire_room
+	
+	return [path_a, path_b]
+
+
+# ============================================================
+# ОСНОВНОЙ МЕТОД ГЕНЕРАЦИИ (ЗАМЕНЯЕТ СТАРЫЙ)
+# ============================================================
+
+func _generate_all_segments() -> void:
+	var rooms_per_segment = DataManager.FLOOR_ROOMS_PER_PATH
+	var total_segments = DataManager.FLOOR_SEGMENTS_BEFORE_BOSS
+	var total_rooms_per_path = total_segments * rooms_per_segment
+	
+	# 1. Генерируем два пути
+	var paths = _generate_two_paths(total_segments)
+	var path1 = paths[0]
+	var path2 = paths[1]
+	
+	# 2. Дополняем пути до нужной длины (на случай, если что-то пошло не так)
+	var target_length = total_rooms_per_path
+	while path1.size() < target_length:
+		path1.append(_create_room_node(DataManager.RoomType.COMBAT, DataManager.CombatType.NORMAL))
+	while path2.size() < target_length:
+		path2.append(_create_room_node(DataManager.RoomType.COMBAT, DataManager.CombatType.NORMAL))
+	
+	# 3. Разбиваем на сегменты и сохраняем в all_paths
+	all_paths.clear()
+	for seg_idx in range(total_segments):
+		var start_idx = seg_idx * rooms_per_segment
+		var end_idx = start_idx + rooms_per_segment
+		
+		var segment_paths: Array[Array] = [
+			path1.slice(start_idx, end_idx),
+			path2.slice(start_idx, end_idx)
+		]
+		
+		# Устанавливаем видимость комнат
+		for path in segment_paths:
+			for i in range(path.size()):
+				if seg_idx == 0:
+					# Первый сегмент — все комнаты видны
+					path[i].is_revealed = true
+				else:
+					# Остальные — часть скрыта
+					path[i].is_revealed = (i < DataManager.FLOOR_VISIBLE_ROOMS - randi_range(0, 2))
+		
+		all_paths.append(segment_paths)
+	
+	print("=== FLOOR GENERATED ===")
+	print("Total segments: ", total_segments)
+	print("Path1 length: ", path1.size())
+	print("Path2 length: ", path2.size())
+
+
+## Перемещает объект внутри сегмента с вероятностью 50%
+func _shuffle_object_in_segment(segment: Array[RoomNode]) -> Array[RoomNode]:
+	var result = segment.duplicate()
+	
+	# Находим позицию объекта в сегменте
+	var object_positions: Array[int] = []
+	for i in range(result.size()):
+		if result[i].room_type == DataManager.RoomType.OBJECT:
+			object_positions.append(i)
+	
+	# Если нет объекта — возвращаем как есть
+	if object_positions.is_empty():
+		return result
+	
+	# Если объект уже на последней позиции — не перемещаем
+	if object_positions.size() == 1 and object_positions[0] == result.size() - 1:
+		# В последнем сегменте объект может быть на позиции 2 (привал)
+		# Проверяем, не привал ли это
+		if result[object_positions[0]].object_type != DataManager.ObjectType.BONFIRE:
+			# Если не привал — можно переместить
+			pass
+		else:
+			# Привал не перемещаем
+			return result
+	
+	# Решаем, перемещать ли объект
+	if randf() < DataManager.FLOOR_OBJECT_SHUFFLE_CHANCE:
+		# Выбираем случайную позицию для объекта (0, 1 или 2)
+		# Но не на место другого объекта и не на место привала
+		var available_positions: Array[int] = []
+		for i in range(result.size()):
+			if result[i].room_type != DataManager.RoomType.OBJECT:
+				# Проверяем, не привал ли это
+				if result[i].room_type == DataManager.RoomType.OBJECT and result[i].object_type == DataManager.ObjectType.BONFIRE:
+					continue
+				available_positions.append(i)
+		
+		if available_positions.is_empty():
+			return result
+		
+		# Берём первый объект и перемещаем его
+		var obj_index = object_positions[0]
+		var obj = result[obj_index]
+		var new_pos = available_positions[randi() % available_positions.size()]
+		
+		# Создаём новый сегмент с перемещённым объектом
+		var new_segment: Array[RoomNode] = []
+		for i in range(result.size()):
+			if i == obj_index:
+				# На старой позиции — бой
+				new_segment.append(_create_room_node(DataManager.RoomType.COMBAT, DataManager.CombatType.NORMAL))
+			elif i == new_pos:
+				# На новой позиции — объект
+				new_segment.append(obj.duplicate())
+			else:
+				new_segment.append(result[i].duplicate())
+		
+		return new_segment
+	
+	return result

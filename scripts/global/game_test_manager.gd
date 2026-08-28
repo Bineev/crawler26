@@ -295,6 +295,8 @@ func _on_room_selected(room_node: RoomNode, should_increment_room_index: bool = 
 	
 	if should_increment_room_index:
 		current_room_index += 1
+		# 🆕 Сохраняем игру ПОСЛЕ обновления индекса
+		SaveManager.save_game()
 	
 	if current_room_node.room_type == DataManager.RoomType.COMBAT:
 		_create_battle_log()
