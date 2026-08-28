@@ -39,6 +39,7 @@ metadata/_custom_type_script = "uid://cmra25r1r3ivt"
 [resource]
 script = ExtResource("2_gh2gt")
 id = 21
+is_burned = true
 origin = 1
 name_key = "card_beast_pulse_name"
 description_key = "card_beast_pulse_desc"

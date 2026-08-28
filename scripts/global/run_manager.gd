@@ -816,7 +816,7 @@ func reset_run_constants():
 	max_energy = DataManager.MAX_ENERGY
 	
 	# === Стартовые валюты ===
-	starting_coins = DataManager.STARTING_COINS
+	starting_coins = DataManager.STARTING_COINS + 100
 	starting_bones = DataManager.STARTING_BONES
 	starting_keys = DataManager.STARTING_KEYS
 	

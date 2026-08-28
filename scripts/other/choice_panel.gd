@@ -2,7 +2,7 @@
 extends Control
 class_name ChoicePanel
 
-var options: Array[Array] = []
+var options: Array = []
 
 func setup(paths: Array):
 	scale *= DataManager.SCALE_FACTOR

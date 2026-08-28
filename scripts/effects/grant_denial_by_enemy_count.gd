@@ -32,6 +32,4 @@ func apply(effect: EffectEntry, source, targets: Array, card_info: Dictionary = 
 	
 	source.apply_passive(denial_instance)
 	
-	source.apply_passive(denial_instance)
-	
 	SignalManager.log_message.emit("Получен Denial (%d зарядов) за %d врагов" % [alive_count, alive_count])

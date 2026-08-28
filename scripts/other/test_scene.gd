@@ -131,6 +131,41 @@ func show_main_menu():
 	var menu_scene = load("res://scenes/main_menu.tscn")
 	menu_instance = menu_scene.instantiate()
 	game_world.add_child(menu_instance)
+	# 🆕 Загружаем настройки (громкость, язык) из файла
+	_load_settings()
+
+
+func _load_settings():
+	var config = ConfigFile.new()
+	var err = config.load("user://settings.cfg")
+	
+	if err == OK:
+		# Загружаем громкость музыки
+		var music_volume = config.get_value("audio", "music_volume", 0.8)
+		_set_bus_volume("Music", music_volume)
+		
+		# Загружаем громкость SFX
+		var sfx_volume = config.get_value("audio", "sfx_volume", 0.8)
+		_set_bus_volume("SFX", sfx_volume)
+		
+		# Загружаем язык
+		var language = config.get_value("locale", "language", "en")
+		TranslationServer.set_locale(language)
+		
+		print("Settings loaded: Music=", music_volume, " SFX=", sfx_volume, " Language=", language)
+	else:
+		# Если файла нет — ставим значения по умолчанию
+		_set_bus_volume("Music", 0.8)
+		_set_bus_volume("SFX", 0.8)
+		TranslationServer.set_locale("en")
+		print("No settings file found, using defaults")
+
+
+func _set_bus_volume(bus_name: String, value: float):
+	var bus_index = AudioServer.get_bus_index(bus_name)
+	if bus_index != -1:
+		var db = linear_to_db(value)
+		AudioServer.set_bus_volume_db(bus_index, db)
 
 
 func start_new_run():

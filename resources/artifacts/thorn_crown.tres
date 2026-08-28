@@ -15,7 +15,7 @@ script = ExtResource("1_qyddr")
 category = 5
 target = 0
 passive = ExtResource("2_t15jm")
-passive_duration = 3
+passive_duration = 1
 metadata/_custom_type_script = "uid://cmra25r1r3ivt"
 
 [resource]

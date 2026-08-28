@@ -24,13 +24,14 @@ metadata/_custom_type_script = "uid://cmra25r1r3ivt"
 [resource]
 script = ExtResource("2_q0ega")
 id = 36
+is_burned = true
 cost_grade = 5
 origin = 1
 biome = 5
 name_key = "card_foul_well_name"
 description_key = "card_foul_well_desc"
 grade = 2
-cost = 2
+cost = 3
 effects = Array[ExtResource("1_7w6f8")]([SubResource("Resource_40i00"), SubResource("Resource_lj0ar")])
 manual_card_types = Array[int]([3, 2])
 metadata/_custom_type_script = "uid://badcs22cck6n5"

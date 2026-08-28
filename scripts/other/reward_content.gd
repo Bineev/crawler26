@@ -1050,13 +1050,36 @@ func _apply_upgrade_to_card(card: CardData) -> void:
 				if effect.category == DataManager.EffectCategory.APPLY_STATUS:
 					if effect.target != DataManager.EffectTarget.SELF and effect.status:
 						if DataManager.is_negative_status(effect.status.id):
-							var status_resource = effect.status
-							if status_resource.is_stacking:
-								# Удваиваем стаки
+							var status_id = effect.status.id
+							
+							# 🆕 Определяем, какие статусы стакаются по стакам, а какие по длительности
+							var stacks_by_value = [
+								DataManager.Status.BLEED,
+								DataManager.Status.BURN,
+								DataManager.Status.COLD,
+								DataManager.Status.GANGRENE,
+								DataManager.Status.INFECTION,
+							]
+							
+							var stacks_by_duration = [
+								DataManager.Status.POISON,
+								DataManager.Status.WEAKNESS,
+								DataManager.Status.VULNERABILITY,
+							]
+							
+							if status_id in stacks_by_value:
+								# Удваиваем стаки (value)
 								effect.value *= 2
-							else:
-								# Удваиваем длительность
+							elif status_id in stacks_by_duration:
+								# Удваиваем длительность (duration)
 								effect.duration *= 2
+							else:
+								# Fallback: если статус неизвестен, проверяем флаг is_stacking
+								var status_resource = effect.status
+								if status_resource.is_stacking:
+									effect.value *= 2
+								else:
+									effect.duration *= 2
 	
 	card.is_can_upgrade = false
 
@@ -1068,6 +1091,9 @@ func _get_upgraded_card_copy(card: CardData) -> CardData:
 
 
 func _get_upgrade_type_for_card(card: CardData) -> DataManager.UpgradeType:
+	# 🆕 Если у карты уже есть НЕ дефолтный upgrade_type — оставляем его
+	if card.upgrade_type != DataManager.UpgradeType.NONE:
+		return card.upgrade_type
 	if not card.is_can_upgrade:
 		return card.upgrade_type
 	

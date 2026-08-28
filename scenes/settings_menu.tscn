@@ -9,6 +9,7 @@ layout_mode = 3
 anchors_preset = 0
 offset_right = 1920.0
 offset_bottom = 1080.0
+mouse_filter = 1
 script = ExtResource("1_05p07")
 
 [node name="CenterContainer" type="CenterContainer" parent="."]

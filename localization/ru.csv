@@ -48,9 +48,9 @@ card_beast_pulse_desc,"Накладывает пассивку Regrowth (5 за�
 card_blood_thread_name,Кровавая нить
 card_blood_thread_desc,"Все враги получают 1 стак Кровотечения.\nДаёт 3 Силы за каждого врага."
 card_mole_toss_name,Бросок слепыша
-card_mole_toss_desc,"Наносит случайное число урона от 1 до 10."
+card_mole_toss_desc,"Наносит случайный урон от 1 до 13."
 card_worm_spirit_name,Дух червя
-card_worm_spirit_desc,"Снимает все статусы и пассивки с героя.\nДаёт Регенерацию на 3 хода.\nБазовое лечение: 2, +1 за каждый снятый эффект."
+card_worm_spirit_desc,"Снимает все статусы и пассивки с героя.\nДаёт Регенерацию на 3 хода.\nБазовое лечение: 4, +1 за каждый снятый эффект."
 card_flesh_rage_name,Ярость плоти
 card_flesh_rage_desc,"Накладывает на себя 1 стак Кровотечения.\nЕсли есть Кровотечение — +1 энергия.\nЕсли нет — добор 1 карты."
 card_torn_wound_name,Рваная рана
@@ -216,7 +216,7 @@ upgrade_card_confirm,Улучшить
 
 "custom_blood_thread","Даёт 3 Силы за каждого живого врага."
 "custom_flesh_rage","Если есть Кровотечение, даёт 1 энергия. Иначе добирает 1 карт."
-"custom_mole_toss","Наносит случайный урон от 1 до 10."
+"custom_mole_toss","Наносит случайный урон от 1 до 13."
 "custom_rotten_cut","Удваивает стак Кровотечение на цели."
 "custom_worm_spirit","Снимает все статусы и пассивки. Даёт 2 Регенерации + количество снятых эффектов на 3 ход."
 
@@ -593,7 +593,7 @@ reward_lost_max_hp_title, "Примите потерю"
 "artifact_rusty_nail_desc","При наложении Слабости на врага, также накладывает Кровотечение (%d на %d хода)"
 "artifact_rusty_nail_lore","Архаичный гвоздь, найденный в руинах. Его ржавчина оставляет раны, которые не заживают."
 "artifact_thorn_crown_name","Терновый венок"
-"artifact_thorn_crown_desc","В начале боя получает %d урона и Denial (%d заряда)"
+"artifact_thorn_crown_desc","В начале боя получает %d урона и Отрицание (%d заряда)"
 "artifact_thorn_crown_lore","Венок из терний, который впивается в плоть владельца, но дарует невероятную стойкость к проклятиям."
 "artifact_serrated_knuckle_name","Зазубренный кастет"
 "artifact_serrated_knuckle_desc","Увеличивает длительность Кровотечения, накладываемого на врага, на 1 ход"
@@ -725,6 +725,8 @@ reward_lost_max_hp_title, "Примите потерю"
 "settings_sfx","Звуки"
 "settings_menu_button","В меню"
 "main_menu_language","Язык"
+"settings_reset_progress","Сбросить прогресс"
+"settings_reset_confirm","Подтвердить"
 
 "condition_target_has_negative_statuses","на цели больше 2 негативных статусов"
 "card_black_envy_name","Черная зависть"
@@ -743,3 +745,5 @@ reward_lost_max_hp_title, "Примите потерю"
 "card_grip_of_despair_name","Хватка отчаяния"
 "card_grip_of_despair_desc","Наносит 10 урон. Если враг погибает, даёт 20 Искупления."
 "effect_grip_of_despair","Наносит 10 урон. Если враг погибает, даёт 20 Искупления."
+"card_forgiveness_name","Прощение"
+"card_forgiveness_desc","Восстанавливает здоровье в зависимости от Искупления: <15 → 8, 15–29 → 12, 30+ → 15."

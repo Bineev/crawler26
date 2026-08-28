@@ -48,9 +48,9 @@ card_beast_pulse_desc,"Apply Regrowth passive (5 charges).\nIf health < 30, gain
 card_blood_thread_name,Blood Thread
 card_blood_thread_desc,"All enemies gain 1 Bleed.\nGain 3 Strength per enemy."
 card_mole_toss_name,Mole Toss
-card_mole_toss_desc,"Deals random damage from 1 to 10."
+card_mole_toss_desc,"Deals random damage from 1 to 13."
 card_worm_spirit_name,Worm Spirit
-card_worm_spirit_desc,"Removes all statuses and passives from the hero.\nGrants Regeneration for 3 turns.\nBase healing: 2, +1 per removed effect."
+card_worm_spirit_desc,"Removes all statuses and passives from the hero.\nGrants Regeneration for 3 turns.\nBase healing: 4, +1 per removed effect."
 card_flesh_rage_name,Flesh Rage
 card_flesh_rage_desc,"Apply 1 Bleed to yourself.\nIf you have Bleed — gain 1 energy.\nIf not — draw 1 card."
 card_torn_wound_name,Torn Wound
@@ -215,7 +215,7 @@ upgrade_card_confirm,Upgrade
 
 "custom_blood_thread","Grants 3 Strength per living enemy."
 "custom_flesh_rage","If has Bleed, gain 1 energy. Otherwise draw 1 card."
-"custom_mole_toss","Deals random damage from 1 to 10."
+"custom_mole_toss","Deals random damage from 1 to 13."
 "custom_rotten_cut","Doubles Bleed stacks on target."
 "custom_worm_spirit","Removes all statuses and passives. Grants Regeneration 2 + number of removed effects for 3 turn."
 
@@ -718,6 +718,8 @@ upgrade_card_confirm,Upgrade
 "settings_sfx","SFX"
 "settings_menu_button","To Menu"
 "main_menu_language","Language"
+"settings_reset_progress","Reset Progress"
+"settings_reset_confirm","Confirm"
 
 "condition_target_has_negative_statuses","target has more than 2 negative statuses"
 "card_black_envy_name","Black Envy"
@@ -736,3 +738,6 @@ upgrade_card_confirm,Upgrade
 "card_grip_of_despair_name","Grip of Despair"
 "card_grip_of_despair_desc","Deal 10 damage. If the enemy dies, gain 20 Atonement."
 "effect_grip_of_despair","Deal 10 damage. If the enemy dies, gain 20 Atonement."
+"card_forgiveness_name","Forgiveness"
+"card_forgiveness_desc","Heal based on Atonement: <15 → 8, 15–29 → 12, 30+ → 15."
+"effect_scaled_heal_self","Heal %s health (%s, requires %s)%s"

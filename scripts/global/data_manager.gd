@@ -131,6 +131,7 @@ enum ModifierChangeType {
 }
 
 enum UpgradeType {
+	NONE,                      # 🆕 Нет улучшения (дефолтное значение)
 	COST_MINUS,
 	BLOCK_PLUS_PROC_50,
 	DAMAGE_PLUS_PROC_50,

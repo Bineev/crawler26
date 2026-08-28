@@ -8,7 +8,7 @@
 script = ExtResource("1_k3kx4")
 category = 15
 custom_description = "custom_mole_toss"
-base_value = 10
+base_value = 13
 custom_script = ExtResource("2_534gs")
 metadata/_custom_type_script = "uid://cmra25r1r3ivt"
 
