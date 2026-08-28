@@ -25,7 +25,7 @@ class_name CardData
 @export var biome: DataManager.Biome = DataManager.Biome.MOLE_TUNNELS
 
 ## Тип улучшения карты (по умолчанию COST_MINUS_1)
-@export var upgrade_type: DataManager.UpgradeType = DataManager.UpgradeType.COST_MINUS
+@export var upgrade_type: DataManager.UpgradeType = DataManager.UpgradeType.NONE
 
 ## Ключ локализации для названия
 @export var name_key: String = ""

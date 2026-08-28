@@ -24,4 +24,6 @@ name_key = "card_rotten_cut_name"
 description_key = "card_rotten_cut_desc"
 grade = 1
 effects = Array[ExtResource("1_0v0gs")]([SubResource("Resource_hrcpl"), SubResource("Resource_4hac5")])
+manual_status_icons = Array[int]([1])
+manual_card_types = Array[int]([0, 6])
 metadata/_custom_type_script = "uid://badcs22cck6n5"

@@ -1,28 +1,41 @@
 extends Node
-class_name HealByPoisonDuration
+class_name BlessingOfRot
 
 func apply(effect: EffectEntry, source, targets: Array, card_info: Dictionary = {}, passive_context: PassiveResource = null) -> void:
-	if targets.is_empty():
+	if not is_instance_valid(source):
 		return
 	
-	var target = targets[0]
-	if not is_instance_valid(target) or not target.has_method("remove_status") or not target.has_method("heal"):
+	var player = source
+	if not player.has_method("get_health") or not player.has_method("heal"):
 		return
 	
-	# Проверяем наличие POISON через словарь
-	var poison_duration = 0
-	if target.active_statuses.has(DataManager.Status.POISON):
-		poison_duration = target.active_statuses[DataManager.Status.POISON].duration
+	# 1. Собираем весь яд в комнате
+	var total_poison_duration = 0
+	var targets_to_cleanse = []
 	
-	if poison_duration <= 0:
+	# Добавляем игрока
+	if player.active_statuses.has(DataManager.Status.POISON):
+		total_poison_duration += player.active_statuses[DataManager.Status.POISON].duration
+		targets_to_cleanse.append(player)
+	
+	# Добавляем всех врагов
+	var enemies = BattleManager.get_enemies()
+	for enemy in enemies:
+		if is_instance_valid(enemy) and enemy.is_alive():
+			if enemy.active_statuses.has(DataManager.Status.POISON):
+				total_poison_duration += enemy.active_statuses[DataManager.Status.POISON].duration
+				targets_to_cleanse.append(enemy)
+	
+	# 2. Если яда нет — ничего не делаем
+	if total_poison_duration <= 0:
 		SignalManager.log_message.emit("Благословение гнили: нет яда для преобразования")
 		return
 	
-	var heal_amount = poison_duration
+	# 3. Снимаем яд со всех целей
+	for target in targets_to_cleanse:
+		if is_instance_valid(target) and target.has_method("remove_status"):
+			target.remove_status(DataManager.Status.POISON)
 	
-	# Снимаем яд
-	target.remove_status(DataManager.Status.POISON)
-	
-	# Лечим
-	target.heal(heal_amount)
-	SignalManager.log_message.emit("Благословение гнили: восстановлено %d здоровья" % heal_amount)
+	# 4. Лечим игрока на суммарную длительность
+	player.heal(total_poison_duration)
+	SignalManager.log_message.emit("Благословение гнили: поглощено %d яда, восстановлено %d здоровья" % [total_poison_duration, total_poison_duration])

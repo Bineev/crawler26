@@ -175,16 +175,16 @@ func _on_buy_pressed(item: Dictionary, container: Control) -> void:
 	match item["type"]:
 		"card":
 			RunManager.add_card(item["data"])
-			SignalManager.log_message.emit(tr("shop_bought_card") % item["data"].get_localized_name())
+			#SignalManager.log_message.emit(tr("shop_bought_card") % item["data"].get_localized_name())
 		"artifact":
 			RunManager.add_artifact(item["data"])
-			SignalManager.log_message.emit(tr("shop_bought_artifact") % item["data"].get_localized_name())
+			#SignalManager.log_message.emit(tr("shop_bought_artifact") % item["data"].get_localized_name())
 		"key":  # 🆕
 			RunManager.add_keys(1)
-			SignalManager.log_message.emit(tr("shop_bought_key"))
+			#SignalManager.log_message.emit(tr("shop_bought_key"))
 		"potion":
 			RunManager.add_potion(item["data"])
-			SignalManager.log_message.emit(tr("shop_bought_potion") % item["data"].get_localized_name())
+			#SignalManager.log_message.emit(tr("shop_bought_potion") % item["data"].get_localized_name())
 	
 	container.queue_free()
 	is_processing = false

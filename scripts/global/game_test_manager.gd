@@ -137,9 +137,10 @@ func start_new_biome() -> void:
 	if not potion_container:
 		_create_potion_display()
 	
-	# Добавляем стартовое зелье
-	for potion in DataManager.get_random_potions(1):
-		RunManager.add_potion(potion)
+	if current_floor == 1:
+		# Добавляем стартовое зелье
+		for potion in DataManager.get_random_potions(1):
+			RunManager.add_potion(potion)
 	
 	# Запускаем этаж
 	FloorManager.start_floor()
@@ -469,6 +470,7 @@ func _clean_empty_canvas_layers() -> void:
 				child.queue_free()
 
 func _create_potion_display() -> void:
+	_clear_potions()
 	potion_container = HBoxContainer.new()
 	potion_container.global_position = DataManager.POTION_CONTAINER_POSITION * DataManager.SCALE_FACTOR
 	potion_container.add_theme_constant_override("separation", 10)
@@ -488,6 +490,22 @@ func _create_potion_display() -> void:
 		_add_potion_icon(potion)
 	
 	_update_full_label()
+
+
+func _clear_potions() -> void:
+	# Очищаем массив иконок
+	potion_icons.clear()
+	
+	# Удаляем все иконки из контейнера
+	if potion_container:
+		for child in potion_container.get_children():
+			if is_instance_valid(child):
+				child.queue_free()
+	
+	# Скрываем надпись "Инвентарь полон"
+	if potion_full_label:
+		potion_full_label.visible = false
+
 
 func _add_potion_icon(potion: PotionResource) -> void:
 	var icon = preload("res://scenes/potion_icon.tscn").instantiate() as PotionIcon

@@ -15,4 +15,4 @@ func check(source, targets: Array) -> bool:
 			if target.has_status(status_id):
 				negative_count += 1
 	
-	return negative_count > 2
+	return negative_count > 1
