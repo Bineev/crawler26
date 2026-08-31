@@ -138,9 +138,16 @@ func start_new_biome() -> void:
 		_create_potion_display()
 	
 	if current_floor == 1:
-		# Добавляем стартовое зелье
 		for potion in DataManager.get_random_potions(1):
 			RunManager.add_potion(potion)
+	else:
+		var player = BattleManager.get_player()
+		if player:
+			var current_hand_size = player.get_flat(DataManager.FlatStat.HAND_SIZE)
+			var increment = RunManager.hand_size_increment_per_biome
+			var new_hand_size = current_hand_size + increment
+			player.set_flat(DataManager.FlatStat.HAND_SIZE, new_hand_size)
+			SignalManager.log_message.emit("Размер руки увеличен на %d до %d!" % [increment, new_hand_size])
 	
 	# Запускаем этаж
 	FloorManager.start_floor()

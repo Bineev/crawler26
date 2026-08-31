@@ -5,6 +5,7 @@
 
 [resource]
 script = ExtResource("2_cf7ck")
+id = 12
 name_key = "status_infection_name"
 description_key = "status_infection_desc"
 is_ticking = true

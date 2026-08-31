@@ -348,7 +348,15 @@ func add_status(status: StatusResource, value: int, duration: int, caster: Chara
 	# 🆕 Звук применения дебаффа (если статус негативный и цель — враг)
 	if DataManager.is_negative_status(status_id) and self is EnemyInstance:
 		SoundManager.play(null, DataManager.get_sound(DataManager.SoundType.APPLY_DEBUFF))
-	# Проверяем наличие взаимодействия (теперь уже без Burn/Cold)
+	# 🆕 Взаимодействия статусов (только НЕ для врагов)
+	var can_use_interactions = not self is EnemyInstance
+	
+	# Проверяем наличие взаимодействия (только для игрока)
+	if can_use_interactions and StatusInteractionManager.has_interaction(self, status_id):
+		StatusInteractionManager.handle_interaction(self, status_id, stacks, dur, status, caster)
+	else:
+		_add_status_direct(status, stacks, dur, caster)
+
 	if StatusInteractionManager.has_interaction(self, status_id):
 		StatusInteractionManager.handle_interaction(self, status_id, stacks, dur, status, caster)
 	else:
@@ -1343,3 +1351,7 @@ func _get_targets_for_effect(effect: EffectEntry, source, targets: Array = []) -
 			result = [source]
 	
 	return result
+
+
+func get_status_index(status_id: DataManager.Status) -> int:
+	return status_application_order.find(status_id)

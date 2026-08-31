@@ -34,7 +34,7 @@ var infection_bleed_multiplier: int = DataManager.INFECTION_BLEED_MULTIPLIER
 var starting_hand_size: int = DataManager.STARTING_HAND_SIZE
 var cards_to_draw_per_turn: int = DataManager.CARDS_TO_DRAW_PER_TURN
 var max_energy: int = DataManager.MAX_ENERGY
-
+var hand_size_increment_per_biome: int = DataManager.HAND_SIZE_INCREMENT_PER_BIOME  # 🆕
 # === Ресурсы ===
 var default_item_cost: int = DataManager.DEFAULT_ITEM_COST
 var reward_gold_default: int = DataManager.REWARD_GOLD_DEFAULT
@@ -699,7 +699,6 @@ func apply_deck_size_buff(amount: int, duration: int) -> void:
 	var old_amount = deck_size_bonus
 	var old_duration = deck_size_buff_remaining
 	
-	# 1. Обновляем deck_size_bonus и deck_size_buff_remaining
 	if old_amount == 0:
 		deck_size_bonus = amount
 		deck_size_buff_remaining = duration
@@ -716,17 +715,11 @@ func apply_deck_size_buff(amount: int, duration: int) -> void:
 	if player:
 		var current_hand_size = player.get_flat(DataManager.FlatStat.HAND_SIZE)
 		
-		# 🆕 Определяем базу для расчёта
-		var base_size: int
-		if old_amount == 0:
-			# Если баффа не было — берём текущее значение (может уже быть изменено артефактами)
-			base_size = current_hand_size
-		else:
-			# Если бафф уже был — откатываем временный бонус и прибавляем новый
-			base_size = DataManager.STARTING_HAND_SIZE + old_amount
-		
-		var new_hand_size = base_size + amount
+		# 🆕 Используем текущее значение, а не STARTING_HAND_SIZE
+		var base_size = current_hand_size - old_amount
+		var new_hand_size = base_size + deck_size_bonus
 		player.set_flat(DataManager.FlatStat.HAND_SIZE, new_hand_size)
+		
 		SignalManager.log_message.emit("Размер руки: +%d на %d боёв!" % [deck_size_bonus, deck_size_buff_remaining])
 
 
@@ -873,7 +866,7 @@ func reset_run_constants():
 	starting_hand_size = DataManager.STARTING_HAND_SIZE
 	cards_to_draw_per_turn = DataManager.CARDS_TO_DRAW_PER_TURN
 	max_energy = DataManager.MAX_ENERGY
-	
+	hand_size_increment_per_biome = DataManager.HAND_SIZE_INCREMENT_PER_BIOME  # 🆕
 	# === Стартовые валюты ===
 	starting_coins = DataManager.STARTING_COINS + 100
 	starting_bones = DataManager.STARTING_BONES

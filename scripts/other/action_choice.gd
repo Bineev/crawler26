@@ -405,6 +405,8 @@ func _handle_make_offering() -> void:
 	var bones = RunManager.get_bones()
 	var rewards: Array[DataManager.RewardType] = []
 	var gold_mod = 1
+	var buff_amount = 0
+	var buff_duration = 0
 	
 	if bones <= 10:
 		# 5-10 костей: кость * 3 золота
@@ -423,6 +425,8 @@ func _handle_make_offering() -> void:
 		rewards.append(DataManager.RewardType.GOLD)
 		rewards.append(DataManager.RewardType.DECK_SIZE_BUFF)
 		gold_mod = 5
+		buff_amount = 1
+		buff_duration = -1  # 🆕 Перманентный бафф
 		await _show_result_label(tr("result_offer_great"), DataManager.COLOR_HEAL_LOG)
 	
 	# Тратим все кости
@@ -431,6 +435,8 @@ func _handle_make_offering() -> void:
 	var reward_panel = preload("res://scenes/reward_panel.tscn").instantiate() as RewardPanel
 	reward_panel.reward_types = rewards
 	reward_panel.gold_mod = gold_mod
+	reward_panel.buff_amount = buff_amount      # 🆕
+	reward_panel.buff_duration = buff_duration  # 🆕
 	SignalManager.hide_object.emit()
 	SignalManager.show_reward.emit(reward_panel)
 	queue_free()
@@ -541,19 +547,26 @@ func _handle_search_trap() -> void:
 func _handle_lose_flesh() -> void:
 	await _show_result_label(tr("result_flesh_sacrifice"), DataManager.COLOR_PENITENT_ART_BG_DARK)
 	
+	var player = BattleManager.get_player()
+	var lost_amount = 0
+	if player:
+		var max_health = player.get_max_health()
+		lost_amount = floor(max_health * DataManager.RACK_MAX_HP_LOST_PERCENT)
+		lost_amount = max(1, lost_amount)  # минимум 1
+	
 	var reward_panel = preload("res://scenes/reward_panel.tscn").instantiate() as RewardPanel
-	# Сначала урон, потом бафф
 	reward_panel.reward_types = [
 		DataManager.RewardType.LOST_MAX_HP,
 		DataManager.RewardType.ENERGY_BUFF
 	]
-	reward_panel.damage_mod = DataManager.RACK_MAX_HP_LOST
-	reward_panel.buff_duration = -1  # перманентный бафф (до конца забега)
+	# 🆕 Передаём конкретные значения для этого действия
+	reward_panel.damage_mod = lost_amount           # сколько теряем
+	reward_panel.buff_amount = DataManager.RACK_ENERGY_BUFF_AMOUNT
+	reward_panel.buff_duration = DataManager.RACK_ENERGY_BUFF_DURATION
 	
 	SignalManager.hide_object.emit()
 	SignalManager.show_reward.emit(reward_panel)
 	queue_free()
-
 
 func _handle_craft() -> void:
 	var success = randf() < 0.5  # 50% шанс

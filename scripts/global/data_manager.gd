@@ -673,6 +673,7 @@ const STARTING_HAND_SIZE: int = 5
 const CARDS_TO_DRAW_PER_TURN: int = 6
 const STARTING_ENERGY: int = 3
 const MAX_ENERGY: int = 3
+const HAND_SIZE_INCREMENT_PER_BIOME: int = 1  # 🆕
 ## === Сломленный (Penitent) ===
 const PENITENT_STARTING_HEALTH: int = 120
 const PENITENT_MAX_ATONEMENT: int = 30
@@ -916,6 +917,9 @@ const IDOL_DAMAGE: int = 3
 const IDOL_BREAK_CHANCE: float = 0.5
 
 const RACK_MAX_HP_LOST: int = 6
+const RACK_MAX_HP_LOST_PERCENT: float = 0.4  # 🆕 40% от максимального здоровья
+const RACK_ENERGY_BUFF_AMOUNT: int = 1       # 🆕 сколько энергии даёт пыточный стол
+const RACK_ENERGY_BUFF_DURATION: int = -1    # 🆕 -1 = перманентно
 
 const STARTING_KEYS: int = 1
 
@@ -1139,6 +1143,7 @@ func load_status_resources():
 	_status_resources[Status.FROZEN] = load("res://resources/statuses/frozen.tres")
 	_status_resources[Status.GANGRENE] = load("res://resources/statuses/gangrene.tres")
 	_status_resources[Status.BLISTER] = load("res://resources/statuses/blister.tres")
+	_status_resources[Status.INFECTION] = load("res://resources/statuses/infection.tres")  # 🆕
 	
 	_status_resources_loaded = true
 

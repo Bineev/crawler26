@@ -318,10 +318,12 @@ func _create_transform_card_reward() -> void:
 
 
 func _create_lost_max_hp_reward() -> void:
-	var lost_amount = DataManager.RACK_MAX_HP_LOST * damage_mod
+	# 🆕 Используем damage_mod как количество теряемого HP
+	var lost_amount = damage_mod
+	if lost_amount <= 0:
+		lost_amount = 30  # fallback
 	
 	var content = preload("res://scenes/reward_content.tscn").instantiate() as RewardContent
-	content.damage_mod = damage_mod
 	center_container.add_child(content)
 	content.setup(DataManager.RewardType.LOST_MAX_HP, [lost_amount])
 	SignalManager.reward_selected.connect(_on_reward_selected)

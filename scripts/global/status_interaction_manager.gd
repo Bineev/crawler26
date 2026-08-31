@@ -154,23 +154,22 @@ func _handle_bleed_cold_gangrene(target, new_status: DataManager.Status, new_sta
 # ===== ВЗАИМОДЕЙСТВИЯ СТАТУСОВ =====
 
 func has_interaction(target, new_status: DataManager.Status) -> bool:
-	# Получаем последний статус
-	var last_status = target._get_last_status(new_status)
-	if last_status == -1:
-		return false
+	# Проверяем Bleed + Poison
+	if RunManager.is_bleed_poison_interaction_enabled:
+		if (new_status == DataManager.Status.BLEED and target.has_status(DataManager.Status.POISON)) or \
+		   (new_status == DataManager.Status.POISON and target.has_status(DataManager.Status.BLEED)):
+			return true
 	
-	# Проверяем пары взаимодействий с учётом флагов
-	var pairs = [
-		[DataManager.Status.BLEED, DataManager.Status.POISON, RunManager.is_bleed_poison_interaction_enabled],
-		[DataManager.Status.POISON, DataManager.Status.BLEED, RunManager.is_bleed_poison_interaction_enabled],
-		[DataManager.Status.POISON, DataManager.Status.BURN, RunManager.is_poison_burn_interaction_enabled],
-		[DataManager.Status.BURN, DataManager.Status.POISON, RunManager.is_poison_burn_interaction_enabled],
-		[DataManager.Status.BLEED, DataManager.Status.COLD, RunManager.is_bleed_cold_interaction_enabled],
-		[DataManager.Status.COLD, DataManager.Status.BLEED, RunManager.is_bleed_cold_interaction_enabled],
-	]
+	# Проверяем Poison + Burn
+	if RunManager.is_poison_burn_interaction_enabled:
+		if (new_status == DataManager.Status.POISON and target.has_status(DataManager.Status.BURN)) or \
+		   (new_status == DataManager.Status.BURN and target.has_status(DataManager.Status.POISON)):
+			return true
 	
-	for pair in pairs:
-		if last_status == pair[0] and new_status == pair[1] and pair[2]:
+	# Проверяем Bleed + Cold
+	if RunManager.is_bleed_cold_interaction_enabled:
+		if (new_status == DataManager.Status.BLEED and target.has_status(DataManager.Status.COLD)) or \
+		   (new_status == DataManager.Status.COLD and target.has_status(DataManager.Status.BLEED)):
 			return true
 	
 	return false
@@ -303,3 +302,55 @@ func _handle_bleed_poison_infection(target, status_a: DataManager.Status, status
 			status_data["damage_per_stack"] = damage_per_stack
 		
 		SignalManager.log_message.emit("Заражение! Урон за стак: %d, Длительность: %d ходов." % [damage_per_stack, infection_duration])
+
+
+func _get_last_status(target, new_status: DataManager.Status) -> int:
+	# Массив: [статус, индекс_наложения]
+	var interacting_statuses: Array = []
+	
+	# Проверяем все возможные взаимодействия
+	if RunManager.is_bleed_poison_interaction_enabled:
+		if new_status == DataManager.Status.BLEED and target.has_status(DataManager.Status.POISON):
+			var index = _get_status_index(target, DataManager.Status.POISON)
+			if index != -1:
+				interacting_statuses.append([DataManager.Status.POISON, index])
+		elif new_status == DataManager.Status.POISON and target.has_status(DataManager.Status.BLEED):
+			var index = _get_status_index(target, DataManager.Status.BLEED)
+			if index != -1:
+				interacting_statuses.append([DataManager.Status.BLEED, index])
+	
+	if RunManager.is_poison_burn_interaction_enabled:
+		if new_status == DataManager.Status.POISON and target.has_status(DataManager.Status.BURN):
+			var index = _get_status_index(target, DataManager.Status.BURN)
+			if index != -1:
+				interacting_statuses.append([DataManager.Status.BURN, index])
+		elif new_status == DataManager.Status.BURN and target.has_status(DataManager.Status.POISON):
+			var index = _get_status_index(target, DataManager.Status.POISON)
+			if index != -1:
+				interacting_statuses.append([DataManager.Status.POISON, index])
+	
+	if RunManager.is_bleed_cold_interaction_enabled:
+		if new_status == DataManager.Status.BLEED and target.has_status(DataManager.Status.COLD):
+			var index = _get_status_index(target, DataManager.Status.COLD)
+			if index != -1:
+				interacting_statuses.append([DataManager.Status.COLD, index])
+		elif new_status == DataManager.Status.COLD and target.has_status(DataManager.Status.BLEED):
+			var index = _get_status_index(target, DataManager.Status.BLEED)
+			if index != -1:
+				interacting_statuses.append([DataManager.Status.BLEED, index])
+	
+	# Если нет взаимодействующих статусов — возвращаем -1
+	if interacting_statuses.is_empty():
+		return -1
+	
+	# Сортируем по индексу (от большего к меньшему) — последний наложенный
+	interacting_statuses.sort_custom(func(a, b): return a[1] > b[1])
+	
+	# Возвращаем статус с самым высоким индексом
+	return interacting_statuses[0][0]
+
+
+func _get_status_index(target, status_id: DataManager.Status) -> int:
+	if not target.has_method("get_status_index"):
+		return -1
+	return target.get_status_index(status_id)
