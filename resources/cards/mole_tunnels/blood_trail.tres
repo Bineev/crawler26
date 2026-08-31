@@ -29,4 +29,5 @@ origin = 1
 name_key = "card_blood_trail_name"
 description_key = "card_blood_trail_desc"
 effects = Array[ExtResource("1_pio7a")]([SubResource("Resource_etij0")])
+manual_status_icons = Array[int]([1])
 metadata/_custom_type_script = "uid://badcs22cck6n5"

@@ -669,7 +669,7 @@ const FLOOR_OBJECT_SHUFFLE_CHANCE: float = 0.5  # 🆕 шанс перемест
 ## ============================================================
 
 ## === Основные лимиты ===
-const STARTING_HAND_SIZE: int = 6
+const STARTING_HAND_SIZE: int = 5
 const CARDS_TO_DRAW_PER_TURN: int = 6
 const STARTING_ENERGY: int = 3
 const MAX_ENERGY: int = 3

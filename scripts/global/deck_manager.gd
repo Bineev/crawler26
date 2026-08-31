@@ -175,23 +175,13 @@ func _get_penitent_starting_deck() -> Array[CardData]:
 	
 	# Базовые атаки (сильные)
 	deck.append(DataManager.get_card(DataManager.CardId.SINFUL_STRIKE))
-	deck.append(DataManager.get_card(DataManager.CardId.BLACK_ENVY))
-	deck.append(DataManager.get_card(DataManager.CardId.TIME_TO_DIE))
-	deck.append(DataManager.get_card(DataManager.CardId.BITTER_VENGEANCE))
-	deck.append(DataManager.get_card(DataManager.CardId.BLIND_VENGEANCE))  # 🆕
-	deck.append(DataManager.get_card(DataManager.CardId.GRIP_OF_DESPAIR))  # 🆕
 	
 	# Утилити
 	deck.append(DataManager.get_card(DataManager.CardId.PENITENT_REVELATION))
-	deck.append(DataManager.get_card(DataManager.CardId.PENITENT_REVELATION))
-	deck.append(DataManager.get_card(DataManager.CardId.FORGIVENESS))  # 🆕
 	
 	# Защита
 	deck.append(DataManager.get_card(DataManager.CardId.ATONEMENT_BARRIER))
-	deck.append(DataManager.get_card(DataManager.CardId.PURE_THOUGHTS))  # 🆕
 	
-	# Тест
-	deck.append(DataManager.get_card(DataManager.CardId.FOUL_WELL))
 	
 	return deck
 

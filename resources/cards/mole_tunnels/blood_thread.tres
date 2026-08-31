@@ -32,4 +32,5 @@ description_key = "card_blood_thread_desc"
 grade = 1
 cost = 2
 effects = Array[ExtResource("1_4yjwn")]([SubResource("Resource_pssyd"), SubResource("Resource_47ww2")])
+manual_status_icons = Array[int]([6, 1])
 metadata/_custom_type_script = "uid://badcs22cck6n5"

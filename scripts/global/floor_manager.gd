@@ -26,8 +26,8 @@ var boss_generated: bool = false
 
 ## Паттерны для генерации сегментов
 const PATTERNS_FIRST = [
-	{ "pattern": ["object", "combat", "object"], "weight": 40 },
-	{ "pattern": ["elite", "object", "object"], "weight": 30 },
+	{ "pattern": ["object", "combat", "object"], "weight": 50 },
+	{ "pattern": ["elite", "object", "object"], "weight": 20 },
 	{ "pattern": ["object", "elite", "object"], "weight": 30 },
 ]
 
@@ -649,15 +649,17 @@ func _build_path_from_patterns(segment_patterns: Array, seg_idx_offset: int, use
 
 
 func _generate_two_paths(total_segments: int) -> Array:
-	var segment_patterns = _generate_segment_patterns(total_segments)
+	# 🆕 Генерируем отдельные паттерны для каждого пути
+	var segment_patterns_a = _generate_segment_patterns(total_segments)
+	var segment_patterns_b = _generate_segment_patterns(total_segments)
 	
 	# Путь А
 	var used_objects_a: Array[DataManager.ObjectType] = []
-	var path_a = _build_path_from_patterns(segment_patterns, 0, used_objects_a)
+	var path_a = _build_path_from_patterns(segment_patterns_a, 0, used_objects_a)
 	
 	# Путь Б
-	var used_objects_b = used_objects_a.duplicate()
-	var path_b = _build_path_from_patterns(segment_patterns, 0, used_objects_b)
+	var used_objects_b: Array[DataManager.ObjectType] = []
+	var path_b = _build_path_from_patterns(segment_patterns_b, 0, used_objects_b)
 	
 	# Применяем перемешивание к каждому сегменту в обоих путях
 	var rooms_per_segment = DataManager.FLOOR_ROOMS_PER_PATH
@@ -667,6 +669,7 @@ func _generate_two_paths(total_segments: int) -> Array:
 		var end_idx = start_idx + rooms_per_segment
 		
 		var segment_a = path_a.slice(start_idx, end_idx)
+		# BUG
 		var shuffled_a = _shuffle_object_in_segment(segment_a)
 		for i in range(shuffled_a.size()):
 			path_a[start_idx + i] = shuffled_a[i]
@@ -676,7 +679,7 @@ func _generate_two_paths(total_segments: int) -> Array:
 		for i in range(shuffled_b.size()):
 			path_b[start_idx + i] = shuffled_b[i]
 	
-	# 🆕 Сегмент 2 (индекс 1) — обязательный магазин и привал в КОНЦЕ
+	# Сегмент 2 (индекс 1) — обязательный магазин и привал в КОНЦЕ
 	var seg2_start = 1 * rooms_per_segment
 	var seg2_end = seg2_start + rooms_per_segment
 	var last_pos_in_seg2 = seg2_end - 1
@@ -691,6 +694,19 @@ func _generate_two_paths(total_segments: int) -> Array:
 	
 	return [path_a, path_b]
 
+
+func _get_segment_types(path: Array, seg_idx: int, rooms_per_segment: int) -> Array:
+	var start = seg_idx * rooms_per_segment
+	var end = start + rooms_per_segment
+	var types = []
+	for i in range(start, end):
+		if i < path.size():
+			var room = path[i]
+			if room.room_type == DataManager.RoomType.COMBAT:
+				types.append("COMBAT" if room.combat_type == DataManager.CombatType.NORMAL else "ELITE")
+			else:
+				types.append("OBJECT")
+	return types
 
 # ============================================================
 # ОСНОВНОЙ МЕТОД ГЕНЕРАЦИИ (ЗАМЕНЯЕТ СТАРЫЙ)
@@ -746,59 +762,38 @@ func _generate_all_segments() -> void:
 func _shuffle_object_in_segment(segment: Array[RoomNode]) -> Array[RoomNode]:
 	var result = segment.duplicate()
 	
-	# Находим позицию объекта в сегменте
+	# Находим позиции объектов (не привалов)
 	var object_positions: Array[int] = []
 	for i in range(result.size()):
 		if result[i].room_type == DataManager.RoomType.OBJECT:
-			object_positions.append(i)
+			# Пропускаем привалы (они не перемещаются)
+			if result[i].object_type != DataManager.ObjectType.BONFIRE:
+				object_positions.append(i)
 	
 	# Если нет объекта — возвращаем как есть
 	if object_positions.is_empty():
 		return result
 	
-	# Если объект уже на последней позиции — не перемещаем
-	if object_positions.size() == 1 and object_positions[0] == result.size() - 1:
-		# В последнем сегменте объект может быть на позиции 2 (привал)
-		# Проверяем, не привал ли это
-		if result[object_positions[0]].object_type != DataManager.ObjectType.BONFIRE:
-			# Если не привал — можно переместить
-			pass
-		else:
-			# Привал не перемещаем
-			return result
+	# Решаем, перемещать ли объект (50%)
+	if randf() >= DataManager.FLOOR_OBJECT_SHUFFLE_CHANCE:
+		return result
 	
-	# Решаем, перемещать ли объект
-	if randf() < DataManager.FLOOR_OBJECT_SHUFFLE_CHANCE:
-		# Выбираем случайную позицию для объекта (0, 1 или 2)
-		# Но не на место другого объекта и не на место привала
-		var available_positions: Array[int] = []
-		for i in range(result.size()):
-			if result[i].room_type != DataManager.RoomType.OBJECT:
-				# Проверяем, не привал ли это
-				if result[i].room_type == DataManager.RoomType.OBJECT and result[i].object_type == DataManager.ObjectType.BONFIRE:
-					continue
-				available_positions.append(i)
-		
-		if available_positions.is_empty():
-			return result
-		
-		# Берём первый объект и перемещаем его
-		var obj_index = object_positions[0]
-		var obj = result[obj_index]
-		var new_pos = available_positions[randi() % available_positions.size()]
-		
-		# Создаём новый сегмент с перемещённым объектом
-		var new_segment: Array[RoomNode] = []
-		for i in range(result.size()):
-			if i == obj_index:
-				# На старой позиции — бой
-				new_segment.append(_create_room_node(DataManager.RoomType.COMBAT, DataManager.CombatType.NORMAL))
-			elif i == new_pos:
-				# На новой позиции — объект
-				new_segment.append(obj.duplicate())
-			else:
-				new_segment.append(result[i].duplicate())
-		
-		return new_segment
+	# Находим доступные позиции (не занятые объектами)
+	var available_positions: Array[int] = []
+	for i in range(result.size()):
+		if result[i].room_type != DataManager.RoomType.OBJECT:
+			available_positions.append(i)
+	
+	if available_positions.is_empty():
+		return result
+	
+	# Берём первый объект и меняем его местами со случайной свободной позицией
+	var obj_index = object_positions[0]
+	var new_pos = available_positions[randi() % available_positions.size()]
+	
+	# Простой swap
+	var temp = result[obj_index]
+	result[obj_index] = result[new_pos]
+	result[new_pos] = temp
 	
 	return result
