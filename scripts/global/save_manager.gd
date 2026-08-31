@@ -76,6 +76,15 @@ func save_game_with_run_ended() -> void:
 		print("Game saved with run_ended flag")
 
 func _collect_progress_data() -> Dictionary:
+	# 🆕 Пересчитываем уровень перед сохранением (если он не обновлялся)
+	var char_levels = {}
+	for class_type in ProgressManager.character_experience.keys():
+		char_levels[class_type] = ProgressManager.calculate_character_level(class_type)
+	
+	var biome_levels = {}
+	for biome in ProgressManager.biome_experience.keys():
+		biome_levels[biome] = ProgressManager.calculate_biome_level(biome)
+
 	return {
 		"unlocked_classes": ProgressManager.unlocked_classes.duplicate(),
 		"unlocked_card_ids": ProgressManager.unlocked_card_ids.duplicate(),
@@ -85,6 +94,21 @@ func _collect_progress_data() -> Dictionary:
 		"total_runs": ProgressManager.total_runs,
 		"total_victories": ProgressManager.total_victories,
 		"total_defeats": ProgressManager.total_defeats,
+		# ============================================================
+		# ОПЫТ И УРОВНИ (основной прогресс)
+		# ============================================================
+		"character_experience": ProgressManager.character_experience.duplicate(),
+		"character_level": char_levels,  # пересчитанные уровни
+		"biome_experience": ProgressManager.biome_experience.duplicate(),
+		"biome_level": biome_levels,  # пересчитанные уровни
+		
+		# ============================================================
+		# СНИМКИ НА НАЧАЛО ЗАБЕГА (для расчёта прогресса за забег)
+		# ============================================================
+		"run_start_character_experience": ProgressManager.run_start_character_experience.duplicate(),
+		"run_start_character_level": ProgressManager.run_start_character_level.duplicate(),
+		"run_start_biome_experience": ProgressManager.run_start_biome_experience.duplicate(),
+		"run_start_biome_level": ProgressManager.run_start_biome_level.duplicate(),
 	}
 
 
@@ -432,23 +456,79 @@ func load_and_apply_save() -> bool:
 
 
 func restore_progress(progress_data: Dictionary) -> void:
+	# ============================================================
+	# МЕТА-ПРОГРЕСС (открытый контент)
+	# ============================================================
 	ProgressManager.unlocked_classes.clear()
 	for class_id in progress_data.get("unlocked_classes", []):
-		ProgressManager.unlocked_classes.append(int(class_id))  # 🆕 int()
+		ProgressManager.unlocked_classes.append(int(class_id))
 	
 	ProgressManager.unlocked_card_ids.clear()
 	for card_id in progress_data.get("unlocked_card_ids", []):
-		ProgressManager.unlocked_card_ids.append(int(card_id))  # 🆕 int()
+		ProgressManager.unlocked_card_ids.append(int(card_id))
 	
 	ProgressManager.unlocked_artifact_ids.clear()
 	for artifact_id in progress_data.get("unlocked_artifact_ids", []):
-		ProgressManager.unlocked_artifact_ids.append(int(artifact_id))  # 🆕 int()
+		ProgressManager.unlocked_artifact_ids.append(int(artifact_id))
 	
-	ProgressManager.meta_currency = int(progress_data.get("meta_currency", 0))  # 🆕 int()
+	ProgressManager.meta_currency = int(progress_data.get("meta_currency", 0))
 	
 	ProgressManager.available_biomes.clear()
 	for biome in progress_data.get("available_biomes", []):
-		ProgressManager.available_biomes.append(int(biome))  # 🆕 int()
+		ProgressManager.available_biomes.append(int(biome))
+	
+	# ============================================================
+	# СТАТИСТИКА
+	# ============================================================
+	ProgressManager.total_runs = int(progress_data.get("total_runs", 0))
+	ProgressManager.total_victories = int(progress_data.get("total_victories", 0))
+	ProgressManager.total_defeats = int(progress_data.get("total_defeats", 0))
+	
+	# ============================================================
+	# ОПЫТ И УРОВНИ (основной прогресс)
+	# ============================================================
+	ProgressManager.character_experience.clear()
+	var char_exp = progress_data.get("character_experience", {})
+	for key in char_exp.keys():
+		ProgressManager.character_experience[int(key)] = int(char_exp[key])
+	
+	ProgressManager.character_level.clear()
+	var char_lvl = progress_data.get("character_level", {})
+	for key in char_lvl.keys():
+		ProgressManager.character_level[int(key)] = int(char_lvl[key])
+	
+	ProgressManager.biome_experience.clear()
+	var biome_exp = progress_data.get("biome_experience", {})
+	for key in biome_exp.keys():
+		ProgressManager.biome_experience[int(key)] = int(biome_exp[key])
+	
+	ProgressManager.biome_level.clear()
+	var biome_lvl = progress_data.get("biome_level", {})
+	for key in biome_lvl.keys():
+		ProgressManager.biome_level[int(key)] = int(biome_lvl[key])
+	
+	# ============================================================
+	# СНИМКИ НА НАЧАЛО ЗАБЕГА (для расчёта прогресса за забег)
+	# ============================================================
+	ProgressManager.run_start_character_experience.clear()
+	var run_char_exp = progress_data.get("run_start_character_experience", {})
+	for key in run_char_exp.keys():
+		ProgressManager.run_start_character_experience[int(key)] = int(run_char_exp[key])
+	
+	ProgressManager.run_start_character_level.clear()
+	var run_char_lvl = progress_data.get("run_start_character_level", {})
+	for key in run_char_lvl.keys():
+		ProgressManager.run_start_character_level[int(key)] = int(run_char_lvl[key])
+	
+	ProgressManager.run_start_biome_experience.clear()
+	var run_biome_exp = progress_data.get("run_start_biome_experience", {})
+	for key in run_biome_exp.keys():
+		ProgressManager.run_start_biome_experience[int(key)] = int(run_biome_exp[key])
+	
+	ProgressManager.run_start_biome_level.clear()
+	var run_biome_lvl = progress_data.get("run_start_biome_level", {})
+	for key in run_biome_lvl.keys():
+		ProgressManager.run_start_biome_level[int(key)] = int(run_biome_lvl[key])
 		
 
 func restore_run_manager(run_data: Dictionary) -> void:

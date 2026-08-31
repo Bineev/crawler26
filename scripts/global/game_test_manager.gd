@@ -138,8 +138,11 @@ func start_new_biome() -> void:
 		_create_potion_display()
 	
 	if current_floor == 1:
+		# 🆕 Сохраняем снимок прогресса на старте забега
+		ProgressManager.save_run_start_snapshot()
 		for potion in DataManager.get_random_potions(1):
 			RunManager.add_potion(potion)
+		
 	
 	# Запускаем этаж
 	FloorManager.start_floor()

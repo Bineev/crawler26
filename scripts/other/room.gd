@@ -283,8 +283,8 @@ func show_rewards() -> void:
 ## Завершает работу комнаты и переходит к следующей
 func exit_room() -> void:
 	await _close_room_animation()
-	# 🆕 Сохраняем игру после выхода из комнаты
-	#SaveManager.save_game()
+	# 🆕 Добавляем опыт за комнату
+	ProgressManager.add_experience_for_room(self)
 	GameTestManager.clear_ui()
 	FloorManager.process_next()
 	queue_free()

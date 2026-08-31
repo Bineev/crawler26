@@ -481,7 +481,7 @@ func _setup_artifact_rewards() -> void:
 		vbox.add_theme_constant_override("separation", 40)
 		
 		# Создаём ArtifactIcon
-		var artifact_icon = preload("res://scenes/artifact_icon.tscn").instantiate() as ArtifactIcon
+		var artifact_icon = load("res://scenes/artifact_icon.tscn").instantiate() as ArtifactIcon
 		artifact_icon.artifact_id = artifact_data.id
 		artifact_icon.artifact_resource = artifact_data
 		

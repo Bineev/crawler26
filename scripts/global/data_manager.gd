@@ -878,7 +878,26 @@ const HINT_PANEL_SIZE: Vector2 = Vector2(350, 268)
 
 const LOCATION_SPRITE_SIZE: Vector2 = Vector2(1024, 768)
 
+## ============================================================
+## ПРОГРЕСС (META)
+## ============================================================
 
+## Базовый опыт для расчёта уровней
+const XP_BASE: int = 15
+
+## Множитель прогресса персонажа (1.5X на первом уровне)
+const XP_CHARACTER_MULTIPLIER: float = 1.5
+
+## Базовый множитель прогресса биома (1X на первом уровне)
+const XP_BIOME_MULTIPLIER: float = 1.0
+
+## Опыт за прохождение комнат
+const XP_PER_OBJECT: int = 1
+const XP_PER_EVENT: int = 1
+const XP_PER_COMBAT: int = 2
+const XP_PER_ELITE: int = 3
+const XP_PER_CONCRETE: int = 3
+const XP_PER_BOSS: int = 5
 ## ============================================================
 ## ВЗАИМОДЕЙСТВИЯ СТАТУСОВ
 ## ============================================================
