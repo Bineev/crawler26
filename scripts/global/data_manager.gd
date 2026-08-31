@@ -2757,6 +2757,21 @@ func get_biome_name(biome: Biome) -> String:
 		_:
 			return "Unknown Biome"
 
+
+func get_character_class_name_key(character_class: CharacterClass) -> String:
+	match character_class:
+		CharacterClass.PENITENT:
+			return "character_class_penitent_name"
+		CharacterClass.WARRIOR:
+			return "character_class_warrior_name"
+		CharacterClass.MYSTIC:
+			return "character_class_mystic_name"
+		CharacterClass.ROGUE:
+			return "character_class_rogue_name"
+		_:
+			return "character_class_unknown_name"
+
+
 func get_biome_description(biome: Biome) -> String:
 	match biome:
 		Biome.MOLE_TUNNELS:

@@ -570,3 +570,43 @@ func process_all_level_ups() -> Dictionary:
 	}
 	
 	return result
+
+
+## ============================================================
+## ДОСТУП К СНИМКАМ НА НАЧАЛО ЗАБЕГА
+## ============================================================
+
+func get_run_start_character_experience(character_class: DataManager.CharacterClass) -> int:
+	return run_start_character_experience.get(character_class, 0)
+
+
+func get_run_start_biome_experience(biome: DataManager.Biome) -> int:
+	return run_start_biome_experience.get(biome, 0)
+
+
+func get_run_progress() -> Dictionary:
+	var character_class = RunManager.current_character
+	var biome = RunManager.current_biome
+	
+	var start_char_xp = get_run_start_character_experience(character_class)
+	var current_char_xp = character_experience.get(character_class, 0)
+	var start_char_lvl = calculate_character_level_from_snapshot(character_class)
+	var current_char_lvl = calculate_character_level(character_class)
+	
+	var start_biome_xp = get_run_start_biome_experience(biome)
+	var current_biome_xp = biome_experience.get(biome, 0)
+	var start_biome_lvl = calculate_biome_level_from_snapshot(biome)
+	var current_biome_lvl = calculate_biome_level(biome)
+	
+	return {
+		"character_start_level": start_char_lvl,
+		"character_start_xp": start_char_xp,
+		"character_current_level": current_char_lvl,
+		"character_current_xp": current_char_xp,
+		"character_xp_gain": current_char_xp - start_char_xp,
+		"biome_start_level": start_biome_lvl,
+		"biome_start_xp": start_biome_xp,
+		"biome_current_level": current_biome_lvl,
+		"biome_current_xp": current_biome_xp,
+		"biome_xp_gain": current_biome_xp - start_biome_xp,
+	}
