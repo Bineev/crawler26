@@ -221,8 +221,10 @@ func show_rewards() -> void:
 			reward_panel.gold_mod = 5
 		
 		DataManager.CombatType.BOSS:
-			reward_types = [DataManager.RewardType.ARTIFACT_COMBO, DataManager.RewardType.CARD_CHARACTER, DataManager.RewardType.GOLD]
+			reward_types = [DataManager.RewardType.ARTIFACT_COMBO, DataManager.RewardType.CARD_CHARACTER, DataManager.RewardType.GOLD, DataManager.RewardType.DECK_SIZE_BUFF]
 			reward_panel.gold_mod = 3
+			reward_panel.buff_amount = RunManager.hand_size_increment_per_biome  # 🆕
+			reward_panel.buff_duration = -1  # 🆕 перманентно
 	
 	reward_panel.reward_types = reward_types
 	SignalManager.show_reward.emit(reward_panel)

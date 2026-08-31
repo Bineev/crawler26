@@ -30,6 +30,7 @@ var shame_damage_taken_multiplier: float = DataManager.SHAME_DAMAGE_TAKEN_MULTIP
 var shame_atonement_multiplier: float = DataManager.SHAME_ATONEMENT_MULTIPLIER
 var frozen_energy_loss: int = DataManager.FROZEN_ENERGY_LOSS
 var infection_bleed_multiplier: int = DataManager.INFECTION_BLEED_MULTIPLIER
+var infection_multiplier: float = DataManager.INFECTION_MULTIPLIER  # 🆕
 # === Балансные константы ===
 var starting_hand_size: int = DataManager.STARTING_HAND_SIZE
 var cards_to_draw_per_turn: int = DataManager.CARDS_TO_DRAW_PER_TURN

@@ -140,14 +140,6 @@ func start_new_biome() -> void:
 	if current_floor == 1:
 		for potion in DataManager.get_random_potions(1):
 			RunManager.add_potion(potion)
-	else:
-		var player = BattleManager.get_player()
-		if player:
-			var current_hand_size = player.get_flat(DataManager.FlatStat.HAND_SIZE)
-			var increment = RunManager.hand_size_increment_per_biome
-			var new_hand_size = current_hand_size + increment
-			player.set_flat(DataManager.FlatStat.HAND_SIZE, new_hand_size)
-			SignalManager.log_message.emit("Размер руки увеличен на %d до %d!" % [increment, new_hand_size])
 	
 	# Запускаем этаж
 	FloorManager.start_floor()
@@ -300,10 +292,12 @@ func _on_room_selected(room_node: RoomNode, should_increment_room_index: bool = 
 		game_world.add_child(current_room_node)
 		current_room_node.position = DataManager.ROOM_POSITION * DataManager.SCALE_FACTOR
 	
+	# 🆕 Сохраняем ТЕКУЩУЮ комнату (если это не конкретный бой)
+	if room_node.combat_type != DataManager.CombatType.CONCRETE_COMBAT:
+		SaveManager.save_game()
+	
 	if should_increment_room_index:
 		current_room_index += 1
-		# 🆕 Сохраняем игру ПОСЛЕ обновления индекса
-		SaveManager.save_game()
 	
 	if current_room_node.room_type == DataManager.RoomType.COMBAT:
 		_create_battle_log()
@@ -759,7 +753,18 @@ func load_current_run() -> void:
 	
 	FloorManager.room_selected.connect(_on_room_selected)
 	FloorManager.floor_completed.connect(_on_floor_completed)
+
+	# отладка
+	print("=== LOAD CURRENT RUN DEBUG ===")
+	print("current_room_index: ", current_room_index)
+	print("FloorManager.all_rooms.size(): ", FloorManager.all_rooms.size())
+	print("FloorManager.all_paths.size(): ", FloorManager.all_paths.size())
 	
+	for i in range(FloorManager.all_rooms.size()):
+		var room = FloorManager.all_rooms[i]
+		var type_str = "COMBAT" if room.room_type == DataManager.RoomType.COMBAT else "OBJECT" if room.room_type == DataManager.RoomType.OBJECT else "EVENT"
+		print("  Room ", i, ": ", type_str, " visited=", room.is_visited, " revealed=", room.is_revealed)
+
 	# 6. Загружаем сохранённую комнату
 	var room_index = current_room_index
 	if room_index < FloorManager.all_rooms.size() and room_index >= 0:

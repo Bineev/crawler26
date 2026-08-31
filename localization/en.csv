@@ -394,8 +394,8 @@ upgrade_card_confirm,Upgrade
 "status_blister_dynamic_desc","Absorbs all incoming damage. Health: %d. Duration: %d turns."
 "status_infection_name","Infection"
 "status_infection_desc","The combination of Bleed and Poison infects the flesh with Infection."
-"status_infection_dynamic_desc","Deals %d damage per stack each turn. Duration: %d turns."
-"status_infection_additional","Damage per tick = Bleed stacks × %d. Reapplying sums the damage and refreshes duration."
+"status_infection_dynamic_desc","Deals %d damage each turn. Duration: %d turns."
+"status_infection_additional","Damage are summed. Ignore block."
 
 "artifact_troll_blade_name","Troll Blade"
 "artifact_troll_blade_desc","Interaction of Cold and Bleed creates Gangrene. Gangrene deals all accumulated damage on the last turn."

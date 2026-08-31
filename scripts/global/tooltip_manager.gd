@@ -174,8 +174,9 @@ func _get_dynamic_status_description(status_id: DataManager.Status, stacks: int,
 				return tr("status_blister_dynamic_desc") % [blister_data.current_health, blister_data.duration]
 			return tr("status_blister_desc")
 		DataManager.Status.INFECTION:
-			var damage_per_stack = status_data.get("damage_per_stack", 1)
-			return tr("status_infection_dynamic_desc") % [damage_per_stack, duration]
+			# 🆕 Берём effect_per_stack из данных статуса на цели
+			var damage = status_data.get("effect_per_stack", 1)
+			return tr("status_infection_dynamic_desc") % [damage, duration]
 		_:
 			return ""
 
@@ -404,7 +405,7 @@ func _get_status_additional_info(status_id: DataManager.Status, status_data: Dic
 				return tr("status_blister_additional") % [burn_on_destroy, damage_on_expire]
 			return ""
 		DataManager.Status.INFECTION:
-			return tr("status_infection_additional") % RunManager.infection_bleed_multiplier
+			return tr("status_infection_additional")
 		_:
 			return ""
 			return ""

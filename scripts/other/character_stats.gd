@@ -931,13 +931,8 @@ func process_start_of_turn():
 						caster = null
 					
 					# 🆕 Получаем значение тика
-					var tick_value = 0
-					if status.id == DataManager.Status.INFECTION:
-						# Для Заражения — берём урон из данных статуса
-						tick_value = get_infection_damage()
-					else:
-						# Для остальных статусов — стандартная логика
-						tick_value = status.get_tick_value(data.stacks, caster)
+					# Для всех статусов используем get_tick_value()
+					var tick_value = status.get_tick_value(data.stacks, caster)
 					
 					match tick_effect.category:
 						DataManager.EffectCategory.DAMAGE:

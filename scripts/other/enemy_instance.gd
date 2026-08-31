@@ -219,13 +219,17 @@ func get_active_statuses_for_ui() -> Array[Dictionary]:
 		var status_data = active_statuses[status_id]
 		var icon = DataManager.get_status_icon(status_id)
 		if icon:
-			result.append({
-				"status_id": status_id,  # ← добавляем
+			var data = {
+				"status_id": status_id,
 				"icon": icon,
 				"stacks": status_data.stacks,
 				"duration": status_data.duration,
 				"name": DataManager.get_status_name(status_id)
-			})
+			}
+			# 🆕 Добавляем effect_per_stack, если есть
+			if status_data.has("effect_per_stack"):
+				data["effect_per_stack"] = status_data["effect_per_stack"]
+			result.append(data)
 	return result
 
 func get_active_passives_for_ui() -> Array[Dictionary]:

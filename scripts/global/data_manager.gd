@@ -710,6 +710,7 @@ const DESPAIR_DURATION: int = 2
 const DESPAIR_DAMAGE_DEALT_MULTIPLIER: float = 0.75
 
 const INFECTION_BLEED_MULTIPLIER: int = 3
+const INFECTION_MULTIPLIER: float = 1.5  # 🆕 множитель для общего урона
 ## === Пассивки ===
 
 const REGROWTH_STARTING_HEAL: int = 2
@@ -1024,7 +1025,9 @@ func is_negative_status(status: Status) -> bool:
 		Status.WEAKNESS,
 		Status.VULNERABILITY,
 		Status.FROZEN,
-		Status.GANGRENE
+		Status.GANGRENE,
+		Status.BLISTER,     # 🆕
+		Status.INFECTION,   # 🆕
 	]
 
 func get_status_name(status: Status) -> String:
@@ -1040,6 +1043,8 @@ func get_status_name(status: Status) -> String:
 		Status.SHIELD: return tr("status_shield_name")
 		Status.FROZEN: return tr("status_frozen_name")
 		Status.GANGRENE: return tr("status_gangrene_name")
+		Status.BLISTER: return tr("status_blister_name")      # 🆕
+		Status.INFECTION: return tr("status_infection_name")  # 🆕
 		_: return tr("status_unknown")
 
 ##

@@ -9,5 +9,6 @@ id = 12
 name_key = "status_infection_name"
 description_key = "status_infection_desc"
 is_ticking = true
+ignore_block = true
 max_stacks = 1
 metadata/_custom_type_script = "uid://cdpdi1bblp6st"

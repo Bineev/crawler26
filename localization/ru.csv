@@ -395,8 +395,8 @@ upgrade_card_confirm,Улучшить
 "status_blister_dynamic_desc","Поглощает весь входящий урон. Прочность: %d. Длительность: %d ходов."
 "status_infection_name","Инфекция"
 "status_infection_desc","Сочетание Кровотечения и Яда заражает плоть Инфекцией."
-"status_infection_dynamic_desc","Наносит %d урона за стак каждый ход. Длительность: %d ходов."
-"status_infection_additional","Урон за тик = стаки Кровотечения × %d. Длительность берется от Яда"
+"status_infection_dynamic_desc","Наносит %d урона каждый ход. Длительность: %d ходов."
+"status_infection_additional","Урон суммируется. Игноририует блок."
 
 "artifact_troll_blade_name","Лезвие троля"
 "artifact_troll_blade_desc","Взаимодействие Холода и Кровотечения образует Гангрену. Гангрена наносит весь накопленный урон в последний ход."

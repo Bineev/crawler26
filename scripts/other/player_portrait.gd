@@ -426,7 +426,7 @@ func _update_icons(target : Node):
 	if not player_stats:
 		return
 	
-	# Добавляем статусы
+		# Добавляем статусы
 	for status_id in player_stats.active_statuses.keys():
 		var status_data = player_stats.active_statuses[status_id]
 		var status_resource = status_data["resource"]
@@ -439,10 +439,15 @@ func _update_icons(target : Node):
 			"name": DataManager.get_status_name(status_id)
 		}
 		
+		# 🆕 Добавляем effect_per_stack, если есть
+		if status_data.has("effect_per_stack"):
+			icon_data["effect_per_stack"] = status_data["effect_per_stack"]
+			# Также добавляем в status_data для тултипа
+			status_data["effect_per_stack"] = status_data["effect_per_stack"]
+		
 		var icon = STATUS_ICON_SCENE.instantiate() as StatusIcon
 		status_container.add_child(icon)
-		icon.setup(icon_data, DataManager.COLOR_MOLE_TUNNELS_ART_BG_LIGHT2, self)  # светлый для игрока
-		# 🆕 Подключаем тултип
+		icon.setup(icon_data, DataManager.COLOR_MOLE_TUNNELS_ART_BG_LIGHT2, self)
 		icon.mouse_entered.connect(_on_status_icon_hovered.bind(status_id, status_data.stacks, status_data.duration, status_data))
 		icon.mouse_exited.connect(_on_icon_mouse_exited)
 		#DataManager.apply_shader_to_icon(icon.icon, "res://shaders/highlight_item.gdshader", {'hover_intensity' : 1.0})

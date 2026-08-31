@@ -252,7 +252,7 @@ func _handle_poison_burn_blister(target, status_a: DataManager.Status, status_b:
 
 
 func _handle_bleed_poison_infection(target, status_a: DataManager.Status, status_b: DataManager.Status, new_stacks: int, new_duration: int):
-	# Получаем стаки и длительность обоих статусов
+	# Получаем значения статусов
 	var bleed_stacks = target.get_status_stacks(DataManager.Status.BLEED)
 	var bleed_duration = target.active_statuses.get(DataManager.Status.BLEED, {}).get("duration", 0)
 	var poison_stacks = target.get_status_stacks(DataManager.Status.POISON)
@@ -270,38 +270,64 @@ func _handle_bleed_poison_infection(target, status_a: DataManager.Status, status
 	target.remove_status(DataManager.Status.BLEED)
 	target.remove_status(DataManager.Status.POISON)
 	
-	# Рассчитываем параметры Заражения
-	var infection_stacks = 1
+	# 🆕 Расчёт урона с учётом урона за стак
+	var bleed_damage_per_stack = RunManager.bleed_damage_per_stack
+	var poison_damage_per_stack = RunManager.poison_damage_per_stack
+
+	var bleed_total = bleed_stacks * bleed_duration * bleed_damage_per_stack
+	var poison_total = poison_stacks * poison_duration * poison_damage_per_stack
+	var total_damage = (bleed_total + poison_total) * RunManager.infection_multiplier
+
 	var infection_duration = poison_duration
-	var damage_per_stack = bleed_stacks * RunManager.infection_bleed_multiplier
+	var infection_stacks = 1
+	var effect_per_stack = floor(total_damage / infection_duration)
+	effect_per_stack = max(1, effect_per_stack)
 	
-	# Проверяем, есть ли уже Заражение
+	# 🆕 Проверяем, есть ли уже Заражение
 	var existing = target.active_statuses.get(DataManager.Status.INFECTION)
 	if existing:
-		# Стакаем: урон складывается, длительность — максимум
-		var existing_damage = existing.get("damage_per_stack", 0)
-		damage_per_stack += existing_damage
+		# Суммируем урон
+		var existing_effect = existing.get("effect_per_stack", 0)
+		effect_per_stack += existing_effect
+		# Длительность — максимум
 		infection_duration = max(infection_duration, existing.duration)
 		
-		# Обновляем существующий статус
-		existing.stacks = infection_stacks
-		existing.duration = infection_duration
-		existing["damage_per_stack"] = damage_per_stack
-		
-		SignalManager.log_message.emit("Заражение усилилось! Урон за стак: %d, Длительность: %d ходов." % [damage_per_stack, infection_duration])
-		return
+		# 🆕 Удаляем старую Infection
+		target.remove_status(DataManager.Status.INFECTION)
 	
-	# Создаём новый статус
+	# 🆕 Создаём эффект для тика
+	var tick_effect = EffectEntry.new()
+	tick_effect.category = DataManager.EffectCategory.DAMAGE
+	tick_effect.target = DataManager.EffectTarget.SELF
+	tick_effect.base_value = effect_per_stack  # ← сохраняем урон в base_value
+	tick_effect.is_direct_damage = false
+	
+	# Создаём ресурс Infection
 	var infection_status = DataManager.get_status_resource(DataManager.Status.INFECTION)
 	if infection_status:
-		target._add_status_direct(infection_status, infection_stacks, infection_duration, target)
+		var status_copy = infection_status.duplicate_for_instance()
+		status_copy.tick_effect = tick_effect
+		status_copy.is_ticking = true
+		status_copy.tick_interval = 1
+		status_copy.ignore_block = true
 		
-		# Сохраняем дополнительные данные
+		# 🆕 Сохраняем effect_per_stack в ресурсе
+		status_copy.effect_per_stack = effect_per_stack
+		
+		target._add_status_direct(status_copy, infection_stacks, infection_duration, target)
+		
+		# 🆕 СОХРАНЯЕМ В ДАННЫХ СТАТУСА
 		var status_data = target.active_statuses.get(DataManager.Status.INFECTION)
 		if status_data:
-			status_data["damage_per_stack"] = damage_per_stack
+			status_data["effect_per_stack"] = effect_per_stack
+			
+		# 3. Принудительно обновляем UI
+		if target is EnemyInstance:
+			SignalManager.enemy_status_changed.emit(target)
+		else:
+			SignalManager.player_status_changed.emit(target)
 		
-		SignalManager.log_message.emit("Заражение! Урон за стак: %d, Длительность: %d ходов." % [damage_per_stack, infection_duration])
+		SignalManager.log_message.emit("Заражение! Урон за стак: %d, Длительность: %d ходов." % [effect_per_stack, infection_duration])
 
 
 func _get_last_status(target, new_status: DataManager.Status) -> int:

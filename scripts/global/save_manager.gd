@@ -145,6 +145,7 @@ func _collect_run_data() -> Dictionary:
 		"shame_atonement_multiplier": RunManager.shame_atonement_multiplier,
 		"frozen_energy_loss": RunManager.frozen_energy_loss,
 		"infection_bleed_multiplier": RunManager.infection_bleed_multiplier,
+		"infection_multiplier": RunManager.infection_multiplier,  # 🆕
 		
 		# === Статусные константы (игрок) ===
 		"player_poison_damage_per_stack": RunManager.player_poison_damage_per_stack,
@@ -157,6 +158,7 @@ func _collect_run_data() -> Dictionary:
 		"starting_hand_size": RunManager.starting_hand_size,
 		"cards_to_draw_per_turn": RunManager.cards_to_draw_per_turn,
 		"max_energy": RunManager.max_energy,
+		"hand_size_increment_per_biome": RunManager.hand_size_increment_per_biome,  # 🆕
 		
 		# === Ресурсы ===
 		"default_item_cost": RunManager.default_item_cost,
@@ -476,6 +478,7 @@ func restore_run_manager(run_data: Dictionary) -> void:
 	RunManager.shame_atonement_multiplier = run_data.get("shame_atonement_multiplier", DataManager.SHAME_ATONEMENT_MULTIPLIER)
 	RunManager.frozen_energy_loss = run_data.get("frozen_energy_loss", DataManager.FROZEN_ENERGY_LOSS)
 	RunManager.infection_bleed_multiplier = run_data.get("infection_bleed_multiplier", DataManager.INFECTION_BLEED_MULTIPLIER)
+	RunManager.infection_multiplier = run_data.get("infection_multiplier", DataManager.INFECTION_MULTIPLIER)  # 🆕
 	
 	# === Статусные константы (игрок) ===
 	RunManager.player_poison_damage_per_stack = run_data.get("player_poison_damage_per_stack", DataManager.POISON_BASE_DAMAGE_PER_STACK)
@@ -488,7 +491,8 @@ func restore_run_manager(run_data: Dictionary) -> void:
 	RunManager.starting_hand_size = run_data.get("starting_hand_size", DataManager.STARTING_HAND_SIZE)
 	RunManager.cards_to_draw_per_turn = run_data.get("cards_to_draw_per_turn", DataManager.CARDS_TO_DRAW_PER_TURN)
 	RunManager.max_energy = run_data.get("max_energy", DataManager.MAX_ENERGY)
-	
+	RunManager.hand_size_increment_per_biome = run_data.get("hand_size_increment_per_biome", DataManager.HAND_SIZE_INCREMENT_PER_BIOME)  # 🆕
+
 	# === Ресурсы ===
 	RunManager.default_item_cost = run_data.get("default_item_cost", DataManager.DEFAULT_ITEM_COST)
 	RunManager.reward_gold_default = run_data.get("reward_gold_default", DataManager.REWARD_GOLD_DEFAULT)
