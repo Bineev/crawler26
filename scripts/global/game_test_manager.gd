@@ -293,9 +293,15 @@ func _on_room_selected(room_node: RoomNode, should_increment_room_index: bool = 
 		current_room_node.position = DataManager.ROOM_POSITION * DataManager.SCALE_FACTOR
 	
 	# 🆕 Сохраняем ТЕКУЩУЮ комнату (если это не конкретный бой)
-	if room_node.combat_type != DataManager.CombatType.CONCRETE_COMBAT:
+	if room_node.room_type == DataManager.RoomType.COMBAT and room_node.combat_type == DataManager.CombatType.CONCRETE_COMBAT:
+		pass
+	else:
 		SaveManager.save_game()
-	
+	# мы сохранили комнату, а затем увеличился индекс
+	# значит при загрузке индекс будет не увеличенный, но увеличится когда загрузится комната
+	# следующая комната (сохраняется опять старый индекс, затем увеличивается)
+	# выходим из игры 
+	# загружаемся (индекс старый, затем увеличивается) - вроде все нормально
 	if should_increment_room_index:
 		current_room_index += 1
 	
@@ -770,7 +776,7 @@ func load_current_run() -> void:
 	if room_index < FloorManager.all_rooms.size() and room_index >= 0:
 		var room_node = FloorManager.all_rooms[room_index]
 		room_node.is_visited = true
-		_on_room_selected(room_node, false)
+		_on_room_selected(room_node, true)  # 🆕 true вместо false
 	else:
 		printerr("Room index invalid, starting new biome...")
 		start_new_biome()
