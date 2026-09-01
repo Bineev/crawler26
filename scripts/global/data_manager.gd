@@ -96,6 +96,10 @@ enum EnemyId {
 	ROTTEN_PORTER,      # Сгнивший рабочий
 	FLESH_HOUND,        # Гончая-цветок
 	MASTER_OF_ROT,      # Хозяин гнили (босс)
+	
+	# 🆕 Пепельные своды
+	SMOLDERING_IMP,  # Тлеющий карлик
+	WAX_GOLEM,  # Восковой голем
 }
 
 enum BattleState {
@@ -162,6 +166,16 @@ enum ModifierStat {
 	DAMAGE_DEALT_DOT_PERCENT,      # +X% к урону от статусов (DOT)
 	DAMAGE_TAKEN_DIRECT_PERCENT,   # +X% к входящему прямому урону
 	DAMAGE_TAKEN_DOT_PERCENT,      # +X% к входящему урону от статусов (DOT)
+
+	# 🆕 Модификаторы для статусов
+	BURN_STACKS_MULTIPLIER,      # Умножает накладываемые стаки Горения
+	POISON_STACKS_MULTIPLIER,    # Умножает накладываемые стаки Яда
+	BLEED_STACKS_MULTIPLIER,     # Умножает накладываемые стаки Кровотечения
+	COLD_STACKS_MULTIPLIER,      # Умножает накладываемые стаки Холода
+	
+	BURN_DAMAGE_MULTIPLIER,      # Умножает урон от Горения
+	POISON_DAMAGE_MULTIPLIER,    # Умножает урон от Яда
+	BLEED_DAMAGE_MULTIPLIER,     # Умножает урон от Кровотечения
 }
 
 enum PotionType {
@@ -464,6 +478,7 @@ enum Status {
 	GANGRENE,  # ← добавить
 	BLISTER,  # Чёрный пузырь
 	INFECTION,  # 🆕 Заражение
+	RESIN,  # 🆕 Смола
 }
 
 ## Классы персонажей
@@ -585,6 +600,7 @@ enum Biome {
 	FROZEN_DEPTHS,      # Ледяные глубины (на будущее)
 	MAGMA_CORE,         # Ядро магмы (на будущее)
 	ROTTEN_MARSHES,     # 🆕 Гнилостные Топи
+	ASHEN_VAULTS,       # 🆕 Пепельные своды
 }
 
 ## Враги Кротовых нор
@@ -1047,6 +1063,7 @@ func is_negative_status(status: Status) -> bool:
 		Status.GANGRENE,
 		Status.BLISTER,     # 🆕
 		Status.INFECTION,   # 🆕
+		Status.RESIN,  # 🆕 Смола (негативный)
 	]
 
 func get_status_name(status: Status) -> String:
@@ -1064,6 +1081,7 @@ func get_status_name(status: Status) -> String:
 		Status.GANGRENE: return tr("status_gangrene_name")
 		Status.BLISTER: return tr("status_blister_name")      # 🆕
 		Status.INFECTION: return tr("status_infection_name")  # 🆕
+		Status.RESIN: return tr("status_resin_name")
 		_: return tr("status_unknown")
 
 ##
@@ -1110,6 +1128,7 @@ const STATUS_ICONS: Dictionary = {
 	Status.GANGRENE: preload("res://img/icons/statuses/gangrene.png"),
 	Status.BLISTER: preload("res://img/icons/statuses/blister.png"),
 	Status.INFECTION: preload("res://img/icons/statuses/infection.png"),
+	#Status.RESIN: preload("res://img/icons/statuses/resin.png"),
 }
 
 const PASSIVE_ICONS: Dictionary = {
@@ -1168,6 +1187,7 @@ func load_status_resources():
 	_status_resources[Status.GANGRENE] = load("res://resources/statuses/gangrene.tres")
 	_status_resources[Status.BLISTER] = load("res://resources/statuses/blister.tres")
 	_status_resources[Status.INFECTION] = load("res://resources/statuses/infection.tres")  # 🆕
+	_status_resources[Status.RESIN] = load("res://resources/statuses/resin.tres")
 	
 	_status_resources_loaded = true
 
@@ -1226,6 +1246,14 @@ func load_biome_backgrounds():
 		preload("res://img/backgrounds/rotten_marshes/rotten_marshes_3.png"),
 		preload("res://img/backgrounds/rotten_marshes/rotten_marshes_4.png"),
 		preload("res://img/backgrounds/rotten_marshes/rotten_marshes_5.png")
+	]
+	# 🆕 Пепельные своды
+	_biome_backgrounds[DataManager.Biome.ASHEN_VAULTS] = [
+		preload("res://img/backgrounds/ashen_vaults/ashen_vaults_1.png"),
+		preload("res://img/backgrounds/ashen_vaults/ashen_vaults_2.png"),
+		preload("res://img/backgrounds/ashen_vaults/ashen_vaults_3.png"),
+		preload("res://img/backgrounds/ashen_vaults/ashen_vaults_4.png"),
+		preload("res://img/backgrounds/ashen_vaults/ashen_vaults_5.png"),
 	]
 	# Пещеры плоти (позже)
 	# _biome_backgrounds[DataManager.Biome.FLESH_CAVES] = [...]
@@ -1299,6 +1327,8 @@ func load_biome_enemies(biome: Biome):
 			_current_enemies_data = preload("res://data/biomes/mole_tunnels_enemies.gd").new()
 		Biome.ROTTEN_MARSHES:  # 🆕
 			_current_enemies_data = preload("res://data/biomes/rotten_marshes_enemies.gd").new()
+		Biome.ASHEN_VAULTS:  # 🆕
+			_current_enemies_data = preload("res://data/biomes/ashen_vaults_enemies.gd").new()
 
 func get_enemy_intents(enemy_id: int) -> Dictionary:
 	if not _current_enemies_data:
@@ -1431,6 +1461,16 @@ func load_enemy_sprites():
 		],
 		"res://img/enemies/rotten_marshes/"
 	)
+	
+	# 🆕 Пепельные своды
+	load_enemy_sprites_for_biome(
+		DataManager.Biome.ASHEN_VAULTS,
+		[
+			{id = DataManager.EnemyId.SMOLDERING_IMP, folder = "smoldering_imp", file = "smoldering_imp"},
+			{id = DataManager.EnemyId.WAX_GOLEM, folder = "wax_golem", file = "wax_golem"},  # 🆕
+		],
+		"res://img/enemies/ashen_vaults/"
+	)
 
 func _register_enemy_sprite(biome: DataManager.Biome, enemy_id, state: EnemyAnimationState, path: String):
 	var key = str(biome) + "_" + str(enemy_id) + "_" + str(state)
@@ -1540,6 +1580,10 @@ func load_enemy_resources():
 	_enemy_resources[EnemyId.FLESH_HOUND] = load("res://resources/enemies/rotten_marshes/flesh_hound.tres")
 	_enemy_resources[EnemyId.MASTER_OF_ROT] = load("res://resources/enemies/rotten_marshes/master_of_rot.tres")
 	
+	# 🆕 Пепельные своды
+	_enemy_resources[EnemyId.SMOLDERING_IMP] = load("res://resources/enemies/ashen_vaults/smoldering_imp.tres")
+	_enemy_resources[EnemyId.WAX_GOLEM] = load("res://resources/enemies/ashen_vaults/wax_golem.tres")  # 🆕
+
 	_enemy_resources_loaded = true
 
 
@@ -1849,6 +1893,24 @@ const COLOR_ROGUE_CARD_BG: Color = Color("b3e6b3")      # светло-зелё�
 const COLOR_MOLE_TUNNELS_CARD_BG: Color = Color("e6d6b3")    # бежево-коричневый
 const COLOR_FLESH_CAVES_CARD_BG: Color = Color("e6c4c4")     # светло-красный
 const COLOR_BONE_LABYRINTH_CARD_BG: Color = Color("e6e0d6")  # светло-серый
+
+# === 🆕 Пепельные Своды (Ashen Vaults) ===
+const COLOR_ASHEN_ART_BG_DARK: Color = Color("050505")      # Черный Излом
+const COLOR_ASHEN_ART_BG_LIGHT: Color = Color("7A7F85")     # Серый Пепел
+const COLOR_ASHEN_ART_BG_WAX: Color = Color("D1C7A5")       # Трупный Воск
+const COLOR_ASHEN_CARD_BG: Color = Color("7A7F85")          # Серый Пепел (фон карт)
+
+# Основные цвета
+const COLOR_ASHEN_BLACK: Color = Color("050505")      # Черный Излом — глубокие тени, силуэты
+const COLOR_ASHEN_GREY: Color = Color("7A7F85")       # Серый Пепел — стены, пол, прах
+const COLOR_ASHEN_WAX: Color = Color("D1C7A5")        # Трупный Воск — свечи, колонны, маски
+const COLOR_ASHEN_FIRE: Color = Color("E65C00")       # Пламя Веры — фитили, глаза-угольки
+const COLOR_ASHEN_CRIMSON: Color = Color("990012")    # Багряный Грех — кровь, раны, гниль
+
+# Дополнительные оттенки для градиентов и акцентов
+const COLOR_ASHEN_WAX_DARK: Color = Color("B8AD8A")   # Тёмный воск
+const COLOR_ASHEN_FIRE_DIM: Color = Color("B84A00")   # Тлеющее пламя
+const COLOR_ASHEN_CRIMSON_DARK: Color = Color("66000A") # Тёмная кровь
 ## ============================================================
 # === НОВЫЕ ЦВЕТА ДЛЯ UI ===
 
@@ -1919,6 +1981,8 @@ func _get_card_art_background_color_dark(origin: CardOrigin, character_class: Ch
 					return COLOR_BONE_LABYRINTH_ART_BG_DARK
 				Biome.ROTTEN_MARSHES:  # 🆕
 					return COLOR_ROTTEN_MARSHES_ART_BG_DARK
+				Biome.ASHEN_VAULTS:  # 🆕 Пепельные своды
+					return COLOR_ASHEN_ART_BG_DARK
 				_:
 					return Color.BLACK
 		
@@ -1950,6 +2014,8 @@ func _get_card_art_background_color_light(origin: CardOrigin, character_class: C
 					return COLOR_BONE_LABYRINTH_ART_BG_LIGHT
 				Biome.ROTTEN_MARSHES:  # 🆕
 					return COLOR_ROTTEN_MARSHES_ART_BG_MINT
+				Biome.ASHEN_VAULTS:  # 🆕 Пепельные своды
+					return COLOR_ASHEN_ART_BG_WAX
 				_:
 					return Color.BLACK
 		
@@ -2754,6 +2820,8 @@ func get_biome_name(biome: Biome) -> String:
 			return tr("biome_flesh_caves_name")
 		Biome.BONE_LABYRINTH:
 			return tr("biome_bone_labyrinth_name")
+		Biome.ASHEN_VAULTS:
+			return tr("biome_ashen_vaults_name")
 		_:
 			return "Unknown Biome"
 
@@ -2778,6 +2846,8 @@ func get_biome_description(biome: Biome) -> String:
 			return tr("biome_mole_tunnels_desc")
 		Biome.ROTTEN_MARSHES:
 			return tr("biome_rotten_marshes_desc")
+		Biome.ASHEN_VAULTS:
+			return tr("biome_ashen_vaults_desc")
 		_:
 			return ""
 
@@ -2787,5 +2857,7 @@ func get_biome_preview(biome: Biome) -> Texture2D:
 			return preload("res://img/ui/biome_previews/mole_tunnels_preview.png")
 		Biome.ROTTEN_MARSHES:
 			return preload("res://img/ui/biome_previews/rotten_marshes_preview.png")
+		Biome.ASHEN_VAULTS:  # 🆕 Пепельные своды
+			return preload("res://img/ui/biome_previews/ashen_vaults_preview.png")
 		_:
 			return null

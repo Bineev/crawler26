@@ -749,3 +749,14 @@ upgrade_card_confirm,Upgrade
 "character_class_mystic_name","Mystic"
 "character_class_rogue_name","Rogue"
 "character_class_unknown_name","Unknown"
+
+"biome_ashen_vaults_name","Ashen Vaults"
+"biome_ashen_vaults_desc","An underground monastery of fanatics who took righteousness to madness. Their bones became wicks, their flesh — melting wax."
+
+"status_resin_name","Resin"
+"status_resin_desc","Doubles Burn stacks applied."
+
+"enemy_smoldering_imp_name","Smoldering Imp"
+"enemy_smoldering_imp_desc","A small malicious creature with a large head and a long nose. Its skin is cracked, and smoldering embers glow in its eye sockets."
+"enemy_wax_golem_name","Wax Golem"
+"enemy_wax_golem_desc","A figure of hardened wax shaped like a candle. Slow but dangerous when it gets too close."

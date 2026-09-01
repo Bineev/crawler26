@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="EnemyResource" load_steps=3 format=3 uid="uid://d3vwv8a2fdqb0"]
+
+[ext_resource type="Script" uid="uid://beudtcsu45bk7" path="res://resources/res_scripts/enemy_resource.gd" id="1_3hi5o"]
+[ext_resource type="Script" uid="uid://br4ase11y58nd" path="res://resources/res_scripts/passive_resource.gd" id="2_yfkwf"]
+
+[resource]
+script = ExtResource("1_3hi5o")
+enemy_id = 15
+biome = 6
+size = 0
+name_key = "enemy_wax_golem_name"
+description_key = "enemy_wax_golem_desc"
+base_strength = 4
+metadata/_custom_type_script = "uid://beudtcsu45bk7"

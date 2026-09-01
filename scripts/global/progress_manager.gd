@@ -33,6 +33,7 @@ var run_start_biome_level: Dictionary = {}          # Biome -> int
 var all_biomes: Array[DataManager.Biome] = [
 	DataManager.Biome.MOLE_TUNNELS,
 	DataManager.Biome.ROTTEN_MARSHES,
+	DataManager.Biome.ASHEN_VAULTS,  # 🆕 Пепельные своды
 	# DataManager.Biome.FLESH_CAVES,  # позже
 	# DataManager.Biome.BONE_LABYRINTH,  # позже
 ]
@@ -127,6 +128,17 @@ var biome_unlock_cards: Dictionary = {
 			DataManager.CardId.BLOOM_OF_CORRUPTION,
 			DataManager.CardId.FOUL_WELL,
 			DataManager.CardId.EPIDEMIC,
+		],
+	},
+	DataManager.Biome.ASHEN_VAULTS: {  # 🆕 Пепельные своды
+		1: [
+			# TODO: добавить карты биома после их создания
+		],
+		2: [
+			# TODO: добавить карты биома после их создания
+		],
+		3: [
+			# TODO: добавить карты биома после их создания
 		],
 	},
 }

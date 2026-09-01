@@ -755,3 +755,14 @@ reward_lost_max_hp_title, "Примите потерю"
 "character_class_mystic_name","Мистик"
 "character_class_rogue_name","Разбойник"
 "character_class_unknown_name","Неизвестный"
+
+"biome_ashen_vaults_name","Пепельные своды"
+"biome_ashen_vaults_desc","Подземный монастырь фанатиков, доведших праведность до безумия. Их кости стали фитилями, а плоть — тающим воском."
+
+"status_resin_name","Смола"
+"status_resin_desc","Удваивает накладываемые стаки Горения."
+
+"enemy_smoldering_imp_name","Тлеющий карлик"
+"enemy_smoldering_imp_desc","Маленькое злобное существо с большой головой и длинным носом. Его кожа потрескалась, а вместо глаз — тлеющие угольки."
+"enemy_wax_golem_name","Восковой голем"
+"enemy_wax_golem_desc","Фигура из застывшего воска в форме свечи. Медлительная, но опасная, когда подходит слишком близко."

@@ -36,6 +36,8 @@ static func _select_normal_enemies(biome: DataManager.Biome, floor_level: int, d
 			enemies = _select_normal_enemies_mole(biome, floor_level, difficulty)
 		DataManager.Biome.ROTTEN_MARSHES:
 			enemies = _select_normal_enemies_rotten(biome, floor_level, difficulty)
+		DataManager.Biome.ASHEN_VAULTS:  # 🆕
+			return _select_normal_enemies_ashen(biome, floor_level, difficulty)
 	
 	return enemies
 
@@ -221,6 +223,99 @@ static func _select_normal_enemies_rotten(biome: DataManager.Biome, floor_level:
 		enemies.append(DataManager.get_enemy_resource(enemy_type))
 	
 	return enemies
+
+
+static func _select_normal_enemies_ashen(biome: DataManager.Biome, floor_level: int, difficulty: float) -> Array[EnemyResource]:
+	var enemies: Array[EnemyResource] = []
+	
+	# 🆕 Слабые враги
+	var weak_enemies = [
+		DataManager.EnemyId.SMOLDERING_IMP,
+		DataManager.EnemyId.WAX_GOLEM,  # 🆕
+	]
+	
+	# 🆕 Обычные враги
+	var normal_enemies = [
+		# TODO: добавить других врагов биома
+	]
+	
+	# 🆕 Элитные враги
+	var elite_enemies = [
+		# TODO: добавить элитных врагов
+	]
+	
+	var count = 1
+	if difficulty >= 0.15:
+		count = 2
+	if difficulty >= 0.40:
+		count = 3
+	
+	var composition = []
+	
+	if count == 1:
+		if difficulty <= 0.1:
+			composition = [weak_enemies[randi() % weak_enemies.size()]]
+		elif difficulty <= 0.2:
+			composition = [normal_enemies[randi() % normal_enemies.size()]]
+		else:
+			if randf() < 0.5:
+				composition = [normal_enemies[randi() % normal_enemies.size()]]
+			else:
+				composition = [elite_enemies[randi() % elite_enemies.size()]]
+	
+	elif count == 2:
+		if difficulty <= 0.25:
+			composition = [
+				weak_enemies[randi() % weak_enemies.size()],
+				weak_enemies[randi() % weak_enemies.size()]
+			]
+		elif difficulty <= 0.35:
+			composition = [
+				weak_enemies[randi() % weak_enemies.size()],
+				normal_enemies[randi() % normal_enemies.size()]
+			]
+		elif difficulty <= 0.50:
+			composition = [
+				normal_enemies[randi() % normal_enemies.size()],
+				normal_enemies[randi() % normal_enemies.size()]
+			]
+		else:
+			composition = [
+				normal_enemies[randi() % normal_enemies.size()],
+				elite_enemies[randi() % elite_enemies.size()]
+			]
+	
+	elif count == 3:
+		if difficulty <= 0.50:
+			composition = [
+				weak_enemies[randi() % weak_enemies.size()],
+				weak_enemies[randi() % weak_enemies.size()],
+				normal_enemies[randi() % normal_enemies.size()]
+			]
+		elif difficulty <= 0.65:
+			composition = [
+				weak_enemies[randi() % weak_enemies.size()],
+				normal_enemies[randi() % normal_enemies.size()],
+				normal_enemies[randi() % normal_enemies.size()]
+			]
+		elif difficulty <= 0.80:
+			composition = [
+				normal_enemies[randi() % normal_enemies.size()],
+				normal_enemies[randi() % normal_enemies.size()],
+				normal_enemies[randi() % normal_enemies.size()]
+			]
+		else:
+			composition = [
+				elite_enemies[randi() % elite_enemies.size()],
+				normal_enemies[randi() % normal_enemies.size()],
+				normal_enemies[randi() % normal_enemies.size()]
+			]
+	
+	for enemy_type in composition:
+		enemies.append(DataManager.get_enemy_resource(enemy_type))
+	
+	return enemies
+
 
 
 static func _select_elite_enemies(biome: DataManager.Biome, floor_level: int, difficulty: float) -> Array[EnemyResource]:

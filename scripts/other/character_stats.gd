@@ -34,6 +34,16 @@ var modifiers: Dictionary = {
 	DataManager.ModifierStat.DAMAGE_DEALT_DOT_PERCENT: 1.0,
 	DataManager.ModifierStat.DAMAGE_TAKEN_DIRECT_PERCENT: 1.0,
 	DataManager.ModifierStat.DAMAGE_TAKEN_DOT_PERCENT: 1.0,
+
+	# 🆕 Модификаторы статусов
+	DataManager.ModifierStat.BURN_STACKS_MULTIPLIER: 1.0,
+	DataManager.ModifierStat.POISON_STACKS_MULTIPLIER: 1.0,
+	DataManager.ModifierStat.BLEED_STACKS_MULTIPLIER: 1.0,
+	DataManager.ModifierStat.COLD_STACKS_MULTIPLIER: 1.0,
+	
+	DataManager.ModifierStat.BURN_DAMAGE_MULTIPLIER: 1.0,
+	DataManager.ModifierStat.POISON_DAMAGE_MULTIPLIER: 1.0,
+	DataManager.ModifierStat.BLEED_DAMAGE_MULTIPLIER: 1.0,
 }
 
 ## ============================================================
@@ -327,6 +337,19 @@ func add_status(status: StatusResource, value: int, duration: int, caster: Chara
 	var status_id = status.id
 	var stacks = value
 	var dur = duration
+
+	var multiplier = 1.0
+	match status_id:
+		DataManager.Status.BURN:
+			multiplier = get_modifier(DataManager.ModifierStat.BURN_STACKS_MULTIPLIER)
+		DataManager.Status.POISON:
+			multiplier = get_modifier(DataManager.ModifierStat.POISON_STACKS_MULTIPLIER)
+		DataManager.Status.BLEED:
+			multiplier = get_modifier(DataManager.ModifierStat.BLEED_STACKS_MULTIPLIER)
+		DataManager.Status.COLD:
+			multiplier = get_modifier(DataManager.ModifierStat.COLD_STACKS_MULTIPLIER)
+
+	stacks = floor(stacks * multiplier)
 
 	# 🆕 Проверяем, если кастер — игрок, а цель — враг, и статус — BLEED
 	if caster and not caster is EnemyInstance and self is EnemyInstance and status_id == DataManager.Status.BLEED:

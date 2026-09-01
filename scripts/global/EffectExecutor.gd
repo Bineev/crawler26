@@ -129,6 +129,15 @@ func _execute_damage(effect: EffectEntry, source, targets: Array, is_direct: boo
 			if is_direct:
 				final_damage *= source.get_modifier(DataManager.ModifierStat.DAMAGE_DEALT_DIRECT_PERCENT)
 			else:
+	# 🆕 Модификаторы урона от конкретных статусов
+				var status_id = effect.status.id if effect.status else -1
+				match status_id:
+					DataManager.Status.BURN:
+						final_damage *= source.get_modifier(DataManager.ModifierStat.BURN_DAMAGE_MULTIPLIER)
+					DataManager.Status.POISON:
+						final_damage *= source.get_modifier(DataManager.ModifierStat.POISON_DAMAGE_MULTIPLIER)
+					DataManager.Status.BLEED:
+						final_damage *= source.get_modifier(DataManager.ModifierStat.BLEED_DAMAGE_MULTIPLIER)
 				final_damage *= source.get_modifier(DataManager.ModifierStat.DAMAGE_DEALT_DOT_PERCENT)
 		
 		# ============================================================

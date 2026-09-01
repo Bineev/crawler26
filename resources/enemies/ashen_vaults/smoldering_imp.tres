@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="EnemyResource" load_steps=3 format=3 uid="uid://8deei0wh2tk4"]
+
+[ext_resource type="Script" uid="uid://beudtcsu45bk7" path="res://resources/res_scripts/enemy_resource.gd" id="1_fnclx"]
+[ext_resource type="Script" uid="uid://br4ase11y58nd" path="res://resources/res_scripts/passive_resource.gd" id="2_a78m2"]
+
+[resource]
+script = ExtResource("1_fnclx")
+enemy_id = 14
+biome = 6
+size = 0
+name_key = "enemy_smoldering_imp_name"
+description_key = "enemy_smoldering_imp_desc"
+base_max_health = 27
+metadata/_custom_type_script = "uid://beudtcsu45bk7"
