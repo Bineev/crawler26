@@ -1136,7 +1136,7 @@ func set_animstate_to_idle():
 
 func _on_status_icon_hovered(status_id: DataManager.Status, stacks: int, duration: int, status_data: Dictionary):
 	var pos = get_global_mouse_position()
-	TooltipManager.request_dynamic_status_tooltip(status_id, stacks, duration, status_data, pos)
+	TooltipManager.request_dynamic_status_tooltip(status_id, stacks, duration, status_data, pos, self.enemy_instance)
 
 
 func _on_passive_icon_hovered(passive_data: Dictionary):

@@ -115,13 +115,13 @@ func _get_card_type_description(card_type: DataManager.CardType) -> String:
 			return ""
 
 
-func request_dynamic_status_tooltip(status_id: DataManager.Status, stacks: int, duration: int, status_data: Dictionary, position: Vector2):
-	var data = _build_dynamic_status_tooltip_data(status_id, stacks, duration, status_data)
+func request_dynamic_status_tooltip(status_id: DataManager.Status, stacks: int, duration: int, status_data: Dictionary, position: Vector2, target: CharacterStats = null):
+	var data = _build_dynamic_status_tooltip_data(status_id, stacks, duration, status_data, target)
 	SignalManager.tooltip_requested.emit(data, position)
 
-func _build_dynamic_status_tooltip_data(status_id: DataManager.Status, stacks: int, duration: int, status_data: Dictionary) -> Dictionary:
+func _build_dynamic_status_tooltip_data(status_id: DataManager.Status, stacks: int, duration: int, status_data: Dictionary, target: CharacterStats = null) -> Dictionary:
 	var name = DataManager.get_status_name(status_id)
-	var desc = _get_dynamic_status_description(status_id, stacks, duration, status_data)  # ← передаём
+	var desc = _get_dynamic_status_description(status_id, stacks, duration, status_data, target)  # ← передаём
 	var additional = _get_status_additional_info(status_id, status_data)  # ← передаём status_data
 	
 	return {
@@ -132,18 +132,41 @@ func _build_dynamic_status_tooltip_data(status_id: DataManager.Status, stacks: i
 	}
 
 
-func _get_dynamic_status_description(status_id: DataManager.Status, stacks: int, duration: int, status_data: Dictionary = {}) -> String:
+func _get_dynamic_status_description(status_id: DataManager.Status, stacks: int, duration: int, status_data: Dictionary = {}, target: CharacterStats = null) -> String:
 	match status_id:
 		DataManager.Status.POISON:
-			var damage = stacks * RunManager.poison_damage_per_stack
+			var caster = status_data.get("caster", null)
+			var is_enemy_caster = caster is EnemyInstance
+			
+			var damage_per_stack = RunManager.poison_damage_per_stack if is_enemy_caster else RunManager.player_poison_damage_per_stack
 			var healing_reduction = RunManager.poison_healing_reduction * 100
-			return tr("status_poison_dynamic_desc") % [damage, duration, healing_reduction]
+			
+			return tr("status_poison_dynamic_desc") % [damage_per_stack, duration, healing_reduction]
+		
 		DataManager.Status.BLEED:
-			var damage_per_stack = RunManager.bleed_damage_per_stack
+			var caster = status_data.get("caster", null)
+			var is_enemy_caster = caster is EnemyInstance
+			
+			var damage_per_stack = RunManager.bleed_damage_per_stack if is_enemy_caster else RunManager.player_bleed_damage_per_stack
+			
 			return tr("status_bleed_dynamic_desc") % [damage_per_stack, stacks, duration]
 		DataManager.Status.BURN:
 			var damage_per_stack = RunManager.burn_damage_per_stack
-			var total_damage = stacks * damage_per_stack
+			
+			# 🆕 Проверяем, кто кастер
+			var caster = status_data.get("caster", null)
+			var is_enemy_caster = caster is EnemyInstance
+			
+			if is_enemy_caster:
+				damage_per_stack = RunManager.burn_damage_per_stack
+			else:
+				damage_per_stack = RunManager.player_burn_damage_per_stack
+			
+			# 🆕 Применяем модификатор BURN_DAMAGE_MULTIPLIER у КАСТЕРА
+			if caster and caster.has_method("get_modifier"):
+				var burn_multiplier = caster.get_modifier(DataManager.ModifierStat.BURN_DAMAGE_MULTIPLIER)
+				damage_per_stack = floor(damage_per_stack * burn_multiplier)
+			
 			var threshold = RunManager.burn_threshold_stacks
 			return tr("status_burn_dynamic_desc") % [damage_per_stack, stacks, duration, threshold]
 		DataManager.Status.COLD:
@@ -177,6 +200,10 @@ func _get_dynamic_status_description(status_id: DataManager.Status, stacks: int,
 			# 🆕 Берём effect_per_stack из данных статуса на цели
 			var damage = status_data.get("effect_per_stack", 1)
 			return tr("status_infection_dynamic_desc") % [damage, duration]
+		DataManager.Status.RESIN:  # 🆕 Смола
+			return tr("status_resin_dynamic_desc") % duration
+		DataManager.Status.COMBUSTIBLE:  # 🆕 Горючесть
+			return tr("status_combustible_dynamic_desc") % duration
 		_:
 			return ""
 

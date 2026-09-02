@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="PassiveResource" load_steps=6 format=3 uid="uid://bmxd5jfxkvdl3"]
+
+[ext_resource type="Script" uid="uid://cmra25r1r3ivt" path="res://resources/res_scripts/effect_entry.gd" id="1_3ur5c"]
+[ext_resource type="Script" uid="uid://0mjn55jcxdti" path="res://resources/res_scripts/modifier_entry.gd" id="2_gcvrr"]
+[ext_resource type="Resource" uid="uid://cbtv6ye0jd4p4" path="res://resources/statuses/burn.tres" id="2_rqnga"]
+[ext_resource type="Script" uid="uid://br4ase11y58nd" path="res://resources/res_scripts/passive_resource.gd" id="3_rqnga"]
+
+[sub_resource type="Resource" id="Resource_wtswk"]
+script = ExtResource("1_3ur5c")
+category = 4
+status = ExtResource("2_rqnga")
+value = 3
+duration = 3
+metadata/_custom_type_script = "uid://cmra25r1r3ivt"
+
+[resource]
+script = ExtResource("3_rqnga")
+id = 13
+name_key = "passive_flame_barrier_name"
+description_key = "passive_flame_barrier_desc"
+charge_type = 2
+starting_charges = 3
+trigger = 10
+effects = Array[ExtResource("1_3ur5c")]([SubResource("Resource_wtswk")])
+metadata/_custom_type_script = "uid://br4ase11y58nd"

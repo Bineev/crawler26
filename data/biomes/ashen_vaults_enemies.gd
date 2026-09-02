@@ -22,19 +22,38 @@ const INTENTS = {
 		]
 	},
 	DataManager.EnemyId.WAX_GOLEM: {
-	"cycle_type": DataManager.IntentCycleType.SEQUENTIAL,
-	"intents": [
-		# 1 ход — Щит 10
-		[ { "category": DataManager.EffectCategory.APPLY_STATUS, "target": DataManager.EffectTarget.SELF, "status": DataManager.Status.SHIELD, "value": 10, "duration": 1 } ],
-		
-		# 2 ход — Горение 10 на 3 хода
-		[ { "category": DataManager.EffectCategory.APPLY_STATUS, "target": DataManager.EffectTarget.ENEMY, "status": DataManager.Status.BURN, "value": 10, "duration": 3 } ],
-		
-		# 3 ход — Уязвимость 1 на 2 хода
-		[ { "category": DataManager.EffectCategory.APPLY_STATUS, "target": DataManager.EffectTarget.ENEMY, "status": DataManager.Status.VULNERABILITY, "value": 1, "duration": 2 } ],
-		
-		# 4 ход — Урон 8
-		[ { "category": DataManager.EffectCategory.DAMAGE, "target": DataManager.EffectTarget.ENEMY, "base_value": 8 } ],
-	]
-}
+		"cycle_type": DataManager.IntentCycleType.SEQUENTIAL,
+		"intents": [
+			# 1 ход — Щит 10
+			[ { "category": DataManager.EffectCategory.APPLY_STATUS, "target": DataManager.EffectTarget.SELF, "status": DataManager.Status.SHIELD, "value": 10, "duration": 1 } ],
+			
+			# 2 ход — Горение 10 на 3 хода
+			[ { "category": DataManager.EffectCategory.APPLY_STATUS, "target": DataManager.EffectTarget.ENEMY, "status": DataManager.Status.BURN, "value": 10, "duration": 3 } ],
+			
+			# 3 ход — Уязвимость 1 на 2 хода
+			[ { "category": DataManager.EffectCategory.APPLY_STATUS, "target": DataManager.EffectTarget.ENEMY, "status": DataManager.Status.VULNERABILITY, "value": 1, "duration": 2 } ],
+			
+			# 4 ход — Урон 8
+			[ { "category": DataManager.EffectCategory.DAMAGE, "target": DataManager.EffectTarget.ENEMY, "base_value": 8 } ],
+		]
+	},
+	DataManager.EnemyId.MOLTEN_ELDER: {
+		"cycle_type": DataManager.IntentCycleType.SEQUENTIAL,
+		"intents": [
+			# 1 ход — Горючесть 1 на 3 хода
+			[ { "category": DataManager.EffectCategory.APPLY_STATUS, "target": DataManager.EffectTarget.ENEMY, "status": DataManager.Status.COMBUSTIBLE, "value": 1, "duration": 3 } ],
+			
+			# 2 ход — Урон 8
+			[ { "category": DataManager.EffectCategory.DAMAGE, "target": DataManager.EffectTarget.ENEMY, "base_value": 8 } ],
+			
+			# 3 ход — Горение 8 на 3 хода
+			[ { "category": DataManager.EffectCategory.APPLY_STATUS, "target": DataManager.EffectTarget.ENEMY, "status": DataManager.Status.BURN, "value": 8, "duration": 3 } ],
+			
+			# 4 ход — Щит 8
+			[ { "category": DataManager.EffectCategory.APPLY_STATUS, "target": DataManager.EffectTarget.SELF, "status": DataManager.Status.SHIELD, "value": 8, "duration": 1 } ],
+			
+			# 5 ход — Урон 12
+			[ { "category": DataManager.EffectCategory.DAMAGE, "target": DataManager.EffectTarget.ENEMY, "base_value": 12 } ],
+		]
+	}
 }

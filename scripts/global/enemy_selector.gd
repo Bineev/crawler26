@@ -241,7 +241,7 @@ static func _select_normal_enemies_ashen(biome: DataManager.Biome, floor_level: 
 	
 	# 🆕 Элитные враги
 	var elite_enemies = [
-		# TODO: добавить элитных врагов
+		DataManager.EnemyId.MOLTEN_ELDER,  # 🆕
 	]
 	
 	var count = 1

@@ -448,7 +448,7 @@ func _update_icons(target : Node):
 		var icon = STATUS_ICON_SCENE.instantiate() as StatusIcon
 		status_container.add_child(icon)
 		icon.setup(icon_data, DataManager.COLOR_MOLE_TUNNELS_ART_BG_LIGHT2, self)
-		icon.mouse_entered.connect(_on_status_icon_hovered.bind(status_id, status_data.stacks, status_data.duration, status_data))
+		icon.mouse_entered.connect(_on_status_icon_hovered.bind(status_id, status_data.stacks, status_data.duration, status_data, player_stats))
 		icon.mouse_exited.connect(_on_icon_mouse_exited)
 		#DataManager.apply_shader_to_icon(icon.icon, "res://shaders/highlight_item.gdshader", {'hover_intensity' : 1.0})
 		DataManager.apply_shader_overlay(icon.icon, "res://shaders/horror_shader.gdshader", {})
@@ -802,9 +802,9 @@ func _apply_debuff_effect():
 	current_shader_priority = DataManager.EnemyShaderPriority.NONE
 
 
-func _on_status_icon_hovered(status_id: DataManager.Status, stacks: int, duration: int, status_data: Dictionary):
+func _on_status_icon_hovered(status_id: DataManager.Status, stacks: int, duration: int, status_data: Dictionary, target: CharacterStats):
 	var pos = get_global_mouse_position()
-	TooltipManager.request_dynamic_status_tooltip(status_id, stacks, duration, status_data, pos)
+	TooltipManager.request_dynamic_status_tooltip(status_id, stacks, duration, status_data, pos, target)
 
 
 func _on_passive_icon_hovered(passive_data: Dictionary):

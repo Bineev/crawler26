@@ -755,8 +755,18 @@ upgrade_card_confirm,Upgrade
 
 "status_resin_name","Resin"
 "status_resin_desc","Doubles Burn stacks applied."
+"status_resin_dynamic_desc","Doubles Burn stacks applied. Duration: %d turns."
+"status_resin_additional","Stacks by duration."
+"passive_flame_barrier_name","Flame Barrier"
+"passive_flame_barrier_desc","When taking direct damage, applies Burn to the attacker"
+"status_combustible_name","Combustible"
+"status_combustible_desc","Doubles Burn damage"
+"status_combustible_dynamic_desc","Doubles Burn damage. Duration: %d turns."
+"status_combustible_additional","Stacks by duration."
 
 "enemy_smoldering_imp_name","Smoldering Imp"
 "enemy_smoldering_imp_desc","A small malicious creature with a large head and a long nose. Its skin is cracked, and smoldering embers glow in its eye sockets."
 "enemy_wax_golem_name","Wax Golem"
 "enemy_wax_golem_desc","A figure of hardened wax shaped like a candle. Slow but dangerous when it gets too close."
+"enemy_molten_elder_name","Molten Elder"
+"enemy_molten_elder_desc","A powerful being of scorched obsidian with veins of molten lava. His fiery beard smokes with rage."

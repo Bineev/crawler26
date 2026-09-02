@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="EnemyResource" load_steps=4 format=3 uid="uid://cvql3poqp8vyj"]
+
+[ext_resource type="Script" uid="uid://beudtcsu45bk7" path="res://resources/res_scripts/enemy_resource.gd" id="1_grmvx"]
+[ext_resource type="Script" uid="uid://br4ase11y58nd" path="res://resources/res_scripts/passive_resource.gd" id="2_i38wv"]
+[ext_resource type="Resource" uid="uid://bmxd5jfxkvdl3" path="res://resources/passives/flame_barrier.tres" id="3_i38wv"]
+
+[resource]
+script = ExtResource("1_grmvx")
+enemy_id = 16
+biome = 6
+size = 2
+name_key = "enemy_molten_elder_name"
+description_key = "enemy_molten_elder_desc"
+base_max_health = 65
+starting_passives = Array[ExtResource("2_i38wv")]([ExtResource("3_i38wv")])
+metadata/_custom_type_script = "uid://beudtcsu45bk7"

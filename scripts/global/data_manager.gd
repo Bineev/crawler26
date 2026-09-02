@@ -100,6 +100,7 @@ enum EnemyId {
 	# 🆕 Пепельные своды
 	SMOLDERING_IMP,  # Тлеющий карлик
 	WAX_GOLEM,  # Восковой голем
+	MOLTEN_ELDER,  # Раскаленный старец
 }
 
 enum BattleState {
@@ -460,7 +461,8 @@ enum Passive {
 	BLOODDRINKER,
 	THORNS,  # 🆕
 	ROTTING_SHIELD,  # 🆕
-	STEEL_HIDE
+	STEEL_HIDE,
+	FLAME_BARRIER,  # 🆕
 }
 
 ## Все возможные статусы
@@ -479,6 +481,7 @@ enum Status {
 	BLISTER,  # Чёрный пузырь
 	INFECTION,  # 🆕 Заражение
 	RESIN,  # 🆕 Смола
+	COMBUSTIBLE,  # 🆕 Горючесть
 }
 
 ## Классы персонажей
@@ -1064,6 +1067,7 @@ func is_negative_status(status: Status) -> bool:
 		Status.BLISTER,     # 🆕
 		Status.INFECTION,   # 🆕
 		Status.RESIN,  # 🆕 Смола (негативный)
+		Status.COMBUSTIBLE,  # 🆕
 	]
 
 func get_status_name(status: Status) -> String:
@@ -1082,6 +1086,7 @@ func get_status_name(status: Status) -> String:
 		Status.BLISTER: return tr("status_blister_name")      # 🆕
 		Status.INFECTION: return tr("status_infection_name")  # 🆕
 		Status.RESIN: return tr("status_resin_name")
+		Status.COMBUSTIBLE: return tr("status_combustible_name")
 		_: return tr("status_unknown")
 
 ##
@@ -1128,7 +1133,8 @@ const STATUS_ICONS: Dictionary = {
 	Status.GANGRENE: preload("res://img/icons/statuses/gangrene.png"),
 	Status.BLISTER: preload("res://img/icons/statuses/blister.png"),
 	Status.INFECTION: preload("res://img/icons/statuses/infection.png"),
-	#Status.RESIN: preload("res://img/icons/statuses/resin.png"),
+	Status.RESIN: preload("res://img/icons/statuses/resin.png"),
+	#Status.COMBUSTIBLE: preload("res://img/icons/statuses/combustible.png"),
 }
 
 const PASSIVE_ICONS: Dictionary = {
@@ -1143,6 +1149,7 @@ const PASSIVE_ICONS: Dictionary = {
 	Passive.THORNS: preload("res://img/icons/passives/thorns.png"),
 	Passive.ROTTING_SHIELD: preload("res://img/icons/passives/rotting_shield.png"),
 	Passive.STEEL_HIDE: preload("res://img/icons/passives/steel_hide.png"),
+	Passive.FLAME_BARRIER: preload("res://img/icons/passives/flame_barrier.png"),
 }
 
 
@@ -1188,6 +1195,7 @@ func load_status_resources():
 	_status_resources[Status.BLISTER] = load("res://resources/statuses/blister.tres")
 	_status_resources[Status.INFECTION] = load("res://resources/statuses/infection.tres")  # 🆕
 	_status_resources[Status.RESIN] = load("res://resources/statuses/resin.tres")
+	_status_resources[Status.COMBUSTIBLE] = load("res://resources/statuses/combustible.tres")
 	
 	_status_resources_loaded = true
 
@@ -1222,6 +1230,7 @@ func load_passive_resources():
 	_passive_resources[Passive.THORNS] = load("res://resources/passives/thorns.tres")
 	_passive_resources[Passive.ROTTING_SHIELD] = load("res://resources/passives/rotting_shield.tres")
 	_passive_resources[Passive.STEEL_HIDE] = load("res://resources/passives/steel_hide.tres")
+	_passive_resources[Passive.FLAME_BARRIER] = load("res://resources/passives/flame_barrier.tres")
 	
 	_passive_resources_loaded = true
 
@@ -1468,6 +1477,7 @@ func load_enemy_sprites():
 		[
 			{id = DataManager.EnemyId.SMOLDERING_IMP, folder = "smoldering_imp", file = "smoldering_imp"},
 			{id = DataManager.EnemyId.WAX_GOLEM, folder = "wax_golem", file = "wax_golem"},  # 🆕
+			{id = DataManager.EnemyId.MOLTEN_ELDER, folder = "molten_elder", file = "molten_elder"},  # 🆕
 		],
 		"res://img/enemies/ashen_vaults/"
 	)
@@ -1583,6 +1593,7 @@ func load_enemy_resources():
 	# 🆕 Пепельные своды
 	_enemy_resources[EnemyId.SMOLDERING_IMP] = load("res://resources/enemies/ashen_vaults/smoldering_imp.tres")
 	_enemy_resources[EnemyId.WAX_GOLEM] = load("res://resources/enemies/ashen_vaults/wax_golem.tres")  # 🆕
+	_enemy_resources[EnemyId.MOLTEN_ELDER] = load("res://resources/enemies/ashen_vaults/molten_elder.tres")  # 🆕
 
 	_enemy_resources_loaded = true
 

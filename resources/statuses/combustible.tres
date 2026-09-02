@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="StatusResource" load_steps=4 format=3 uid="uid://dlpqpsnjcls1s"]
+
+[ext_resource type="Script" uid="uid://0mjn55jcxdti" path="res://resources/res_scripts/modifier_entry.gd" id="1_0wnwu"]
+[ext_resource type="Script" uid="uid://cdpdi1bblp6st" path="res://resources/res_scripts/status_resource.gd" id="2_bfka7"]
+
+[sub_resource type="Resource" id="Resource_0wnwu"]
+script = ExtResource("1_0wnwu")
+stat = 14
+change_type = 1
+metadata/_custom_type_script = "uid://0mjn55jcxdti"
+
+[resource]
+script = ExtResource("2_bfka7")
+id = 14
+name_key = "status_combustible_name"
+description_key = "status_combustible_desc"
+is_ticking = true
+modifiers = Array[ExtResource("1_0wnwu")]([SubResource("Resource_0wnwu")])
+metadata/_custom_type_script = "uid://cdpdi1bblp6st"
