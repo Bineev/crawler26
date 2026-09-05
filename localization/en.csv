@@ -763,6 +763,9 @@ upgrade_card_confirm,Upgrade
 "status_combustible_desc","Doubles Burn damage"
 "status_combustible_dynamic_desc","Doubles Burn damage. Duration: %d turns."
 "status_combustible_additional","Stacks by duration."
+"passive_fatum_name","Fatum"
+"passive_fatum_desc","Direct attacks ignore Shield."
+"effect_fatum","Direct attacks ignore Shield this turn."
 
 "enemy_smoldering_imp_name","Smoldering Imp"
 "enemy_smoldering_imp_desc","A small malicious creature with a large head and a long nose. Its skin is cracked, and smoldering embers glow in its eye sockets."
@@ -770,3 +773,5 @@ upgrade_card_confirm,Upgrade
 "enemy_wax_golem_desc","A figure of hardened wax shaped like a candle. Slow but dangerous when it gets too close."
 "enemy_molten_elder_name","Molten Elder"
 "enemy_molten_elder_desc","A powerful being of scorched obsidian with veins of molten lava. His fiery beard smokes with rage."
+"enemy_ash_herald_name","Ash Herald"
+"enemy_ash_herald_desc","A cultist warrior in a gothic mask, wielding two massive swords. His strikes are swift and relentless."

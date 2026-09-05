@@ -101,6 +101,7 @@ enum EnemyId {
 	SMOLDERING_IMP,  # Тлеющий карлик
 	WAX_GOLEM,  # Восковой голем
 	MOLTEN_ELDER,  # Раскаленный старец
+	ASH_HERALD,  # Вестник пепла
 }
 
 enum BattleState {
@@ -463,6 +464,7 @@ enum Passive {
 	ROTTING_SHIELD,  # 🆕
 	STEEL_HIDE,
 	FLAME_BARRIER,  # 🆕
+	FATUM,  # 🆕
 }
 
 ## Все возможные статусы
@@ -1150,6 +1152,7 @@ const PASSIVE_ICONS: Dictionary = {
 	Passive.ROTTING_SHIELD: preload("res://img/icons/passives/rotting_shield.png"),
 	Passive.STEEL_HIDE: preload("res://img/icons/passives/steel_hide.png"),
 	Passive.FLAME_BARRIER: preload("res://img/icons/passives/flame_barrier.png"),
+	Passive.FATUM: preload("res://img/icons/passives/fatum.png"),
 }
 
 
@@ -1231,6 +1234,7 @@ func load_passive_resources():
 	_passive_resources[Passive.ROTTING_SHIELD] = load("res://resources/passives/rotting_shield.tres")
 	_passive_resources[Passive.STEEL_HIDE] = load("res://resources/passives/steel_hide.tres")
 	_passive_resources[Passive.FLAME_BARRIER] = load("res://resources/passives/flame_barrier.tres")
+	_passive_resources[Passive.FATUM] = load("res://resources/passives/fatum.tres")
 	
 	_passive_resources_loaded = true
 
@@ -1478,6 +1482,7 @@ func load_enemy_sprites():
 			{id = DataManager.EnemyId.SMOLDERING_IMP, folder = "smoldering_imp", file = "smoldering_imp"},
 			{id = DataManager.EnemyId.WAX_GOLEM, folder = "wax_golem", file = "wax_golem"},  # 🆕
 			{id = DataManager.EnemyId.MOLTEN_ELDER, folder = "molten_elder", file = "molten_elder"},  # 🆕
+			{id = DataManager.EnemyId.ASH_HERALD, folder = "ash_herald", file = "ash_herald"},  # 🆕
 		],
 		"res://img/enemies/ashen_vaults/"
 	)
@@ -1594,6 +1599,7 @@ func load_enemy_resources():
 	_enemy_resources[EnemyId.SMOLDERING_IMP] = load("res://resources/enemies/ashen_vaults/smoldering_imp.tres")
 	_enemy_resources[EnemyId.WAX_GOLEM] = load("res://resources/enemies/ashen_vaults/wax_golem.tres")  # 🆕
 	_enemy_resources[EnemyId.MOLTEN_ELDER] = load("res://resources/enemies/ashen_vaults/molten_elder.tres")  # 🆕
+	_enemy_resources[EnemyId.ASH_HERALD] = load("res://resources/enemies/ashen_vaults/ash_herald.tres")  # 🆕
 
 	_enemy_resources_loaded = true
 

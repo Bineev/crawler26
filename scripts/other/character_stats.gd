@@ -46,6 +46,7 @@ var modifiers: Dictionary = {
 	DataManager.ModifierStat.BLEED_DAMAGE_MULTIPLIER: 1.0,
 }
 
+var is_direct_ignore_shield: bool = false
 ## ============================================================
 ## СТАТУСЫ
 ## ============================================================
@@ -190,8 +191,13 @@ func take_damage(amount: int, ignore_block: bool = false, attacker: CharacterSta
 			damage *= max(cold_multiplier, RunManager.cold_min_multiplier)
 	
 	damage = floor(damage)
-	
-	if not ignore_block and has_status(DataManager.Status.SHIELD):
+
+	# 🆕 Проверяем, должен ли урон игнорировать блок (Фатум)
+	var should_ignore_block = ignore_block
+	if is_direct and attacker and attacker.is_direct_ignore_shield:
+		should_ignore_block = true
+
+	if not should_ignore_block and has_status(DataManager.Status.SHIELD):
 		var shield_stacks = get_status_stacks(DataManager.Status.SHIELD)
 		if shield_stacks >= damage:
 			modify_status_stacks(DataManager.Status.SHIELD, -damage)
@@ -879,6 +885,8 @@ func get_applied_statuses() -> Array:
 
 func process_start_of_turn():
 	await Engine.get_main_loop().create_timer(0.5).timeout
+	# 🆕 Сбрасываем флаг Фатума в начале хода (до активации пассивок)
+	is_direct_ignore_shield = false
 	# Если заморожен — статусы не тикают
 	if not has_status(DataManager.Status.FROZEN):
 		# Снимаем STRENGTH в самом конце (после всех тиков)

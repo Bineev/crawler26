@@ -55,5 +55,27 @@ const INTENTS = {
 			# 5 ход — Урон 12
 			[ { "category": DataManager.EffectCategory.DAMAGE, "target": DataManager.EffectTarget.ENEMY, "base_value": 12 } ],
 		]
+	},
+	DataManager.EnemyId.ASH_HERALD: {
+		"cycle_type": DataManager.IntentCycleType.SEQUENTIAL,
+		"intents": [
+			# 1 ход — Уязвимость 1 на 3 хода
+			[ { "category": DataManager.EffectCategory.APPLY_STATUS, "target": DataManager.EffectTarget.ENEMY, "status": DataManager.Status.VULNERABILITY, "value": 1, "duration": 3 } ],
+			
+			# 2 ход — Урон 5
+			[ { "category": DataManager.EffectCategory.DAMAGE, "target": DataManager.EffectTarget.ENEMY, "base_value": 5 } ],
+			
+			# 3 ход — Урон 10
+			[ { "category": DataManager.EffectCategory.DAMAGE, "target": DataManager.EffectTarget.ENEMY, "base_value": 10 } ],
+			
+			# 4 ход — Урон 15
+			[ { "category": DataManager.EffectCategory.DAMAGE, "target": DataManager.EffectTarget.ENEMY, "base_value": 15 } ],
+			
+			# 5 ход — Щит 10
+			[ { "category": DataManager.EffectCategory.APPLY_STATUS, "target": DataManager.EffectTarget.SELF, "status": DataManager.Status.SHIELD, "value": 10, "duration": 1 } ],
+			
+			# 6 ход — Урон 30
+			[ { "category": DataManager.EffectCategory.DAMAGE, "target": DataManager.EffectTarget.ENEMY, "base_value": 30 } ],
+		]
 	}
 }
