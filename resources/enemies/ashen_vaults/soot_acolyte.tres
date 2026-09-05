@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="EnemyResource" load_steps=5 format=3 uid="uid://b0d3ko3nmva3p"]
+
+[ext_resource type="Script" uid="uid://beudtcsu45bk7" path="res://resources/res_scripts/enemy_resource.gd" id="1_5r3ul"]
+[ext_resource type="Script" uid="uid://br4ase11y58nd" path="res://resources/res_scripts/passive_resource.gd" id="2_qi2ft"]
+[ext_resource type="Resource" uid="uid://do4j6drxrdsqt" path="res://resources/passives/regrowth.tres" id="3_en4l4"]
+[ext_resource type="Resource" uid="uid://dplc4s5dvvbod" path="res://resources/passives/shell.tres" id="4_qfnb2"]
+
+[resource]
+script = ExtResource("1_5r3ul")
+enemy_id = 18
+biome = 6
+name_key = "enemy_soot_acolyte_name"
+description_key = "enemy_soot_acolyte_desc"
+base_max_health = 42
+starting_passives = Array[ExtResource("2_qi2ft")]([ExtResource("3_en4l4"), ExtResource("4_qfnb2")])
+metadata/_custom_type_script = "uid://beudtcsu45bk7"

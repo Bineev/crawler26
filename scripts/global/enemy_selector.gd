@@ -236,7 +236,7 @@ static func _select_normal_enemies_ashen(biome: DataManager.Biome, floor_level: 
 	
 	# 🆕 Обычные враги
 	var normal_enemies = [
-
+		DataManager.EnemyId.SOOT_ACOLYTE,  # 🆕
 	]
 	
 	# 🆕 Элитные враги

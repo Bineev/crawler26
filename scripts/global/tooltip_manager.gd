@@ -204,6 +204,8 @@ func _get_dynamic_status_description(status_id: DataManager.Status, stacks: int,
 			return tr("status_resin_dynamic_desc") % duration
 		DataManager.Status.COMBUSTIBLE:  # 🆕 Горючесть
 			return tr("status_combustible_dynamic_desc") % duration
+		DataManager.Status.FRACTURE:  # 🆕
+			return tr("status_fracture_dynamic_desc") % duration
 		_:
 			return ""
 
@@ -433,8 +435,9 @@ func _get_status_additional_info(status_id: DataManager.Status, status_data: Dic
 			return ""
 		DataManager.Status.INFECTION:
 			return tr("status_infection_additional")
+		DataManager.Status.FRACTURE:  # 🆕
+			return tr("status_fracture_additional")
 		_:
-			return ""
 			return ""
 
 

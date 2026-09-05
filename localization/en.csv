@@ -766,6 +766,10 @@ upgrade_card_confirm,Upgrade
 "passive_fatum_name","Fatum"
 "passive_fatum_desc","Direct attacks ignore Shield."
 "effect_fatum","Direct attacks ignore Shield this turn."
+"status_fracture_name","Fracture"
+"status_fracture_desc","Shield gained is halved."
+"status_fracture_dynamic_desc","Shield gained is halved. Duration: %d turns."
+"status_fracture_additional","Stacks by duration."
 
 "enemy_smoldering_imp_name","Smoldering Imp"
 "enemy_smoldering_imp_desc","A small malicious creature with a large head and a long nose. Its skin is cracked, and smoldering embers glow in its eye sockets."
@@ -775,3 +779,5 @@ upgrade_card_confirm,Upgrade
 "enemy_molten_elder_desc","A powerful being of scorched obsidian with veins of molten lava. His fiery beard smokes with rage."
 "enemy_ash_herald_name","Ash Herald"
 "enemy_ash_herald_desc","A cultist warrior in a gothic mask, wielding two massive swords. His strikes are swift and relentless."
+"enemy_soot_acolyte_name","Soot Acolyte"
+"enemy_soot_acolyte_desc","A crazed candlemaker, whose body is covered in a layer of black soot. He tirelessly serves the flame, not noticing how he himself becomes its victim."

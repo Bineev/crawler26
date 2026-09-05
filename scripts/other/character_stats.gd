@@ -405,7 +405,7 @@ func _add_status_direct(status: StatusResource, stacks: int, duration: int, cast
 				existing.duration = max(existing.duration, duration)
 			
 			# Стакаются только по длительности (стаки не меняются)
-			DataManager.Status.POISON, DataManager.Status.WEAKNESS, DataManager.Status.VULNERABILITY, DataManager.Status.RESIN, DataManager.Status.COMBUSTIBLE:  # 🆕
+			DataManager.Status.POISON, DataManager.Status.WEAKNESS, DataManager.Status.VULNERABILITY, DataManager.Status.RESIN, DataManager.Status.COMBUSTIBLE, DataManager.Status.FRACTURE: # 🆕
 				existing.duration += duration
 				# Если duration стало больше, чем max_stacks — обрезаем
 				if status.max_stacks > 0 and existing.duration > status.max_stacks:

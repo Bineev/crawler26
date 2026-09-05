@@ -77,5 +77,27 @@ const INTENTS = {
 			# 6 ход — Урон 30
 			[ { "category": DataManager.EffectCategory.DAMAGE, "target": DataManager.EffectTarget.ENEMY, "base_value": 30 } ],
 		]
+	},
+	DataManager.EnemyId.SOOT_ACOLYTE: {
+		"cycle_type": DataManager.IntentCycleType.SEQUENTIAL,
+		"intents": [
+			# 1 ход — Урон 7
+			[ { "category": DataManager.EffectCategory.DAMAGE, "target": DataManager.EffectTarget.ENEMY, "base_value": 7 } ],
+			
+			# 2 ход — Надлом 1 на 3 хода
+			[ { "category": DataManager.EffectCategory.APPLY_STATUS, "target": DataManager.EffectTarget.ENEMY, "status": DataManager.Status.FRACTURE, "value": 1, "duration": 3 } ],
+			
+			# 3 ход — Урон 7
+			[ { "category": DataManager.EffectCategory.DAMAGE, "target": DataManager.EffectTarget.ENEMY, "base_value": 7 } ],
+			
+			# 4 ход — Смола 1 на 2 хода
+			[ { "category": DataManager.EffectCategory.APPLY_STATUS, "target": DataManager.EffectTarget.ENEMY, "status": DataManager.Status.RESIN, "value": 1, "duration": 2 } ],
+			
+			# 5 ход — Горение 5 на 3 хода
+			[ { "category": DataManager.EffectCategory.APPLY_STATUS, "target": DataManager.EffectTarget.ENEMY, "status": DataManager.Status.BURN, "value": 5, "duration": 3 } ],
+			
+			# 6 ход — Лечение всех союзников на 15
+			[ { "category": DataManager.EffectCategory.HEAL, "target": DataManager.EffectTarget.ALL_ALLIES, "base_value": 15 } ],
+		]
 	}
 }

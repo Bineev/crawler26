@@ -102,6 +102,7 @@ enum EnemyId {
 	WAX_GOLEM,  # Восковой голем
 	MOLTEN_ELDER,  # Раскаленный старец
 	ASH_HERALD,  # Вестник пепла
+	SOOT_ACOLYTE,  # Аколит сажи
 }
 
 enum BattleState {
@@ -484,6 +485,7 @@ enum Status {
 	INFECTION,  # 🆕 Заражение
 	RESIN,  # 🆕 Смола
 	COMBUSTIBLE,  # 🆕 Горючесть
+	FRACTURE,  # 🆕 Надлом
 }
 
 ## Классы персонажей
@@ -1070,6 +1072,7 @@ func is_negative_status(status: Status) -> bool:
 		Status.INFECTION,   # 🆕
 		Status.RESIN,  # 🆕 Смола (негативный)
 		Status.COMBUSTIBLE,  # 🆕
+		Status.FRACTURE,  # 🆕
 	]
 
 func get_status_name(status: Status) -> String:
@@ -1089,6 +1092,7 @@ func get_status_name(status: Status) -> String:
 		Status.INFECTION: return tr("status_infection_name")  # 🆕
 		Status.RESIN: return tr("status_resin_name")
 		Status.COMBUSTIBLE: return tr("status_combustible_name")
+		Status.FRACTURE: return tr("status_fracture_name")
 		_: return tr("status_unknown")
 
 ##
@@ -1136,7 +1140,8 @@ const STATUS_ICONS: Dictionary = {
 	Status.BLISTER: preload("res://img/icons/statuses/blister.png"),
 	Status.INFECTION: preload("res://img/icons/statuses/infection.png"),
 	Status.RESIN: preload("res://img/icons/statuses/resin.png"),
-	#Status.COMBUSTIBLE: preload("res://img/icons/statuses/combustible.png"),
+	Status.COMBUSTIBLE: preload("res://img/icons/statuses/combustible.png"),
+	Status.FRACTURE: preload("res://img/icons/statuses/fracture.png"),
 }
 
 const PASSIVE_ICONS: Dictionary = {
@@ -1199,6 +1204,7 @@ func load_status_resources():
 	_status_resources[Status.INFECTION] = load("res://resources/statuses/infection.tres")  # 🆕
 	_status_resources[Status.RESIN] = load("res://resources/statuses/resin.tres")
 	_status_resources[Status.COMBUSTIBLE] = load("res://resources/statuses/combustible.tres")
+	_status_resources[Status.FRACTURE] = load("res://resources/statuses/fracture.tres")
 	
 	_status_resources_loaded = true
 
@@ -1483,6 +1489,7 @@ func load_enemy_sprites():
 			{id = DataManager.EnemyId.WAX_GOLEM, folder = "wax_golem", file = "wax_golem"},  # 🆕
 			{id = DataManager.EnemyId.MOLTEN_ELDER, folder = "molten_elder", file = "molten_elder"},  # 🆕
 			{id = DataManager.EnemyId.ASH_HERALD, folder = "ash_herald", file = "ash_herald"},  # 🆕
+			{id = DataManager.EnemyId.SOOT_ACOLYTE, folder = "soot_acolyte", file = "soot_acolyte"},  # 🆕
 		],
 		"res://img/enemies/ashen_vaults/"
 	)
@@ -1600,6 +1607,7 @@ func load_enemy_resources():
 	_enemy_resources[EnemyId.WAX_GOLEM] = load("res://resources/enemies/ashen_vaults/wax_golem.tres")  # 🆕
 	_enemy_resources[EnemyId.MOLTEN_ELDER] = load("res://resources/enemies/ashen_vaults/molten_elder.tres")  # 🆕
 	_enemy_resources[EnemyId.ASH_HERALD] = load("res://resources/enemies/ashen_vaults/ash_herald.tres")  # 🆕
+	_enemy_resources[EnemyId.SOOT_ACOLYTE] = load("res://resources/enemies/ashen_vaults/soot_acolyte.tres")  # 🆕
 
 	_enemy_resources_loaded = true
 
