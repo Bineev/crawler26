@@ -124,5 +124,33 @@ const INTENTS = {
 			# 5 ход — Урон 12
 			[ { "category": DataManager.EffectCategory.DAMAGE, "target": DataManager.EffectTarget.ENEMY, "base_value": 12 } ],
 		]
+	},
+	DataManager.EnemyId.HELLFIRE_ABBOT: {
+		"cycle_type": DataManager.IntentCycleType.SEQUENTIAL,
+		"intents": [
+			# 1 ход — Смола 1 на 5 ходов
+			[ { "category": DataManager.EffectCategory.APPLY_STATUS, "target": DataManager.EffectTarget.ENEMY, "status": DataManager.Status.RESIN, "value": 1, "duration": 5 } ],
+			
+			# 2 ход — Горение 10 на 5 ходов
+			[ { "category": DataManager.EffectCategory.APPLY_STATUS, "target": DataManager.EffectTarget.ENEMY, "status": DataManager.Status.BURN, "value": 10, "duration": 5 } ],
+			
+			# 3 ход — Горючесть 1 на 5 ходов
+			[ { "category": DataManager.EffectCategory.APPLY_STATUS, "target": DataManager.EffectTarget.ENEMY, "status": DataManager.Status.COMBUSTIBLE, "value": 1, "duration": 5 } ],
+			
+			# 4 ход — Щит 20
+			[ { "category": DataManager.EffectCategory.APPLY_STATUS, "target": DataManager.EffectTarget.SELF, "status": DataManager.Status.SHIELD, "value": 20, "duration": 1 } ],
+			
+			# 5 ход — Горение 15 на 5 ходов
+			[ { "category": DataManager.EffectCategory.APPLY_STATUS, "target": DataManager.EffectTarget.ENEMY, "status": DataManager.Status.BURN, "value": 15, "duration": 5 } ],
+			
+			# 6 ход — Regrowth на себя
+			[ { "category": DataManager.EffectCategory.APPLY_PASSIVE, "target": DataManager.EffectTarget.SELF, "passive": DataManager.Passive.REGROWTH, "passive_duration": 0 } ],
+			
+			# 7 ход — Урон 15
+			[ { "category": DataManager.EffectCategory.DAMAGE, "target": DataManager.EffectTarget.ENEMY, "base_value": 15 } ],
+			
+			# 8 ход — Урон 30
+			[ { "category": DataManager.EffectCategory.DAMAGE, "target": DataManager.EffectTarget.ENEMY, "base_value": 30 } ],
+		]
 	}
 }

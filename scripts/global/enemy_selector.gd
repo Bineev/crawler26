@@ -390,6 +390,8 @@ static func _select_boss_enemies(biome: DataManager.Biome, floor_level: int) -> 
 			return _select_boss_enemies_mole(biome, floor_level)
 		DataManager.Biome.ROTTEN_MARSHES:
 			return _select_boss_enemies_rotten(biome, floor_level)
+		DataManager.Biome.ASHEN_VAULTS:
+			return _select_boss_enemies_ashen(biome, floor_level)
 	
 	return []
 
@@ -415,6 +417,24 @@ static func _select_boss_enemies_rotten(biome: DataManager.Biome, floor_level: i
 			DataManager.EnemyId.TOXIC_IMP,
 			DataManager.EnemyId.CRESTED_TOAD,
 			DataManager.EnemyId.ROTTING_SNAIL,
+		]
+		var minion_count = 1 if floor_level < 5 else 2
+		for i in range(minion_count):
+			var minion_id = minion_pool[randi() % minion_pool.size()]
+			enemies.append(DataManager.get_enemy_resource(minion_id))
+	
+	return enemies
+
+
+static func _select_boss_enemies_ashen(biome: DataManager.Biome, floor_level: int) -> Array[EnemyResource]:
+	var enemies: Array[EnemyResource] = []
+	enemies.append(DataManager.get_enemy_resource(DataManager.EnemyId.HELLFIRE_ABBOT))
+	
+	# 🆕 Миньоны для босса (начиная с 3-го этажа)
+	if floor_level >= DataManager.BOSS_ADD_MINIONS_FROM_FLOOR:
+		var minion_pool = [
+			DataManager.EnemyId.SMOLDERING_IMP,
+			DataManager.EnemyId.WAX_GOLEM,
 		]
 		var minion_count = 1 if floor_level < 5 else 2
 		for i in range(minion_count):

@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="EnemyResource" load_steps=5 format=3 uid="uid://dr3jw6wq45jxl"]
+
+[ext_resource type="Script" uid="uid://beudtcsu45bk7" path="res://resources/res_scripts/enemy_resource.gd" id="1_4xss3"]
+[ext_resource type="Script" uid="uid://br4ase11y58nd" path="res://resources/res_scripts/passive_resource.gd" id="2_oqesm"]
+[ext_resource type="Resource" uid="uid://bmxd5jfxkvdl3" path="res://resources/passives/flame_barrier.tres" id="3_il1aa"]
+[ext_resource type="Resource" uid="uid://cjgmceou5cois" path="res://resources/passives/wrath.tres" id="4_wkg34"]
+
+[resource]
+script = ExtResource("1_4xss3")
+enemy_id = 20
+biome = 6
+size = 3
+name_key = "enemy_hellfire_abbot_name"
+description_key = "enemy_hellfire_abbot_desc"
+base_max_health = 125
+starting_passives = Array[ExtResource("2_oqesm")]([ExtResource("3_il1aa"), ExtResource("4_wkg34")])
+metadata/_custom_type_script = "uid://beudtcsu45bk7"
