@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="EnemyResource" load_steps=4 format=3 uid="uid://cnwfrk30ojvyp"]
+
+[ext_resource type="Script" uid="uid://beudtcsu45bk7" path="res://resources/res_scripts/enemy_resource.gd" id="1_7qu2n"]
+[ext_resource type="Script" uid="uid://br4ase11y58nd" path="res://resources/res_scripts/passive_resource.gd" id="2_bwhtg"]
+[ext_resource type="Resource" uid="uid://bh68i1okrq38g" path="res://resources/passives/thorns.tres" id="3_bwhtg"]
+
+[resource]
+script = ExtResource("1_7qu2n")
+enemy_id = 19
+biome = 6
+name_key = "enemy_grotesque_pain_name"
+description_key = "enemy_grotesque_pain_desc"
+base_max_health = 45
+starting_passives = Array[ExtResource("2_bwhtg")]([ExtResource("3_bwhtg")])
+metadata/_custom_type_script = "uid://beudtcsu45bk7"

@@ -99,5 +99,30 @@ const INTENTS = {
 			# 6 ход — Лечение всех союзников на 15
 			[ { "category": DataManager.EffectCategory.HEAL, "target": DataManager.EffectTarget.ALL_ALLIES, "base_value": 15 } ],
 		]
+	},
+	DataManager.EnemyId.GROTESQUE_PAIN: {
+		"cycle_type": DataManager.IntentCycleType.SEQUENTIAL,
+		"intents": [
+			# 1 ход — Урон 6 + Щит 10
+			[ 
+				{ "category": DataManager.EffectCategory.DAMAGE, "target": DataManager.EffectTarget.ENEMY, "base_value": 6 },
+				{ "category": DataManager.EffectCategory.APPLY_STATUS, "target": DataManager.EffectTarget.SELF, "status": DataManager.Status.SHIELD, "value": 10, "duration": 1 }
+			],
+			
+			# 2 ход — Слабость 1 на 2 хода
+			[ { "category": DataManager.EffectCategory.APPLY_STATUS, "target": DataManager.EffectTarget.ENEMY, "status": DataManager.Status.WEAKNESS, "value": 1, "duration": 2 } ],
+			
+			# 3 ход — Урон 10 + Кровотечение 2 на 2 хода
+			[ 
+				{ "category": DataManager.EffectCategory.DAMAGE, "target": DataManager.EffectTarget.ENEMY, "base_value": 10 },
+				{ "category": DataManager.EffectCategory.APPLY_STATUS, "target": DataManager.EffectTarget.ENEMY, "status": DataManager.Status.BLEED, "value": 2, "duration": 2 }
+			],
+			
+			# 4 ход — Щит 12
+			[ { "category": DataManager.EffectCategory.APPLY_STATUS, "target": DataManager.EffectTarget.SELF, "status": DataManager.Status.SHIELD, "value": 12, "duration": 1 } ],
+			
+			# 5 ход — Урон 12
+			[ { "category": DataManager.EffectCategory.DAMAGE, "target": DataManager.EffectTarget.ENEMY, "base_value": 12 } ],
+		]
 	}
 }

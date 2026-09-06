@@ -515,6 +515,7 @@ func _setup_artifact_without_choice_reward() -> void:
 	
 	# Создаём ArtifactIcon
 	var artifact_icon = preload("res://scenes/artifact_icon.tscn").instantiate() as ArtifactIcon
+	# BUG (когда хочешь получить арт с эвента с шахтером)
 	artifact_icon.artifact_id = artifact_data.id
 	artifact_icon.artifact_resource = artifact_data
 	vbox.add_child(artifact_icon)

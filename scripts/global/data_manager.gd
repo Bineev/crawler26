@@ -103,6 +103,7 @@ enum EnemyId {
 	MOLTEN_ELDER,  # Раскаленный старец
 	ASH_HERALD,  # Вестник пепла
 	SOOT_ACOLYTE,  # Аколит сажи
+	GROTESQUE_PAIN,  # Гротеск боли
 }
 
 enum BattleState {
@@ -1490,6 +1491,7 @@ func load_enemy_sprites():
 			{id = DataManager.EnemyId.MOLTEN_ELDER, folder = "molten_elder", file = "molten_elder"},  # 🆕
 			{id = DataManager.EnemyId.ASH_HERALD, folder = "ash_herald", file = "ash_herald"},  # 🆕
 			{id = DataManager.EnemyId.SOOT_ACOLYTE, folder = "soot_acolyte", file = "soot_acolyte"},  # 🆕
+			{id = DataManager.EnemyId.GROTESQUE_PAIN, folder = "grotesque_pain", file = "grotesque_pain"},  # 🆕
 		],
 		"res://img/enemies/ashen_vaults/"
 	)
@@ -1608,6 +1610,7 @@ func load_enemy_resources():
 	_enemy_resources[EnemyId.MOLTEN_ELDER] = load("res://resources/enemies/ashen_vaults/molten_elder.tres")  # 🆕
 	_enemy_resources[EnemyId.ASH_HERALD] = load("res://resources/enemies/ashen_vaults/ash_herald.tres")  # 🆕
 	_enemy_resources[EnemyId.SOOT_ACOLYTE] = load("res://resources/enemies/ashen_vaults/soot_acolyte.tres")  # 🆕
+	_enemy_resources[EnemyId.GROTESQUE_PAIN] = load("res://resources/enemies/ashen_vaults/grotesque_pain.tres")  # 🆕
 
 	_enemy_resources_loaded = true
 
