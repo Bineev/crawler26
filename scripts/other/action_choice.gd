@@ -98,6 +98,19 @@ func _get_action_text(action: DataManager.ActionType) -> String:
 			return tr("event_leonardo_krotini_action_moon")
 		DataManager.ActionType.EVENT_KROTINI_OPAL:   # 🆕
 			return tr("event_leonardo_krotini_action_opal")
+		# 🆕 Эвенты Пепельных сводов
+		DataManager.ActionType.EVENT_ETERNAL_SERVANT_HELP:
+			return tr("event_eternal_servant_action_help")
+		DataManager.ActionType.EVENT_ETERNAL_SERVANT_STOP:
+			return tr("event_eternal_servant_action_stop")
+		DataManager.ActionType.EVENT_WAX_TOMB_SEARCH:
+			return tr("event_wax_tomb_action_search")
+		DataManager.ActionType.EVENT_WAX_TOMB_LISTEN:
+			return tr("event_wax_tomb_action_listen")
+		DataManager.ActionType.EVENT_IRON_MAIDEN_INTERACT:
+			return tr("event_iron_maiden_action_interact")
+		DataManager.ActionType.EVENT_IRON_MAIDEN_FORCE:
+			return tr("event_iron_maiden_action_force")
 		_:
 			return ""
 

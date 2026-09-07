@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="EventResource" load_steps=2 format=3 uid="uid://5lpfcbtw7pda"]
+
+[ext_resource type="Script" uid="uid://ew2p1pg1vq1x" path="res://resources/res_scripts/event_resource.gd" id="1_naeea"]
+
+[resource]
+script = ExtResource("1_naeea")
+event_type = 7
+name_key = "event_wax_tomb_name"
+narrative_key = "event_wax_tomb_narrative"
+first_action = 33
+first_action_success_key = "event_wax_tomb_search_success"
+first_action_failure_key = "event_wax_tomb_search_fail"
+first_action_success_rewards = Array[int]([6, 2])
+first_action_failure_rewards = Array[int]([7, 11])
+first_failure_gold_mod = 2
+first_failure_damage_mod = 2
+second_action = 34
+second_action_success_key = "event_wax_tomb_listen_success"
+second_action_failure_key = "event_wax_tomb_listen_fail"
+second_action_success_rewards = Array[int]([8])
+second_action_failure_rewards = Array[int]([23])
+second_success_heal_mod = 3
+second_failure_concrete_status = 13
+second_failure_concrete_status_duration = 3
+metadata/_custom_type_script = "uid://ew2p1pg1vq1x"

@@ -255,6 +255,8 @@ func _init_default_progress():
 		DataManager.ArtifactId.TROLL_BLADE,
 		DataManager.ArtifactId.IMP_BLADE,
 		DataManager.ArtifactId.PLAGUE_AMULET,
+		DataManager.ArtifactId.BRASS_CANDLESTICK,  # 🆕
+		# BUG возможно нужно добавить остальные арты
 	]
 	
 	meta_currency = 0

@@ -77,6 +77,13 @@ enum ActionType {
 	EVENT_DANGER_ATTACK,     # 🆕
 	EVENT_KROTINI_MOON,   # 🆕
 	EVENT_KROTINI_OPAL,   # 🆕
+	# 🆕 Эвенты Пепельных сводов
+	EVENT_ETERNAL_SERVANT_HELP,
+	EVENT_ETERNAL_SERVANT_STOP,
+	EVENT_WAX_TOMB_SEARCH,
+	EVENT_WAX_TOMB_LISTEN,
+	EVENT_IRON_MAIDEN_INTERACT,
+	EVENT_IRON_MAIDEN_FORCE,
 }
 
 enum EnemyId {
@@ -329,6 +336,7 @@ enum ArtifactId {
 	RING_OF_BARRICADE,  # 🆕
 	LUCKY_PICK,  # 🆕
 	INSATIABLE_BLADE,  # 🆕
+	BRASS_CANDLESTICK,  # Латунный шандал
 }
 
 ## ============================================================
@@ -651,6 +659,9 @@ enum EventType {
 	DIAMOND_WEDDING,  # 🆕
 	DANGER_BEHIND,  # 🆕
 	LEONARDO_KROTINI,     # 5 🆕
+	ETERNAL_SERVANT,  # 🆕 Вечный служитель
+	WAX_TOMB,  # 🆕 Восковая могила
+	IRON_MAIDEN,  # 🆕 Затворница
 }
 
 ## Тип объекта
@@ -1860,6 +1871,7 @@ const ARTIFACT_ICONS: Dictionary = {
 	DataManager.ArtifactId.RING_OF_BARRICADE: preload("res://img/icons/artifacts/ring_of_barricade1.png"),  # 🆕
 	DataManager.ArtifactId.LUCKY_PICK: preload("res://img/icons/artifacts/lucky_pick1.png"),  # 🆕
 	DataManager.ArtifactId.INSATIABLE_BLADE: preload("res://img/icons/artifacts/insatiable_blade1.png"),  # 🆕
+	DataManager.ArtifactId.BRASS_CANDLESTICK: preload("res://img/icons/artifacts/brass_candlestick.png"),
 }
 
 
@@ -2285,6 +2297,8 @@ func get_artifact_name(artifact_id: ArtifactId) -> String:
 			return tr("artifact_lucky_pick_name")
 		ArtifactId.INSATIABLE_BLADE:  # 🆕
 			return tr("artifact_insatiable_blade_name")
+		ArtifactId.BRASS_CANDLESTICK:
+			return tr("artifact_brass_candlestick_name")
 		_:
 			return tr("artifact_unknown_name")
 
@@ -2375,6 +2389,8 @@ func get_artifact_description(artifact_id: ArtifactId) -> String:
 					artifact.effects[0].base_value if artifact.effects.size() > 0 else 3
 				]
 			return tr("artifact_insatiable_blade_desc") % [3, 3]
+		ArtifactId.BRASS_CANDLESTICK:
+			return tr("artifact_brass_candlestick_desc")
 		_:
 			return ""
 
@@ -2403,6 +2419,8 @@ func load_artifact_resources() -> void:
 	_artifact_resources[ArtifactId.RING_OF_BARRICADE] = load("res://resources/artifacts/ring_of_barricade.tres")  # 🆕
 	_artifact_resources[ArtifactId.LUCKY_PICK] = load("res://resources/artifacts/lucky_pick.tres")  # 🆕
 	_artifact_resources[ArtifactId.INSATIABLE_BLADE] = load("res://resources/artifacts/insatiable_blade.tres")  # 🆕
+	_artifact_resources[ArtifactId.BRASS_CANDLESTICK] = load("res://resources/artifacts/brass_candlestick.tres")
+	
 	_artifact_resources_loaded = true
 
 func get_random_artifact_by_grade(grade: ArtifactGrade) -> ArtifactResource:
@@ -2711,6 +2729,11 @@ const EVENT_TEXTURES: Dictionary = {
 		DataManager.EventType.FLOWER: preload("res://img/events/rotten_marshes/flower.png"),  # 🆕
 		DataManager.EventType.DIAMOND_WEDDING: preload("res://img/events/rotten_marshes/diamond_wedding.png"),  # 🆕
 	},
+	DataManager.Biome.ASHEN_VAULTS: {  # 🆕
+		DataManager.EventType.ETERNAL_SERVANT: preload("res://img/events/ashen_vaults/eternal_servant.png"),
+		DataManager.EventType.WAX_TOMB: preload("res://img/events/ashen_vaults/wax_tomb.png"),  # 🆕
+		DataManager.EventType.IRON_MAIDEN: preload("res://img/events/ashen_vaults/iron_maiden.png"),  # 🆕
+	},
 }
 
 func get_event_texture(event_type: DataManager.EventType, biome: DataManager.Biome) -> Texture2D:
@@ -2740,6 +2763,12 @@ func load_event_resources() -> void:
 		load("res://resources/events/rotten_marshes/flower.tres"),  # 🆕
 		load("res://resources/events/rotten_marshes/diamond_wedding.tres"),  # 🆕
 	
+	]
+	
+	_event_resources[DataManager.Biome.ASHEN_VAULTS] = [  # 🆕
+		load("res://resources/events/ashen_vaults/eternal_servant.tres"),
+		load("res://resources/events/ashen_vaults/wax_tomb.tres"),  # 🆕
+		load("res://resources/events/ashen_vaults/iron_maiden.tres"),  # 🆕
 	]
 	
 	_event_resources_loaded = true

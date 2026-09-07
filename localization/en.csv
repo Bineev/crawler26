@@ -785,3 +785,50 @@ upgrade_card_confirm,Upgrade
 "enemy_grotesque_pain_desc","A massive stone statue whose torso is encased in an iron sarcophagus — an iron maiden. Spikes protrude from the metal joints and dark blood drips from them. A soulless guardian that knows no mercy."
 "enemy_hellfire_abbot_name","Hellfire Abbot"
 "enemy_hellfire_abbot_desc","The high priest of the Ashen Vaults, whose body has long become a vessel for hellfire. His voice is the crackling of burning wood, and his will is an unyielding flame."
+
+"event_eternal_servant_name","Eternal Servant"
+"event_eternal_servant_narrative","You enter a hall whose walls are covered with hundreds of extinguished candles. In the twilight, an old man with a blindfold shuffles through the hall, clutching a dying splint in his blackened hands. As soon as he lights one candle and moves to the next, the previous one goes out."
+
+"event_eternal_servant_action_help","Help the old man"
+"event_eternal_servant_action_stop","Stop the ritual"
+
+"event_eternal_servant_help_success","You take the tinder and walk along the wall toward the old man, lighting candle after candle. Crimson flames barely pierce the gloom and quickly die out. You manage to light six candles, and when the old man lights the seventh, a niche with treasures opens in the center of the hall."
+
+"event_eternal_servant_help_fail","You take the tinder and light the nearest candle. But instead of the candle, the old man ignites like a torch. The room fills with sorcerous heat, scorching your clothes. The old man burns to ash in moments, leaving only ash and an old candlestick in his place."
+
+"event_eternal_servant_stop_success","You approach the servant and snuff out the splint in his hands with your gauntlet. Even through the metal, unbearable heat pierces you. As soon as the splint dies, the old man crumbles to dust, and all the candles in the hall burst into flames. In the light, you notice treasures hidden in the walls."
+
+"event_eternal_servant_stop_fail","You approach the servant and touch his shoulder, but snatch your hand back from the unbearable heat. The old man turns to you and mutters threateningly. In the dim light, his face pulses like a glowing ember."
+
+"artifact_brass_candlestick_name","Brass Candlestick"
+"artifact_brass_candlestick_desc","At the start of battle, applies Burn (5 stacks, 2 turns) to all enemies."
+"artifact_brass_candlestick_lore","A heavy brass candlestick found among the ashes. Its flame burns even in the void."
+
+"event_wax_tomb_name","Wax Tomb"
+"event_wax_tomb_narrative","In the center of the hall gapes the maw of a huge stone well, but instead of water, it is filled to the brim with a monolithic mass of deathly white wax. Dozens of human hands are frozen forever in this pale mass. From the impenetrable depths of the well, through the thickness of the wax tomb, a barely audible, guttural groan can be heard."
+
+"event_wax_tomb_action_search","Search the well"
+"event_wax_tomb_action_listen","Listen to the groans"
+
+"event_wax_tomb_search_success","You decide to break the wax shell. The blade of your weapon cracks the monolith with a crunch. Trying not to look at the frozen fingers, you plunge your hand into the depths. Among the pieces of cold paraffin, your fingers find forgotten belongings of past victims — among the buried things, you manage to salvage surviving valuables."
+
+"event_wax_tomb_search_fail","You decide to break the wax shell. As soon as you strike the hardened crust, a jet of boiling liquid wax bursts through the crack under pressure. The fiery substance burns into your skin, forcing you to cry out in pain and pull your hand back. Along with the stream of wax, several ancient coins rise to the surface."
+
+"event_wax_tomb_listen_success","You close your eyes and press your ear to the cold stone, trying to make out the words of those buried alive. Through the guttural hum, you begin to distinguish individual words. As soon as you whisper them back, your body fills with pure, healing power."
+
+"event_wax_tomb_listen_fail","Suddenly, the groans cut off into dead silence. The next moment, a dense cloud of acrid, hot ash bursts with a hiss from the cracks in the well. It fills your eyes and lungs, choking you and forcing you to retreat back into the darkness."
+
+
+"event_iron_maiden_name","The Iron Maiden"
+"event_iron_maiden_narrative","In the corner of one of the halls, you find a massive torture sarcophagus. The joints of the plates are clogged with centuries-old grime. At chest level, a dark hole gapes in the metal, from which a barely audible, dry scraping sound can be heard."
+
+"event_iron_maiden_action_interact","Reach inside"
+"event_iron_maiden_action_force","Break the mechanism"
+
+"event_iron_maiden_interact_success","You blindly plunge your hand into the dark opening of the sarcophagus. Feeling around in the void among the rusted spikes, you find an old hiding place and carefully pull out surviving valuables."
+
+"event_iron_maiden_interact_fail","You blindly plunge your hand into the dark opening of the sarcophagus. As soon as your hand disappears into the darkness, a rat that was hiding there leaps out with a malicious squeak. Sharp teeth sink into your palm, spreading poison through your veins."
+
+"event_iron_maiden_force_success","You strike the rusted hinges with a heavy tool, trying to break the lock. The lock bursts open with a crash, and the door swings open. A frightened rat squeaks out of the darkness and disappears into a corner. At the bottom of the sarcophagus, among the dust, you find forgotten valuables."
+
+"event_iron_maiden_force_fail","You strike the rusted hinges with a heavy tool, trying to break the lock. The impact causes the doors to swing open sharply under the force of an old cocked spring. The protruding spikes pierce you. Recovering from the blow, you find something useful inside."

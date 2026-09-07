@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="EventResource" load_steps=2 format=3 uid="uid://bc1btj7jytyg"]
+
+[ext_resource type="Script" uid="uid://ew2p1pg1vq1x" path="res://resources/res_scripts/event_resource.gd" id="1_yel73"]
+
+[resource]
+script = ExtResource("1_yel73")
+event_type = 8
+name_key = "event_iron_maiden_name"
+narrative_key = "event_iron_maiden_narrative"
+first_action = 35
+first_action_success_key = "event_iron_maiden_interact_success"
+first_action_failure_key = "event_iron_maiden_interact_fail"
+first_action_success_rewards = Array[int]([2, 6])
+first_action_failure_rewards = Array[int]([23])
+first_failure_concrete_status = 0
+first_failure_concrete_status_duration = 3
+second_action = 36
+second_action_success_key = "event_iron_maiden_force_success"
+second_action_failure_key = "event_iron_maiden_force_fail"
+second_action_success_rewards = Array[int]([11])
+second_action_failure_rewards = Array[int]([7, 1])
+second_success_gold_mod = 4
+second_failure_damage_mod = 3
+metadata/_custom_type_script = "uid://ew2p1pg1vq1x"
