@@ -618,6 +618,7 @@ enum Biome {
 	MAGMA_CORE,         # Ядро магмы (на будущее)
 	ROTTEN_MARSHES,     # 🆕 Гнилостные Топи
 	ASHEN_VAULTS,       # 🆕 Пепельные своды
+	GENERAL,            # 🆕 Общие эвенты (не привязаны к биому)
 }
 
 ## Враги Кротовых нор
@@ -2747,9 +2748,12 @@ var _event_resources_loaded: bool = false
 func load_event_resources() -> void:
 	if _event_resources_loaded:
 		return
-	
-	# TODO: загружать события для каждого биома
-	# Пока заглушка
+
+	# 🆕 Общие эвенты (для всех биомов)
+	_event_resources[DataManager.Biome.GENERAL] = [
+		# TODO: добавить общие эвенты
+	]
+
 	_event_resources[DataManager.Biome.MOLE_TUNNELS] = [
 		load("res://resources/events/mole_tunnels/miner.tres"),
 		load("res://resources/events/mole_tunnels/danger_behind.tres"),  # 🆕
@@ -2931,3 +2935,17 @@ func get_biome_preview(biome: Biome) -> Texture2D:
 			return preload("res://img/ui/biome_previews/ashen_vaults_preview.png")
 		_:
 			return null
+
+
+## Возвращает все эвенты для биома (без удаления)
+func get_all_events_for_biome(biome: DataManager.Biome) -> Array[EventResource]:
+	if not _event_resources_loaded:
+		load_event_resources()
+	return _event_resources.get(biome, []).duplicate()
+
+
+## Возвращает общие эвенты (без привязки к биому)
+func get_general_events() -> Array[EventResource]:
+	if not _event_resources_loaded:
+		load_event_resources()
+	return _event_resources.get(DataManager.Biome.GENERAL, []).duplicate()

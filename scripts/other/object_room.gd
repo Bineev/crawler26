@@ -53,8 +53,8 @@ func _init_content(room_data: Dictionary) -> void:
 
 	var event_resource: EventResource
 	if object_type == DataManager.ObjectType.EVENT:
-		# 🆕 Получаем ресурс события для текущего биома
-		event_resource = DataManager.get_event_for_biome(current_biome)
+		# 🆕 Получаем эвент через ProgressManager
+		event_resource = ProgressManager.get_next_event(current_biome)
 		# 🆕 Добавляем Label вверху комнаты
 		_add_object_label(object_type, event_resource.get_localized_name())
 	else:

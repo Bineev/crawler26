@@ -109,7 +109,20 @@ func _collect_progress_data() -> Dictionary:
 		"run_start_character_level": ProgressManager.run_start_character_level.duplicate(),
 		"run_start_biome_experience": ProgressManager.run_start_biome_experience.duplicate(),
 		"run_start_biome_level": ProgressManager.run_start_biome_level.duplicate(),
+
+		# ============================================================
+		# 🆕 ПРОГРЕСС ЭВЕНТОВ
+		# ============================================================
+		"available_events": _collect_available_events(),
 	}
+
+
+func _collect_available_events() -> Array:
+	var result: Array = []
+	for event in ProgressManager.available_events:
+		# Сохраняем путь к ресурсу, чтобы восстановить его при загрузке
+		result.append(event.resource_path)
+	return result
 
 
 func _collect_run_data() -> Dictionary:
@@ -529,7 +542,21 @@ func restore_progress(progress_data: Dictionary) -> void:
 	var run_biome_lvl = progress_data.get("run_start_biome_level", {})
 	for key in run_biome_lvl.keys():
 		ProgressManager.run_start_biome_level[int(key)] = int(run_biome_lvl[key])
-		
+
+	# ============================================================
+	# 🆕 ПРОГРЕСС ЭВЕНТОВ
+	# ============================================================
+	ProgressManager.available_events.clear()
+	var event_paths = progress_data.get("available_events", [])
+	for path in event_paths:
+		var event = load(path)
+		if event and event is EventResource:
+			ProgressManager.available_events.append(event)
+	
+	# Если есть сохранённые эвенты — помечаем, что они загружены
+	if not ProgressManager.available_events.is_empty():
+		ProgressManager.events_loaded = true
+
 
 func restore_run_manager(run_data: Dictionary) -> void:
 	# === Состояние забега ===
