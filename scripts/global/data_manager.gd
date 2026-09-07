@@ -1328,6 +1328,16 @@ const OBJECT_TEXTURES: Dictionary = {
 		DataManager.ObjectType.TORTURE_RACK: preload("res://img/objects/mole_tunnels/torture_rack.png"),
 		DataManager.ObjectType.BONFIRE: preload("res://img/objects/mole_tunnels/bonfire.png"),
 		DataManager.ObjectType.SHOP: preload("res://img/objects/rotten_marshes/shop.png"),
+	},
+	# 🆕 Пепельные Своды
+	DataManager.Biome.ASHEN_VAULTS: {
+		DataManager.ObjectType.CHEST: preload("res://img/objects/mole_tunnels/chest.png"),
+		DataManager.ObjectType.IDOL: preload("res://img/objects/ashen_vaults/idol.png"),
+		DataManager.ObjectType.TRAP: preload("res://img/objects/mole_tunnels/trap.png"),
+		DataManager.ObjectType.CAULDRON: preload("res://img/objects/mole_tunnels/cauldron.png"),
+		DataManager.ObjectType.TORTURE_RACK: preload("res://img/objects/mole_tunnels/torture_rack.png"),
+		DataManager.ObjectType.BONFIRE: preload("res://img/objects/mole_tunnels/bonfire.png"),
+		DataManager.ObjectType.SHOP: preload("res://img/objects/ashen_vaults/shop.png"),
 	}
 }
 
