@@ -1,0 +1,40 @@
+[gd_resource type="Resource" script_class="CardData" load_steps=8 format=3 uid="uid://cpkbfaqh140u0"]
+
+[ext_resource type="Script" uid="uid://cmra25r1r3ivt" path="res://resources/res_scripts/effect_entry.gd" id="1_w1e72"]
+[ext_resource type="Script" uid="uid://badcs22cck6n5" path="res://resources/res_scripts/card_data.gd" id="2_6kiiq"]
+[ext_resource type="Script" uid="uid://dotfr7jfm2bb7" path="res://scripts/conditions/target_has_combustible.gd" id="2_46lkb"]
+[ext_resource type="Resource" uid="uid://cbtv6ye0jd4p4" path="res://resources/statuses/burn.tres" id="3_l4n7i"]
+
+[sub_resource type="Resource" id="Resource_h03ww"]
+script = ExtResource("1_w1e72")
+base_value = 5
+metadata/_custom_type_script = "uid://cmra25r1r3ivt"
+
+[sub_resource type="Resource" id="Resource_5y18g"]
+script = ExtResource("1_w1e72")
+category = 4
+status = ExtResource("3_l4n7i")
+value = 3
+duration = 2
+metadata/_custom_type_script = "uid://cmra25r1r3ivt"
+
+[sub_resource type="Resource" id="Resource_fhen8"]
+script = ExtResource("1_w1e72")
+category = 14
+condition_script = ExtResource("2_46lkb")
+true_effect = SubResource("Resource_5y18g")
+metadata/_custom_type_script = "uid://cmra25r1r3ivt"
+
+[resource]
+script = ExtResource("2_6kiiq")
+id = 48
+cost_grade = 4
+origin = 1
+biome = 6
+upgrade_type = 3
+name_key = "card_torch_throw_name"
+description_key = "card_torch_throw_desc"
+effects = Array[ExtResource("1_w1e72")]([SubResource("Resource_h03ww"), SubResource("Resource_fhen8")])
+manual_status_icons = Array[int]([14, 2])
+manual_card_types = Array[int]([0, 3])
+metadata/_custom_type_script = "uid://badcs22cck6n5"

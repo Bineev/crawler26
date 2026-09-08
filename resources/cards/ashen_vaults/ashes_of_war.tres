@@ -1,0 +1,29 @@
+[gd_resource type="Resource" script_class="CardData" load_steps=5 format=3 uid="uid://cpebwuh75dilx"]
+
+[ext_resource type="Script" uid="uid://cmra25r1r3ivt" path="res://resources/res_scripts/effect_entry.gd" id="1_s5tew"]
+[ext_resource type="Script" uid="uid://ddev5gg10ho57" path="res://scripts/effects/ashes_of_war.gd" id="2_1yabh"]
+[ext_resource type="Script" uid="uid://badcs22cck6n5" path="res://resources/res_scripts/card_data.gd" id="2_qrk3l"]
+
+[sub_resource type="Resource" id="Resource_7aqno"]
+script = ExtResource("1_s5tew")
+category = 15
+target = 0
+custom_description = "card_ashes_of_war_desc"
+custom_script = ExtResource("2_1yabh")
+metadata/_custom_type_script = "uid://cmra25r1r3ivt"
+
+[resource]
+script = ExtResource("2_qrk3l")
+id = 50
+cost_grade = 6
+origin = 1
+biome = 6
+upgrade_type = 13
+name_key = "card_ashes_of_war_name"
+description_key = "card_ashes_of_war_desc"
+grade = 4
+cost = 3
+effects = Array[ExtResource("1_s5tew")]([SubResource("Resource_7aqno")])
+manual_status_icons = Array[int]([2])
+manual_card_types = Array[int]([1, 6])
+metadata/_custom_type_script = "uid://badcs22cck6n5"

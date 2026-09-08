@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="CardData" load_steps=5 format=3 uid="uid://3hc6s3sruru7"]
+
+[ext_resource type="Script" uid="uid://cmra25r1r3ivt" path="res://resources/res_scripts/effect_entry.gd" id="1_0pyv3"]
+[ext_resource type="Script" uid="uid://badcs22cck6n5" path="res://resources/res_scripts/card_data.gd" id="2_0b4vh"]
+[ext_resource type="Resource" uid="uid://bgayt8l88u4a1" path="res://resources/statuses/resin.tres" id="2_prfba"]
+
+[sub_resource type="Resource" id="Resource_mxc2k"]
+script = ExtResource("1_0pyv3")
+category = 4
+status = ExtResource("2_prfba")
+duration = 2
+metadata/_custom_type_script = "uid://cmra25r1r3ivt"
+
+[resource]
+script = ExtResource("2_0b4vh")
+id = 46
+origin = 1
+biome = 6
+upgrade_type = 12
+name_key = "card_siege_barrel_name"
+description_key = "card_siege_barrel_desc"
+effects = Array[ExtResource("1_0pyv3")]([SubResource("Resource_mxc2k")])
+manual_status_icons = Array[int]([13])
+manual_card_types = Array[int]([3])
+metadata/_custom_type_script = "uid://badcs22cck6n5"

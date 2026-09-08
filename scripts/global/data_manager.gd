@@ -593,6 +593,14 @@ enum CardId {
 	BLIND_VENGEANCE,  # 🆕 Слепая месть
 	GRIP_OF_DESPAIR,  # 🆕 Хватка отчаяния
 	FORGIVENESS,  # 🆕 Прощение
+	
+	# 🆕 Пепельные своды
+	SCORCHED_EARTH,  # Выженная земля
+	SIEGE_BARREL,  # Осадная бочка
+	IGNITION,  # Воспламенение
+	TORCH_THROW,  # Бросок факела
+	PYROMANIAC_MADNESS,  # Безумие пиромана
+	ASHES_OF_WAR,  # Пепел войны
 }
 
 ## Намерения врагов
@@ -1741,6 +1749,13 @@ func load_all_cards():
 	_register_card(CardId.BLIND_VENGEANCE, "res://resources/cards/penitent/blind_vengeance.tres")
 	_register_card(CardId.GRIP_OF_DESPAIR, "res://resources/cards/penitent/grip_of_despair.tres")
 	_register_card(CardId.FORGIVENESS, "res://resources/cards/penitent/forgiveness.tres")
+	# 🆕 Пепельные своды
+	_register_card(CardId.SCORCHED_EARTH, "res://resources/cards/ashen_vaults/scorched_earth.tres")
+	_register_card(CardId.SIEGE_BARREL, "res://resources/cards/ashen_vaults/siege_barrel.tres")
+	_register_card(CardId.IGNITION, "res://resources/cards/ashen_vaults/ignition.tres")
+	_register_card(CardId.TORCH_THROW, "res://resources/cards/ashen_vaults/torch_throw.tres")
+	_register_card(CardId.PYROMANIAC_MADNESS, "res://resources/cards/ashen_vaults/pyromaniac_madness.tres")
+	_register_card(CardId.ASHES_OF_WAR, "res://resources/cards/ashen_vaults/ashes_of_war.tres")
 	
 	_cards_loaded = true
 
@@ -1766,6 +1781,7 @@ func load_card_backgrounds():
 	# Фоны биомов
 	_card_backgrounds["biome_" + str(Biome.MOLE_TUNNELS)] = preload("res://img/cards/backgrounds/mole_tunnels_card_bg.png")
 	_card_backgrounds["biome_" + str(Biome.ROTTEN_MARSHES)] = preload("res://img/cards/backgrounds/rotten_marshes_card_bg.png")
+	_card_backgrounds["biome_" + str(Biome.ASHEN_VAULTS)] = preload("res://img/cards/backgrounds/ashen_vaults_card_bg.png")  # 🆕
 
 	_card_backgrounds["class_" + str(CharacterClass.PENITENT)] = preload("res://img/cards/backgrounds/penitent_card_bg.png")
 
@@ -1840,6 +1856,13 @@ func load_card_illustrations():
 	_card_illustrations[CardId.BLIND_VENGEANCE] = preload("res://img/cards/penitent/blind_vengeance.png")
 	_card_illustrations[CardId.GRIP_OF_DESPAIR] = preload("res://img/cards/penitent/grip_of_despair.png")
 	_card_illustrations[CardId.FORGIVENESS] = preload("res://img/cards/penitent/forgiveness.png")
+	# 🆕 Пепельные своды
+	_card_illustrations[CardId.SCORCHED_EARTH] = preload("res://img/cards/ashen_vaults/scorched_earth.png")
+	_card_illustrations[CardId.SIEGE_BARREL] = preload("res://img/cards/ashen_vaults/siege_barrel.png")
+	_card_illustrations[CardId.IGNITION] = preload("res://img/cards/ashen_vaults/ignition.png")
+	_card_illustrations[CardId.TORCH_THROW] = preload("res://img/cards/ashen_vaults/torch_throw.png")
+	_card_illustrations[CardId.PYROMANIAC_MADNESS] = preload("res://img/cards/ashen_vaults/pyromaniac_madness.png")
+	#_card_illustrations[CardId.ASHES_OF_WAR] = preload("res://img/cards/ashen_vaults/ashes_of_war.png")
 
 func get_card_illustration(card_id: CardId) -> Texture2D:
 	if _card_illustrations.is_empty():
@@ -1965,6 +1988,7 @@ const COLOR_ASHEN_CRIMSON: Color = Color("990012")    # Багряный Гре�
 const COLOR_ASHEN_WAX_DARK: Color = Color("B8AD8A")   # Тёмный воск
 const COLOR_ASHEN_FIRE_DIM: Color = Color("B84A00")   # Тлеющее пламя
 const COLOR_ASHEN_CRIMSON_DARK: Color = Color("66000A") # Тёмная кровь
+const COLOR_ASHEN_CRIMSON_DARK2: Color = Color("211a1c") # Тёмная кровь
 ## ============================================================
 # === НОВЫЕ ЦВЕТА ДЛЯ UI ===
 
@@ -2036,7 +2060,7 @@ func _get_card_art_background_color_dark(origin: CardOrigin, character_class: Ch
 				Biome.ROTTEN_MARSHES:  # 🆕
 					return COLOR_ROTTEN_MARSHES_ART_BG_DARK
 				Biome.ASHEN_VAULTS:  # 🆕 Пепельные своды
-					return COLOR_ASHEN_ART_BG_DARK
+					return COLOR_ASHEN_FIRE_DIM
 				_:
 					return Color.BLACK
 		
@@ -2069,7 +2093,7 @@ func _get_card_art_background_color_light(origin: CardOrigin, character_class: C
 				Biome.ROTTEN_MARSHES:  # 🆕
 					return COLOR_ROTTEN_MARSHES_ART_BG_MINT
 				Biome.ASHEN_VAULTS:  # 🆕 Пепельные своды
-					return COLOR_ASHEN_ART_BG_WAX
+					return COLOR_BONE_LABYRINTH_CARD_BG
 				_:
 					return Color.BLACK
 		
@@ -2877,6 +2901,8 @@ func get_glow_color_for_card(card: CardData) -> Color:
 					return COLOR_WARRIOR_ART_BG_LIGHT
 				DataManager.Biome.MAGMA_CORE:
 					return COLOR_FLESH_CAVES_ART_BG_DARK
+				DataManager.Biome.ASHEN_VAULTS:
+					return COLOR_ASHEN_CRIMSON_DARK2
 				_:
 					return COLOR_MOLE_TUNNELS_ART_BG_LIGHT2
 		
@@ -2941,11 +2967,23 @@ func get_biome_preview(biome: Biome) -> Texture2D:
 func get_all_events_for_biome(biome: DataManager.Biome) -> Array[EventResource]:
 	if not _event_resources_loaded:
 		load_event_resources()
-	return _event_resources.get(biome, []).duplicate()
+	
+	var events: Array[EventResource] = []
+	var raw_events = _event_resources.get(biome, [])
+	for event in raw_events:
+		if event is EventResource:
+			events.append(event)
+	return events
 
 
 ## Возвращает общие эвенты (без привязки к биому)
 func get_general_events() -> Array[EventResource]:
 	if not _event_resources_loaded:
 		load_event_resources()
-	return _event_resources.get(DataManager.Biome.GENERAL, []).duplicate()
+	
+	var events: Array[EventResource] = []
+	var raw_events = _event_resources.get(DataManager.Biome.GENERAL, [])
+	for event in raw_events:
+		if event is EventResource:
+			events.append(event)
+	return events

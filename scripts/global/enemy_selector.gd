@@ -142,14 +142,14 @@ static func _select_normal_enemies_rotten(biome: DataManager.Biome, floor_level:
 	
 	# 🆕 Обычные враги
 	var normal_enemies = [
+		DataManager.EnemyId.FLESH_HOUND,
 		DataManager.EnemyId.TOXIC_IMP,
-		DataManager.EnemyId.THORNY_BLOOM,
-		DataManager.EnemyId.ROTTEN_PORTER,
 	]
 	
 	# 🆕 Элитные враги
 	var elite_enemies = [
-		DataManager.EnemyId.FLESH_HOUND,
+		DataManager.EnemyId.THORNY_BLOOM,
+		DataManager.EnemyId.ROTTEN_PORTER,
 	]
 	
 	var count = 1
@@ -237,6 +237,7 @@ static func _select_normal_enemies_ashen(biome: DataManager.Biome, floor_level: 
 	# 🆕 Обычные враги
 	var normal_enemies = [
 		DataManager.EnemyId.SOOT_ACOLYTE,  # 🆕
+		DataManager.EnemyId.GROTESQUE_PAIN,  # 🆕
 	]
 	
 	# 🆕 Элитные враги
@@ -325,6 +326,8 @@ static func _select_elite_enemies(biome: DataManager.Biome, floor_level: int, di
 			return _select_elite_enemies_mole(biome, floor_level, difficulty)
 		DataManager.Biome.ROTTEN_MARSHES:
 			return _select_elite_enemies_rotten(biome, floor_level, difficulty)
+		DataManager.Biome.ASHEN_VAULTS:  # 🆕
+			return _select_elite_enemies_ashen(biome, floor_level, difficulty)
 	
 	return []
 
@@ -362,7 +365,6 @@ static func _select_elite_enemies_rotten(biome: DataManager.Biome, floor_level: 
 	
 	# 🆕 Элитные враги Гнилостных Топей
 	var elite_enemies = [
-		DataManager.EnemyId.FLESH_HOUND,
 		DataManager.EnemyId.THORNY_BLOOM,  # THORNY_BLOOM стал элитным
 		DataManager.EnemyId.ROTTEN_PORTER,  # ROTTEN_PORTER стал элитным
 	]
@@ -459,6 +461,8 @@ static func _select_elite_enemies_after_rob(biome: DataManager.Biome, floor_leve
 			return _select_elite_after_rob_mole(biome, floor_level, difficulty)
 		DataManager.Biome.ROTTEN_MARSHES:
 			return _select_elite_after_rob_rotten(biome, floor_level, difficulty)
+		DataManager.Biome.ASHEN_VAULTS:  # 🆕
+			return _select_elite_after_rob_ashen(biome, floor_level, difficulty)
 	
 	return []
 
@@ -514,6 +518,67 @@ static func _select_elite_after_rob_rotten(biome: DataManager.Biome, floor_level
 		DataManager.EnemyId.TOXIC_IMP,
 		DataManager.EnemyId.CRESTED_TOAD,
 		DataManager.EnemyId.ROTTING_SNAIL,
+	]
+	
+	var count = 2
+	if difficulty >= 0.5:
+		count = 3
+	
+	var elite_id = elite_pool[randi() % elite_pool.size()]
+	enemies.append(DataManager.get_enemy_resource(elite_id))
+	
+	for i in range(count - 1):
+		var support_id = support_pool[randi() % support_pool.size()]
+		enemies.append(DataManager.get_enemy_resource(support_id))
+	
+	if floor_level >= 4 and difficulty >= 0.7:
+		var second_elite = elite_pool[randi() % elite_pool.size()]
+		if enemies.size() > 1:
+			enemies[1] = DataManager.get_enemy_resource(second_elite)
+	
+	if floor_level >= 6 and difficulty >= 0.8:
+		var extra = support_pool[randi() % support_pool.size()]
+		enemies.append(DataManager.get_enemy_resource(extra))
+	
+	return enemies
+
+
+static func _select_elite_enemies_ashen(biome: DataManager.Biome, floor_level: int, difficulty: float) -> Array[EnemyResource]:
+	var enemies: Array[EnemyResource] = []
+	
+	var elite_enemies = [
+		DataManager.EnemyId.ASH_HERALD,
+		DataManager.EnemyId.MOLTEN_ELDER,
+	]
+	
+	if difficulty < DataManager.ELITE_DIFFICULTY_EARLY:
+		var elite_id = elite_enemies[randi() % elite_enemies.size()]
+		enemies.append(DataManager.get_enemy_resource(elite_id))
+	
+	elif difficulty < DataManager.ELITE_DIFFICULTY_LATE:
+		var elite_id = elite_enemies[randi() % elite_enemies.size()]
+		enemies.append(DataManager.get_enemy_resource(elite_id))
+		enemies.append(DataManager.get_enemy_resource(DataManager.EnemyId.SMOLDERING_IMP))
+	
+	else:
+		for i in range(DataManager.ELITE_ENEMY_COUNT_LATE):
+			var elite_id = elite_enemies[randi() % elite_enemies.size()]
+			enemies.append(DataManager.get_enemy_resource(elite_id))
+	
+	return enemies
+
+
+static func _select_elite_after_rob_ashen(biome: DataManager.Biome, floor_level: int, difficulty: float) -> Array[EnemyResource]:
+	var enemies: Array[EnemyResource] = []
+	
+	var elite_pool = [
+		DataManager.EnemyId.ASH_HERALD,
+		DataManager.EnemyId.MOLTEN_ELDER,
+	]
+	
+	var support_pool = [
+		DataManager.EnemyId.WAX_GOLEM,
+		DataManager.EnemyId.SOOT_ACOLYTE,
 	]
 	
 	var count = 2

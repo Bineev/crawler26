@@ -514,7 +514,7 @@ func _setup_artifact_without_choice_reward() -> void:
 	vbox.add_theme_constant_override("separation", 10)
 	
 	# Создаём ArtifactIcon
-	var artifact_icon = preload("res://scenes/artifact_icon.tscn").instantiate() as ArtifactIcon
+	var artifact_icon = load("res://scenes/artifact_icon.tscn").instantiate() as ArtifactIcon
 	# BUG (когда хочешь получить арт с эвента с шахтером)
 	artifact_icon.artifact_id = artifact_data.id
 	artifact_icon.artifact_resource = artifact_data

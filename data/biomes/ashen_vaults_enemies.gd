@@ -14,7 +14,7 @@ const INTENTS = {
 			# 3 ход — Урон 5 + Щит 5
 			[ 
 				{ "category": DataManager.EffectCategory.DAMAGE, "target": DataManager.EffectTarget.ENEMY, "base_value": 5 },
-				{ "category": DataManager.EffectCategory.APPLY_STATUS, "target": DataManager.EffectTarget.SELF, "status": DataManager.Status.SHIELD, "value": 5, "duration": 1 }
+				{ "category": DataManager.EffectCategory.BLOCK, "target": DataManager.EffectTarget.SELF, "base_value": 5 }
 			],
 			
 			# 4 ход — Горение 5 на 3 хода
@@ -25,7 +25,7 @@ const INTENTS = {
 		"cycle_type": DataManager.IntentCycleType.SEQUENTIAL,
 		"intents": [
 			# 1 ход — Щит 10
-			[ { "category": DataManager.EffectCategory.APPLY_STATUS, "target": DataManager.EffectTarget.SELF, "status": DataManager.Status.SHIELD, "value": 10, "duration": 1 } ],
+			[ { "category": DataManager.EffectCategory.BLOCK, "target": DataManager.EffectTarget.SELF, "base_value": 10 } ],
 			
 			# 2 ход — Горение 10 на 3 хода
 			[ { "category": DataManager.EffectCategory.APPLY_STATUS, "target": DataManager.EffectTarget.ENEMY, "status": DataManager.Status.BURN, "value": 10, "duration": 3 } ],
@@ -50,7 +50,7 @@ const INTENTS = {
 			[ { "category": DataManager.EffectCategory.APPLY_STATUS, "target": DataManager.EffectTarget.ENEMY, "status": DataManager.Status.BURN, "value": 8, "duration": 3 } ],
 			
 			# 4 ход — Щит 8
-			[ { "category": DataManager.EffectCategory.APPLY_STATUS, "target": DataManager.EffectTarget.SELF, "status": DataManager.Status.SHIELD, "value": 8, "duration": 1 } ],
+			[ { "category": DataManager.EffectCategory.BLOCK, "target": DataManager.EffectTarget.SELF, "base_value": 8 } ],
 			
 			# 5 ход — Урон 12
 			[ { "category": DataManager.EffectCategory.DAMAGE, "target": DataManager.EffectTarget.ENEMY, "base_value": 12 } ],
@@ -72,7 +72,7 @@ const INTENTS = {
 			[ { "category": DataManager.EffectCategory.DAMAGE, "target": DataManager.EffectTarget.ENEMY, "base_value": 15 } ],
 			
 			# 5 ход — Щит 10
-			[ { "category": DataManager.EffectCategory.APPLY_STATUS, "target": DataManager.EffectTarget.SELF, "status": DataManager.Status.SHIELD, "value": 10, "duration": 1 } ],
+			[ { "category": DataManager.EffectCategory.BLOCK, "target": DataManager.EffectTarget.SELF, "base_value": 10 } ],
 			
 			# 6 ход — Урон 30
 			[ { "category": DataManager.EffectCategory.DAMAGE, "target": DataManager.EffectTarget.ENEMY, "base_value": 30 } ],
@@ -106,7 +106,7 @@ const INTENTS = {
 			# 1 ход — Урон 6 + Щит 10
 			[ 
 				{ "category": DataManager.EffectCategory.DAMAGE, "target": DataManager.EffectTarget.ENEMY, "base_value": 6 },
-				{ "category": DataManager.EffectCategory.APPLY_STATUS, "target": DataManager.EffectTarget.SELF, "status": DataManager.Status.SHIELD, "value": 10, "duration": 1 }
+				{ "category": DataManager.EffectCategory.BLOCK, "target": DataManager.EffectTarget.SELF, "base_value": 10 }
 			],
 			
 			# 2 ход — Слабость 1 на 2 хода
@@ -119,7 +119,7 @@ const INTENTS = {
 			],
 			
 			# 4 ход — Щит 12
-			[ { "category": DataManager.EffectCategory.APPLY_STATUS, "target": DataManager.EffectTarget.SELF, "status": DataManager.Status.SHIELD, "value": 12, "duration": 1 } ],
+			[ { "category": DataManager.EffectCategory.BLOCK, "target": DataManager.EffectTarget.SELF, "base_value": 12 } ],
 			
 			# 5 ход — Урон 12
 			[ { "category": DataManager.EffectCategory.DAMAGE, "target": DataManager.EffectTarget.ENEMY, "base_value": 12 } ],
@@ -138,7 +138,7 @@ const INTENTS = {
 			[ { "category": DataManager.EffectCategory.APPLY_STATUS, "target": DataManager.EffectTarget.ENEMY, "status": DataManager.Status.COMBUSTIBLE, "value": 1, "duration": 5 } ],
 			
 			# 4 ход — Щит 20
-			[ { "category": DataManager.EffectCategory.APPLY_STATUS, "target": DataManager.EffectTarget.SELF, "status": DataManager.Status.SHIELD, "value": 20, "duration": 1 } ],
+			[ { "category": DataManager.EffectCategory.BLOCK, "target": DataManager.EffectTarget.SELF, "base_value": 20 } ],
 			
 			# 5 ход — Горение 15 на 5 ходов
 			[ { "category": DataManager.EffectCategory.APPLY_STATUS, "target": DataManager.EffectTarget.ENEMY, "status": DataManager.Status.BURN, "value": 15, "duration": 5 } ],

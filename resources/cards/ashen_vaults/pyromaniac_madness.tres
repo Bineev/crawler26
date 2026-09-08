@@ -1,0 +1,28 @@
+[gd_resource type="Resource" script_class="CardData" load_steps=5 format=3 uid="uid://drrn1hf13fxie"]
+
+[ext_resource type="Script" uid="uid://cmra25r1r3ivt" path="res://resources/res_scripts/effect_entry.gd" id="1_ipwx6"]
+[ext_resource type="Script" uid="uid://badcs22cck6n5" path="res://resources/res_scripts/card_data.gd" id="2_3h78s"]
+[ext_resource type="Script" uid="uid://b2q7fq4ckee8h" path="res://scripts/effects/pyromaniac_madness.gd" id="2_utw52"]
+
+[sub_resource type="Resource" id="Resource_3yfk0"]
+script = ExtResource("1_ipwx6")
+category = 15
+custom_description = "card_pyromaniac_madness_desc"
+custom_script = ExtResource("2_utw52")
+metadata/_custom_type_script = "uid://cmra25r1r3ivt"
+
+[resource]
+script = ExtResource("2_3h78s")
+id = 49
+cost_grade = 5
+origin = 1
+biome = 6
+upgrade_type = 11
+name_key = "card_pyromaniac_madness_name"
+description_key = "card_pyromaniac_madness_desc"
+grade = 3
+cost = 2
+effects = Array[ExtResource("1_ipwx6")]([SubResource("Resource_3yfk0")])
+manual_status_icons = Array[int]([14, 2])
+manual_card_types = Array[int]([3, 0])
+metadata/_custom_type_script = "uid://badcs22cck6n5"

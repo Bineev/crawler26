@@ -1,0 +1,29 @@
+[gd_resource type="Resource" script_class="CardData" load_steps=5 format=3 uid="uid://tf67jg6487nm"]
+
+[ext_resource type="Script" uid="uid://cmra25r1r3ivt" path="res://resources/res_scripts/effect_entry.gd" id="1_0mrdh"]
+[ext_resource type="Script" uid="uid://dl4j67560kib1" path="res://scripts/effects/scorched_earth.gd" id="2_7i1hl"]
+[ext_resource type="Script" uid="uid://badcs22cck6n5" path="res://resources/res_scripts/card_data.gd" id="2_v7l5q"]
+
+[sub_resource type="Resource" id="Resource_m8262"]
+script = ExtResource("1_0mrdh")
+category = 15
+custom_description = "card_scorched_earth_desc"
+custom_script = ExtResource("2_7i1hl")
+metadata/_custom_type_script = "uid://cmra25r1r3ivt"
+
+[resource]
+script = ExtResource("2_v7l5q")
+id = 45
+is_burned = true
+cost_grade = 4
+origin = 1
+biome = 6
+upgrade_type = 15
+name_key = "card_scorched_earth_name"
+description_key = "card_scorched_earth_desc"
+grade = 2
+cost = 3
+effects = Array[ExtResource("1_0mrdh")]([SubResource("Resource_m8262")])
+manual_status_icons = Array[int]([2])
+manual_card_types = Array[int]([6, 3])
+metadata/_custom_type_script = "uid://badcs22cck6n5"

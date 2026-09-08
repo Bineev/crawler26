@@ -147,7 +147,8 @@ var biome_unlock_cards: Dictionary = {
 	},
 	DataManager.Biome.ASHEN_VAULTS: {  # 🆕 Пепельные своды
 		1: [
-			# TODO: добавить карты биома после их создания
+			DataManager.CardId.SCORCHED_EARTH,  # 🆕
+			DataManager.CardId.SIEGE_BARREL,  # 🆕
 		],
 		2: [
 			# TODO: добавить карты биома после их создания
@@ -257,7 +258,19 @@ func _init_default_progress():
 	]
 	for card_id in rotten_cards:
 		unlock_card(card_id)
-	
+
+	# 2.4 🆕 Карты биома Пепельные Своды
+	var ashen_cards = [
+		DataManager.CardId.SCORCHED_EARTH,
+		DataManager.CardId.SIEGE_BARREL,
+		DataManager.CardId.IGNITION,
+		DataManager.CardId.TORCH_THROW,
+		DataManager.CardId.PYROMANIAC_MADNESS,
+		DataManager.CardId.ASHES_OF_WAR,
+	]
+	for card_id in ashen_cards:
+		unlock_card(card_id)
+
 	# ============================================================
 	# 3. ОТКРЫТЫЕ АРТЕФАКТЫ (все существующие)
 	# ============================================================

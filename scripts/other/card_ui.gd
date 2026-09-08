@@ -95,6 +95,8 @@ func _ready():
 		effect_overlay.material = effect_overlay.material.duplicate()
 	if effect_overlay2.material:
 		effect_overlay2.material = effect_overlay2.material.duplicate()
+	if art_shader.material:  # 🆕
+		art_shader.material = art_shader.material.duplicate()
 
 	_setup_click_area()
 
