@@ -1876,8 +1876,8 @@ func load_card_illustrations():
 	_card_illustrations[CardId.PHOENIX] = preload("res://img/cards/ashen_vaults/phoenix.png")
 	_card_illustrations[CardId.CREMATORIUM] = preload("res://img/cards/ashen_vaults/crematorium.png")
 	_card_illustrations[CardId.FLAME_RITUAL] = preload("res://img/cards/ashen_vaults/flame_ritual.png")
-	#_card_illustrations[CardId.RANDOM_BURST] = preload("res://img/cards/ashen_vaults/random_burst.png")
-	#_card_illustrations[CardId.BOILING_PASSION] = preload("res://img/cards/ashen_vaults/boiling_passion.png")
+	_card_illustrations[CardId.RANDOM_BURST] = preload("res://img/cards/ashen_vaults/random_burst.png")
+	_card_illustrations[CardId.BOILING_PASSION] = preload("res://img/cards/ashen_vaults/boiling_passion.png")
 
 
 func get_card_illustration(card_id: CardId) -> Texture2D:
