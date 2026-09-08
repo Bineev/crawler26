@@ -142,6 +142,23 @@ func _generate_default_description() -> String:
 			return tr("passive_denial_desc")
 		DataManager.Passive.SHAME:
 			return tr("passive_shame_desc")
+		# 🆕 Пепельные своды
+		DataManager.Passive.FLAME_BARRIER:
+			return tr("passive_flame_barrier_desc")
+		DataManager.Passive.FATUM:
+			return tr("passive_fatum_desc")
+		
+		# 🆕 Существующие из других биомов (если не были добавлены)
+		DataManager.Passive.SHELL:
+			return tr("passive_shell_desc")
+		DataManager.Passive.BLOODDRINKER:
+			return tr("passive_blooddrinker_desc")
+		DataManager.Passive.THORNS:
+			return tr("passive_thorns_desc")
+		DataManager.Passive.ROTTING_SHIELD:
+			return tr("passive_rotting_shield_desc")
+		DataManager.Passive.STEEL_HIDE:
+			return tr("passive_steel_hide_desc")
 		_:
 			return tr("passive_unknown_desc")
 

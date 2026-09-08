@@ -386,11 +386,6 @@ func add_status(status: StatusResource, value: int, duration: int, caster: Chara
 	else:
 		_add_status_direct(status, stacks, dur, caster)
 
-	if StatusInteractionManager.has_interaction(self, status_id):
-		StatusInteractionManager.handle_interaction(self, status_id, stacks, dur, status, caster)
-	else:
-		_add_status_direct(status, stacks, dur, caster)
-
 
 func _add_status_direct(status: StatusResource, stacks: int, duration: int, caster: CharacterStats = null, from_passive: bool = false):
 	var status_id = status.id

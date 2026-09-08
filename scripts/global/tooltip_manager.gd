@@ -58,6 +58,12 @@ func _get_status_description(status_id: DataManager.Status) -> String:
 			return tr("status_blister_desc")
 		DataManager.Status.INFECTION:
 			return tr("status_infection_desc")
+		DataManager.Status.RESIN:  # 🆕 Смола
+			return tr("status_resin_desc")
+		DataManager.Status.COMBUSTIBLE:  # 🆕 Горючесть
+			return tr("status_combustible_desc")
+		DataManager.Status.FRACTURE:  # 🆕 Надлом
+			return tr("status_fracture_desc")
 		_:
 			return ""
 

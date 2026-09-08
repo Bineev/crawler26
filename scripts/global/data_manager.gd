@@ -1862,7 +1862,7 @@ func load_card_illustrations():
 	_card_illustrations[CardId.IGNITION] = preload("res://img/cards/ashen_vaults/ignition.png")
 	_card_illustrations[CardId.TORCH_THROW] = preload("res://img/cards/ashen_vaults/torch_throw.png")
 	_card_illustrations[CardId.PYROMANIAC_MADNESS] = preload("res://img/cards/ashen_vaults/pyromaniac_madness.png")
-	#_card_illustrations[CardId.ASHES_OF_WAR] = preload("res://img/cards/ashen_vaults/ashes_of_war.png")
+	_card_illustrations[CardId.ASHES_OF_WAR] = preload("res://img/cards/ashen_vaults/ashes_of_war.png")
 
 func get_card_illustration(card_id: CardId) -> Texture2D:
 	if _card_illustrations.is_empty():
