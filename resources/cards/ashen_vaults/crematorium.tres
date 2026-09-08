@@ -1,0 +1,28 @@
+[gd_resource type="Resource" script_class="CardData" load_steps=5 format=3 uid="uid://be0nn1pa7im0h"]
+
+[ext_resource type="Script" uid="uid://cmra25r1r3ivt" path="res://resources/res_scripts/effect_entry.gd" id="1_pnvml"]
+[ext_resource type="Script" uid="uid://badcs22cck6n5" path="res://resources/res_scripts/card_data.gd" id="2_e3p26"]
+[ext_resource type="Script" uid="uid://bwhbkh2eqqi4l" path="res://scripts/effects/crematorium.gd" id="2_qpccs"]
+
+[sub_resource type="Resource" id="Resource_k418l"]
+script = ExtResource("1_pnvml")
+category = 15
+target = 0
+custom_description = "card_crematorium_desc"
+custom_script = ExtResource("2_qpccs")
+metadata/_custom_type_script = "uid://cmra25r1r3ivt"
+
+[resource]
+script = ExtResource("2_e3p26")
+id = 52
+origin = 1
+biome = 6
+upgrade_type = 15
+name_key = "card_crematorium_name"
+description_key = "card_crematorium_desc"
+grade = 3
+cost = 2
+effects = Array[ExtResource("1_pnvml")]([SubResource("Resource_k418l")])
+manual_status_icons = Array[int]([2])
+manual_card_types = Array[int]([3])
+metadata/_custom_type_script = "uid://badcs22cck6n5"

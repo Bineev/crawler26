@@ -601,6 +601,11 @@ enum CardId {
 	TORCH_THROW,  # Бросок факела
 	PYROMANIAC_MADNESS,  # Безумие пиромана
 	ASHES_OF_WAR,  # Пепел войны
+	PHOENIX,  # 🆕 Феникс
+	CREMATORIUM,  # 🆕 Крематорий
+	FLAME_RITUAL,  # 🆕 Пламенный обряд
+	RANDOM_BURST,  # 🆕 Случайная вспышка
+	BOILING_PASSION,  # 🆕 Кипящая страсть
 }
 
 ## Намерения врагов
@@ -1756,6 +1761,11 @@ func load_all_cards():
 	_register_card(CardId.TORCH_THROW, "res://resources/cards/ashen_vaults/torch_throw.tres")
 	_register_card(CardId.PYROMANIAC_MADNESS, "res://resources/cards/ashen_vaults/pyromaniac_madness.tres")
 	_register_card(CardId.ASHES_OF_WAR, "res://resources/cards/ashen_vaults/ashes_of_war.tres")
+	_register_card(CardId.PHOENIX, "res://resources/cards/ashen_vaults/phoenix.tres")
+	_register_card(CardId.CREMATORIUM, "res://resources/cards/ashen_vaults/crematorium.tres")
+	_register_card(CardId.FLAME_RITUAL, "res://resources/cards/ashen_vaults/flame_ritual.tres")
+	_register_card(CardId.RANDOM_BURST, "res://resources/cards/ashen_vaults/random_burst.tres")
+	_register_card(CardId.BOILING_PASSION, "res://resources/cards/ashen_vaults/boiling_passion.tres")
 	
 	_cards_loaded = true
 
@@ -1863,6 +1873,12 @@ func load_card_illustrations():
 	_card_illustrations[CardId.TORCH_THROW] = preload("res://img/cards/ashen_vaults/torch_throw.png")
 	_card_illustrations[CardId.PYROMANIAC_MADNESS] = preload("res://img/cards/ashen_vaults/pyromaniac_madness.png")
 	_card_illustrations[CardId.ASHES_OF_WAR] = preload("res://img/cards/ashen_vaults/ashes_of_war.png")
+	_card_illustrations[CardId.PHOENIX] = preload("res://img/cards/ashen_vaults/phoenix.png")
+	_card_illustrations[CardId.CREMATORIUM] = preload("res://img/cards/ashen_vaults/crematorium.png")
+	_card_illustrations[CardId.FLAME_RITUAL] = preload("res://img/cards/ashen_vaults/flame_ritual.png")
+	#_card_illustrations[CardId.RANDOM_BURST] = preload("res://img/cards/ashen_vaults/random_burst.png")
+	#_card_illustrations[CardId.BOILING_PASSION] = preload("res://img/cards/ashen_vaults/boiling_passion.png")
+
 
 func get_card_illustration(card_id: CardId) -> Texture2D:
 	if _card_illustrations.is_empty():

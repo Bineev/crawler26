@@ -1,0 +1,30 @@
+[gd_resource type="Resource" script_class="CardData" load_steps=5 format=3 uid="uid://ds5krty71anve"]
+
+[ext_resource type="Script" uid="uid://cmra25r1r3ivt" path="res://resources/res_scripts/effect_entry.gd" id="1_k3tyd"]
+[ext_resource type="Script" uid="uid://cklffvhjq3noc" path="res://scripts/effects/flame_ritual.gd" id="2_g7sm1"]
+[ext_resource type="Script" uid="uid://badcs22cck6n5" path="res://resources/res_scripts/card_data.gd" id="2_qb8jd"]
+
+[sub_resource type="Resource" id="Resource_fepx8"]
+script = ExtResource("1_k3tyd")
+category = 15
+target = 0
+custom_description = "card_flame_ritual_desc"
+custom_script = ExtResource("2_g7sm1")
+metadata/_custom_type_script = "uid://cmra25r1r3ivt"
+
+[resource]
+script = ExtResource("2_qb8jd")
+id = 53
+is_burned = true
+cost_grade = 5
+origin = 1
+biome = 6
+upgrade_type = 5
+name_key = "card_flame_ritual_name"
+description_key = "card_flame_ritual_desc"
+grade = 4
+effects = Array[ExtResource("1_k3tyd")]([SubResource("Resource_fepx8")])
+manual_status_icons = Array[int]([2, 6])
+manual_passive_icons = Array[int]([13])
+manual_card_types = Array[int]([2])
+metadata/_custom_type_script = "uid://badcs22cck6n5"

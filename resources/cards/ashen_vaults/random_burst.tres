@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="CardData" load_steps=5 format=3 uid="uid://dgs3eyjd7f5lv"]
+
+[ext_resource type="Script" uid="uid://cmra25r1r3ivt" path="res://resources/res_scripts/effect_entry.gd" id="1_vwkfh"]
+[ext_resource type="Script" uid="uid://dwdsqkbs714e4" path="res://scripts/effects/random_burst.gd" id="2_4dn4b"]
+[ext_resource type="Script" uid="uid://badcs22cck6n5" path="res://resources/res_scripts/card_data.gd" id="2_qqbdn"]
+
+[sub_resource type="Resource" id="Resource_ia445"]
+script = ExtResource("1_vwkfh")
+category = 15
+target = 0
+custom_description = "card_random_burst_desc"
+custom_script = ExtResource("2_4dn4b")
+metadata/_custom_type_script = "uid://cmra25r1r3ivt"
+
+[resource]
+script = ExtResource("2_qqbdn")
+id = 54
+cost_grade = 4
+origin = 1
+biome = 6
+upgrade_type = 1
+name_key = "card_random_burst_name"
+description_key = "card_random_burst_desc"
+effects = Array[ExtResource("1_vwkfh")]([SubResource("Resource_ia445")])
+manual_card_types = Array[int]([0])
+metadata/_custom_type_script = "uid://badcs22cck6n5"

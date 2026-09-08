@@ -267,6 +267,7 @@ func _init_default_progress():
 		DataManager.CardId.TORCH_THROW,
 		DataManager.CardId.PYROMANIAC_MADNESS,
 		DataManager.CardId.ASHES_OF_WAR,
+		DataManager.CardId.PHOENIX,  # 🆕
 	]
 	for card_id in ashen_cards:
 		unlock_card(card_id)

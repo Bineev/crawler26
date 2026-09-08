@@ -957,8 +957,17 @@ func process_start_of_turn():
 						caster = null
 					
 					# 🆕 Получаем значение тика
-					# Для всех статусов используем get_tick_value()
 					var tick_value = status.get_tick_value(data.stacks, caster)
+					
+					# 🆕 Применяем модификаторы урона от статусов (у кастера)
+					if caster and caster.has_method("get_modifier"):
+						match status.id:
+							DataManager.Status.BURN:
+								tick_value = floor(tick_value * caster.get_modifier(DataManager.ModifierStat.BURN_DAMAGE_MULTIPLIER))
+							DataManager.Status.POISON:
+								tick_value = floor(tick_value * caster.get_modifier(DataManager.ModifierStat.POISON_DAMAGE_MULTIPLIER))
+							DataManager.Status.BLEED:
+								tick_value = floor(tick_value * caster.get_modifier(DataManager.ModifierStat.BLEED_DAMAGE_MULTIPLIER))
 					
 					match tick_effect.category:
 						DataManager.EffectCategory.DAMAGE:
@@ -971,8 +980,8 @@ func process_start_of_turn():
 							tick_effect.value = tick_value
 						_:
 							tick_effect.base_value = tick_value
-					#BUG здесь тикает статус (после тика враг может быть мертв)
-					var status_icon = DataManager.get_status_icon(status_id)
+					
+					var status_icon = DataManager.get_status_icon(status.id)
 					EffectExecutor.execute(tick_effect, caster, [self], {}, null, tick_effect.is_direct_damage, status_icon, status.ignore_block)
 					if self is EnemyInstance:
 						await Engine.get_main_loop().create_timer(DataManager.STATUS_TRIGGER_DELAY).timeout

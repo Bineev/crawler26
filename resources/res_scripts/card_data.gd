@@ -503,6 +503,8 @@ func _get_condition_name(condition_script: Script) -> String:
 			return tr("condition_atonement_equals_zero")
 		"res://scripts/conditions/target_has_combustible.gd":  # 🆕
 			return tr("condition_target_has_combustible")
+		"res://scripts/conditions/health_below_30_percent.gd":  # 🆕
+			return tr("condition_health_below_30_percent")
 		_:
 			return tr("condition_unknown")
 
