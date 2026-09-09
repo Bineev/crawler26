@@ -326,8 +326,9 @@ func _on_item_selected(index: int) -> void:
 
 
 func _apply_reward(index: int) -> void:
-	# BUG когда получаем награду GET_CONCRETE_STATUS
-	var selected_item = rewards[index]
+	var selected_item = null
+	if not rewards.is_empty():
+		selected_item = rewards[index]
 	
 	match reward_type:
 		DataManager.RewardType.CARD_BIOM, DataManager.RewardType.CARD_CHARACTER:
@@ -1648,11 +1649,7 @@ func _setup_concrete_status_reward() -> void:
 	hbox.add_child(icon)
 	
 	var status_label = Label.new()
-	status_label.text = tr("reward_concrete_status_label") % [
-		DataManager.get_status_name(concrete_status),
-		concrete_status_stacks,
-		concrete_status_duration
-	]
+	status_label.text = tr("reward_concrete_status_label") % DataManager.get_status_name(concrete_status)
 	status_label.add_theme_font_override("font", DataManager.FONT_HEADERS)
 	status_label.add_theme_font_size_override("font_size", 32)
 	status_label.add_theme_color_override("font_color", DataManager.COLOR_MOLE_TUNNELS_ART_BG_LIGHT2)
