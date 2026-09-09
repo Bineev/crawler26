@@ -36,16 +36,18 @@ func duplicate_for_instance() -> PotionResource:
 
 func generate_dynamic_description() -> String:
 	var desc_parts: Array[String] = []
+	var lang = TranslationServer.get_locale()
 	
 	for effect in effects:
 		var effect_desc = _effect_to_string(effect)
 		if not effect_desc.is_empty():
+			if lang == "ru" and effect.category != DataManager.EffectCategory.CUSTOM:
+				effect_desc = _fix_russian_endings(effect_desc)
 			desc_parts.append(effect_desc)
 	
 	if desc_parts.is_empty():
 		return tr("card_no_effect_description")
 	
-	# 🆕 Пост-парсинг: объединяем и чистим
 	var full_desc = "\n".join(desc_parts)
 	full_desc = _post_process_description(full_desc)
 	
@@ -209,19 +211,7 @@ func _get_condition_name(condition_script: Script) -> String:
 
 
 func _post_process_description(desc: String) -> String:
-	var lang = TranslationServer.get_locale()
-	
-	match lang:
-		"ru":
-			# 🆕 Заменяем 2+ точек подряд на 1 точку
-			desc = _fix_multiple_dots(desc)
-			
-			# Исправляем окончания
-			desc = _fix_russian_endings(desc)
-		
-		"en":
-			desc = _fix_multiple_dots(desc)
-	
+	desc = _fix_multiple_dots(desc)
 	return desc
 
 

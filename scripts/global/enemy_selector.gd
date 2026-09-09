@@ -1,604 +1,203 @@
 # scripts/room/enemy_selector.gd
 extends Node
 
+const SEGMENT_0_PATTERNS = [
+	{ "composition": [DataManager.EnemySize.WEAK], "weight": 100 },
+]
+
+const SEGMENT_1_PATTERNS = [
+	{ "composition": [DataManager.EnemySize.WEAK, DataManager.EnemySize.WEAK], "weight": 50 },
+	{ "composition": [DataManager.EnemySize.NORMAL], "weight": 30 },
+	{ "composition": [DataManager.EnemySize.WEAK, DataManager.EnemySize.NORMAL], "weight": 20 },
+]
+
+const SEGMENT_2_PATTERNS = [
+	{ "composition": [DataManager.EnemySize.WEAK, DataManager.EnemySize.NORMAL], "weight": 50 },
+	{ "composition": [DataManager.EnemySize.NORMAL, DataManager.EnemySize.WEAK, DataManager.EnemySize.WEAK], "weight": 30 },
+	{ "composition": [DataManager.EnemySize.NORMAL, DataManager.EnemySize.NORMAL], "weight": 20 },
+]
+
+const SEGMENT_3_PATTERNS = [
+	{ "composition": [DataManager.EnemySize.NORMAL, DataManager.EnemySize.WEAK, DataManager.EnemySize.WEAK], "weight": 50 },
+	{ "composition": [DataManager.EnemySize.NORMAL, DataManager.EnemySize.NORMAL], "weight": 30 },
+	{ "composition": [DataManager.EnemySize.NORMAL, DataManager.EnemySize.ELITE], "weight": 20 },
+]
+
+const SEGMENT_4_PATTERNS = [
+	{ "composition": [DataManager.EnemySize.ELITE, DataManager.EnemySize.WEAK, DataManager.EnemySize.WEAK], "weight": 50 },
+	{ "composition": [DataManager.EnemySize.ELITE, DataManager.EnemySize.NORMAL], "weight": 30 },
+	{ "composition": [DataManager.EnemySize.ELITE, DataManager.EnemySize.ELITE], "weight": 20 },
+]
 ## ============================================================
 ## ПОДБОР ВРАГОВ
 ## ============================================================
 
-static func select_enemies(combat_type: DataManager.CombatType, biome: DataManager.Biome, floor_level: int, progress_on_floor: int = 0) -> Array[EnemyResource]:
+static func select_enemies(combat_type: DataManager.CombatType, biome: DataManager.Biome, floor_level: int, room_index: int = 0) -> Array[EnemyResource]:
 	var enemies: Array[EnemyResource] = []
-	var difficulty_factor = _calculate_difficulty_factor(progress_on_floor)
 	
 	match combat_type:
 		DataManager.CombatType.NORMAL:
-			enemies = _select_normal_enemies(biome, floor_level, difficulty_factor)
+			enemies = _select_normal_enemies_generic(biome, floor_level, room_index)
+		
 		DataManager.CombatType.ELITE:
-			enemies = _select_elite_enemies(biome, floor_level, difficulty_factor)
+			# Элитный бой — сдвигаем на 1 сегмент вперёд (3 комнаты)
+			var elite_room_index = room_index + 3
+			enemies = _select_normal_enemies_generic(biome, floor_level, elite_room_index)
+		
 		DataManager.CombatType.BOSS:
 			enemies = _select_boss_enemies(biome, floor_level)
-		DataManager.CombatType.LIMITED_TURNS:
-			enemies = _select_limited_enemies(biome, floor_level, difficulty_factor)
+		
 		DataManager.CombatType.ELITE_AFTER_ROB:
-			enemies = _select_elite_enemies_after_rob(biome, floor_level, difficulty_factor)
+			# Бой после ограбления — сдвигаем на 2 сегмента (6 комнат)
+			var rob_room_index = room_index + 6
+			enemies = _select_normal_enemies_generic(biome, floor_level, rob_room_index)
 	
 	return enemies
 
-
-static func _calculate_difficulty_factor(progress_on_floor: int) -> float:
-	return clamp(progress_on_floor / float(DataManager.DIFFICULTY_MAX_PROGRESS), 0.0, 1.0)
-
-
-static func _select_normal_enemies(biome: DataManager.Biome, floor_level: int, difficulty: float) -> Array[EnemyResource]:
-	var enemies: Array[EnemyResource] = []
-	
-	match biome:
-		DataManager.Biome.MOLE_TUNNELS:
-			enemies = _select_normal_enemies_mole(biome, floor_level, difficulty)
-		DataManager.Biome.ROTTEN_MARSHES:
-			enemies = _select_normal_enemies_rotten(biome, floor_level, difficulty)
-		DataManager.Biome.ASHEN_VAULTS:  # 🆕
-			return _select_normal_enemies_ashen(biome, floor_level, difficulty)
-	
-	return enemies
-
-
-static func _select_normal_enemies_mole(biome: DataManager.Biome, floor_level: int, difficulty: float) -> Array[EnemyResource]:
-	var enemies: Array[EnemyResource] = []
-	
-	var weak_enemies = [
-		DataManager.EnemyId.MOLE_MUTANT,
-		DataManager.EnemyId.RABID_RAT,
-	]
-	var normal_enemies = [
-		DataManager.EnemyId.STRONG_MOLE,
-		DataManager.EnemyId.MOLE_FUNGUS,
-	]
-	var elite_enemies = [
-		DataManager.EnemyId.MANY_HEADED_MOLE,
-		DataManager.EnemyId.FUNGAL_MINER,
-	]
-	
-	var count = 1
-	if difficulty >= 0.15:
-		count = 2
-	if difficulty >= 0.40:
-		count = 3
-	
-	var composition = []
-	
-	if count == 1:
-		if difficulty <= 0.1:
-			composition = [weak_enemies[randi() % weak_enemies.size()]]
-		elif difficulty <= 0.2:
-			composition = [normal_enemies[randi() % normal_enemies.size()]]
-		else:
-			if randf() < 0.5:
-				composition = [normal_enemies[randi() % normal_enemies.size()]]
-			else:
-				composition = [elite_enemies[randi() % elite_enemies.size()]]
-	
-	elif count == 2:
-		if difficulty <= 0.25:
-			composition = [
-				weak_enemies[randi() % weak_enemies.size()],
-				weak_enemies[randi() % weak_enemies.size()]
-			]
-		elif difficulty <= 0.35:
-			composition = [
-				weak_enemies[randi() % weak_enemies.size()],
-				normal_enemies[randi() % normal_enemies.size()]
-			]
-		elif difficulty <= 0.50:
-			composition = [
-				normal_enemies[randi() % normal_enemies.size()],
-				normal_enemies[randi() % normal_enemies.size()]
-			]
-		else:
-			composition = [
-				normal_enemies[randi() % normal_enemies.size()],
-				elite_enemies[randi() % elite_enemies.size()]
-			]
-	
-	elif count == 3:
-		if difficulty <= 0.50:
-			composition = [
-				weak_enemies[randi() % weak_enemies.size()],
-				weak_enemies[randi() % weak_enemies.size()],
-				normal_enemies[randi() % normal_enemies.size()]
-			]
-		elif difficulty <= 0.65:
-			composition = [
-				weak_enemies[randi() % weak_enemies.size()],
-				normal_enemies[randi() % normal_enemies.size()],
-				normal_enemies[randi() % normal_enemies.size()]
-			]
-		elif difficulty <= 0.80:
-			composition = [
-				normal_enemies[randi() % normal_enemies.size()],
-				normal_enemies[randi() % normal_enemies.size()],
-				normal_enemies[randi() % normal_enemies.size()]
-			]
-		else:
-			composition = [
-				elite_enemies[randi() % elite_enemies.size()],
-				normal_enemies[randi() % normal_enemies.size()],
-				normal_enemies[randi() % normal_enemies.size()]
-			]
-	
-	for enemy_type in composition:
-		enemies.append(DataManager.get_enemy_resource(enemy_type))
-	
-	return enemies
-
-
-static func _select_normal_enemies_rotten(biome: DataManager.Biome, floor_level: int, difficulty: float) -> Array[EnemyResource]:
-	var enemies: Array[EnemyResource] = []
-	
-	# 🆕 Слабые враги
-	var weak_enemies = [
-		DataManager.EnemyId.CRESTED_TOAD,
-		DataManager.EnemyId.ROTTING_SNAIL,
-	]
-	
-	# 🆕 Обычные враги
-	var normal_enemies = [
-		DataManager.EnemyId.FLESH_HOUND,
-		DataManager.EnemyId.TOXIC_IMP,
-	]
-	
-	# 🆕 Элитные враги
-	var elite_enemies = [
-		DataManager.EnemyId.THORNY_BLOOM,
-		DataManager.EnemyId.ROTTEN_PORTER,
-	]
-	
-	var count = 1
-	if difficulty >= 0.15:
-		count = 2
-	if difficulty >= 0.40:
-		count = 3
-	
-	var composition = []
-	
-	if count == 1:
-		if difficulty <= 0.1:
-			composition = [weak_enemies[randi() % weak_enemies.size()]]
-		elif difficulty <= 0.2:
-			composition = [normal_enemies[randi() % normal_enemies.size()]]
-		else:
-			if randf() < 0.5:
-				composition = [normal_enemies[randi() % normal_enemies.size()]]
-			else:
-				composition = [elite_enemies[randi() % elite_enemies.size()]]
-	
-	elif count == 2:
-		if difficulty <= 0.25:
-			composition = [
-				weak_enemies[randi() % weak_enemies.size()],
-				weak_enemies[randi() % weak_enemies.size()]
-			]
-		elif difficulty <= 0.35:
-			composition = [
-				weak_enemies[randi() % weak_enemies.size()],
-				normal_enemies[randi() % normal_enemies.size()]
-			]
-		elif difficulty <= 0.50:
-			composition = [
-				normal_enemies[randi() % normal_enemies.size()],
-				normal_enemies[randi() % normal_enemies.size()]
-			]
-		else:
-			composition = [
-				normal_enemies[randi() % normal_enemies.size()],
-				elite_enemies[randi() % elite_enemies.size()]
-			]
-	
-	elif count == 3:
-		if difficulty <= 0.50:
-			composition = [
-				weak_enemies[randi() % weak_enemies.size()],
-				weak_enemies[randi() % weak_enemies.size()],
-				normal_enemies[randi() % normal_enemies.size()]
-			]
-		elif difficulty <= 0.65:
-			composition = [
-				weak_enemies[randi() % weak_enemies.size()],
-				normal_enemies[randi() % normal_enemies.size()],
-				normal_enemies[randi() % normal_enemies.size()]
-			]
-		elif difficulty <= 0.80:
-			composition = [
-				normal_enemies[randi() % normal_enemies.size()],
-				normal_enemies[randi() % normal_enemies.size()],
-				normal_enemies[randi() % normal_enemies.size()]
-			]
-		else:
-			composition = [
-				elite_enemies[randi() % elite_enemies.size()],
-				normal_enemies[randi() % normal_enemies.size()],
-				normal_enemies[randi() % normal_enemies.size()]
-			]
-	
-	for enemy_type in composition:
-		enemies.append(DataManager.get_enemy_resource(enemy_type))
-	
-	return enemies
-
-
-static func _select_normal_enemies_ashen(biome: DataManager.Biome, floor_level: int, difficulty: float) -> Array[EnemyResource]:
-	var enemies: Array[EnemyResource] = []
-	
-	# 🆕 Слабые враги
-	var weak_enemies = [
-		DataManager.EnemyId.SMOLDERING_IMP,
-		DataManager.EnemyId.WAX_GOLEM,  # 🆕
-	]
-	
-	# 🆕 Обычные враги
-	var normal_enemies = [
-		DataManager.EnemyId.SOOT_ACOLYTE,  # 🆕
-		DataManager.EnemyId.GROTESQUE_PAIN,  # 🆕
-	]
-	
-	# 🆕 Элитные враги
-	var elite_enemies = [
-		DataManager.EnemyId.MOLTEN_ELDER,  # 🆕
-		DataManager.EnemyId.ASH_HERALD,  # 🆕
-	]
-	
-	var count = 1
-	if difficulty >= 0.15:
-		count = 2
-	if difficulty >= 0.40:
-		count = 3
-	
-	var composition = []
-	
-	if count == 1:
-		if difficulty <= 0.1:
-			composition = [weak_enemies[randi() % weak_enemies.size()]]
-		elif difficulty <= 0.2:
-			composition = [normal_enemies[randi() % normal_enemies.size()]]
-		else:
-			if randf() < 0.5:
-				composition = [normal_enemies[randi() % normal_enemies.size()]]
-			else:
-				composition = [elite_enemies[randi() % elite_enemies.size()]]
-	
-	elif count == 2:
-		if difficulty <= 0.25:
-			composition = [
-				weak_enemies[randi() % weak_enemies.size()],
-				weak_enemies[randi() % weak_enemies.size()]
-			]
-		elif difficulty <= 0.35:
-			composition = [
-				weak_enemies[randi() % weak_enemies.size()],
-				normal_enemies[randi() % normal_enemies.size()]
-			]
-		elif difficulty <= 0.50:
-			composition = [
-				normal_enemies[randi() % normal_enemies.size()],
-				normal_enemies[randi() % normal_enemies.size()]
-			]
-		else:
-			composition = [
-				normal_enemies[randi() % normal_enemies.size()],
-				elite_enemies[randi() % elite_enemies.size()]
-			]
-	
-	elif count == 3:
-		if difficulty <= 0.50:
-			composition = [
-				weak_enemies[randi() % weak_enemies.size()],
-				weak_enemies[randi() % weak_enemies.size()],
-				normal_enemies[randi() % normal_enemies.size()]
-			]
-		elif difficulty <= 0.65:
-			composition = [
-				weak_enemies[randi() % weak_enemies.size()],
-				normal_enemies[randi() % normal_enemies.size()],
-				normal_enemies[randi() % normal_enemies.size()]
-			]
-		elif difficulty <= 0.80:
-			composition = [
-				normal_enemies[randi() % normal_enemies.size()],
-				normal_enemies[randi() % normal_enemies.size()],
-				normal_enemies[randi() % normal_enemies.size()]
-			]
-		else:
-			composition = [
-				elite_enemies[randi() % elite_enemies.size()],
-				normal_enemies[randi() % normal_enemies.size()],
-				normal_enemies[randi() % normal_enemies.size()]
-			]
-	
-	for enemy_type in composition:
-		enemies.append(DataManager.get_enemy_resource(enemy_type))
-	
-	return enemies
-
-
-
-static func _select_elite_enemies(biome: DataManager.Biome, floor_level: int, difficulty: float) -> Array[EnemyResource]:
-	match biome:
-		DataManager.Biome.MOLE_TUNNELS:
-			return _select_elite_enemies_mole(biome, floor_level, difficulty)
-		DataManager.Biome.ROTTEN_MARSHES:
-			return _select_elite_enemies_rotten(biome, floor_level, difficulty)
-		DataManager.Biome.ASHEN_VAULTS:  # 🆕
-			return _select_elite_enemies_ashen(biome, floor_level, difficulty)
-	
-	return []
-
-
-static func _select_elite_enemies_mole(biome: DataManager.Biome, floor_level: int, difficulty: float) -> Array[EnemyResource]:
-	var enemies: Array[EnemyResource] = []
-	
-	var elite_enemies = [
-		DataManager.EnemyId.MOLE_FUNGUS,
-		DataManager.EnemyId.MANY_HEADED_MOLE,
-	]
-	
-	if floor_level >= DataManager.ELITE_MINER_APPEARS_FROM_FLOOR:
-		elite_enemies.append(DataManager.EnemyId.FUNGAL_MINER)
-	
-	if difficulty < DataManager.ELITE_DIFFICULTY_EARLY:
-		var elite_id = elite_enemies[randi() % elite_enemies.size()]
-		enemies.append(DataManager.get_enemy_resource(elite_id))
-	
-	elif difficulty < DataManager.ELITE_DIFFICULTY_LATE:
-		var elite_id = elite_enemies[randi() % elite_enemies.size()]
-		enemies.append(DataManager.get_enemy_resource(elite_id))
-		enemies.append(DataManager.get_enemy_resource(DataManager.EnemyId.MOLE_MUTANT))
-	
-	else:
-		for i in range(DataManager.ELITE_ENEMY_COUNT_LATE):
-			var elite_id = elite_enemies[randi() % elite_enemies.size()]
-			enemies.append(DataManager.get_enemy_resource(elite_id))
-	
-	return enemies
-
-
-static func _select_elite_enemies_rotten(biome: DataManager.Biome, floor_level: int, difficulty: float) -> Array[EnemyResource]:
-	var enemies: Array[EnemyResource] = []
-	
-	# 🆕 Элитные враги Гнилостных Топей
-	var elite_enemies = [
-		DataManager.EnemyId.THORNY_BLOOM,  # THORNY_BLOOM стал элитным
-		DataManager.EnemyId.ROTTEN_PORTER,  # ROTTEN_PORTER стал элитным
-	]
-	
-	if difficulty < DataManager.ELITE_DIFFICULTY_EARLY:
-		var elite_id = elite_enemies[randi() % elite_enemies.size()]
-		enemies.append(DataManager.get_enemy_resource(elite_id))
-	
-	elif difficulty < DataManager.ELITE_DIFFICULTY_LATE:
-		var elite_id = elite_enemies[randi() % elite_enemies.size()]
-		enemies.append(DataManager.get_enemy_resource(elite_id))
-		enemies.append(DataManager.get_enemy_resource(DataManager.EnemyId.CRESTED_TOAD))  # слабый как поддержка
-	
-	else:
-		for i in range(DataManager.ELITE_ENEMY_COUNT_LATE):
-			var elite_id = elite_enemies[randi() % elite_enemies.size()]
-			enemies.append(DataManager.get_enemy_resource(elite_id))
-	
-	return enemies
 
 
 static func _select_boss_enemies(biome: DataManager.Biome, floor_level: int) -> Array[EnemyResource]:
+	var enemies: Array[EnemyResource] = []
+	
+	var boss_id = _get_boss_for_biome(biome)
+	var boss_resource = DataManager.get_enemy_resource(boss_id)
+	if boss_resource:
+		enemies.append(boss_resource)
+	
+	return enemies
+
+
+static func _select_normal_enemies_generic(biome: DataManager.Biome, floor_level: int, room_index: int) -> Array[EnemyResource]:
+	var enemies: Array[EnemyResource] = []
+	
+	var pools = _get_enemy_pools_for_biome(biome)
+	var weak_pool = pools["weak"]
+	var normal_pool = pools["normal"]
+	var elite_pool = pools["elite"]
+	
+	if weak_pool.is_empty():
+		return enemies
+	
+	# Определяем сегмент по индексу комнаты
+	var rooms_per_segment = DataManager.FLOOR_ROOMS_PER_PATH  # 3
+	var segment_index = floor(room_index / rooms_per_segment)
+	
+	# Ограничиваем сегмент (0-4)
+	segment_index = clamp(segment_index, 0, 4)
+	
+	# Получаем паттерны для сегмента
+	var patterns = _get_patterns_for_segment(segment_index)
+	var composition = _select_pattern_by_weight(patterns)
+	
+	# Заполняем состав врагами (без повторений)
+	var enemy_ids = _fill_composition(composition, weak_pool, normal_pool, elite_pool)
+	
+	for enemy_id in enemy_ids:
+		var resource = DataManager.get_enemy_resource(enemy_id)
+		if resource:
+			enemies.append(resource)
+	
+	return enemies
+
+
+static func _get_enemy_pools_for_biome(biome: DataManager.Biome) -> Dictionary:
 	match biome:
 		DataManager.Biome.MOLE_TUNNELS:
-			return _select_boss_enemies_mole(biome, floor_level)
+			return {
+				"weak": [DataManager.EnemyId.MOLE_MUTANT, DataManager.EnemyId.RABID_RAT],
+				"normal": [DataManager.EnemyId.MOLE_FUNGUS, DataManager.EnemyId.STRONG_MOLE],
+				"elite": [DataManager.EnemyId.FUNGAL_MINER, DataManager.EnemyId.MANY_HEADED_MOLE],
+			}
+		
 		DataManager.Biome.ROTTEN_MARSHES:
-			return _select_boss_enemies_rotten(biome, floor_level)
+			return {
+				"weak": [DataManager.EnemyId.ROTTING_SNAIL, DataManager.EnemyId.CRESTED_TOAD],
+				"normal": [DataManager.EnemyId.FLESH_HOUND, DataManager.EnemyId.TOXIC_IMP],
+				"elite": [DataManager.EnemyId.THORNY_BLOOM, DataManager.EnemyId.ROTTEN_PORTER],
+			}
+		
 		DataManager.Biome.ASHEN_VAULTS:
-			return _select_boss_enemies_ashen(biome, floor_level)
-	
-	return []
+			return {
+				"weak": [DataManager.EnemyId.SMOLDERING_IMP, DataManager.EnemyId.WAX_GOLEM],
+				"normal": [DataManager.EnemyId.GROTESQUE_PAIN, DataManager.EnemyId.SOOT_ACOLYTE],
+				"elite": [DataManager.EnemyId.MOLTEN_ELDER, DataManager.EnemyId.ASH_HERALD],
+			}
+		
+		_:
+			return {"weak": [], "normal": [], "elite": []}
 
 
-static func _select_boss_enemies_mole(biome: DataManager.Biome, floor_level: int) -> Array[EnemyResource]:
-	var enemies: Array[EnemyResource] = []
-	enemies.append(DataManager.get_enemy_resource(DataManager.EnemyId.RODENT_MOUND))
-	
-	if floor_level >= DataManager.BOSS_ADD_MINIONS_FROM_FLOOR:
-		enemies.append(DataManager.get_enemy_resource(DataManager.EnemyId.MOLE_MUTANT))
-	
-	return enemies
-
-
-static func _select_boss_enemies_rotten(biome: DataManager.Biome, floor_level: int) -> Array[EnemyResource]:
-	var enemies: Array[EnemyResource] = []
-	enemies.append(DataManager.get_enemy_resource(DataManager.EnemyId.MASTER_OF_ROT))
-	
-	# 🆕 Миньоны для босса (начиная с 3-го этажа)
-	if floor_level >= DataManager.BOSS_ADD_MINIONS_FROM_FLOOR:
-		# Добавляем 1-2 миньона
-		var minion_pool = [
-			DataManager.EnemyId.TOXIC_IMP,
-			DataManager.EnemyId.CRESTED_TOAD,
-			DataManager.EnemyId.ROTTING_SNAIL,
-		]
-		var minion_count = 1 if floor_level < 5 else 2
-		for i in range(minion_count):
-			var minion_id = minion_pool[randi() % minion_pool.size()]
-			enemies.append(DataManager.get_enemy_resource(minion_id))
-	
-	return enemies
-
-
-static func _select_boss_enemies_ashen(biome: DataManager.Biome, floor_level: int) -> Array[EnemyResource]:
-	var enemies: Array[EnemyResource] = []
-	enemies.append(DataManager.get_enemy_resource(DataManager.EnemyId.HELLFIRE_ABBOT))
-	
-	# 🆕 Миньоны для босса (начиная с 3-го этажа)
-	if floor_level >= DataManager.BOSS_ADD_MINIONS_FROM_FLOOR:
-		var minion_pool = [
-			DataManager.EnemyId.SMOLDERING_IMP,
-			DataManager.EnemyId.WAX_GOLEM,
-		]
-		var minion_count = 1 if floor_level < 5 else 2
-		for i in range(minion_count):
-			var minion_id = minion_pool[randi() % minion_pool.size()]
-			enemies.append(DataManager.get_enemy_resource(minion_id))
-	
-	return enemies
-
-
-static func _select_limited_enemies(biome: DataManager.Biome, floor_level: int, difficulty: float) -> Array[EnemyResource]:
-	var enemies = _select_normal_enemies(biome, floor_level, difficulty)
-	
-	if enemies.size() > 1:
-		enemies = enemies.slice(0, 1)
-	
-	return enemies
-
-
-static func _select_elite_enemies_after_rob(biome: DataManager.Biome, floor_level: int, difficulty: float) -> Array[EnemyResource]:
+static func _get_boss_for_biome(biome: DataManager.Biome) -> DataManager.EnemyId:
 	match biome:
 		DataManager.Biome.MOLE_TUNNELS:
-			return _select_elite_after_rob_mole(biome, floor_level, difficulty)
+			return DataManager.EnemyId.RODENT_MOUND
 		DataManager.Biome.ROTTEN_MARSHES:
-			return _select_elite_after_rob_rotten(biome, floor_level, difficulty)
-		DataManager.Biome.ASHEN_VAULTS:  # 🆕
-			return _select_elite_after_rob_ashen(biome, floor_level, difficulty)
-	
-	return []
+			return DataManager.EnemyId.MASTER_OF_ROT
+		DataManager.Biome.ASHEN_VAULTS:
+			return DataManager.EnemyId.HELLFIRE_ABBOT
+		_:
+			return DataManager.EnemyId.RODENT_MOUND
 
 
-static func _select_elite_after_rob_mole(biome: DataManager.Biome, floor_level: int, difficulty: float) -> Array[EnemyResource]:
-	var enemies: Array[EnemyResource] = []
-	
-	var elite_pool = [
-		DataManager.EnemyId.MANY_HEADED_MOLE,
-		DataManager.EnemyId.FUNGAL_MINER,
-	]
-	
-	var support_pool = [
-		DataManager.EnemyId.STRONG_MOLE,
-		DataManager.EnemyId.MOLE_FUNGUS,
-	]
-	
-	var count = 2
-	if difficulty >= 0.5:
-		count = 3
-	
-	var elite_id = elite_pool[randi() % elite_pool.size()]
-	enemies.append(DataManager.get_enemy_resource(elite_id))
-	
-	for i in range(count - 1):
-		var support_id = support_pool[randi() % support_pool.size()]
-		enemies.append(DataManager.get_enemy_resource(support_id))
-	
-	if floor_level >= 4 and difficulty >= 0.7:
-		var second_elite = elite_pool[randi() % elite_pool.size()]
-		if enemies.size() > 1:
-			enemies[1] = DataManager.get_enemy_resource(second_elite)
-	
-	if floor_level >= 6 and difficulty >= 0.8:
-		var extra = support_pool[randi() % support_pool.size()]
-		enemies.append(DataManager.get_enemy_resource(extra))
-	
-	return enemies
+static func _get_patterns_for_segment(segment_index: int) -> Array:
+	match segment_index:
+		0:
+			return SEGMENT_0_PATTERNS
+		1:
+			return SEGMENT_1_PATTERNS
+		2:
+			return SEGMENT_2_PATTERNS
+		3:
+			return SEGMENT_3_PATTERNS
+		4:
+			return SEGMENT_4_PATTERNS
+		_:
+			return SEGMENT_1_PATTERNS
 
 
-static func _select_elite_after_rob_rotten(biome: DataManager.Biome, floor_level: int, difficulty: float) -> Array[EnemyResource]:
-	var enemies: Array[EnemyResource] = []
+static func _select_pattern_by_weight(patterns: Array) -> Array:
+	var total_weight = 0
+	for p in patterns:
+		total_weight += p["weight"]
 	
-	# 🆕 Элитный пул
-	var elite_pool = [
-		DataManager.EnemyId.FLESH_HOUND,
-		DataManager.EnemyId.THORNY_BLOOM,
-		DataManager.EnemyId.ROTTEN_PORTER,
-	]
+	var roll = randi() % total_weight
+	var accumulated = 0
+	for p in patterns:
+		accumulated += p["weight"]
+		if roll < accumulated:
+			return p["composition"]
 	
-	# 🆕 Поддержка
-	var support_pool = [
-		DataManager.EnemyId.TOXIC_IMP,
-		DataManager.EnemyId.CRESTED_TOAD,
-		DataManager.EnemyId.ROTTING_SNAIL,
-	]
-	
-	var count = 2
-	if difficulty >= 0.5:
-		count = 3
-	
-	var elite_id = elite_pool[randi() % elite_pool.size()]
-	enemies.append(DataManager.get_enemy_resource(elite_id))
-	
-	for i in range(count - 1):
-		var support_id = support_pool[randi() % support_pool.size()]
-		enemies.append(DataManager.get_enemy_resource(support_id))
-	
-	if floor_level >= 4 and difficulty >= 0.7:
-		var second_elite = elite_pool[randi() % elite_pool.size()]
-		if enemies.size() > 1:
-			enemies[1] = DataManager.get_enemy_resource(second_elite)
-	
-	if floor_level >= 6 and difficulty >= 0.8:
-		var extra = support_pool[randi() % support_pool.size()]
-		enemies.append(DataManager.get_enemy_resource(extra))
-	
-	return enemies
+	return patterns[0]["composition"]
 
 
-static func _select_elite_enemies_ashen(biome: DataManager.Biome, floor_level: int, difficulty: float) -> Array[EnemyResource]:
-	var enemies: Array[EnemyResource] = []
+static func _fill_composition(composition: Array, weak_pool: Array, normal_pool: Array, elite_pool: Array) -> Array[DataManager.EnemyId]:
+	var result: Array[DataManager.EnemyId] = []
 	
-	var elite_enemies = [
-		DataManager.EnemyId.ASH_HERALD,
-		DataManager.EnemyId.MOLTEN_ELDER,
-	]
+	# Копируем пулы для удаления использованных врагов
+	var available_weak = weak_pool.duplicate()
+	var available_normal = normal_pool.duplicate()
+	var available_elite = elite_pool.duplicate()
 	
-	if difficulty < DataManager.ELITE_DIFFICULTY_EARLY:
-		var elite_id = elite_enemies[randi() % elite_enemies.size()]
-		enemies.append(DataManager.get_enemy_resource(elite_id))
+	for enemy_size in composition:
+		var selected_id: DataManager.EnemyId = -1
+		
+		match enemy_size:
+			DataManager.EnemySize.WEAK:
+				if available_weak.is_empty():
+					available_weak = weak_pool.duplicate()
+				selected_id = available_weak.pop_at(randi() % available_weak.size())
+			
+			DataManager.EnemySize.NORMAL:
+				if available_normal.is_empty():
+					available_normal = normal_pool.duplicate()
+				selected_id = available_normal.pop_at(randi() % available_normal.size())
+			
+			DataManager.EnemySize.ELITE:
+				if available_elite.is_empty():
+					available_elite = elite_pool.duplicate()
+				selected_id = available_elite.pop_at(randi() % available_elite.size())
+		
+		if selected_id != -1:
+			result.append(selected_id)
 	
-	elif difficulty < DataManager.ELITE_DIFFICULTY_LATE:
-		var elite_id = elite_enemies[randi() % elite_enemies.size()]
-		enemies.append(DataManager.get_enemy_resource(elite_id))
-		enemies.append(DataManager.get_enemy_resource(DataManager.EnemyId.SMOLDERING_IMP))
-	
-	else:
-		for i in range(DataManager.ELITE_ENEMY_COUNT_LATE):
-			var elite_id = elite_enemies[randi() % elite_enemies.size()]
-			enemies.append(DataManager.get_enemy_resource(elite_id))
-	
-	return enemies
-
-
-static func _select_elite_after_rob_ashen(biome: DataManager.Biome, floor_level: int, difficulty: float) -> Array[EnemyResource]:
-	var enemies: Array[EnemyResource] = []
-	
-	var elite_pool = [
-		DataManager.EnemyId.ASH_HERALD,
-		DataManager.EnemyId.MOLTEN_ELDER,
-	]
-	
-	var support_pool = [
-		DataManager.EnemyId.WAX_GOLEM,
-		DataManager.EnemyId.SOOT_ACOLYTE,
-	]
-	
-	var count = 2
-	if difficulty >= 0.5:
-		count = 3
-	
-	var elite_id = elite_pool[randi() % elite_pool.size()]
-	enemies.append(DataManager.get_enemy_resource(elite_id))
-	
-	for i in range(count - 1):
-		var support_id = support_pool[randi() % support_pool.size()]
-		enemies.append(DataManager.get_enemy_resource(support_id))
-	
-	if floor_level >= 4 and difficulty >= 0.7:
-		var second_elite = elite_pool[randi() % elite_pool.size()]
-		if enemies.size() > 1:
-			enemies[1] = DataManager.get_enemy_resource(second_elite)
-	
-	if floor_level >= 6 and difficulty >= 0.8:
-		var extra = support_pool[randi() % support_pool.size()]
-		enemies.append(DataManager.get_enemy_resource(extra))
-	
-	return enemies
+	return result

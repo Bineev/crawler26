@@ -278,18 +278,27 @@ func get_art_background_color(use_light: bool = false) -> Color:
 
 func generate_dynamic_description() -> String:
 	var desc_parts: Array[String] = []
+	var lang = TranslationServer.get_locale()
 	
 	for effect in effects:
 		var effect_desc = _effect_to_string(effect)
 		if not effect_desc.is_empty():
+			# 🆕 Обрабатываем окончания только для RU и НЕ CUSTOM
+			if lang == "ru" and effect.category != DataManager.EffectCategory.CUSTOM:
+				effect_desc = _fix_russian_endings(effect_desc)
 			desc_parts.append(effect_desc)
 	
 	if desc_parts.is_empty():
 		return tr("card_no_effect_description")
 	
-	# 🆕 Пост-парсинг: объединяем и чистим
 	var full_desc = "\n".join(desc_parts)
+	
+	# 🆕 Пост-обработка всего описания (удаление лишних точек)
 	full_desc = _post_process_description(full_desc)
+	
+	# 🆕 Добавляем информацию о сжигании, если карта сгораемая
+	if is_burned:
+		full_desc += "\n" + tr("card_is_burned")
 	
 	return full_desc
 
@@ -510,23 +519,8 @@ func _get_condition_name(condition_script: Script) -> String:
 
 
 func _post_process_description(desc: String) -> String:
-	var lang = TranslationServer.get_locale()
-	
-	match lang:
-		"ru":
-			# 🆕 Заменяем 2+ точек подряд на 1 точку
-			desc = _fix_multiple_dots(desc)
-			
-			# Исправляем окончания
-			desc = _fix_russian_endings(desc)
-		
-		"en":
-			desc = _fix_multiple_dots(desc)
-
-	# 🆕 Добавляем информацию о сжигании, если карта сгораемая
-	if is_burned:
-		desc += "\n" + tr("card_is_burned")
-	
+	# 🆕 Только удаляем лишние точки
+	desc = _fix_multiple_dots(desc)
 	return desc
 
 

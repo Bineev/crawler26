@@ -999,29 +999,6 @@ const EVENT_LABEL_SIZE: Vector2 = Vector2(700, 0)
 ## НАСТРОЙКИ ПОДБОРА ВРАГОВ
 ## ============================================================
 
-# Сложность (прогресс на этаже)
-const DIFFICULTY_MAX_PROGRESS: int = 10  # максимальный прогресс для фактора сложности
-
-# Пороги сложности для обычных боёв
-const NORMAL_DIFFICULTY_EARLY: float = 0.2   # 0-20% - начало этажа
-const NORMAL_DIFFICULTY_MID: float = 0.5     # 20-50% - середина этажа
-const NORMAL_DIFFICULTY_LATE: float = 0.8    # 50-80% - поздний этаж
-
-# Пороги сложности для элитных боёв
-const ELITE_DIFFICULTY_EARLY: float = 0.3    # 0-30% - начало этажа
-const ELITE_DIFFICULTY_LATE: float = 0.7     # 30-70% - середина
-
-# Количество врагов в обычных боях
-const NORMAL_ENEMY_COUNT_EARLY: int = 1      # первая комната
-const NORMAL_ENEMY_COUNT_MID: int = 2        # середина
-const NORMAL_ENEMY_COUNT_LATE_MIN: int = 2   # минимум в поздней
-const NORMAL_ENEMY_COUNT_LATE_MAX: int = 3   # максимум в поздней
-
-# Количество врагов в элитных боях
-const ELITE_ENEMY_COUNT_EARLY: int = 1       # начало
-const ELITE_ENEMY_COUNT_MID: int = 2         # середина
-const ELITE_ENEMY_COUNT_LATE: int = 2        # конец
-
 const CONSECUTIVE_BATTLES_COUNT: int = 2
 const SHOPS_ON_FLOOR_COUNT: int = 1
 const EVENTS_ON_FLOOR_COUNT: int = 2
