@@ -588,7 +588,6 @@ func _unlock_character_cards(character_class: DataManager.CharacterClass, level:
 		if not is_card_unlocked(card_id):
 			unlocked_card_ids.append(card_id)
 			unlocked.append(card_id)
-			SignalManager.log_message.emit("Открыта карта: %s" % DataManager.get_card(card_id).get_localized_name())
 	
 	return unlocked
 
@@ -681,7 +680,8 @@ func load_events_for_biome(biome: DataManager.Biome) -> void:
 	all_events.append_array(general_events_cache)
 	
 	# 4. Перемешиваем и сохраняем
-	all_events.shuffle()
+	# BUG разкоментировать, когда добавим общие эвенты
+	#all_events.shuffle()
 	available_events = all_events
 	
 	events_loaded = true
@@ -720,6 +720,7 @@ func _refill_events(biome: DataManager.Biome) -> void:
 		load_events_for_biome(biome)
 		return
 	
-	all_events.shuffle()
+	# BUG раскоментировать, когда добавим общие эвенты
+	#all_events.shuffle()
 	available_events = all_events
 	print("Events refilled: ", available_events.size(), " events available")

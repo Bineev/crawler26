@@ -80,9 +80,9 @@ func animate() -> void:
 	var tween = create_tween()
 	tween.set_parallel(true)
 	tween.tween_property(icon, "scale", Vector2(1.5, 1.5), 0.15).set_ease(Tween.EASE_OUT)
-	tween.tween_property(icon, "position", icon.position + Vector2(0, -5), 0.15).set_ease(Tween.EASE_OUT)
+	tween.tween_property(icon, "position", Vector2(0, -5), 0.15).as_relative().set_ease(Tween.EASE_OUT)
 	tween.tween_property(icon, "scale", Vector2(1, 1), 0.15).set_delay(0.15).set_ease(Tween.EASE_IN)
-	tween.tween_property(icon, "position", icon.position - Vector2(0, -5), 0.15).set_delay(0.15).set_ease(Tween.EASE_IN)
+	tween.tween_property(icon, "position", Vector2(0, 0), 0.15).as_relative().set_delay(0.15).set_ease(Tween.EASE_IN)
 
 
 func _on_artifact_counter_changed(artifact_id: DataManager.ArtifactId, counter: int) -> void:

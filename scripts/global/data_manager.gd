@@ -2365,7 +2365,7 @@ func get_artifact_description(artifact_id: ArtifactId) -> String:
 			if artifact:
 				return tr("artifact_dragon_brooch_desc") % [
 					artifact.amount_check_conditional,  # процент здоровья
-					artifact.effects[0].passive.starting_charges if artifact.effects.size() > 0 and artifact.effects[0].passive else 3
+					artifact.effects[0].passive_duration if artifact.effects.size() > 0 and artifact.effects[0].passive else 3
 				]
 			return tr("artifact_dragon_brooch_desc") % [50, 3]  # fallback
 		ArtifactId.RUSTY_NAIL:

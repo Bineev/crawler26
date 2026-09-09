@@ -743,12 +743,8 @@ func _generate_all_segments() -> void:
 		# Устанавливаем видимость комнат
 		for path in segment_paths:
 			for i in range(path.size()):
-				if seg_idx == 0:
-					# Первый сегмент — все комнаты видны
-					path[i].is_revealed = true
-				else:
-					# Остальные — часть скрыта
-					path[i].is_revealed = (i < DataManager.FLOOR_VISIBLE_ROOMS - randi_range(0, 2))
+				path[i].is_revealed = true
+
 		
 		all_paths.append(segment_paths)
 	

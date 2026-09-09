@@ -46,11 +46,23 @@ func _input(event: InputEvent):
 		# Проверяем, не в процессе ли анимации меню
 		if _is_main_menu_animating():
 			return
+			
+		# 🆕 Проверяем, не открыта ли панель выбора пути
+		if _is_choice_panel_open():
+			return
 		
 		if settings_menu_is_open():
 			close_options()
 		else:
 			_on_settings_requested()
+
+
+func _is_choice_panel_open() -> bool:
+	var game_world = $SubViewportContainer/SubViewport/GameWorld
+	for child in game_world.get_children():
+		if child is ChoicePanel:
+			return true
+	return false
 
 
 func _on_load_game_requested():
