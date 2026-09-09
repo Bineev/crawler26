@@ -15,6 +15,7 @@ var concrete_artifact_id: DataManager.ArtifactId
 var concrete_card_id: DataManager.CardId
 var concrete_enemy: DataManager.EnemyId
 var selected_card: CardData = null
+var upgraded_card: CardData = null
 var preview_container : CenterContainer = null
 var transform_attempts: int = 0
 var max_transform_attempts: int = 3
@@ -325,6 +326,7 @@ func _on_item_selected(index: int) -> void:
 
 
 func _apply_reward(index: int) -> void:
+	# BUG когда получаем награду GET_CONCRETE_STATUS
 	var selected_item = rewards[index]
 	
 	match reward_type:
@@ -892,9 +894,8 @@ func _on_upgrade_confirm() -> void:
 	if not selected_card:
 		return
 	
-	# 🆕 Создаём копию карты с улучшением
-	var upgraded_card = selected_card.duplicate_for_instance()
-	_apply_upgrade_to_card(upgraded_card)
+	## 🆕 Используем существующую функцию для создания улучшенной копии
+	#var upgraded_card = _get_upgraded_card_copy(selected_card)
 	
 	# 🆕 Заменяем оригинальную карту в мастер-колоде
 	var master_cards = RunManager.get_player_deck().master_cards
@@ -924,7 +925,7 @@ func _on_card_wrapper_clicked(event: InputEvent, original_card: CardData, card_d
 			child.queue_free()
 
 		# 🆕 Показываем улучшенную версию карты
-		var upgraded_card = _get_upgraded_card_copy(card_data)
+		upgraded_card = _get_upgraded_card_copy(card_data)
 		
 		var card_ui = preload("res://scenes/card.tscn").instantiate() as CardUI
 		card_ui.card_data = upgraded_card

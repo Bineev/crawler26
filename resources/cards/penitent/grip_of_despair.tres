@@ -18,7 +18,6 @@ cost_grade = 4
 name_key = "card_grip_of_despair_name"
 description_key = "card_grip_of_despair_desc"
 grade = 2
-cost = 2
 effects = Array[ExtResource("1_vlpc7")]([SubResource("Resource_wfr7f")])
 manual_card_types = Array[int]([0, 5])
 metadata/_custom_type_script = "uid://badcs22cck6n5"

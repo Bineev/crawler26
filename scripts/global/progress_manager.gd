@@ -6,17 +6,9 @@ extends Node
 ## ЭВЕНТЫ
 ## ============================================================
 
-## Кэш эвентов для каждого биома (загруженные из ресурсов)
-var biome_events_cache: Dictionary = {}  # Biome -> Array[EventResource]
-
-## Доступные эвенты для каждого биома (оставшиеся)
 var available_events_per_biome: Dictionary = {}  # Biome -> Array[EventResource]
-
-## Общие эвенты (без привязки к биому)
-var general_events_cache: Array[EventResource] = []
-
-## Флаг, что общие эвенты загружены
-var general_events_loaded: bool = false
+var available_events_general: Array[EventResource] = []
+var is_events_loaded: bool = false
 ## ============================================================
 ## ПРОГРЕСС ПЕРСОНАЖА (общий, накапливается)
 ## ============================================================
@@ -655,78 +647,47 @@ func get_run_progress() -> Dictionary:
 	}
 
 
-func load_events_for_biome(biome: DataManager.Biome) -> void:
-	DataManager.load_event_resources()
-	
-	# Проверяем, загружены ли эвенты для этого биома
-	if biome_events_cache.has(biome):
+func load_all_events() -> void:
+	if is_events_loaded:
 		return
 	
-	var biome_events = DataManager.get_all_events_for_biome(biome).duplicate()
-	biome_events.shuffle()
-	biome_events_cache[biome] = biome_events
-	available_events_per_biome[biome] = biome_events.duplicate()
+	DataManager.load_event_resources()
 	
-	print("Events loaded for biome: ", DataManager.get_biome_name(biome), " (", available_events_per_biome[biome].size(), " available)")
+	# Загружаем эвенты для всех биомов
+	for biome in DataManager.Biome.values():
+		var events = DataManager.get_all_events_for_biome(biome)
+		if not events.is_empty():
+			events.shuffle()
+			available_events_per_biome[biome] = events
+	
+	# Загружаем общие эвенты
+	var general_events = DataManager.get_general_events()
+	if not general_events.is_empty():
+		general_events.shuffle()
+		available_events_general = general_events
+	
+	is_events_loaded = true
+	print("All events loaded: ", available_events_per_biome.size(), " biomes, ", available_events_general.size(), " general events")
 
 
 func get_next_event(biome: DataManager.Biome) -> EventResource:
-	# Загружаем общие эвенты (если не загружены)
-	if not general_events_loaded:
-		load_general_events()
+	# Загружаем эвенты, если не загружены
+	if not is_events_loaded:
+		load_all_events()
 	
-	# Загружаем эвенты для биома (если не загружены)
-	if not biome_events_cache.has(biome):
-		load_events_for_biome(biome)
-	
-	# Сначала выдаём эвенты биома
+	# 1. Сначала эвенты биома
 	var biome_events = available_events_per_biome.get(biome, [])
 	if not biome_events.is_empty():
 		var event = biome_events.pop_front()
 		print("Event from biome: ", event.get_localized_name(), " (", biome_events.size(), " remaining)")
 		return event
 	
-	# Если эвенты биома закончились — выдаём общие
-	if not general_events_cache.is_empty():
-		var event = general_events_cache.pop_front()
-		print("Event from general pool: ", event.get_localized_name(), " (", general_events_cache.size(), " remaining)")
+	# 2. Потом общие эвенты
+	if not available_events_general.is_empty():
+		var event = available_events_general.pop_front()
+		print("Event from general pool: ", event.get_localized_name(), " (", available_events_general.size(), " remaining)")
 		return event
 	
-	# Если всё закончилось — перезаполняем
-	_refill_events(biome)
-	return get_next_event(biome)
-
-
-func _refill_events(biome: DataManager.Biome) -> void:
-	# Перезаполняем эвенты биома
-	if biome_events_cache.has(biome):
-		var refilled = biome_events_cache[biome].duplicate()
-		refilled.shuffle()
-		available_events_per_biome[biome] = refilled
-		print("Biome events refilled: ", biome, " (", refilled.size(), " available)")
-	
-	# Перезаполняем общие эвенты
-	if not general_events_cache.is_empty():
-		var refilled = general_events_cache.duplicate()
-		refilled.shuffle()
-		general_events_cache = refilled
-		print("General events refilled: ", general_events_cache.size(), " available")
-
-
-func load_general_events() -> void:
-	if general_events_loaded:
-		return
-	
-	DataManager.load_event_resources()
-	general_events_cache = DataManager.get_general_events().duplicate()
-	general_events_cache.shuffle()
-	general_events_loaded = true
-	print("General events loaded: ", general_events_cache.size())
-
-
-func reset_events_state() -> void:
-	available_events_per_biome.clear()
-	biome_events_cache.clear()
-	general_events_cache.clear()
-	general_events_loaded = false
-	print("All events state reset")
+	# 3. Если всё закончилось — перезагружаем
+	is_events_loaded = false
+	return get_next_event(biome)  # ← просто вызываем себя заново
