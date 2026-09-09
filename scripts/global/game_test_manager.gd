@@ -110,7 +110,9 @@ func start_new_biome() -> void:
 	current_room_index = 0
 	# Очищаем этаж
 	_reset_game_state()
-	
+
+	## 🆕 Сбрасываем эвенты при переходе на новый биом
+	#ProgressManager.reset_events_state()
 	# 🆕 Сбрасываем FloorManager
 	FloorManager.reset()
 	

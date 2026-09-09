@@ -111,9 +111,10 @@ func _collect_progress_data() -> Dictionary:
 		"run_start_biome_level": ProgressManager.run_start_biome_level.duplicate(),
 
 		# ============================================================
-		# 🆕 ПРОГРЕСС ЭВЕНТОВ
+		# 🆕 ПРОГРЕСС ЭВЕНТОВ (новая структура)
 		# ============================================================
-		"available_events": _collect_available_events(),
+		"general_events_cache": _collect_general_events(),
+		"biome_events_cache": _collect_biome_events_cache(),
 	}
 
 
@@ -544,18 +545,36 @@ func restore_progress(progress_data: Dictionary) -> void:
 		ProgressManager.run_start_biome_level[int(key)] = int(run_biome_lvl[key])
 
 	# ============================================================
-	# 🆕 ПРОГРЕСС ЭВЕНТОВ
+	# 🆕 ПРОГРЕСС ЭВЕНТОВ (новая структура)
 	# ============================================================
-	ProgressManager.available_events.clear()
-	var event_paths = progress_data.get("available_events", [])
-	for path in event_paths:
+	
+	# Восстанавливаем общие эвенты
+	ProgressManager.general_events_cache.clear()
+	var general_paths = progress_data.get("general_events_cache", [])
+	for path in general_paths:
 		var event = load(path)
 		if event and event is EventResource:
-			ProgressManager.available_events.append(event)
+			ProgressManager.general_events_cache.append(event)
+	ProgressManager.general_events_loaded = not ProgressManager.general_events_cache.is_empty()
 	
-	# Если есть сохранённые эвенты — помечаем, что они загружены
-	if not ProgressManager.available_events.is_empty():
-		ProgressManager.events_loaded = true
+	# Восстанавливаем эвенты биомов
+	ProgressManager.biome_events_cache.clear()
+	ProgressManager.available_events_per_biome.clear()
+	
+	var biome_events_data = progress_data.get("biome_events_cache", {})
+	for biome_key in biome_events_data.keys():
+		var biome = int(biome_key)
+		var paths = biome_events_data[biome_key]
+		
+		var events: Array[EventResource] = []
+		for path in paths:
+			var event = load(path)
+			if event and event is EventResource:
+				events.append(event)
+		
+		ProgressManager.biome_events_cache[biome] = events
+		# Начальный пул доступных эвентов — это копия кэша
+		ProgressManager.available_events_per_biome[biome] = events.duplicate()
 
 
 func restore_run_manager(run_data: Dictionary) -> void:
@@ -898,3 +917,20 @@ func _restore_effect(effect_entry: Dictionary) -> EffectEntry:
 				effect.false_effect = _restore_effect(false_effect_data)
 	
 	return effect
+
+
+func _collect_general_events() -> Array:
+	var result: Array = []
+	for event in ProgressManager.general_events_cache:
+		result.append(event.resource_path)
+	return result
+
+
+func _collect_biome_events_cache() -> Dictionary:
+	var result: Dictionary = {}
+	for biome in ProgressManager.biome_events_cache.keys():
+		var paths: Array = []
+		for event in ProgressManager.biome_events_cache[biome]:
+			paths.append(event.resource_path)
+		result[biome] = paths
+	return result
