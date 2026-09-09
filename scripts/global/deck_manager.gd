@@ -6,6 +6,13 @@ var cards_by_biome: Dictionary = {}  # Biome -> Array[CardId]
 ## Словарь карт по персонажам
 var cards_by_character: Dictionary = {}  # CharacterClass -> Array[CardId]
 
+const REWARD_BANNED_CARDS: Array[DataManager.CardId] = [
+	DataManager.CardId.ATONEMENT_STRIKE,
+	DataManager.CardId.SINFUL_STRIKE,
+	DataManager.CardId.ATONEMENT_BARRIER,
+]
+
+
 func _ready():
 	_load_cards_data()
 
@@ -75,11 +82,60 @@ func get_cards_by_biome(biome: DataManager.Biome, room_progress: int = 0, floor_
 	if pool.is_empty():
 		return result
 	
-	var shuffled = pool.duplicate()
-	shuffled.shuffle()
+	# 🆕 Получаем ID карт, которые уже есть у игрока
+	var existing_ids: Array[DataManager.CardId] = []
+	var deck = RunManager.get_player_deck()
+	if deck:
+		for card in deck.master_cards:
+			existing_ids.append(card.id)
 	
-	for i in range(min(amount, shuffled.size())):
-		result.append(DataManager.get_card(shuffled[i]))
+	# 🆕 Собираем карты с весами
+	var weighted_pool: Array[Dictionary] = []
+	for card_id in pool:
+		var weight = 4  # высокий вес для новых карт
+		if card_id in existing_ids:
+			weight = 1  # низкий вес для уже имеющихся
+		weighted_pool.append({
+			"id": card_id,
+			"weight": weight
+		})
+	
+	# 🆕 Выбираем карты с учётом весов
+	var total_weight = 0
+	for entry in weighted_pool:
+		total_weight += entry["weight"]
+	
+	var selected_ids: Array[DataManager.CardId] = []
+	var attempts = 0
+	var max_attempts = amount * 10
+	
+	while selected_ids.size() < amount and attempts < max_attempts:
+		attempts += 1
+		
+		var roll = randi() % total_weight
+		var accumulated = 0
+		var selected_entry: Dictionary = {}
+		
+		for entry in weighted_pool:
+			accumulated += entry["weight"]
+			if roll < accumulated:
+				selected_entry = entry
+				break
+		
+		if selected_entry.is_empty():
+			continue
+		
+		var selected_id = selected_entry["id"]
+		if selected_id not in selected_ids:
+			selected_ids.append(selected_id)
+			result.append(DataManager.get_card(selected_id))
+	
+	# Если всё ещё не хватает — добираем случайными
+	while selected_ids.size() < amount:
+		var random_id = pool[randi() % pool.size()]
+		if random_id not in selected_ids:
+			selected_ids.append(random_id)
+			result.append(DataManager.get_card(random_id))
 	
 	return result
 
@@ -90,11 +146,69 @@ func get_cards_by_character(character: DataManager.CharacterClass, room_progress
 	if pool.is_empty():
 		return result
 	
-	var shuffled = pool.duplicate()
-	shuffled.shuffle()
+	# 🆕 Фильтруем запрещённые карты (стартовые)
+	var filtered_pool: Array[DataManager.CardId] = []
+	for card_id in pool:
+		if card_id not in REWARD_BANNED_CARDS:
+			filtered_pool.append(card_id)
 	
-	for i in range(min(amount, shuffled.size())):
-		result.append(DataManager.get_card(shuffled[i]))
+	if filtered_pool.is_empty():
+		return result
+	
+	# 🆕 Получаем ID карт, которые уже есть у игрока
+	var existing_ids: Array[DataManager.CardId] = []
+	var deck = RunManager.get_player_deck()
+	if deck:
+		for card in deck.master_cards:
+			existing_ids.append(card.id)
+	
+	# 🆕 Собираем карты с весами
+	var weighted_pool: Array[Dictionary] = []
+	for card_id in filtered_pool:
+		var weight = 4  # высокий вес для новых карт
+		if card_id in existing_ids:
+			weight = 1  # низкий вес для уже имеющихся
+		weighted_pool.append({
+			"id": card_id,
+			"weight": weight
+		})
+	
+	# 🆕 Выбираем карты с учётом весов
+	var total_weight = 0
+	for entry in weighted_pool:
+		total_weight += entry["weight"]
+	
+	var selected_ids: Array[DataManager.CardId] = []
+	var attempts = 0
+	var max_attempts = amount * 10
+	
+	while selected_ids.size() < amount and attempts < max_attempts:
+		attempts += 1
+		
+		var roll = randi() % total_weight
+		var accumulated = 0
+		var selected_entry: Dictionary = {}
+		
+		for entry in weighted_pool:
+			accumulated += entry["weight"]
+			if roll < accumulated:
+				selected_entry = entry
+				break
+		
+		if selected_entry.is_empty():
+			continue
+		
+		var selected_id = selected_entry["id"]
+		if selected_id not in selected_ids:
+			selected_ids.append(selected_id)
+			result.append(DataManager.get_card(selected_id))
+	
+	# Если всё ещё не хватает — добираем случайными
+	while selected_ids.size() < amount:
+		var random_id = filtered_pool[randi() % filtered_pool.size()]
+		if random_id not in selected_ids:
+			selected_ids.append(random_id)
+			result.append(DataManager.get_card(random_id))
 	
 	return result
 
