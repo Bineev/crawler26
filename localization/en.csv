@@ -835,8 +835,8 @@ upgrade_card_confirm,Upgrade
 
 
 "card_scorched_earth_name","Scorched Earth"
-"card_scorched_earth_desc","Burns all statuses in the room. Applies Burn stacks equal to burned statuses ×2 to the target."
-"effect_scorched_earth","Burns all statuses in the room. Applies Burn stacks equal to burned statuses ×2 to the target."
+"card_scorched_earth_desc","Burns all statuses in the room. Applies Burn stacks equal to burned statuses ×3 to the target."
+"effect_scorched_earth","Burns all statuses in the room. Applies Burn stacks equal to burned statuses ×3 to the target."
 "card_siege_barrel_name","Siege Barrel"
 "card_siege_barrel_desc","Applies Resin to the target for 2 turns."
 "effect_siege_barrel","Applies Resin to the target for 2 turns."

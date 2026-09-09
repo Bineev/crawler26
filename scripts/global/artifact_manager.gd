@@ -19,15 +19,22 @@ func get_random_artifact(grade: DataManager.ArtifactGrade) -> ArtifactResource:
 	if pool.is_empty():
 		return null
 	
-	# 🆕 Фильтруем — убираем артефакты, которые уже есть у игрока
+	# 🆕 Фильтруем — убираем артефакты, помеченные как event_only
 	var existing_ids: Array[DataManager.ArtifactId] = []
 	for artifact in RunManager.artifacts:
 		existing_ids.append(artifact.id)
 	
 	var filtered: Array[DataManager.ArtifactId] = []
 	for artifact_id in pool:
-		if artifact_id not in existing_ids:
-			filtered.append(artifact_id)
+		if artifact_id in existing_ids:
+			continue
+		
+		# 🆕 Проверяем, не является ли артефакт event_only
+		var resource = DataManager.get_artifact_resource(artifact_id)
+		if resource and resource.is_event_only:
+			continue
+		
+		filtered.append(artifact_id)
 	
 	if filtered.is_empty():
 		return null
@@ -42,11 +49,21 @@ func get_random_artifacts(grade: DataManager.ArtifactGrade, amount: int) -> Arra
 	if pool.is_empty():
 		return result
 	
-	var shuffled = pool.duplicate()
-	shuffled.shuffle()
+	# 🆕 Фильтруем event_only артефакты
+	var filtered: Array[DataManager.ArtifactId] = []
+	for artifact_id in pool:
+		var resource = DataManager.get_artifact_resource(artifact_id)
+		if resource and resource.is_event_only:
+			continue
+		filtered.append(artifact_id)
 	
-	for i in range(min(amount, shuffled.size())):
-		var resource = DataManager.get_artifact_resource(shuffled[i])
+	if filtered.is_empty():
+		return result
+	
+	filtered.shuffle()
+	
+	for i in range(min(amount, filtered.size())):
+		var resource = DataManager.get_artifact_resource(filtered[i])
 		if resource:
 			result.append(resource)
 	

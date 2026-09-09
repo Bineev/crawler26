@@ -143,7 +143,8 @@ func start_new_biome() -> void:
 		for potion in DataManager.get_random_potions(1):
 			RunManager.add_potion(potion)
 		
-	
+	# BUG for test
+	RunManager.add_artifact(DataManager.get_artifact_resource(DataManager.ArtifactId.BRASS_CANDLESTICK))
 	# Запускаем этаж
 	FloorManager.start_floor()
 

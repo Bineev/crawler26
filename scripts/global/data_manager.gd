@@ -2525,17 +2525,65 @@ func get_random_effect_from_pool(categories: Array) -> EffectEntry:
 		DataManager.EffectCategory.HEAL:
 			effect.base_value = randi() % 3 + 2  # 2-4
 		DataManager.EffectCategory.APPLY_STATUS:
+			# Расширенный список статусов
 			var statuses = [
 				DataManager.Status.POISON,
 				DataManager.Status.BLEED,
+				DataManager.Status.BURN,
+				DataManager.Status.COLD,
 				DataManager.Status.WEAKNESS,
 				DataManager.Status.VULNERABILITY,
+				DataManager.Status.RESIN,
+				DataManager.Status.COMBUSTIBLE,
+				DataManager.Status.FRACTURE,
 			]
 			var status_id = statuses[randi() % statuses.size()]
 			effect.status = DataManager.get_status_resource(status_id)
-			effect.value = randi() % 3 + 1  # 1-3
-			effect.duration = randi() % 3 + 2  # 2-4
 			effect.target = DataManager.EffectTarget.ENEMY
+			
+			# Устанавливаем value и duration в зависимости от статуса
+			match status_id:
+				# Статусы с value = 1 (всегда 1 стак, стакаются по длительности)
+				DataManager.Status.POISON:
+					effect.value = 1
+					effect.duration = randi() % 3 + 2  # 2-4
+				
+				DataManager.Status.WEAKNESS:
+					effect.value = 1
+					effect.duration = randi() % 2 + 1  # 1-2
+				
+				DataManager.Status.VULNERABILITY:
+					effect.value = 1
+					effect.duration = randi() % 2 + 1  # 1-2
+				
+				DataManager.Status.RESIN:
+					effect.value = 1
+					effect.duration = randi() % 2 + 2  # 2-3
+				
+				DataManager.Status.COMBUSTIBLE:
+					effect.value = 1
+					effect.duration = randi() % 2 + 2  # 2-3
+				
+				DataManager.Status.FRACTURE:
+					effect.value = 1
+					effect.duration = randi() % 2 + 2  # 2-3
+				
+				# Статусы, которые стакаются по стакам
+				DataManager.Status.BLEED:
+					effect.value = randi() % 2 + 1  # 1-2
+					effect.duration = randi() % 3 + 2  # 2-4
+				
+				DataManager.Status.BURN:
+					effect.value = randi() % 4 + 3  # 3-6
+					effect.duration = randi() % 2 + 2  # 2-3
+				
+				DataManager.Status.COLD:
+					effect.value = randi() % 6 + 5  # 5-10
+					effect.duration = randi() % 3 + 2  # 2-4
+				
+				_:
+					effect.value = 1
+					effect.duration = randi() % 3 + 2  # 2-4
 		DataManager.EffectCategory.DRAW_CARD:
 			effect.amount = randi() % 2 + 1  # 1-2
 		DataManager.EffectCategory.GAIN_ENERGY:

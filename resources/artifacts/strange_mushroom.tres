@@ -30,6 +30,7 @@ metadata/_custom_type_script = "uid://cmra25r1r3ivt"
 [resource]
 script = ExtResource("2_ct6h5")
 triggers = Array[int]([0, 3, 0])
+is_event_only = true
 name_key = "artifact_strange_mushroom_name"
 description_key = "artifact_strange_mushroom_desc"
 lore_key = "artifact_strange_mushroom_lore"

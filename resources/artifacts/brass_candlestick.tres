@@ -18,6 +18,7 @@ script = ExtResource("2_htixf")
 id = 17
 cost_grade = 5
 triggers = Array[int]([3])
+is_event_only = true
 name_key = "artifact_brass_candlestick_name"
 description_key = "artifact_brass_candlestick_desc"
 lore_key = "artifact_brass_candlestick_lore"

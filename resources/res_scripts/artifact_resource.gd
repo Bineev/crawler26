@@ -18,7 +18,8 @@ class_name ArtifactResource
 ## Тип срабатывания (может быть несколько)
 @export var triggers: Array[DataManager.ArtifactTrigger] = []
 
-
+## Если true — артефакт доступен ТОЛЬКО через события
+@export var is_event_only: bool = false
 ## ============================================================
 ## ЛОКАЛИЗАЦИЯ
 ## ============================================================
@@ -123,6 +124,7 @@ func duplicate_for_instance() -> ArtifactResource:
 	copy.tracked_status = tracked_status
 	copy.damage_threshold = damage_threshold
 	copy.attack_threshold = attack_threshold
+	copy.is_event_only = is_event_only  # 🆕
 	
 	for effect in effects:
 		copy.effects.append(effect.duplicate_for_instance())

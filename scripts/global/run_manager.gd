@@ -291,7 +291,9 @@ func _process_one_time_trigger(artifact: ArtifactResource) -> void:
 		# Проверяем, что есть эффект для этого триггера
 		if trigger_index < artifact.effects.size():
 			var effect = artifact.effects[trigger_index]
-			EffectExecutor.execute(effect, player, [player])
+			# 🆕 Определяем цели на основе эффекта
+			var targets = player._get_targets_for_effect(effect, player, [])
+			EffectExecutor.execute(effect, player, targets)
 			SignalManager.log_message.emit("Артефакт активирован (ONE_TIME): %s" % artifact.get_localized_name())
 			
 			# Удаляем триггер и эффект
@@ -341,7 +343,9 @@ func process_artifacts_on_start_fight() -> void:
 			if artifact.triggers[i] == DataManager.ArtifactTrigger.ON_START_FIGHT:
 				if i < artifact.effects.size():
 					var effect = artifact.effects[i]
-					EffectExecutor.execute(effect, player, [player])
+					# 🆕 Определяем цели на основе эффекта
+					var targets = player._get_targets_for_effect(effect, player, [])
+					EffectExecutor.execute(effect, player, targets)
 					SignalManager.log_message.emit("Артефакт сработал в начале боя: %s" % artifact.get_localized_name())
 					SignalManager.artifact_triggered.emit(artifact)
 
@@ -378,7 +382,9 @@ func process_artifacts_on_turn_start() -> void:
 		if counter == artifact.trigger_count:
 			if trigger_index < artifact.effects.size():
 				var effect = artifact.effects[trigger_index]
-				EffectExecutor.execute(effect, player, [player])
+				# 🆕 Определяем цели на основе эффекта
+				var targets = player._get_targets_for_effect(effect, player, [])
+				EffectExecutor.execute(effect, player, targets)
 				SignalManager.log_message.emit("Артефакт сработал: %s" % artifact.get_localized_name())
 				SignalManager.artifact_triggered.emit(artifact)
 
@@ -407,7 +413,9 @@ func process_artifacts_on_turn_end() -> void:
 			# Выполняем эффект
 			if trigger_index < artifact.effects.size():
 				var effect = artifact.effects[trigger_index]
-				EffectExecutor.execute(effect, player, [player])
+				# 🆕 Определяем цели на основе эффекта
+				var targets = player._get_targets_for_effect(effect, player, [])
+				EffectExecutor.execute(effect, player, targets)
 				SignalManager.log_message.emit("Артефакт сработал: %s" % artifact.get_localized_name())
 				SignalManager.artifact_triggered.emit(artifact)
 
@@ -438,7 +446,9 @@ func process_artifacts_on_card_played(card_data: CardData) -> void:
 		if counter == artifact.card_count_threshold:
 			if trigger_index < artifact.effects.size():
 				var effect = artifact.effects[trigger_index]
-				EffectExecutor.execute(effect, player, [player])
+				# 🆕 Определяем цели на основе эффекта
+				var targets = player._get_targets_for_effect(effect, player, [])
+				EffectExecutor.execute(effect, player, targets)
 				SignalManager.log_message.emit("Артефакт сработал: %s" % artifact.get_localized_name())
 				SignalManager.artifact_triggered.emit(artifact)
 
@@ -458,7 +468,9 @@ func _process_custom_trigger(artifact: ArtifactResource) -> void:
 			if custom_instance.has_method("apply"):
 				var player = BattleManager.get_player()
 				if player:
-					custom_instance.apply(effect, player, [player], {}, null)
+					# 🆕 Определяем цели на основе эффекта
+					var targets = player._get_targets_for_effect(effect, player, [])
+					custom_instance.apply(effect, player, targets, {}, null)
 					SignalManager.log_message.emit("Артефакт активирован (CUSTOM): %s" % artifact.get_localized_name())
 			else:
 				printerr("CUSTOM script missing 'apply' method: ", effect.custom_script.resource_path)
@@ -505,7 +517,9 @@ func process_health_dropped_below(health_before: int, health_after: int, percent
 		
 		# Выполняем эффект
 		var effect = artifact.effects[trigger_index]
-		EffectExecutor.execute(effect, player, [player])
+		# 🆕 Определяем цели на основе эффекта
+		var targets = player._get_targets_for_effect(effect, player, [])
+		EffectExecutor.execute(effect, player, targets)
 		SignalManager.log_message.emit("Артефакт сработал (здоровье упало ниже): %s" % artifact.get_localized_name())
 		SignalManager.artifact_triggered.emit(artifact)
 		
@@ -777,7 +791,9 @@ func process_artifact_on_status_applied_to_enemy(status_id: DataManager.Status, 
 		
 		if trigger_index < artifact.effects.size():
 			var effect = artifact.effects[trigger_index]
-			EffectExecutor.execute(effect, player, [player])
+				# 🆕 Определяем цели на основе эффекта
+			var targets = player._get_targets_for_effect(effect, player, [])
+			EffectExecutor.execute(effect, player, targets)
 			SignalManager.log_message.emit("Артефакт сработал при наложении статуса: %s" % artifact.get_localized_name())
 			SignalManager.artifact_triggered.emit(artifact)
 			
@@ -801,7 +817,9 @@ func process_artifact_on_attack_threshold(player: CharacterStats) -> void:
 		
 		if trigger_index < artifact.effects.size():
 			var effect = artifact.effects[trigger_index]
-			EffectExecutor.execute(effect, player, [player])
+			# 🆕 Определяем цели на основе эффекта
+			var targets = player._get_targets_for_effect(effect, player, [])
+			EffectExecutor.execute(effect, player, targets)
 			SignalManager.log_message.emit("Артефакт сработал: %s" % artifact.get_localized_name())
 			SignalManager.artifact_triggered.emit(artifact)
 			
@@ -825,7 +843,9 @@ func process_artifact_on_damage_threshold(damage_taken: int) -> void:
 		
 		if trigger_index < artifact.effects.size():
 			var effect = artifact.effects[trigger_index]
-			EffectExecutor.execute(effect, player, [player])
+			# 🆕 Определяем цели на основе эффекта
+			var targets = player._get_targets_for_effect(effect, player, [])
+			EffectExecutor.execute(effect, player, targets)
 			SignalManager.log_message.emit("Артефакт сработал: %s" % artifact.get_localized_name())
 			SignalManager.artifact_triggered.emit(artifact)
 			

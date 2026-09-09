@@ -800,7 +800,8 @@ func process_end_of_turn():
 ## ============================================================
 ## ВЗРЫВ ГОРЕНИЯ
 ## ============================================================
-
+ 
+# BUG Cannot call method 'get_nodes_in_group' on a null value.
 func _trigger_burn_explosion(stacks: int):
 	var explosion_damage = stacks * DataManager.BURN_EXPLOSION_DAMAGE_PER_STACK
 	var enemies = get_tree().get_nodes_in_group("enemies")

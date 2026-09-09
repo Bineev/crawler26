@@ -32,4 +32,5 @@ name_key = "card_weak_spot_name"
 description_key = "card_weak_spot_desc"
 grade = 1
 effects = Array[ExtResource("1_h3rg7")]([SubResource("Resource_02832")])
+manual_status_icons = Array[int]([4])
 metadata/_custom_type_script = "uid://badcs22cck6n5"

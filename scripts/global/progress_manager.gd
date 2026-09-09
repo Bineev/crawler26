@@ -582,11 +582,12 @@ func _unlock_character_cards(character_class: DataManager.CharacterClass, level:
 	var unlocked: Array[DataManager.CardId] = []
 	var cards = character_unlock_cards.get(character_class, {}).get(level, [])
 	
+	# BUG
+	# Invalid call. Nonexistent function 'get_localized_name' in base 'Nil'.
 	for card_id in cards:
 		if not is_card_unlocked(card_id):
 			unlocked_card_ids.append(card_id)
 			unlocked.append(card_id)
-			print("🔓 Открыта карта персонажа: %s" % DataManager.get_card(card_id).get_localized_name())
 			SignalManager.log_message.emit("Открыта карта: %s" % DataManager.get_card(card_id).get_localized_name())
 	
 	return unlocked
