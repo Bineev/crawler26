@@ -190,6 +190,24 @@ enum ModifierStat {
 	BLEED_DAMAGE_MULTIPLIER,     # Умножает урон от Кровотечения
 }
 
+## ============================================================
+## ДЛЯ ГЕНЕРАЦИИ КОМНАТ
+## ============================================================
+
+enum RoomGenerationType {
+	COMBAT_NORMAL,
+	COMBAT_ELITE,
+	OBJECT_CHEST,
+	OBJECT_SHOP,
+	OBJECT_IDOL,
+	OBJECT_TRAP,
+	OBJECT_CAULDRON,
+	OBJECT_TORTURE_RACK,
+	OBJECT_BONFIRE,
+	OBJECT_EVENT,
+}
+
+
 enum PotionType {
 	HEAL,
 	ENERGY,

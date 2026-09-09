@@ -45,6 +45,34 @@ const PATTERNS_LAST = [
 	{ "pattern": ["combat", "combat", "bonfire"], "weight": 20 },
 	{ "pattern": ["combat", "elite", "bonfire"], "weight": 10 },
 ]
+
+
+# НОВОЕ ДЛЯ ГЕНЕРАЦИИ ПУТЕЙ - ПРЕДУСТАНОВЛЕННЫЕ ПУТИ
+const PRESET_PATHS: Array[Dictionary] = [
+	# Вариант 1
+	{
+		"path_a": [
+			# Сегмент 1
+			[DataManager.RoomGenerationType.OBJECT_TRAP, DataManager.RoomGenerationType.COMBAT_NORMAL, DataManager.RoomGenerationType.OBJECT_CHEST],
+			# Сегмент 2
+			[DataManager.RoomGenerationType.OBJECT_EVENT, DataManager.RoomGenerationType.COMBAT_NORMAL, DataManager.RoomGenerationType.OBJECT_SHOP],
+			# Сегмент 3
+			[DataManager.RoomGenerationType.COMBAT_NORMAL, DataManager.RoomGenerationType.OBJECT_CAULDRON, DataManager.RoomGenerationType.COMBAT_ELITE],
+			# Сегмент 4
+			[DataManager.RoomGenerationType.OBJECT_TRAP, DataManager.RoomGenerationType.COMBAT_NORMAL, DataManager.RoomGenerationType.OBJECT_BONFIRE],
+		],
+		"path_b": [
+			# Сегмент 1
+			[DataManager.RoomGenerationType.OBJECT_TORTURE_RACK, DataManager.RoomGenerationType.COMBAT_NORMAL, DataManager.RoomGenerationType.COMBAT_NORMAL],
+			# Сегмент 2
+			[DataManager.RoomGenerationType.COMBAT_NORMAL, DataManager.RoomGenerationType.COMBAT_NORMAL, DataManager.RoomGenerationType.OBJECT_BONFIRE],
+			# Сегмент 3
+			[DataManager.RoomGenerationType.COMBAT_NORMAL, DataManager.RoomGenerationType.COMBAT_ELITE, DataManager.RoomGenerationType.OBJECT_IDOL],
+			# Сегмент 4
+			[DataManager.RoomGenerationType.COMBAT_ELITE, DataManager.RoomGenerationType.OBJECT_EVENT, DataManager.RoomGenerationType.OBJECT_BONFIRE],
+		]
+	},
+]
 ## ============================================================
 ## ТОЧКА ВХОДА
 ## ============================================================
@@ -97,8 +125,11 @@ func generate_floor(floor_level: int, biome: DataManager.Biome):
 	_add_combat_room(DataManager.CombatType.NORMAL)
 	print("  Room 0: COMBAT (NORMAL)")
 	
-	# 🆕 Генерируем все сегменты сразу
-	_generate_all_segments()
+	# 🆕 Используем новую функцию
+	generate_all_segments_test()
+	
+	## 🆕 Генерируем все сегменты сразу
+	#_generate_all_segments()
 
 
 func _add_combat_room(combat_type: DataManager.CombatType):
@@ -793,3 +824,118 @@ func _shuffle_object_in_segment(segment: Array[RoomNode]) -> Array[RoomNode]:
 	result[new_pos] = temp
 	
 	return result
+
+
+# НОВАЯ ФУНКЦИЯ ГЕНЕРАЦИИ
+func generate_all_segments_test() -> void:
+	print("=== GENERATE ALL SEGMENTS TEST ===")
+	
+	var rooms_per_segment = DataManager.FLOOR_ROOMS_PER_PATH  # 3
+	var total_segments = DataManager.FLOOR_SEGMENTS_BEFORE_BOSS  # 4
+	var total_rooms_per_path = total_segments * rooms_per_segment  # 12
+	
+	# 1. Выбираем случайный вариант
+	var preset = PRESET_PATHS[randi() % PRESET_PATHS.size()]
+	var path_a_patterns = preset["path_a"]
+	var path_b_patterns = preset["path_b"]
+	
+	print("Selected preset: ", preset)
+	
+	var path1: Array[RoomNode]
+	var path2: Array[RoomNode]
+
+	# 🆕 Случайно меняем местами
+	if randf() < 0.5:
+		path1 = _build_path_from_preset(path_a_patterns)
+		path2 = _build_path_from_preset(path_b_patterns)
+	else:
+		path1 = _build_path_from_preset(path_b_patterns)
+		path2 = _build_path_from_preset(path_a_patterns)
+	
+	print("Path1 length: ", path1.size())
+	print("Path2 length: ", path2.size())
+	
+	# 3. Дополняем пути до нужной длины (если вдруг не хватает)
+	while path1.size() < total_rooms_per_path:
+		path1.append(_create_room_node(DataManager.RoomType.COMBAT, DataManager.CombatType.NORMAL))
+	while path2.size() < total_rooms_per_path:
+		path2.append(_create_room_node(DataManager.RoomType.COMBAT, DataManager.CombatType.NORMAL))
+	
+	# 4. Разбиваем на сегменты и сохраняем в all_paths
+	all_paths.clear()
+	for seg_idx in range(total_segments):
+		var start_idx = seg_idx * rooms_per_segment
+		var end_idx = start_idx + rooms_per_segment
+		
+		var segment_paths: Array[Array] = [
+			path1.slice(start_idx, end_idx),
+			path2.slice(start_idx, end_idx)
+		]
+		
+		# Устанавливаем видимость комнат (все видны)
+		for path in segment_paths:
+			for i in range(path.size()):
+				path[i].is_revealed = true
+		
+		all_paths.append(segment_paths)
+	
+	print("All paths generated: ", all_paths.size(), " segments")
+	
+	# Отладка: вывод паттернов по сегментам
+	for seg_idx in range(all_paths.size()):
+		print("Segment ", seg_idx, ":")
+		for path_idx in range(all_paths[seg_idx].size()):
+			var path = all_paths[seg_idx][path_idx]
+			var types = []
+			for room in path:
+				if room.room_type == DataManager.RoomType.COMBAT:
+					types.append("COMBAT" if room.combat_type == DataManager.CombatType.NORMAL else "ELITE")
+				else:
+					types.append("OBJECT")
+			print("  Path ", path_idx, ": ", types)
+
+
+func _build_path_from_preset(patterns: Array) -> Array[RoomNode]:
+	var path: Array[RoomNode] = []
+	
+	for segment in patterns:
+		for gen_type in segment:
+			var room_node: RoomNode
+			
+			match gen_type:
+				DataManager.RoomGenerationType.COMBAT_NORMAL:
+					room_node = _create_room_node(DataManager.RoomType.COMBAT, DataManager.CombatType.NORMAL)
+				
+				DataManager.RoomGenerationType.COMBAT_ELITE:
+					room_node = _create_room_node(DataManager.RoomType.COMBAT, DataManager.CombatType.ELITE)
+				
+				DataManager.RoomGenerationType.OBJECT_CHEST:
+					room_node = _create_room_node(DataManager.RoomType.OBJECT, DataManager.CombatType.NORMAL, DataManager.ObjectType.CHEST)
+				
+				DataManager.RoomGenerationType.OBJECT_SHOP:
+					room_node = _create_room_node(DataManager.RoomType.OBJECT, DataManager.CombatType.NORMAL, DataManager.ObjectType.SHOP)
+				
+				DataManager.RoomGenerationType.OBJECT_IDOL:
+					room_node = _create_room_node(DataManager.RoomType.OBJECT, DataManager.CombatType.NORMAL, DataManager.ObjectType.IDOL)
+				
+				DataManager.RoomGenerationType.OBJECT_TRAP:
+					room_node = _create_room_node(DataManager.RoomType.OBJECT, DataManager.CombatType.NORMAL, DataManager.ObjectType.TRAP)
+				
+				DataManager.RoomGenerationType.OBJECT_CAULDRON:
+					room_node = _create_room_node(DataManager.RoomType.OBJECT, DataManager.CombatType.NORMAL, DataManager.ObjectType.CAULDRON)
+				
+				DataManager.RoomGenerationType.OBJECT_TORTURE_RACK:
+					room_node = _create_room_node(DataManager.RoomType.OBJECT, DataManager.CombatType.NORMAL, DataManager.ObjectType.TORTURE_RACK)
+				
+				DataManager.RoomGenerationType.OBJECT_BONFIRE:
+					room_node = _create_room_node(DataManager.RoomType.OBJECT, DataManager.CombatType.NORMAL, DataManager.ObjectType.BONFIRE)
+				
+				DataManager.RoomGenerationType.OBJECT_EVENT:
+					room_node = _create_room_node(DataManager.RoomType.OBJECT, DataManager.CombatType.NORMAL, DataManager.ObjectType.EVENT)
+				
+				_:
+					room_node = _create_room_node(DataManager.RoomType.COMBAT, DataManager.CombatType.NORMAL)
+			
+			path.append(room_node)
+	
+	return path
