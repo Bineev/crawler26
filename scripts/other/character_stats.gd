@@ -394,8 +394,32 @@ func _add_status_direct(status: StatusResource, stacks: int, duration: int, cast
 	if existing:
 		# 🆕 Разная логика стакания в зависимости от статуса
 		match status_id:
+# ============================================================
+# BURN — специальная логика с порогом взрыва
+# ============================================================
+			DataManager.Status.BURN:
+				# Считаем, сколько стаков будет после наложения
+				var total_stacks = existing.stacks + stacks
+				var overflow = total_stacks - RunManager.burn_threshold_stacks
+				
+				if overflow >= 0:
+					# 🆕 ВЗРЫВ
+					_trigger_burn_explosion()
+					
+					# Снимаем Burn с self
+					remove_status(DataManager.Status.BURN)
+					
+					# Накладываем остаток (если есть)
+					if overflow > 0:
+						var burn_status = DataManager.get_status_resource(DataManager.Status.BURN)
+						if burn_status:
+							_add_status_direct(burn_status, overflow, duration, caster)
+				else:
+					# 🆕 Обычное стакание (порог не достигнут)
+					existing.stacks += stacks
+					existing.duration = max(existing.duration, duration)
 			# Стакаются по стакам + макс длительность
-			DataManager.Status.BLEED, DataManager.Status.COLD, DataManager.Status.BURN, DataManager.Status.REGEN:
+			DataManager.Status.BLEED, DataManager.Status.COLD, DataManager.Status.REGEN:
 				existing.stacks += stacks
 				existing.duration = max(existing.duration, duration)
 			
@@ -798,19 +822,6 @@ func process_end_of_turn():
 		SignalManager.player_status_changed.emit(self)
 
 ## ============================================================
-## ВЗРЫВ ГОРЕНИЯ
-## ============================================================
- 
-# BUG Cannot call method 'get_nodes_in_group' on a null value.
-func _trigger_burn_explosion(stacks: int):
-	var explosion_damage = stacks * DataManager.BURN_EXPLOSION_DAMAGE_PER_STACK
-	var enemies = get_tree().get_nodes_in_group("enemies")
-	for enemy in enemies:
-		if enemy.has_method("take_damage"):
-			enemy.take_damage(explosion_damage)
-	remove_status(DataManager.Status.BURN)
-
-## ============================================================
 ## БОНУС ОТ СИЛЫ (STRENGTH)
 ## ============================================================
 
@@ -988,9 +999,6 @@ func process_start_of_turn():
 						await Engine.get_main_loop().create_timer(DataManager.STATUS_TRIGGER_DELAY).timeout
 					elif self is PenitentStats:
 						await Engine.get_main_loop().create_timer(DataManager.PLAYER_STATUS_TRIGGER_DELAY).timeout
-				if status.id == DataManager.Status.BURN and data.stacks >= RunManager.burn_threshold_stacks:
-					_trigger_burn_explosion(data.stacks)
-					statuses_to_remove.append(status_id)
 				# 🆕 Уменьшаем длительность (но не для SHIELD)
 				if status.id != DataManager.Status.SHIELD and status.id != DataManager.Status.STRENGTH:
 					data.duration -= 1
@@ -1386,3 +1394,20 @@ func _get_targets_for_effect(effect: EffectEntry, source, targets: Array = []) -
 
 func get_status_index(status_id: DataManager.Status) -> int:
 	return status_application_order.find(status_id)
+
+
+func _trigger_burn_explosion() -> void:
+	var explosion_damage = RunManager.burn_threshold_stacks
+	
+	if self is EnemyInstance:
+		# Урон всем живым врагам
+		var enemies = BattleManager.get_enemies()
+		for enemy in enemies:
+			if is_instance_valid(enemy) and enemy.is_alive():
+				enemy.take_damage(explosion_damage, true, self, true)
+		SignalManager.log_message.emit("Взрыв Горения! %d урона всем врагам." % explosion_damage)
+	
+	else:
+		# Урон игроку
+		take_damage(explosion_damage, true, self, true)
+		SignalManager.log_message.emit("Взрыв Горения! Вы получили %d урона." % explosion_damage)
