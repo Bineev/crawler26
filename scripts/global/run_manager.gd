@@ -889,7 +889,7 @@ func reset_run_constants():
 	max_energy = DataManager.MAX_ENERGY
 	hand_size_increment_per_biome = DataManager.HAND_SIZE_INCREMENT_PER_BIOME  # 🆕
 	# === Стартовые валюты ===
-	starting_coins = DataManager.STARTING_COINS + 100
+	starting_coins = DataManager.STARTING_COINS
 	starting_bones = DataManager.STARTING_BONES
 	starting_keys = DataManager.STARTING_KEYS
 	

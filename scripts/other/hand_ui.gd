@@ -102,6 +102,11 @@ func _calculate_card_positions() -> Array[Vector2]:
 	# 🆕 Все размеры в базовой системе координат (1920×1080)
 	var base_size = Vector2(1920, 1080)
 	
+	# 🆕 Если 4:3 — сдвигаем карты влево
+	if GameTestManager.is_4_3_monitor:
+		# 🆕 Берём реальную ширину окна в базовой системе координат
+		base_size.x = DisplayServer.window_get_size().x / DataManager.SCALE_FACTOR
+
 	var card_width = DataManager.CARD_BASE_WIDTH * DataManager.CARD_SCALE_IN_HAND
 	var card_height = DataManager.CARD_BASE_HEIGHT * DataManager.CARD_SCALE_IN_HAND
 	
@@ -136,6 +141,10 @@ func layout_cards():
 	
 	# 🆕 Используем базовое разрешение
 	var base_size = Vector2(1920, 1080)
+	
+	# 🆕 Для 4:3 — берём реальную ширину
+	if GameTestManager.is_4_3_monitor:
+		base_size.x = DisplayServer.window_get_size().x / DataManager.SCALE_FACTOR
 	
 	var card_width = DataManager.CARD_BASE_WIDTH * DataManager.CARD_SCALE_IN_HAND
 	var card_height = DataManager.CARD_BASE_HEIGHT * DataManager.CARD_SCALE_IN_HAND

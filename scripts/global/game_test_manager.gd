@@ -4,7 +4,8 @@ extends Node
 ## ============================================================
 ## ТОЧКА ВХОДА ДЛЯ ТЕСТИРОВАНИЯ
 ## ============================================================
-
+## Является ли монитор 4:3
+var is_4_3_monitor: bool = false
 var current_room_node: Room = null
 var current_floor: int = 1
 var current_biome: DataManager.Biome = DataManager.Biome.ROTTEN_MARSHES
@@ -144,9 +145,7 @@ func start_new_biome() -> void:
 		ProgressManager.save_run_start_snapshot()
 		for potion in DataManager.get_random_potions(1):
 			RunManager.add_potion(potion)
-		
-	# BUG for test
-	RunManager.add_artifact(DataManager.get_artifact_resource(DataManager.ArtifactId.BRASS_CANDLESTICK))
+	
 	# Запускаем этаж
 	FloorManager.start_floor()
 
@@ -339,6 +338,10 @@ func _get_room_type_string(room_type: DataManager.RoomType, combat_type: DataMan
 	return "UNKNOWN"
 
 func _create_battle_log():
+	# 🆕 На 4:3 мониторах лог не создаём
+	if is_4_3_monitor:
+		return
+	
 	var log_scene = preload("res://scenes/battle_log.tscn")
 	battle_log = log_scene.instantiate() as BattleLogUI
 	battle_log.position = Vector2(1520, 80) * DataManager.SCALE_FACTOR
@@ -384,7 +387,12 @@ func _create_end_turn_button():
 	var canvas_layer = hand_ui.get_parent()
 	if canvas_layer:
 		canvas_layer.add_child(end_turn_button)
-		end_turn_button.position = DataManager.END_BUTTON_POSITION * DataManager.SCALE_FACTOR
+		
+		if is_4_3_monitor:
+			# 🆕 Для 4:3 — под портретом
+			end_turn_button.position = Vector2(170, 770) * DataManager.SCALE_FACTOR
+		else:
+			end_turn_button.position = DataManager.END_BUTTON_POSITION * DataManager.SCALE_FACTOR
 
 func _on_battle_started():
 	if end_turn_button:
@@ -424,7 +432,13 @@ func _create_player_portrait():
 func _create_energy_display():
 	var energy_scene = preload("res://scenes/energy_display.tscn")
 	energy_display = energy_scene.instantiate() as EnergyDisplay
-	energy_display.position = (DataManager.END_BUTTON_POSITION + Vector2(10, 70)) * DataManager.SCALE_FACTOR
+	
+	if is_4_3_monitor:
+		# 🆕 Для 4:3 — под портретом
+		energy_display.position = Vector2(20, 770) * DataManager.SCALE_FACTOR
+	else:
+		energy_display.position = (DataManager.END_BUTTON_POSITION + Vector2(10, 70)) * DataManager.SCALE_FACTOR
+	
 	game_world.add_child(energy_display)
 
 func get_player_portrait() -> PlayerPortrait:
@@ -487,7 +501,13 @@ func _clean_empty_canvas_layers() -> void:
 func _create_potion_display() -> void:
 	_clear_potions()
 	potion_container = HBoxContainer.new()
-	potion_container.global_position = DataManager.POTION_CONTAINER_POSITION * DataManager.SCALE_FACTOR
+	
+	if is_4_3_monitor:
+		# 🆕 Для 4:3 — под кнопкой завершения хода
+		potion_container.global_position = Vector2(50, 360) * DataManager.SCALE_FACTOR
+	else:
+		potion_container.global_position = DataManager.POTION_CONTAINER_POSITION * DataManager.SCALE_FACTOR
+	
 	potion_container.add_theme_constant_override("separation", 10)
 	game_world.add_child(potion_container)
 	potion_container.scale *= DataManager.SCALE_FACTOR
@@ -497,7 +517,10 @@ func _create_potion_display() -> void:
 	potion_full_label.add_theme_font_override("font", DataManager.FONT_MAIN)
 	potion_full_label.add_theme_font_size_override("font_size", 16)
 	potion_full_label.add_theme_color_override("font_color", DataManager.COLOR_MOLE_TUNNELS_ART_BG_LIGHT2)
-	potion_full_label.global_position = DataManager.POTION_CONTAINER_POSITION + Vector2(110, 90)
+	if is_4_3_monitor:
+		potion_full_label.hide()
+	else:
+		potion_full_label.global_position = (DataManager.POTION_CONTAINER_POSITION + Vector2(110, 90)) * DataManager.SCALE_FACTOR
 	potion_full_label.visible = false
 	game_world.add_child(potion_full_label)
 	

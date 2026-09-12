@@ -7,6 +7,8 @@ var menu_instance: MainMenu
 var is_other_effect_played: bool = false
 
 func _ready():
+	# 🆕 Проверяем соотношение сторон монитора
+	GameTestManager.is_4_3_monitor = is_4_3()
 	# Получаем реальный размер экрана пользователя
 	# 1. Принудительно подключаемся к событию изменения размера окна ОС
 	get_tree().root.size_changed.connect(_force_recalculate_scale)
@@ -212,13 +214,6 @@ func _load_biomes_choice():
 	game_world.add_child(biome_instance)
 
 
-func _process(delta):
-	# Для теста: нажатие пробела - пропуск комнаты
-	if Input.is_action_just_pressed("ui_accept"):
-		# После победы в бою вызываем
-		GameTestManager.after_combat_victory()
-
-
 func play_slash_effect(amount : int):
 	if is_other_effect_played:
 		return
@@ -417,3 +412,11 @@ func _fade_and_load_current_run():
 	tween2.tween_property(fade, "color:a", 0.0, 1)
 	await tween2.finished
 	fade.queue_free()
+
+
+## Проверяет, является ли текущее разрешение экрана 4:3
+func is_4_3() -> bool:
+	var screen_size = DisplayServer.screen_get_size()
+	var aspect = float(screen_size.x) / float(screen_size.y)
+	# 4:3 = 1.333...
+	return abs(aspect - 4.0 / 3.0) < 0.05
