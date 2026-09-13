@@ -715,34 +715,18 @@ func _generate_shop_items() -> Array[Dictionary]:
 		})
 	
 	# ============================================================
-	# 4. ЗЕЛЬЯ (всегда 2-3 + ОБЯЗАТЕЛЬНОЕ ЗЕЛЬЕ ЛЕЧЕНИЯ)
+	# 4. ЗЕЛЬЯ (2-3 штуки)
 	# ============================================================
-	
-	# 🆕 Добавляем обязательное зелье лечения
-	var heal_potion = DataManager.get_potion_resource_by_type(DataManager.PotionType.HEAL)
-	if heal_potion:
-		items.append({
-			"type": "potion",
-			"data": heal_potion,
-			"cost_grade": DataManager.CostGrade.NORMAL,
-		})
-	
-	# Добавляем остальные случайные зелья (1-2 штуки)
-	var potion_count = randi() % 2 + 1  # 1-2
+
+	var potion_count = randi() % 2 + 2  # 2-3
 	var potions = DataManager.get_random_potions(10)
-	var added = 0
-	for potion in potions:
-		if added >= potion_count:
-			break
-		# Пропускаем зелье лечения, если оно уже добавлено
-		if potion.potion_type == DataManager.PotionType.HEAL:
-			continue
+	for i in range(min(potion_count, potions.size())):
+		var potion = potions[i]
 		items.append({
 			"type": "potion",
 			"data": potion,
 			"cost_grade": _random_cost_grade(),
 		})
-		added += 1
 	
 	return items
 

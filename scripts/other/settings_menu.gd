@@ -8,7 +8,7 @@ enum OpenContext {
 }
 
 const SETTINGS_FILE := "user://settings.cfg"
-const SAVE_FILE := "user://savegame.save"  # 🆕 Добавляем константу
+const SAVE_FILE := "user://savegame1.save"  # 🆕 Добавляем константу
 
 var open_context: OpenContext = OpenContext.MAIN_MENU
 var is_open: bool = false
