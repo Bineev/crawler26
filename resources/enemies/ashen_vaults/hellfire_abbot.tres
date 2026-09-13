@@ -12,6 +12,6 @@ biome = 6
 size = 3
 name_key = "enemy_hellfire_abbot_name"
 description_key = "enemy_hellfire_abbot_desc"
-base_max_health = 125
+base_max_health = 105
 starting_passives = Array[ExtResource("2_oqesm")]([ExtResource("3_il1aa"), ExtResource("4_wkg34")])
 metadata/_custom_type_script = "uid://beudtcsu45bk7"

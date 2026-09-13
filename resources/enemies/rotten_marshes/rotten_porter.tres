@@ -23,6 +23,6 @@ biome = 5
 size = 2
 name_key = "enemy_rotten_porter_name"
 description_key = "enemy_rotten_porter_desc"
-base_max_health = 75
+base_max_health = 60
 starting_passives = Array[ExtResource("2_77tsb")]([SubResource("Resource_u3ckw")])
 metadata/_custom_type_script = "uid://beudtcsu45bk7"

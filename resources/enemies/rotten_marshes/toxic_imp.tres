@@ -10,6 +10,6 @@ enemy_id = 7
 biome = 5
 name_key = "enemy_toxic_imp_name"
 description_key = "enemy_toxic_imp_desc"
-base_max_health = 55
+base_max_health = 45
 starting_passives = Array[ExtResource("2_8lvk3")]([ExtResource("3_8lvk3")])
 metadata/_custom_type_script = "uid://beudtcsu45bk7"

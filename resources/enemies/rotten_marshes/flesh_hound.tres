@@ -10,6 +10,6 @@ enemy_id = 12
 biome = 5
 name_key = "enemy_flesh_hound_name"
 description_key = "enemy_flesh_hound_desc"
-base_max_health = 60
+base_max_health = 42
 starting_passives = Array[ExtResource("2_ff6tj")]([ExtResource("3_ff6tj")])
 metadata/_custom_type_script = "uid://beudtcsu45bk7"

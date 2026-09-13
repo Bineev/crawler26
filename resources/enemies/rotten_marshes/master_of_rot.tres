@@ -11,6 +11,6 @@ biome = 5
 size = 3
 name_key = "enemy_master_of_rot_name"
 description_key = "enemy_master_of_rot_desc"
-base_max_health = 140
+base_max_health = 100
 starting_passives = Array[ExtResource("2_r5145")]([ExtResource("3_r5145")])
 metadata/_custom_type_script = "uid://beudtcsu45bk7"

@@ -11,6 +11,6 @@ biome = 5
 size = 2
 name_key = "enemy_thorny_bloom_name"
 description_key = "enemy_thorny_bloom_desc"
-base_max_health = 70
+base_max_health = 55
 starting_passives = Array[ExtResource("2_7gpy2")]([ExtResource("3_7gpy2")])
 metadata/_custom_type_script = "uid://beudtcsu45bk7"

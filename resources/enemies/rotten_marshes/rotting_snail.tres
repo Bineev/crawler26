@@ -11,5 +11,6 @@ biome = 5
 size = 0
 name_key = "enemy_rotting_snail_name"
 description_key = "enemy_rotting_snail_desc"
+base_max_health = 27
 starting_passives = Array[ExtResource("2_f1j55")]([ExtResource("3_f1j55")])
 metadata/_custom_type_script = "uid://beudtcsu45bk7"
