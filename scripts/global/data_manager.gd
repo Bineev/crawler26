@@ -743,7 +743,7 @@ const STARTING_ENERGY: int = 3
 const MAX_ENERGY: int = 3
 const HAND_SIZE_INCREMENT_PER_BIOME: int = 1  # 🆕
 ## === Сломленный (Penitent) ===
-const PENITENT_STARTING_HEALTH: int = 120
+const PENITENT_STARTING_HEALTH: int = 130
 const PENITENT_MAX_ATONEMENT: int = 30
 const PENITENT_ATONEMENT_GAIN_PER_ATTACK: int = 5
 

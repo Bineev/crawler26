@@ -80,19 +80,13 @@ var character_unlock_cards: Dictionary = {
 	# Penitent
 	DataManager.CharacterClass.PENITENT: {
 		1: [  # уровень 0→1
-			DataManager.CardId.BLOOD_SACRIFICE,
-			DataManager.CardId.PRICE_OF_DESPAIR,
+			DataManager.CardId.BLACK_ENVY,  # 🆕 в мету
 		],
 		2: [  # уровень 1→2
-			DataManager.CardId.SCOURING_FLAME,
-			DataManager.CardId.SIN_OF_VANITY,
-			DataManager.CardId.THIRST_FOR_PUNISHMENT,
+			DataManager.CardId.BITTER_VENGEANCE,  # 🆕 в мету
 		],
 		3: [  # уровень 2→3
-			DataManager.CardId.SHIELD_OF_PENANCE,
-			DataManager.CardId.VOID_STRIKE,
-			DataManager.CardId.CRY_OF_DESPAIR,
-			DataManager.CardId.PURE_THOUGHTS,
+			DataManager.CardId.PURE_THOUGHTS,  # 🆕 в мету
 		],
 	},
 	# TODO: WARRIOR, MYSTIC, ROGUE
@@ -102,51 +96,35 @@ var character_unlock_cards: Dictionary = {
 var biome_unlock_cards: Dictionary = {
 	DataManager.Biome.MOLE_TUNNELS: {
 		1: [  # уровень 0→1
-			DataManager.CardId.BLOOD_TRAIL,
-			DataManager.CardId.FROZEN_EARTH,
+			DataManager.CardId.FROZEN_EARTH, # в мету
 		],
 		2: [  # уровень 1→2
-			DataManager.CardId.RODENT_AGILITY,
-			DataManager.CardId.FROZEN_BITE,
-			DataManager.CardId.ROTTEN_CUT,
+			DataManager.CardId.WORM_SPIRIT, # в мету
 		],
 		3: [  # уровень 2→3
-			DataManager.CardId.BEAST_PULSE,
-			DataManager.CardId.BLOOD_THREAD,
-			DataManager.CardId.MOLE_TOSS,
-			DataManager.CardId.WORM_SPIRIT,
-			DataManager.CardId.FLESH_RAGE,
-			DataManager.CardId.TORN_WOUND,
+			DataManager.CardId.FROZEN_BITE, # в мету
 		],
 	},
 	DataManager.Biome.ROTTEN_MARSHES: {
 		1: [  # уровень 0→1
-			DataManager.CardId.SNAKE_BITE,
-			DataManager.CardId.MUD_SPLASH,
+			DataManager.CardId.WEAK_SPOT, # в мету
 		],
 		2: [  # уровень 1→2
-			DataManager.CardId.WEAK_SPOT,
-			DataManager.CardId.BLOOD_INFECTION,
-			DataManager.CardId.STING_OF_CORRUPTION,
+			DataManager.CardId.EPIDEMIC, # в мету
 		],
 		3: [  # уровень 2→3
-			DataManager.CardId.SWAMP_BLAST,
-			DataManager.CardId.BLESSING_OF_ROT,
-			DataManager.CardId.BLOOM_OF_CORRUPTION,
-			DataManager.CardId.FOUL_WELL,
-			DataManager.CardId.EPIDEMIC,
+			DataManager.CardId.STING_OF_CORRUPTION, # в мету
 		],
 	},
 	DataManager.Biome.ASHEN_VAULTS: {  # 🆕 Пепельные своды
 		1: [
-			DataManager.CardId.SCORCHED_EARTH,  # 🆕
-			DataManager.CardId.SIEGE_BARREL,  # 🆕
+			DataManager.CardId.PHOENIX,  # 🆕 в мету
 		],
 		2: [
-			# TODO: добавить карты биома после их создания
+			DataManager.CardId.RANDOM_BURST, # в мету
 		],
 		3: [
-			# TODO: добавить карты биома после их создания
+			DataManager.CardId.CREMATORIUM, # в мету
 		],
 	},
 }
@@ -208,10 +186,7 @@ func _init_default_progress():
 		DataManager.CardId.SINFUL_STRIKE,
 		DataManager.CardId.PENITENT_REVELATION,
 		DataManager.CardId.ATONEMENT_BARRIER,
-		DataManager.CardId.BLACK_ENVY,  # 🆕
 		DataManager.CardId.TIME_TO_DIE,  # 🆕
-		DataManager.CardId.BITTER_VENGEANCE,  # 🆕
-		DataManager.CardId.PURE_THOUGHTS,  # 🆕
 		DataManager.CardId.BLIND_VENGEANCE,  # 🆕
 		DataManager.CardId.GRIP_OF_DESPAIR,  # 🆕
 		DataManager.CardId.FORGIVENESS,  # 🆕
@@ -222,14 +197,11 @@ func _init_default_progress():
 	# 2.2 Карты биома Кротовые норы
 	var mole_cards = [
 		DataManager.CardId.BLOOD_TRAIL,
-		DataManager.CardId.FROZEN_EARTH,
 		DataManager.CardId.RODENT_AGILITY,
-		DataManager.CardId.FROZEN_BITE,
 		DataManager.CardId.ROTTEN_CUT,
-		DataManager.CardId.BEAST_PULSE,
+		DataManager.CardId.BEAST_PULSE, 
 		DataManager.CardId.BLOOD_THREAD,
 		DataManager.CardId.MOLE_TOSS,
-		DataManager.CardId.WORM_SPIRIT,
 		DataManager.CardId.FLESH_RAGE,
 		DataManager.CardId.TORN_WOUND,
 	]
@@ -241,13 +213,10 @@ func _init_default_progress():
 		DataManager.CardId.SNAKE_BITE,
 		DataManager.CardId.SWAMP_BLAST,
 		DataManager.CardId.BLESSING_OF_ROT,
-		DataManager.CardId.WEAK_SPOT,
 		DataManager.CardId.BLOOM_OF_CORRUPTION,
 		DataManager.CardId.MUD_SPLASH,
-		DataManager.CardId.BLOOD_INFECTION,
-		DataManager.CardId.EPIDEMIC,
+		DataManager.CardId.BLOOD_INFECTION, 
 		DataManager.CardId.FOUL_WELL,
-		DataManager.CardId.STING_OF_CORRUPTION,
 	]
 	for card_id in rotten_cards:
 		unlock_card(card_id)
@@ -260,7 +229,8 @@ func _init_default_progress():
 		DataManager.CardId.TORCH_THROW,
 		DataManager.CardId.PYROMANIAC_MADNESS,
 		DataManager.CardId.ASHES_OF_WAR,
-		DataManager.CardId.PHOENIX,  # 🆕
+		DataManager.CardId.BOILING_PASSION,
+		DataManager.CardId.FLAME_RITUAL,
 	]
 	for card_id in ashen_cards:
 		unlock_card(card_id)
