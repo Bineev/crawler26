@@ -565,17 +565,27 @@ func _unlock_biome_cards(biome: DataManager.Biome, level: int) -> Array[DataMana
 ## ОБЩАЯ ФУНКЦИЯ ДЛЯ ЭКРАНА СМЕРТИ
 ## ============================================================
 
-## Проверяет все левел-апы за забег и возвращает словарь с открытыми картами
 func process_all_level_ups() -> Dictionary:
 	var character_class = RunManager.current_character
-	var biome = RunManager.current_biome
 	
-	var result = {
-		"character_unlocked": process_character_level_ups(character_class),
-		"biome_unlocked": process_biome_level_ups(biome),
+	# === Разблокировка карт персонажа ===
+	var character_unlocked = process_character_level_ups(character_class)
+	
+	# === Разблокировка карт биомов (по всем биомам, где был прирост) ===
+	var biome_unlocked: Array[DataManager.CardId] = []
+	for biome in DataManager.Biome.values():
+		var start_xp = run_start_biome_experience.get(biome, 0)
+		var current_xp = biome_experience.get(biome, 0)
+		
+		if current_xp <= start_xp:
+			continue
+		
+		biome_unlocked.append_array(process_biome_level_ups(biome))
+	
+	return {
+		"character_unlocked": character_unlocked,
+		"biome_unlocked": biome_unlocked,
 	}
-	
-	return result
 
 
 ## ============================================================
@@ -592,17 +602,29 @@ func get_run_start_biome_experience(biome: DataManager.Biome) -> int:
 
 func get_run_progress() -> Dictionary:
 	var character_class = RunManager.current_character
-	var biome = RunManager.current_biome
 	
+	# === Прогресс персонажа ===
 	var start_char_xp = get_run_start_character_experience(character_class)
 	var current_char_xp = character_experience.get(character_class, 0)
 	var start_char_lvl = calculate_character_level_from_snapshot(character_class)
 	var current_char_lvl = calculate_character_level(character_class)
 	
-	var start_biome_xp = get_run_start_biome_experience(biome)
-	var current_biome_xp = biome_experience.get(biome, 0)
-	var start_biome_lvl = calculate_biome_level_from_snapshot(biome)
-	var current_biome_lvl = calculate_biome_level(biome)
+	# === Прогресс биомов (только те, где был прирост XP за забег) ===
+	var biomes_progress: Dictionary = {}
+	for biome in DataManager.Biome.values():
+		var start_xp = run_start_biome_experience.get(biome, 0)
+		var current_xp = biome_experience.get(biome, 0)
+		
+		if current_xp <= start_xp:
+			continue
+		
+		biomes_progress[biome] = {
+			"start_level": calculate_biome_level_from_snapshot(biome),
+			"start_xp": start_xp,
+			"current_level": calculate_biome_level(biome),
+			"current_xp": current_xp,
+			"xp_gain": current_xp - start_xp,
+		}
 	
 	return {
 		"character_start_level": start_char_lvl,
@@ -610,11 +632,7 @@ func get_run_progress() -> Dictionary:
 		"character_current_level": current_char_lvl,
 		"character_current_xp": current_char_xp,
 		"character_xp_gain": current_char_xp - start_char_xp,
-		"biome_start_level": start_biome_lvl,
-		"biome_start_xp": start_biome_xp,
-		"biome_current_level": current_biome_lvl,
-		"biome_current_xp": current_biome_xp,
-		"biome_xp_gain": current_biome_xp - start_biome_xp,
+		"biomes": biomes_progress,
 	}
 
 

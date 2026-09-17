@@ -10,6 +10,6 @@ biome = 6
 size = 0
 name_key = "enemy_wax_golem_name"
 description_key = "enemy_wax_golem_desc"
-base_max_health = 18
+base_max_health = 23
 base_strength = 4
 metadata/_custom_type_script = "uid://beudtcsu45bk7"

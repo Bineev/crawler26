@@ -318,6 +318,7 @@ upgrade_card_confirm,Upgrade
 "death_title","You have died..."
 "death_stats_floor","Floor: %d"
 "death_stats_biome","Biome: %s"
+"death_progress_level","Level: %d"
 "death_lobby","To Lobby"
 "death_retry","Retry Run"
 

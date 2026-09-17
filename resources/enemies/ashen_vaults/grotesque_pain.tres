@@ -10,6 +10,6 @@ enemy_id = 19
 biome = 6
 name_key = "enemy_grotesque_pain_name"
 description_key = "enemy_grotesque_pain_desc"
-base_max_health = 32
+base_max_health = 37
 starting_passives = Array[ExtResource("2_bwhtg")]([ExtResource("3_bwhtg")])
 metadata/_custom_type_script = "uid://beudtcsu45bk7"

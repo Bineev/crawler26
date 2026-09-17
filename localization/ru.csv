@@ -319,6 +319,7 @@ upgrade_card_confirm,Улучшить
 "death_title","Ты погиб..."
 "death_stats_floor","Этаж: %d"
 "death_stats_biome","Биом: %s"
+"death_progress_level","Уровень: %d"
 "death_lobby","В лобби"
 "death_retry","Повторить забег"
 

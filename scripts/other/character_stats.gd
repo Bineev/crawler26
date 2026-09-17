@@ -873,8 +873,6 @@ func _on_death():
 	SignalManager.log_message.emit("%s погиб!" % get_display_name())
 	
 	if self is PenitentStats:
-		# 🆕 Сохраняем игру с флагом is_run_ended = true
-		SaveManager.save_game_with_run_ended()
 		GameTestManager.clear_ui_after_death()
 		var portrait = GameTestManager.get_player_portrait()
 		if portrait:

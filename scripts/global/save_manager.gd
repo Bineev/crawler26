@@ -1,7 +1,7 @@
 # autoload/save_manager.gd
 extends Node
 
-const SAVE_PATH: String = "user://savegame3.save"
+const SAVE_PATH: String = "user://savegame5.save"
 const SAVE_VERSION: int = 1
 
 var current_save_data: Dictionary = {}

@@ -10,6 +10,7 @@ class_name DeathUI
 
 func _ready():
 	# Начальное состояние: всё прозрачно
+	scale *= DataManager.SCALE_FACTOR
 	modulate = Color(1, 1, 1, 0)
 	dark_overlay.color.a = 0.0
 	death_label.modulate = Color(1, 1, 1, 0)
@@ -91,34 +92,28 @@ func _on_retry_pressed():
 ## ============================================================
 
 func show_run_progress_ui() -> void:
-	# Получаем прогресс за забег
 	var progress = ProgressManager.get_run_progress()
 	var unlocked = ProgressManager.process_all_level_ups()
-	
+
+	# 🆕 Сохраняем игру с флагом is_run_ended ПОСЛЕ разблокировки карт,
+	# чтобы новые unlocked_card_ids попали в сейв
+	SaveManager.save_game_with_run_ended()
+
 	var character_class = RunManager.current_character
-	var biome = RunManager.current_biome
 	
-	# Данные персонажа
+	# === Данные персонажа ===
 	var char_start_lvl = progress.character_start_level
 	var char_start_xp = progress.character_start_xp
 	var char_current_lvl = progress.character_current_level
 	var char_current_xp = progress.character_current_xp
-	var char_xp_gain = progress.character_xp_gain
 	
-	# Данные биома
-	var biome_start_lvl = progress.biome_start_level
-	var biome_start_xp = progress.biome_start_xp
-	var biome_current_lvl = progress.biome_current_level
-	var biome_current_xp = progress.biome_current_xp
-	var biome_xp_gain = progress.biome_xp_gain
-	
-	# Создаём контейнер для прогресса
+	# === Контейнер для прогресса ===
 	var progress_container = VBoxContainer.new()
 	progress_container.add_theme_constant_override("separation", 20)
 	progress_container.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	progress_container.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	
-	# Создаём UI для персонажа
+	# === Секция персонажа ===
 	var char_vbox = _create_progress_section(
 		tr("death_progress_character"),
 		tr(DataManager.get_character_class_name_key(character_class)),
@@ -126,36 +121,42 @@ func show_run_progress_ui() -> void:
 		char_start_xp,
 		char_current_lvl,
 		char_current_xp,
-		true  # 🆕 is_character
+		true
 	)
 	progress_container.add_child(char_vbox)
-
-	# Создаём UI для биома
-	var biome_vbox = _create_progress_section(
-		tr("death_progress_biome"),
-		DataManager.get_biome_name(biome),
-		biome_start_lvl,
-		biome_start_xp,
-		biome_current_lvl,
-		biome_current_xp,
-		false  # 🆕 is_character
-	)
-	progress_container.add_child(biome_vbox)
 	
-	# Контейнер для наград
+	# === Секции биомов (только те, где был прогресс) ===
+	var biome_vboxes: Array[VBoxContainer] = []
+	var biomes = progress.get("biomes", {})
+	
+	for biome_id in biomes.keys():
+		var data = biomes[biome_id]
+		var biome_vbox = _create_progress_section(
+			tr("death_progress_biome"),
+			DataManager.get_biome_name(biome_id),
+			data.start_level,
+			data.start_xp,
+			data.current_level,
+			data.current_xp,
+			false
+		)
+		progress_container.add_child(biome_vbox)
+		biome_vboxes.append(biome_vbox)
+	
+	# === Контейнер для наград ===
 	var rewards_hbox = HBoxContainer.new()
 	rewards_hbox.add_theme_constant_override("separation", 10)
 	rewards_hbox.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	progress_container.add_child(rewards_hbox)
 	
-	# Добавляем контейнер в интерфейс (после stats_label, перед buttons_container)
+	# === Вставляем после stats_label ===
 	var vbox = $VBoxContainer
 	var stats_index = vbox.get_children().find(stats_label)
 	vbox.add_child(progress_container)
 	vbox.move_child(progress_container, stats_index + 1)
 	
-	# Запускаем анимацию заполнения баров
-	_animate_bars(progress_container, char_vbox, biome_vbox, rewards_hbox, unlocked)
+	# === Запускаем анимацию ===
+	_animate_bars(progress_container, char_vbox, biome_vboxes, rewards_hbox, unlocked)
 
 
 func _create_progress_section(title: String, name: String, start_lvl: int, start_xp: int, current_lvl: int, current_xp: int, is_character: bool) -> VBoxContainer:
@@ -230,24 +231,29 @@ func _create_progress_section(title: String, name: String, start_lvl: int, start
 ## АНИМАЦИЯ БАРОВ
 ## ============================================================
 
-func _animate_bars(container: Control, char_vbox: VBoxContainer, biome_vbox: VBoxContainer, rewards_hbox: HBoxContainer, unlocked: Dictionary) -> void:
+func _animate_bars(
+	container: Control,
+	char_vbox: VBoxContainer,
+	biome_vboxes: Array[VBoxContainer],
+	rewards_hbox: HBoxContainer,
+	unlocked: Dictionary
+) -> void:
 	var tween = create_tween()
 	tween.set_parallel(false)
 	
-	# Анимируем бар персонажа
+	# === Бар персонажа ===
 	var char_bar = char_vbox.get_child(1)  # ProgressBar
 	_animate_single_bar(tween, char_bar, 0.8)
 	
-	# Анимируем бар биома
-	var biome_bar = biome_vbox.get_child(1)  # ProgressBar
-	_animate_single_bar(tween, biome_bar, 0.8)
+	# === Бары биомов (последовательно) ===
+	for biome_vbox in biome_vboxes:
+		var biome_bar = biome_vbox.get_child(1)
+		_animate_single_bar(tween, biome_bar, 0.8)
 	
 	await tween.finished
 	
-	# После заполнения баров показываем награды
+	# === После заполнения баров показываем награды и кнопки ===
 	_show_rewards(rewards_hbox, unlocked)
-	
-	# 🆕 После всех анимаций показываем кнопки
 	_show_buttons()
 
 
@@ -315,23 +321,35 @@ func _show_rewards(rewards_hbox: HBoxContainer, unlocked: Dictionary) -> void:
 	rewards_hbox.show()
 	
 	var card_scene = preload("res://scenes/card.tscn")
+	var card_scale = 0.7
+	var card_size = Vector2(
+		DataManager.CARD_BASE_WIDTH * card_scale * 1.5,
+		DataManager.CARD_BASE_HEIGHT * card_scale * 1.5
+	)
 	
 	for i in range(all_cards.size()):
 		var card_data = DataManager.get_card(all_cards[i])
 		if not card_data:
 			continue
 		
+		# 🆕 Обёртка Control, чтобы HBoxContainer правильно позиционировал карту
+		var card_wrapper = Control.new()
+		card_wrapper.custom_minimum_size = card_size
+		
 		var card_ui = card_scene.instantiate() as CardUI
 		card_ui.card_data = card_data
+		card_wrapper.add_child(card_ui)
+		rewards_hbox.add_child(card_wrapper)
+		
+		# 🆕 Теперь, когда карта в дереве, _ready() сработал и display() безопасен
 		card_ui.display()
 		card_ui.set_reward_state()
-		card_ui.scale = Vector2(0.7, 0.7)
-		rewards_hbox.add_child(card_ui)
+		card_ui.card_control.scale = Vector2(card_scale, card_scale)
 		
-		card_ui.modulate = Color(1, 1, 1, 0)
+		card_wrapper.modulate = Color(1, 1, 1, 0)
 		var delay = i * 0.15
 		var tween = create_tween()
-		tween.tween_property(card_ui, "modulate", Color(1, 1, 1, 1), 0.3).set_delay(delay)
+		tween.tween_property(card_wrapper, "modulate", Color(1, 1, 1, 1), 0.3).set_delay(delay)
 	
 	var tween = create_tween()
 	tween.tween_property(rewards_hbox, "modulate", Color(1, 1, 1, 1), 0.3)

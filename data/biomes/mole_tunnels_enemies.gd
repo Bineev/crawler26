@@ -7,25 +7,25 @@ class_name MoleTunnelsEnemies
 ## ============================================================
 
 const INTENTS = {
-	# Слепыш-мутант (урон 3–7)
+	# Слепыш-мутант (урон 12/цикл, было 10, +20%)
 	DataManager.EnemyId.MOLE_MUTANT: {
 		"cycle_type": DataManager.IntentCycleType.SEQUENTIAL,
 		"intents": [
 			# 1. Атака малая
-			[ { "category": DataManager.EffectCategory.DAMAGE, "target": DataManager.EffectTarget.ENEMY, "base_value": 3 } ],
+			[ { "category": DataManager.EffectCategory.DAMAGE, "target": DataManager.EffectTarget.ENEMY, "base_value": 4 } ],
 			
 			# 2. Наложить уязвимость
 			[ { "category": DataManager.EffectCategory.APPLY_STATUS, "target": DataManager.EffectTarget.ENEMY, "status": DataManager.Status.VULNERABILITY, "value": 1, "duration": 2 } ],
 			
 			# 3. Атака побольше
-			[ { "category": DataManager.EffectCategory.DAMAGE, "target": DataManager.EffectTarget.ENEMY, "base_value": 7 } ],
+			[ { "category": DataManager.EffectCategory.DAMAGE, "target": DataManager.EffectTarget.ENEMY, "base_value": 8 } ],
 			
 			# 4. Щит
 			[ { "category": DataManager.EffectCategory.BLOCK, "target": DataManager.EffectTarget.SELF, "base_value": 5 } ],
 		]
 	},
 	
-	# Крот-силач (урон 5–9)
+	# Крот-силач (урон 17/цикл, было 14, +20%)
 	DataManager.EnemyId.STRONG_MOLE: {
 		"cycle_type": DataManager.IntentCycleType.SEQUENTIAL,
 		"intents": [
@@ -36,26 +36,26 @@ const INTENTS = {
 			[ { "category": DataManager.EffectCategory.BLOCK, "target": DataManager.EffectTarget.SELF, "base_value": 8 } ],
 			
 			# 3. Урон
-			[ { "category": DataManager.EffectCategory.DAMAGE, "target": DataManager.EffectTarget.ENEMY, "base_value": 5 } ],
+			[ { "category": DataManager.EffectCategory.DAMAGE, "target": DataManager.EffectTarget.ENEMY, "base_value": 6 } ],
 			
 			# 4. Урон побольше
-			[ { "category": DataManager.EffectCategory.DAMAGE, "target": DataManager.EffectTarget.ENEMY, "base_value": 9 } ],
+			[ { "category": DataManager.EffectCategory.DAMAGE, "target": DataManager.EffectTarget.ENEMY, "base_value": 11 } ],
 			
 			# 5. Наложить на себя реген (3 на 3)
 			[ { "category": DataManager.EffectCategory.APPLY_STATUS, "target": DataManager.EffectTarget.SELF, "status": DataManager.Status.REGEN, "value": 3, "duration": 3 } ],
 		]
 	},
 	
-	# Бешеная крыса (урон 4–8)
+	# Бешеная крыса (урон 10/цикл, было 8, +20%)
 	DataManager.EnemyId.RABID_RAT: {
 		"cycle_type": DataManager.IntentCycleType.SEQUENTIAL,
 		"intents": [
 			# 1. Урон
-			[ { "category": DataManager.EffectCategory.DAMAGE, "target": DataManager.EffectTarget.ENEMY, "base_value": 4 } ],
+			[ { "category": DataManager.EffectCategory.DAMAGE, "target": DataManager.EffectTarget.ENEMY, "base_value": 5 } ],
 			
 			# 2. Урон и яд (1 на 2)
 			[ 
-				{ "category": DataManager.EffectCategory.DAMAGE, "target": DataManager.EffectTarget.ENEMY, "base_value": 4 },
+				{ "category": DataManager.EffectCategory.DAMAGE, "target": DataManager.EffectTarget.ENEMY, "base_value": 5 },
 				{ "category": DataManager.EffectCategory.APPLY_STATUS, "target": DataManager.EffectTarget.ENEMY, "status": DataManager.Status.POISON, "value": 1, "duration": 2 }
 			],
 			
@@ -67,7 +67,7 @@ const INTENTS = {
 		]
 	},
 	
-	# Крот-гриб (урон 4–8)
+	# Крот-гриб (урон 10/цикл, было 8, +20%)
 	DataManager.EnemyId.MOLE_FUNGUS: {
 		"cycle_type": DataManager.IntentCycleType.SEQUENTIAL,
 		"intents": [
@@ -81,11 +81,11 @@ const INTENTS = {
 			[ { "category": DataManager.EffectCategory.APPLY_STATUS, "target": DataManager.EffectTarget.ENEMY, "status": DataManager.Status.WEAKNESS, "value": 1, "duration": 2 } ],
 			
 			# 4. Урон
-			[ { "category": DataManager.EffectCategory.DAMAGE, "target": DataManager.EffectTarget.ENEMY, "base_value": 8 } ],
+			[ { "category": DataManager.EffectCategory.DAMAGE, "target": DataManager.EffectTarget.ENEMY, "base_value": 10 } ],
 		]
 	},
 	
-	# Многоголовый слепыш (урон 6–11)
+	# Многоголовый слепыш (урон 20/цикл, было 17, +20%)
 	DataManager.EnemyId.MANY_HEADED_MOLE: {
 		"cycle_type": DataManager.IntentCycleType.SEQUENTIAL,
 		"intents": [
@@ -93,26 +93,26 @@ const INTENTS = {
 			[ { "category": DataManager.EffectCategory.APPLY_STATUS, "target": DataManager.EffectTarget.ENEMY, "status": DataManager.Status.COLD, "value": 5, "duration": 3 } ],
 			
 			# 2. Урон
-			[ { "category": DataManager.EffectCategory.DAMAGE, "target": DataManager.EffectTarget.ENEMY, "base_value": 6 } ],
+			[ { "category": DataManager.EffectCategory.DAMAGE, "target": DataManager.EffectTarget.ENEMY, "base_value": 7 } ],
 			
 			# 3. Реген (5 на 3)
 			[ { "category": DataManager.EffectCategory.APPLY_STATUS, "target": DataManager.EffectTarget.SELF, "status": DataManager.Status.REGEN, "value": 5, "duration": 3 } ],
 			
 			# 4. Урон выше
-			[ { "category": DataManager.EffectCategory.DAMAGE, "target": DataManager.EffectTarget.ENEMY, "base_value": 11 } ],
+			[ { "category": DataManager.EffectCategory.DAMAGE, "target": DataManager.EffectTarget.ENEMY, "base_value": 13 } ],
 			
 			# 5. Щит
 			[ { "category": DataManager.EffectCategory.BLOCK, "target": DataManager.EffectTarget.SELF, "base_value": 8 } ],
 		]
 	},
 	
-	# Шахтёр-гриб (урон 8–12)
+	# Шахтёр-гриб (урон 24/цикл, было 20, +20%)
 	DataManager.EnemyId.FUNGAL_MINER: {
 		"cycle_type": DataManager.IntentCycleType.SEQUENTIAL,
 		"intents": [
 			# 1. Урон + блид (1 на 3)
 			[ 
-				{ "category": DataManager.EffectCategory.DAMAGE, "target": DataManager.EffectTarget.ENEMY, "base_value": 8 },
+				{ "category": DataManager.EffectCategory.DAMAGE, "target": DataManager.EffectTarget.ENEMY, "base_value": 10 },
 				{ "category": DataManager.EffectCategory.APPLY_STATUS, "target": DataManager.EffectTarget.ENEMY, "status": DataManager.Status.BLEED, "value": 1, "duration": 3 }
 			],
 			
@@ -120,7 +120,7 @@ const INTENTS = {
 			[ { "category": DataManager.EffectCategory.APPLY_PASSIVE, "target": DataManager.EffectTarget.SELF, "passive": DataManager.Passive.BLOODDRINKER, "passive_duration": 0 } ],
 			
 			# 3. Урон сильнее
-			[ { "category": DataManager.EffectCategory.DAMAGE, "target": DataManager.EffectTarget.ENEMY, "base_value": 12 } ],
+			[ { "category": DataManager.EffectCategory.DAMAGE, "target": DataManager.EffectTarget.ENEMY, "base_value": 14 } ],
 			
 			# 4. Щит
 			[ { "category": DataManager.EffectCategory.BLOCK, "target": DataManager.EffectTarget.SELF, "base_value": 10 } ],
@@ -130,12 +130,12 @@ const INTENTS = {
 		]
 	},
 	
-	# Гора грызунов (босс) (урон 5–15)
+	# Гора грызунов (босс) (урон 42/цикл, было 35, +20%)
 	DataManager.EnemyId.RODENT_MOUND: {
 		"cycle_type": DataManager.IntentCycleType.SEQUENTIAL,
 		"intents": [
 			# 1. Сильный урон
-			[ { "category": DataManager.EffectCategory.DAMAGE, "target": DataManager.EffectTarget.ENEMY, "base_value": 15 } ],
+			[ { "category": DataManager.EffectCategory.DAMAGE, "target": DataManager.EffectTarget.ENEMY, "base_value": 18 } ],
 			
 			# 2. Наложить на себя щит
 			[ { "category": DataManager.EffectCategory.BLOCK, "target": DataManager.EffectTarget.SELF, "base_value": 12 } ],
@@ -147,10 +147,10 @@ const INTENTS = {
 			[ { "category": DataManager.EffectCategory.APPLY_PASSIVE, "target": DataManager.EffectTarget.SELF, "passive": DataManager.Passive.FATUM, "passive_duration": 0 } ],
 			
 			# 5. Урон
-			[ { "category": DataManager.EffectCategory.DAMAGE, "target": DataManager.EffectTarget.ENEMY, "base_value": 8 } ],
+			[ { "category": DataManager.EffectCategory.DAMAGE, "target": DataManager.EffectTarget.ENEMY, "base_value": 10 } ],
 			
 			# 6. Урон сильнее
-			[ { "category": DataManager.EffectCategory.DAMAGE, "target": DataManager.EffectTarget.ENEMY, "base_value": 12 } ],
+			[ { "category": DataManager.EffectCategory.DAMAGE, "target": DataManager.EffectTarget.ENEMY, "base_value": 14 } ],
 			
 			# 7. Уязвимость (1 на 2)
 			[ { "category": DataManager.EffectCategory.APPLY_STATUS, "target": DataManager.EffectTarget.ENEMY, "status": DataManager.Status.VULNERABILITY, "value": 1, "duration": 2 } ],
