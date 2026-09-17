@@ -49,27 +49,49 @@ const PATTERNS_LAST = [
 
 # НОВОЕ ДЛЯ ГЕНЕРАЦИИ ПУТЕЙ - ПРЕДУСТАНОВЛЕННЫЕ ПУТИ
 const PRESET_PATHS: Array[Dictionary] = [
-	# Вариант 1
+	# Вариант 1 (текущий)
 	{
 		"path_a": [
-			# Сегмент 1
 			[DataManager.RoomGenerationType.OBJECT_TRAP, DataManager.RoomGenerationType.COMBAT_NORMAL, DataManager.RoomGenerationType.OBJECT_CHEST],
-			# Сегмент 2
 			[DataManager.RoomGenerationType.OBJECT_EVENT, DataManager.RoomGenerationType.COMBAT_NORMAL, DataManager.RoomGenerationType.OBJECT_SHOP],
-			# Сегмент 3
 			[DataManager.RoomGenerationType.COMBAT_NORMAL, DataManager.RoomGenerationType.OBJECT_CAULDRON, DataManager.RoomGenerationType.COMBAT_ELITE],
-			# Сегмент 4
 			[DataManager.RoomGenerationType.OBJECT_TRAP, DataManager.RoomGenerationType.COMBAT_NORMAL, DataManager.RoomGenerationType.OBJECT_BONFIRE],
 		],
 		"path_b": [
-			# Сегмент 1
 			[DataManager.RoomGenerationType.OBJECT_TORTURE_RACK, DataManager.RoomGenerationType.COMBAT_NORMAL, DataManager.RoomGenerationType.COMBAT_NORMAL],
-			# Сегмент 2
 			[DataManager.RoomGenerationType.COMBAT_NORMAL, DataManager.RoomGenerationType.COMBAT_NORMAL, DataManager.RoomGenerationType.OBJECT_BONFIRE],
-			# Сегмент 3
 			[DataManager.RoomGenerationType.COMBAT_NORMAL, DataManager.RoomGenerationType.COMBAT_ELITE, DataManager.RoomGenerationType.OBJECT_IDOL],
-			# Сегмент 4
 			[DataManager.RoomGenerationType.COMBAT_ELITE, DataManager.RoomGenerationType.OBJECT_EVENT, DataManager.RoomGenerationType.OBJECT_BONFIRE],
+		]
+	},
+	# Вариант 2
+	{
+		"path_a": [
+			[DataManager.RoomGenerationType.OBJECT_CHEST, DataManager.RoomGenerationType.COMBAT_NORMAL, DataManager.RoomGenerationType.OBJECT_TRAP],
+			[DataManager.RoomGenerationType.COMBAT_NORMAL, DataManager.RoomGenerationType.OBJECT_EVENT, DataManager.RoomGenerationType.OBJECT_BONFIRE],
+			[DataManager.RoomGenerationType.COMBAT_NORMAL, DataManager.RoomGenerationType.COMBAT_ELITE, DataManager.RoomGenerationType.OBJECT_CAULDRON],
+			[DataManager.RoomGenerationType.OBJECT_EVENT, DataManager.RoomGenerationType.COMBAT_NORMAL, DataManager.RoomGenerationType.OBJECT_BONFIRE],
+		],
+		"path_b": [
+			[DataManager.RoomGenerationType.COMBAT_NORMAL, DataManager.RoomGenerationType.COMBAT_NORMAL, DataManager.RoomGenerationType.OBJECT_TORTURE_RACK],
+			[DataManager.RoomGenerationType.OBJECT_EVENT, DataManager.RoomGenerationType.COMBAT_NORMAL, DataManager.RoomGenerationType.OBJECT_SHOP],
+			[DataManager.RoomGenerationType.COMBAT_ELITE, DataManager.RoomGenerationType.COMBAT_NORMAL, DataManager.RoomGenerationType.OBJECT_IDOL],
+			[DataManager.RoomGenerationType.COMBAT_NORMAL, DataManager.RoomGenerationType.COMBAT_ELITE, DataManager.RoomGenerationType.OBJECT_BONFIRE],
+		]
+	},
+	# Вариант 3
+	{
+		"path_a": [
+			[DataManager.RoomGenerationType.OBJECT_TRAP, DataManager.RoomGenerationType.COMBAT_NORMAL, DataManager.RoomGenerationType.OBJECT_TORTURE_RACK],
+			[DataManager.RoomGenerationType.OBJECT_EVENT, DataManager.RoomGenerationType.COMBAT_NORMAL, DataManager.RoomGenerationType.OBJECT_BONFIRE],
+			[DataManager.RoomGenerationType.COMBAT_NORMAL, DataManager.RoomGenerationType.OBJECT_IDOL, DataManager.RoomGenerationType.COMBAT_ELITE],
+			[DataManager.RoomGenerationType.OBJECT_CHEST, DataManager.RoomGenerationType.COMBAT_NORMAL, DataManager.RoomGenerationType.OBJECT_BONFIRE],
+		],
+		"path_b": [
+			[DataManager.RoomGenerationType.COMBAT_NORMAL, DataManager.RoomGenerationType.OBJECT_CHEST, DataManager.RoomGenerationType.COMBAT_NORMAL],
+			[DataManager.RoomGenerationType.COMBAT_NORMAL, DataManager.RoomGenerationType.OBJECT_EVENT, DataManager.RoomGenerationType.OBJECT_SHOP],
+			[DataManager.RoomGenerationType.COMBAT_ELITE, DataManager.RoomGenerationType.OBJECT_CAULDRON, DataManager.RoomGenerationType.COMBAT_NORMAL],
+			[DataManager.RoomGenerationType.OBJECT_EVENT, DataManager.RoomGenerationType.COMBAT_ELITE, DataManager.RoomGenerationType.OBJECT_BONFIRE],
 		]
 	},
 ]

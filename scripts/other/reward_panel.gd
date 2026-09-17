@@ -267,7 +267,8 @@ func _create_take_damage_reward() -> void:
 	SignalManager.reward_selected.connect(_on_reward_selected)
 
 func _create_heal_reward() -> void:
-	var heal_amount = RunManager.rest_default_heal * heal_mod
+	# BUG
+	var heal_amount = DataManager.BASE_HEAL_AMOUNT * heal_mod
 	
 	var content = preload("res://scenes/reward_content.tscn").instantiate() as RewardContent
 	center_container.add_child(content)

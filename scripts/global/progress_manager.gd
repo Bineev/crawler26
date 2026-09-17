@@ -609,6 +609,10 @@ func get_run_progress() -> Dictionary:
 	var start_char_lvl = calculate_character_level_from_snapshot(character_class)
 	var current_char_lvl = calculate_character_level(character_class)
 	
+	# 🆕 XP на текущем уровне (остаток после предыдущих уровней)
+	var start_char_xp_on_level = get_xp_on_current_level(start_char_xp, start_char_lvl, true)
+	var current_char_xp_on_level = get_xp_on_current_level(current_char_xp, current_char_lvl, true)
+	
 	# === Прогресс биомов (только те, где был прирост XP за забег) ===
 	var biomes_progress: Dictionary = {}
 	for biome in DataManager.Biome.values():
@@ -618,19 +622,26 @@ func get_run_progress() -> Dictionary:
 		if current_xp <= start_xp:
 			continue
 		
+		var start_lvl = calculate_biome_level_from_snapshot(biome)
+		var current_lvl = calculate_biome_level(biome)
+		
 		biomes_progress[biome] = {
-			"start_level": calculate_biome_level_from_snapshot(biome),
+			"start_level": start_lvl,
 			"start_xp": start_xp,
-			"current_level": calculate_biome_level(biome),
+			"start_xp_on_level": get_xp_on_current_level(start_xp, start_lvl, false),  # 🆕
+			"current_level": current_lvl,
 			"current_xp": current_xp,
+			"current_xp_on_level": get_xp_on_current_level(current_xp, current_lvl, false),  # 🆕
 			"xp_gain": current_xp - start_xp,
 		}
 	
 	return {
 		"character_start_level": start_char_lvl,
 		"character_start_xp": start_char_xp,
+		"character_start_xp_on_level": start_char_xp_on_level,  # 🆕
 		"character_current_level": current_char_lvl,
 		"character_current_xp": current_char_xp,
+		"character_current_xp_on_level": current_char_xp_on_level,  # 🆕
 		"character_xp_gain": current_char_xp - start_char_xp,
 		"biomes": biomes_progress,
 	}
@@ -680,3 +691,11 @@ func get_next_event(biome: DataManager.Biome) -> EventResource:
 	# 3. Если всё закончилось — перезагружаем
 	is_events_loaded = false
 	return get_next_event(biome)  # ← просто вызываем себя заново
+
+
+func get_xp_on_current_level(total_xp: int, current_level: int, is_character: bool) -> int:
+	var remaining = total_xp
+	for lvl in range(current_level):
+		var required = get_required_xp_for_character_level(lvl) if is_character else get_required_xp_for_biome_level(lvl)
+		remaining -= required
+	return remaining

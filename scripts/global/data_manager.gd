@@ -747,7 +747,7 @@ const STARTING_ENERGY: int = 3
 const MAX_ENERGY: int = 3
 const HAND_SIZE_INCREMENT_PER_BIOME: int = 1  # 🆕
 ## === Сломленный (Penitent) ===
-const PENITENT_STARTING_HEALTH: int = 80
+const PENITENT_STARTING_HEALTH: int = 100
 const PENITENT_MAX_ATONEMENT: int = 30
 const PENITENT_ATONEMENT_GAIN_PER_ATTACK: int = 5
 
@@ -955,7 +955,7 @@ const LOCATION_SPRITE_SIZE: Vector2 = Vector2(1024, 768)
 ## ============================================================
 
 ## Базовый опыт для расчёта уровней
-const XP_BASE: int = 5
+const XP_BASE: int = 10
 
 ## Множитель прогресса персонажа (1.5X на первом уровне)
 const XP_CHARACTER_MULTIPLIER: float = 1.5
@@ -1051,7 +1051,7 @@ const TRAP_SEARCH_CHANCE: float = 0.5      # 50% шанс
 const TRAP_NEUTRALIZE_DAMAGE: int = 1
 const TRAP_SEARCH_DAMAGE: int = 2
 
-const REST_DEFAULT_HEAL: int = 30
+const REST_DEFAULT_HEAL: int = 50
 const BONFIRE_ENERGY_BUFF_DURATION: int = 3  # количество боевых комнат
 
 const EVENT_SUCCESS_CHANCE : float = 0.6

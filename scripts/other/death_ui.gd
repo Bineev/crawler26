@@ -94,18 +94,18 @@ func _on_retry_pressed():
 func show_run_progress_ui() -> void:
 	var progress = ProgressManager.get_run_progress()
 	var unlocked = ProgressManager.process_all_level_ups()
-
-	# 🆕 Сохраняем игру с флагом is_run_ended ПОСЛЕ разблокировки карт,
-	# чтобы новые unlocked_card_ids попали в сейв
+	
 	SaveManager.save_game_with_run_ended()
-
+	
 	var character_class = RunManager.current_character
 	
 	# === Данные персонажа ===
 	var char_start_lvl = progress.character_start_level
 	var char_start_xp = progress.character_start_xp
+	var char_start_xp_on_level = progress.character_start_xp_on_level
 	var char_current_lvl = progress.character_current_level
 	var char_current_xp = progress.character_current_xp
+	var char_current_xp_on_level = progress.character_current_xp_on_level
 	
 	# === Контейнер для прогресса ===
 	var progress_container = VBoxContainer.new()
@@ -119,8 +119,10 @@ func show_run_progress_ui() -> void:
 		tr(DataManager.get_character_class_name_key(character_class)),
 		char_start_lvl,
 		char_start_xp,
+		char_start_xp_on_level,
 		char_current_lvl,
 		char_current_xp,
+		char_current_xp_on_level,
 		true
 	)
 	progress_container.add_child(char_vbox)
@@ -136,8 +138,10 @@ func show_run_progress_ui() -> void:
 			DataManager.get_biome_name(biome_id),
 			data.start_level,
 			data.start_xp,
+			data.start_xp_on_level,
 			data.current_level,
 			data.current_xp,
+			data.current_xp_on_level,
 			false
 		)
 		progress_container.add_child(biome_vbox)
@@ -159,7 +163,17 @@ func show_run_progress_ui() -> void:
 	_animate_bars(progress_container, char_vbox, biome_vboxes, rewards_hbox, unlocked)
 
 
-func _create_progress_section(title: String, name: String, start_lvl: int, start_xp: int, current_lvl: int, current_xp: int, is_character: bool) -> VBoxContainer:
+func _create_progress_section(
+	title: String,
+	name: String,
+	start_lvl: int,
+	start_xp: int,
+	start_xp_on_level: int,
+	current_lvl: int,
+	current_xp: int,
+	current_xp_on_level: int,
+	is_character: bool
+) -> VBoxContainer:
 	var section = VBoxContainer.new()
 	section.add_theme_constant_override("separation", 5)
 	
@@ -186,15 +200,15 @@ func _create_progress_section(title: String, name: String, start_lvl: int, start
 	# Бар прогресса
 	var bar = ProgressBar.new()
 	bar.custom_minimum_size = Vector2(400, 30)
-	bar.show_percentage = false  # 🆕 отключаем проценты
+	bar.show_percentage = false
 	
 	# Рассчитываем XP для барьера
 	var start_required = ProgressManager.get_required_xp_for_character_level(start_lvl) if is_character else ProgressManager.get_required_xp_for_biome_level(start_lvl)
 	var current_required = ProgressManager.get_required_xp_for_character_level(current_lvl) if is_character else ProgressManager.get_required_xp_for_biome_level(current_lvl)
 	
-	# Сохраняем данные в метаданные для анимации
-	bar.set_meta("start_xp", start_xp)
-	bar.set_meta("current_xp", current_xp)
+	# 🆕 Сохраняем данные в метаданные для анимации
+	bar.set_meta("start_xp", start_xp_on_level)
+	bar.set_meta("current_xp", current_xp_on_level)
 	bar.set_meta("start_required", start_required)
 	bar.set_meta("current_required", current_required)
 	bar.set_meta("start_lvl", start_lvl)
@@ -214,7 +228,7 @@ func _create_progress_section(title: String, name: String, start_lvl: int, start
 	
 	# Текст прогресса
 	var xp_label = Label.new()
-	xp_label.text = "%d / %d XP" % [start_xp, start_required]
+	xp_label.text = "%d / %d XP" % [start_xp_on_level, start_required]
 	xp_label.add_theme_font_override("font", DataManager.FONT_MAIN)
 	xp_label.add_theme_font_size_override("font_size", 14)
 	xp_label.add_theme_color_override("font_color", DataManager.COLOR_MOLE_TUNNELS_ART_BG_LIGHT)
@@ -272,33 +286,29 @@ func _animate_single_bar(tween: Tween, bar: ProgressBar, duration: float) -> voi
 	var xp_label = bar.get_meta("xp_label", null)
 	
 	# Начальное состояние
-	bar.value = 0
+	bar.value = start_xp
 	bar.max_value = start_required
 	
 	# Если был левел-ап
 	if current_lvl > start_lvl:
-		# Сначала заполняем до конца первого уровня
-		var first_fill = start_xp
+		# 🆕 Фаза 1: заполняем до конца старого уровня
+		var first_fill = start_required
 		tween.tween_property(bar, "value", first_fill, duration * 0.5)
 		if xp_label:
 			tween.tween_callback(func(): xp_label.text = "%d / %d XP" % [first_fill, start_required])
 		
-		# Меняем max_value на новый уровень
+		# Смена уровня: max_value на новый, value сбрасывается в 0
 		tween.tween_callback(func(): 
 			bar.max_value = current_required
-			# Визуальный эффект перехода уровня
-			bar.modulate = Color(1, 1, 0.5, 1)
-			bar.modulate = Color(1, 1, 1, 1)
+			bar.value = 0
 		)
 		
-		# Заполняем до текущего значения
-		var remaining_xp = current_xp - start_xp
+		# 🆕 Фаза 2: заполняем до текущего значения на новом уровне
 		tween.tween_property(bar, "value", current_xp, duration * 0.5)
 		if xp_label:
 			tween.tween_callback(func(): xp_label.text = "%d / %d XP" % [current_xp, current_required])
 	else:
-		# Если левел-апа не было
-		var xp_gain = current_xp - start_xp
+		# Левел-апа не было — просто анимируем от start_xp до current_xp
 		tween.tween_property(bar, "value", current_xp, duration)
 		if xp_label:
 			tween.tween_callback(func(): xp_label.text = "%d / %d XP" % [current_xp, start_required])

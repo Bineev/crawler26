@@ -41,7 +41,9 @@ func get_enemy_ui() -> EnemyUI:
 
 func init(floor_level: int = 1):
 	var scale_multiplier = _calculate_scale(floor_level)
-	var scaled_max_health = int(resource.base_max_health * scale_multiplier)
+	var flat_bonus = (floor_level - 1) * 3  # 🆕 +3 HP за каждый этаж после первого
+	
+	var scaled_max_health = int(resource.base_max_health * scale_multiplier) + flat_bonus
 	
 	# Используем self, а не stats
 	set_flat(DataManager.FlatStat.MAX_HEALTH, scaled_max_health)
@@ -51,7 +53,6 @@ func init(floor_level: int = 1):
 	for passive in resource.starting_passives:
 		var passive_copy = passive.duplicate_for_instance()
 		passive_copy.init_instance()
-		# starting_charges уже установлены в ресурсе
 		apply_passive(passive_copy)
 
 	# Находим компоненты
@@ -65,7 +66,7 @@ func init(floor_level: int = 1):
 
 func _calculate_scale(floor_level: int) -> float:
 	var scale = 1.0
-	scale += (floor_level - 1) * 0.1
+	scale += (floor_level - 1) * 0.12  # 🆕 +12% за каждый этаж после первого
 	return scale
 
 

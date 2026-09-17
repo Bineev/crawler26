@@ -203,7 +203,7 @@ func _handle_rest() -> void:
 	
 	var reward_panel = preload("res://scenes/reward_panel.tscn").instantiate() as RewardPanel
 	reward_panel.reward_types = _generate_rewards(DataManager.ActionType.REST, true)
-	reward_panel.heal_mod = 1
+	reward_panel.heal_mod = 4  # 🆕 4 × BASE_HEAL_AMOUNT (10) = 40 HP
 	SignalManager.hide_object.emit()
 	SignalManager.show_reward.emit(reward_panel)
 	queue_free()
