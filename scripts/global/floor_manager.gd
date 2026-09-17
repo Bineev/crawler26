@@ -700,7 +700,6 @@ func _generate_two_paths(total_segments: int) -> Array:
 		var end_idx = start_idx + rooms_per_segment
 		
 		var segment_a = path_a.slice(start_idx, end_idx)
-		# BUG
 		var shuffled_a = _shuffle_object_in_segment(segment_a)
 		for i in range(shuffled_a.size()):
 			path_a[start_idx + i] = shuffled_a[i]

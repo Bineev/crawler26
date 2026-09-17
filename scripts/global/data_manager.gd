@@ -1,14 +1,18 @@
 # data_manager.gd
 extends Node
 
+#func get_scale_factor() -> float:
+	#var base_size = Vector2(1920, 1080)  # или из Project Settings
+	#var viewport_size = DisplayServer.screen_get_size()
+	#var scale_factor
+	#scale_factor = viewport_size.y / base_size.y
+	#if base_size.y == viewport_size.y:
+		#scale_factor = 1
+	#return scale_factor
 func get_scale_factor() -> float:
-	var base_size = Vector2(1920, 1080)  # или из Project Settings
-	var viewport_size = DisplayServer.screen_get_size()
-	var scale_factor
-	scale_factor = viewport_size.y / base_size.y
-	if base_size.y == viewport_size.y:
-		scale_factor = 1
-	return scale_factor
+	var base_size := Vector2(1920, 1080)
+	var screen_size := DisplayServer.screen_get_size()
+	return screen_size.y / base_size.y
 	
 var SCALE_FACTOR = get_scale_factor()
 ## ============================================================
@@ -743,7 +747,7 @@ const STARTING_ENERGY: int = 3
 const MAX_ENERGY: int = 3
 const HAND_SIZE_INCREMENT_PER_BIOME: int = 1  # 🆕
 ## === Сломленный (Penitent) ===
-const PENITENT_STARTING_HEALTH: int = 130
+const PENITENT_STARTING_HEALTH: int = 140
 const PENITENT_MAX_ATONEMENT: int = 30
 const PENITENT_ATONEMENT_GAIN_PER_ATTACK: int = 5
 

@@ -11,6 +11,6 @@ biome = 6
 size = 2
 name_key = "enemy_ash_herald_name"
 description_key = "enemy_ash_herald_desc"
-base_max_health = 55
+base_max_health = 48
 starting_passives = Array[ExtResource("2_bs7mj")]([ExtResource("3_bs7mj")])
 metadata/_custom_type_script = "uid://beudtcsu45bk7"

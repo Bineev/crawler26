@@ -69,22 +69,30 @@ func get_card_by_biome(biome: DataManager.Biome, room_progress: int = 0, floor_p
 		return null
 	return DataManager.get_card(pool[randi() % pool.size()])
 
+
 func get_card_by_character(character: DataManager.CharacterClass, room_progress: int = 0, floor_progress: int = 0) -> CardData:
 	var pool = _get_available_cards_by_character(character, room_progress, floor_progress)
 	if pool.is_empty():
 		return null
 	return DataManager.get_card(pool[randi() % pool.size()])
 
+
 func get_cards_by_biome(biome: DataManager.Biome, room_progress: int = 0, floor_progress: int = 0, amount: int = 3) -> Array[CardData]:
 	var pool = _get_available_cards_by_biome(biome, room_progress, floor_progress)
+	pool.shuffle()
 	var result: Array[CardData] = []
-	
+
+	var current_amount = 0
+
 	if pool.is_empty():
 		return result
 	
 	for item in pool:
 		var card = DataManager.get_card(item)
 		result.append(card)
+		current_amount += 1
+		if current_amount == amount:
+			break
 	
 	return result
 
@@ -92,7 +100,10 @@ func get_cards_by_biome(biome: DataManager.Biome, room_progress: int = 0, floor_
 
 func get_cards_by_character(character: DataManager.CharacterClass, room_progress: int = 0, floor_progress: int = 0, amount: int = 3) -> Array[CardData]:
 	var pool = _get_available_cards_by_character(character, room_progress, floor_progress)
+	pool.shuffle()
 	var result: Array[CardData] = []
+	
+	var current_amount = 0
 	
 	if pool.is_empty():
 		return result
@@ -100,6 +111,9 @@ func get_cards_by_character(character: DataManager.CharacterClass, room_progress
 	for item in pool:
 		var card = DataManager.get_card(item)
 		result.append(card)
+		current_amount += 1
+		if current_amount == amount:
+			break
 	
 	return result
 

@@ -83,7 +83,7 @@ func _ready():
 	SignalManager.add_artifact.connect(_on_add_artifact)
 	SignalManager.add_card_to_deck.connect(add_card)
 	SignalManager.add_coins.connect(add_coins)
-	SignalManager.spend_coins.connect(spend_bones)
+	#SignalManager.spend_coins.connect(spend_bones)
 	SignalManager.add_potion.connect(add_potion)
 
 

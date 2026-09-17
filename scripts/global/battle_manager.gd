@@ -224,11 +224,11 @@ func start_enemy_turn():
 	# Передаём ход игроку
 	start_player_turn()
 	
-	check_defeat()
-	if current_state == DataManager.BattleState.VICTORY or current_state == DataManager.BattleState.DEFEAT:
-		return
-	
-	start_player_turn()
+	#check_defeat()
+	#if current_state == DataManager.BattleState.VICTORY or current_state == DataManager.BattleState.DEFEAT:
+		#return
+	#
+	#start_player_turn()
 ## ============================================================
 ## КОНЕЦ ХОДА
 ## ============================================================
