@@ -221,11 +221,16 @@ func show_rewards() -> void:
 			reward_panel.gold_mod = 5
 		
 		DataManager.CombatType.BOSS:
-			reward_types = [DataManager.RewardType.ARTIFACT_COMBO, DataManager.RewardType.CARD_CHARACTER, DataManager.RewardType.GET_HEAL, DataManager.RewardType.DECK_SIZE_BUFF]
+			# 🆕 На 2-м этаже — элитные артефакты (кирасы)
+			if FloorManager.current_floor == 2:
+				reward_types = [DataManager.RewardType.ARTIFACT_ELITE, DataManager.RewardType.CARD_CHARACTER, DataManager.RewardType.GET_HEAL, DataManager.RewardType.DECK_SIZE_BUFF]
+			else:
+				reward_types = [DataManager.RewardType.ARTIFACT_COMBO, DataManager.RewardType.CARD_CHARACTER, DataManager.RewardType.GET_HEAL, DataManager.RewardType.DECK_SIZE_BUFF]
+			
 			reward_panel.gold_mod = 3
 			reward_panel.heal_mod = 10
-			reward_panel.buff_amount = RunManager.hand_size_increment_per_biome  # 🆕
-			reward_panel.buff_duration = -1  # 🆕 перманентно
+			reward_panel.buff_amount = RunManager.hand_size_increment_per_biome
+			reward_panel.buff_duration = -1
 	
 	reward_panel.reward_types = reward_types
 	SignalManager.show_reward.emit(reward_panel)

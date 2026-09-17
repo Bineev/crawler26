@@ -904,3 +904,10 @@ func reset_run_constants():
 	is_bleed_poison_interaction_enabled = false
 	is_poison_burn_interaction_enabled = false
 	is_bleed_cold_interaction_enabled = false
+
+
+func has_artifact(artifact_id: DataManager.ArtifactId) -> bool:
+	for artifact in artifacts:
+		if artifact.id == artifact_id:
+			return true
+	return false

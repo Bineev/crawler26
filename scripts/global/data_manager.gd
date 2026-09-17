@@ -359,6 +359,9 @@ enum ArtifactId {
 	LUCKY_PICK,  # 🆕
 	INSATIABLE_BLADE,  # 🆕
 	BRASS_CANDLESTICK,  # Латунный шандал
+	LIVING_ARMOR,  # 🆕
+	SMOLDERING_CUIRASS,  # 🆕
+	MUSHROOM_CARAPACE,  # 🆕
 }
 
 ## ============================================================
@@ -805,6 +808,8 @@ const SHAME_DURATION: int = 2
 const SHAME_DAMAGE_TAKEN_MULTIPLIER: float = 1.25
 const SHAME_ATONEMENT_MULTIPLIER: float = 2.0
 
+const ARTIFACT_SMOLDERING_CUIRASS_HP_REDUCTION: float = 0.9
+
 ## === Карты Сломленного ===
 
 const ATONEMENT_STRIKE_DAMAGE: int = 8
@@ -898,6 +903,10 @@ const CARD_SPACING_COMPRESSION_FACTOR: float = 0.13
 
 ## Минимальный отступ между картами (в процентах от ширины карты, 0.7 = 70%)
 const CARD_MIN_SPACING_RATIO: float = 0.7
+
+## 
+const ARTIFACT_LIVING_ARMOR_ENERGY_BONUS: int = 1
+const ARTIFACT_LIVING_ARMOR_HP_BONUS: int = 20
 
 ## ============================================================
 ## КАРТА: ВРЕМЯ УМИРАТЬ
@@ -994,7 +1003,8 @@ const GANGRENE_DURATION_DIVIDER: int = 3
 const FROZEN_ENERGY_LOSS: int = 2
 ## Burn ↔ Cold (контр-статусы, 1:1 вычитание)
 # Константа не нужна, так как вычитание 1:1
-
+const ARTIFACT_MUSHROOM_CARAPACE_ENERGY_BONUS: int = 1
+const ARTIFACT_MUSHROOM_CARAPACE_HEAL: int = 7
 ## ============================================================
 ## 5. КОЛОДА
 ## ============================================================
@@ -1914,6 +1924,9 @@ const ARTIFACT_ICONS: Dictionary = {
 	DataManager.ArtifactId.LUCKY_PICK: preload("res://img/icons/artifacts/lucky_pick1.png"),  # 🆕
 	DataManager.ArtifactId.INSATIABLE_BLADE: preload("res://img/icons/artifacts/insatiable_blade1.png"),  # 🆕
 	DataManager.ArtifactId.BRASS_CANDLESTICK: preload("res://img/icons/artifacts/brass_candlestick.png"),
+	DataManager.ArtifactId.LIVING_ARMOR: preload("res://img/icons/artifacts/living_armor.png"),  # 🆕
+	DataManager.ArtifactId.SMOLDERING_CUIRASS: preload("res://img/icons/artifacts/smoldering_cuirass.png"),  # 🆕
+	DataManager.ArtifactId.MUSHROOM_CARAPACE: preload("res://img/icons/artifacts/mushroom_carapace.png"),  # 🆕
 }
 
 
@@ -2316,32 +2329,38 @@ func get_artifact_name(artifact_id: ArtifactId) -> String:
 			return tr("artifact_healers_amulet_name")
 		ArtifactId.ABYSS_DUST:
 			return tr("artifact_abyss_dust_name")
-		ArtifactId.TROLL_BLADE:  # 🆕
+		ArtifactId.TROLL_BLADE:
 			return tr("artifact_troll_blade_name")
-		ArtifactId.IMP_BLADE:  # 🆕
+		ArtifactId.IMP_BLADE:
 			return tr("artifact_imp_blade_name")
-		ArtifactId.PLAGUE_AMULET:  # 🆕
+		ArtifactId.PLAGUE_AMULET:
 			return tr("artifact_plague_amulet_name")
-		ArtifactId.ARACHNID_BELT:  # 🆕
+		ArtifactId.ARACHNID_BELT:
 			return tr("artifact_arachnid_belt_name")
-		ArtifactId.RUNIC_HELM:  # 🆕
+		ArtifactId.RUNIC_HELM:
 			return tr("artifact_runic_helm_name")
-		ArtifactId.DRAGON_BROOCH:  # 🆕
+		ArtifactId.DRAGON_BROOCH:
 			return tr("artifact_dragon_brooch_name")
-		ArtifactId.RUSTY_NAIL:  # 🆕
+		ArtifactId.RUSTY_NAIL:
 			return tr("artifact_rusty_nail_name")
-		ArtifactId.THORN_CROWN:  # 🆕
+		ArtifactId.THORN_CROWN:
 			return tr("artifact_thorn_crown_name")
-		ArtifactId.SERRATED_KNUCKLE:  # 🆕
+		ArtifactId.SERRATED_KNUCKLE:
 			return tr("artifact_serrated_knuckle_name")
-		ArtifactId.RING_OF_BARRICADE:  # 🆕
+		ArtifactId.RING_OF_BARRICADE:
 			return tr("artifact_ring_of_barricade_name")
-		ArtifactId.LUCKY_PICK:  # 🆕
+		ArtifactId.LUCKY_PICK:
 			return tr("artifact_lucky_pick_name")
-		ArtifactId.INSATIABLE_BLADE:  # 🆕
+		ArtifactId.INSATIABLE_BLADE:
 			return tr("artifact_insatiable_blade_name")
 		ArtifactId.BRASS_CANDLESTICK:
 			return tr("artifact_brass_candlestick_name")
+		ArtifactId.LIVING_ARMOR:
+			return tr("artifact_living_armor_name")
+		ArtifactId.SMOLDERING_CUIRASS:
+			return tr("artifact_smoldering_cuirass_name")
+		ArtifactId.MUSHROOM_CARAPACE:
+			return tr("artifact_mushroom_carapace_name")
 		_:
 			return tr("artifact_unknown_name")
 
@@ -2369,13 +2388,13 @@ func get_artifact_description(artifact_id: ArtifactId) -> String:
 			]
 		ArtifactId.ABYSS_DUST:
 			return tr("artifact_abyss_dust_desc") % ARTIFACT_ABYSS_DUST_CARD_COST
-		ArtifactId.TROLL_BLADE:  # 🆕
+		ArtifactId.TROLL_BLADE:
 			return tr("artifact_troll_blade_desc")
-		ArtifactId.IMP_BLADE:  # 🆕
+		ArtifactId.IMP_BLADE:
 			return tr("artifact_imp_blade_desc")
-		ArtifactId.PLAGUE_AMULET:  # 🆕
+		ArtifactId.PLAGUE_AMULET:
 			return tr("artifact_plague_amulet_desc")
-		ArtifactId.ARACHNID_BELT:  # 🆕
+		ArtifactId.ARACHNID_BELT:
 			return tr("artifact_arachnid_belt_desc")
 		ArtifactId.RUNIC_HELM:
 			var artifact = get_artifact_resource(ArtifactId.RUNIC_HELM)
@@ -2385,7 +2404,7 @@ func get_artifact_description(artifact_id: ArtifactId) -> String:
 					effect.base_value  # количество щита
 				]
 			return tr("artifact_runic_helm_desc") % [10]  # fallback
-		ArtifactId.DRAGON_BROOCH:  # 🆕
+		ArtifactId.DRAGON_BROOCH:
 			var artifact = get_artifact_resource(ArtifactId.DRAGON_BROOCH)
 			if artifact:
 				return tr("artifact_dragon_brooch_desc") % [
@@ -2402,7 +2421,7 @@ func get_artifact_description(artifact_id: ArtifactId) -> String:
 					effect.duration  # длительность
 				]
 			return tr("artifact_rusty_nail_desc") % [1, 2]  # fallback
-		ArtifactId.THORN_CROWN:  # 🆕
+		ArtifactId.THORN_CROWN:
 			var artifact = get_artifact_resource(ArtifactId.THORN_CROWN)
 			if artifact and artifact.effects.size() >= 2:
 				var damage_effect = artifact.effects[0]
@@ -2412,9 +2431,9 @@ func get_artifact_description(artifact_id: ArtifactId) -> String:
 					denial_effect.passive_duration  # заряды Denial
 				]
 			return tr("artifact_thorn_crown_desc") % [3, 3]  # fallback
-		ArtifactId.SERRATED_KNUCKLE:  # 🆕
+		ArtifactId.SERRATED_KNUCKLE:
 			return tr("artifact_serrated_knuckle_desc")
-		ArtifactId.RING_OF_BARRICADE:  # 🆕
+		ArtifactId.RING_OF_BARRICADE:
 			var artifact = get_artifact_resource(ArtifactId.RING_OF_BARRICADE)
 			if artifact:
 				return tr("artifact_ring_of_barricade_desc") % [
@@ -2422,9 +2441,9 @@ func get_artifact_description(artifact_id: ArtifactId) -> String:
 					artifact.effects[0].base_value if artifact.effects.size() > 0 else 10  # щит
 				]
 			return tr("artifact_ring_of_barricade_desc") % [8, 10]  # fallback
-		ArtifactId.LUCKY_PICK:  # 🆕
+		ArtifactId.LUCKY_PICK:
 			return tr("artifact_lucky_pick_desc")
-		ArtifactId.INSATIABLE_BLADE:  # 🆕
+		ArtifactId.INSATIABLE_BLADE:
 			var artifact = get_artifact_resource(ArtifactId.INSATIABLE_BLADE)
 			if artifact:
 				return tr("artifact_insatiable_blade_desc") % [
@@ -2434,6 +2453,20 @@ func get_artifact_description(artifact_id: ArtifactId) -> String:
 			return tr("artifact_insatiable_blade_desc") % [3, 3]
 		ArtifactId.BRASS_CANDLESTICK:
 			return tr("artifact_brass_candlestick_desc")
+		ArtifactId.LIVING_ARMOR:  # 🆕
+			return tr("artifact_living_armor_desc") % [
+				ARTIFACT_LIVING_ARMOR_ENERGY_BONUS,
+				ARTIFACT_LIVING_ARMOR_HP_BONUS
+			]
+		ArtifactId.SMOLDERING_CUIRASS:
+			return tr("artifact_smoldering_cuirass_desc") % [
+				int((1.0 - ARTIFACT_SMOLDERING_CUIRASS_HP_REDUCTION) * 100)
+			]
+		ArtifactId.MUSHROOM_CARAPACE:
+			return tr("artifact_mushroom_carapace_desc") % [
+				ARTIFACT_MUSHROOM_CARAPACE_ENERGY_BONUS,
+				ARTIFACT_MUSHROOM_CARAPACE_HEAL
+			]
 		_:
 			return ""
 
@@ -2463,6 +2496,9 @@ func load_artifact_resources() -> void:
 	_artifact_resources[ArtifactId.LUCKY_PICK] = load("res://resources/artifacts/lucky_pick.tres")  # 🆕
 	_artifact_resources[ArtifactId.INSATIABLE_BLADE] = load("res://resources/artifacts/insatiable_blade.tres")  # 🆕
 	_artifact_resources[ArtifactId.BRASS_CANDLESTICK] = load("res://resources/artifacts/brass_candlestick.tres")
+	_artifact_resources[ArtifactId.LIVING_ARMOR] = load("res://resources/artifacts/living_armor.tres")  # 🆕
+	_artifact_resources[ArtifactId.SMOLDERING_CUIRASS] = load("res://resources/artifacts/smoldering_cuirass.tres")  # 🆕
+	_artifact_resources[ArtifactId.MUSHROOM_CARAPACE] = load("res://resources/artifacts/mushroom_carapace.tres")  # 🆕
 	
 	_artifact_resources_loaded = true
 

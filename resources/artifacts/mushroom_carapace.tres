@@ -1,0 +1,31 @@
+[gd_resource type="Resource" script_class="ArtifactResource" load_steps=5 format=3 uid="uid://ylany2jk8ufr"]
+
+[ext_resource type="Script" uid="uid://cmra25r1r3ivt" path="res://resources/res_scripts/effect_entry.gd" id="1_nt3w7"]
+[ext_resource type="Script" uid="uid://dxepc28vep34d" path="res://resources/res_scripts/artifact_resource.gd" id="2_qpswr"]
+
+[sub_resource type="Resource" id="Resource_nt3w7"]
+script = ExtResource("1_nt3w7")
+category = 6
+target = 0
+target_stat = 3
+delta = 1
+metadata/_custom_type_script = "uid://cmra25r1r3ivt"
+
+[sub_resource type="Resource" id="Resource_qpswr"]
+script = ExtResource("1_nt3w7")
+category = 2
+target = 0
+base_value = 7
+metadata/_custom_type_script = "uid://cmra25r1r3ivt"
+
+[resource]
+script = ExtResource("2_qpswr")
+id = 20
+cost_grade = 6
+grade = 1
+triggers = Array[int]([0, 3])
+name_key = "artifact_mushroom_carapace_name"
+description_key = "artifact_mushroom_carapace_desc"
+lore_key = "artifact_mushroom_carapace_lore"
+effects = Array[ExtResource("1_nt3w7")]([SubResource("Resource_nt3w7"), SubResource("Resource_qpswr")])
+metadata/_custom_type_script = "uid://dxepc28vep34d"

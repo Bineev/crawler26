@@ -74,8 +74,16 @@ func get_available_artifacts_by_grade(grade: DataManager.ArtifactGrade) -> Array
 	var available: Array[DataManager.ArtifactId] = []
 	
 	for artifact_id in all:
-		if artifact_id in unlocked_artifact_ids:
-			available.append(artifact_id)
+		# 🆕 Проверяем мета-прогресс
+		if not ProgressManager.is_artifact_unlocked(artifact_id):
+			continue
+		
+		# 🆕 Пропускаем event_only
+		var resource = DataManager.get_artifact_resource(artifact_id)
+		if resource and resource.is_event_only:
+			continue
+		
+		available.append(artifact_id)
 	
 	return available
 

@@ -3,6 +3,7 @@
 [ext_resource type="Script" uid="uid://me7t81o2d0pr" path="res://scripts/other/death_ui.gd" id="1_bb3uk"]
 
 [node name="DeathUI" type="Control"]
+z_index = 1000
 custom_minimum_size = Vector2(1920, 1080)
 layout_mode = 3
 anchors_preset = 0

@@ -47,7 +47,11 @@ func init(floor_level: int = 1):
 	var flat_bonus = (actual_floor - 1) * 3  # +3 HP за каждый этаж после первого
 	
 	var scaled_max_health = int(resource.base_max_health * scale_multiplier) + flat_bonus
-	
+
+	# 🆕 Тлеющая кираса: −10% макс. HP врагов
+	if RunManager.has_artifact(DataManager.ArtifactId.SMOLDERING_CUIRASS):
+		scaled_max_health = int(scaled_max_health * DataManager.ARTIFACT_SMOLDERING_CUIRASS_HP_REDUCTION)
+
 	set_flat(DataManager.FlatStat.MAX_HEALTH, scaled_max_health)
 	set_flat(DataManager.FlatStat.HEALTH, scaled_max_health)
 	base_strength = int(resource.base_strength * scale_multiplier)

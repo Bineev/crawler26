@@ -238,6 +238,7 @@ func _init_default_progress():
 	# ============================================================
 	# 3. ОТКРЫТЫЕ АРТЕФАКТЫ (все существующие)
 	# ============================================================
+	# BUG не факт что нужна эта функция
 	unlocked_artifact_ids = [
 		DataManager.ArtifactId.STRANGE_MUSHROOM,
 		DataManager.ArtifactId.HEROS_BROOCH,
@@ -247,8 +248,19 @@ func _init_default_progress():
 		DataManager.ArtifactId.TROLL_BLADE,
 		DataManager.ArtifactId.IMP_BLADE,
 		DataManager.ArtifactId.PLAGUE_AMULET,
-		DataManager.ArtifactId.BRASS_CANDLESTICK,  # 🆕
-		# BUG возможно нужно добавить остальные арты
+		DataManager.ArtifactId.ARACHNID_BELT,       # 🆕
+		DataManager.ArtifactId.RUNIC_HELM,          # 🆕
+		DataManager.ArtifactId.DRAGON_BROOCH,       # 🆕
+		DataManager.ArtifactId.RUSTY_NAIL,          # 🆕
+		DataManager.ArtifactId.THORN_CROWN,         # 🆕
+		DataManager.ArtifactId.SERRATED_KNUCKLE,    # 🆕
+		DataManager.ArtifactId.RING_OF_BARRICADE,   # 🆕
+		DataManager.ArtifactId.LUCKY_PICK,          # 🆕
+		DataManager.ArtifactId.INSATIABLE_BLADE,    # 🆕
+		DataManager.ArtifactId.BRASS_CANDLESTICK,
+		DataManager.ArtifactId.LIVING_ARMOR,        # 🆕
+		DataManager.ArtifactId.SMOLDERING_CUIRASS,  # 🆕
+		DataManager.ArtifactId.MUSHROOM_CARAPACE,  # 🆕
 	]
 	
 	meta_currency = 0

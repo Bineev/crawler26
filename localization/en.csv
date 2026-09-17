@@ -870,3 +870,13 @@ upgrade_card_confirm,Upgrade
 "card_boiling_passion_name","Boiling Passion"
 "card_boiling_passion_desc","Applies Fatum to yourself for 3 turns."
 "effect_boiling_passion","Applies Fatum to yourself for 3 turns."
+
+"artifact_living_armor_name","Living Armor"
+"artifact_living_armor_desc","+%d max Energy.\n+%d max Health."
+"artifact_living_armor_lore","Armor that breathes. It does not protect - it lives."
+"artifact_smoldering_cuirass_name","Smoldering Cuirass"
+"artifact_smoldering_cuirass_desc","Maximum health of all enemies reduced by %d%%."
+"artifact_smoldering_cuirass_lore","The heat it radiates weakens all living things before the first blow."
+"artifact_mushroom_carapace_name","Mushroom Carapace"
+"artifact_mushroom_carapace_desc","+%d max Energy.\nRestores %d HP at the start of each battle."
+"artifact_mushroom_carapace_lore","Mushrooms grow on dead flesh — but they are willing to sustain the living too."
