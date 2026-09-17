@@ -378,7 +378,7 @@ func add_status(status: StatusResource, value: int, duration: int, caster: Chara
 	if DataManager.is_negative_status(status_id) and self is EnemyInstance:
 		SoundManager.play(null, DataManager.get_sound(DataManager.SoundType.APPLY_DEBUFF))
 	# 🆕 Взаимодействия статусов (только НЕ для врагов)
-	var can_use_interactions = not self is EnemyInstance
+	var can_use_interactions = self is EnemyInstance
 	
 	# Проверяем наличие взаимодействия (только для игрока)
 	if can_use_interactions and StatusInteractionManager.has_interaction(self, status_id):
@@ -1158,29 +1158,23 @@ func _explode_blister():
 		return
 	
 	var blister_data = status_data["blister_data"]
-	var burn_stacks = blister_data.burn_stacks_on_create
-	var poison_duration = blister_data.poison_duration_on_create
-	var burn_amount = burn_stacks * poison_duration
+	var max_health = blister_data.max_health
+	
+	# 🆕 Burn-стаки при сбитии = прочность пузыря / BLISTER_DIVIDER
+	var burn_amount = int(max_health / DataManager.BLISTER_DIVIDER)
 	
 	# Удаляем пузырь
 	remove_status(DataManager.Status.BLISTER)
 	
-	# Определяем, кому наносить BURN
-	var is_player = self is PenitentStats
-	var targets: Array = []
-	
-	if is_player:
-		# Если пузырь был на игроке — взрыв наносит BURN игроку
-		targets = [self]
-	else:
-		# Если пузырь был на враге — все враги получают BURN
-		targets = BattleManager.get_enemies()
-	
+	# 🆕 Накладываем Burn на всех врагов
 	var burn_status = DataManager.get_status_resource(DataManager.Status.BURN)
-	for target in targets:
-		target.add_status(burn_status, burn_amount, 2, self)
+	var enemies = BattleManager.get_enemies()
 	
-	SignalManager.log_message.emit("Чёрный пузырь уничтожен! %d стаков Горения наложено!" % burn_amount)
+	for enemy in enemies:
+		if is_instance_valid(enemy) and enemy.is_alive():
+			enemy.add_status(burn_status, burn_amount, 2, self)
+	
+	SignalManager.log_message.emit("Чёрный пузырь уничтожен! %d стаков Горения наложено на всех врагов!" % burn_amount)
 
 
 func get_infection_damage() -> int:

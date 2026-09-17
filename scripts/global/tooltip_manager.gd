@@ -198,9 +198,10 @@ func _get_dynamic_status_description(status_id: DataManager.Status, stacks: int,
 		DataManager.Status.GANGRENE:
 			return tr("status_gangrene_dynamic_desc") % [stacks, duration]
 		DataManager.Status.BLISTER:
-			var blister_data = _get_blister_data()
-			if blister_data:
-				return tr("status_blister_dynamic_desc") % [blister_data.current_health, blister_data.duration]
+			var blister_data = status_data.get("blister_data", {})
+			if not blister_data.is_empty():
+				var current_health = blister_data.get("current_health", 0)
+				return tr("status_blister_dynamic_desc") % [current_health, duration]
 			return tr("status_blister_desc")
 		DataManager.Status.INFECTION:
 			# 🆕 Берём effect_per_stack из данных статуса на цели
@@ -434,8 +435,9 @@ func _get_status_additional_info(status_id: DataManager.Status, status_data: Dic
 			return tr("status_gangrene_additional")
 		DataManager.Status.BLISTER:
 			var blister_data = status_data.get("blister_data", {})
-			if blister_data and not blister_data.is_empty():
-				var burn_on_destroy = blister_data.get("burn_stacks_on_create", 0) * blister_data.get("poison_duration_on_create", 0)
+			if not blister_data.is_empty():
+				var max_health = blister_data.get("max_health", 0)
+				var burn_on_destroy = int(max_health / DataManager.BLISTER_DIVIDER)
 				var damage_on_expire = blister_data.get("current_health", 0)
 				return tr("status_blister_additional") % [burn_on_destroy, damage_on_expire]
 			return ""
@@ -503,12 +505,6 @@ func _build_potion_tooltip_data(potion: PotionResource) -> Dictionary:
 		"title": potion.get_localized_name(),
 		"description": desc,
 	}
-
-
-func _get_blister_data() -> Dictionary:
-	# Получаем данные о текущем блистере (нужно передавать извне)
-	# Пока заглушка
-	return {"current_health": 0, "duration": 0}
 
 
 func request_intent_tooltip(effect: EffectEntry, position: Vector2):

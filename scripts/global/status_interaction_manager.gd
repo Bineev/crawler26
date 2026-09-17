@@ -44,30 +44,34 @@ func can_apply(target, new_status: DataManager.Status) -> bool:
 # StatusInteractionManager.gd
 
 func handle_interaction(target, new_status: DataManager.Status, stacks: int, duration: int, status_resource: StatusResource, caster: CharacterStats = null):
-	# 1. Получаем последний статус (уже без Burn/Cold, так как они обработаны до)
-	var last_status = target._get_last_status(new_status)
+	# 🆕 Вызываем метод из StatusInteractionManager (проверяет флаги)
+	var last_status = _get_last_status(target, new_status)
 	
 	# 2. Если нет последнего статуса — просто накладываем
 	if last_status == -1:
 		target._add_status_direct(status_resource, stacks, duration, caster)
 		return
 	
-	if (last_status == DataManager.Status.BLEED and new_status == DataManager.Status.POISON) or \
-	   (last_status == DataManager.Status.POISON and new_status == DataManager.Status.BLEED):
-		_handle_bleed_poison_infection(target, last_status, new_status, stacks, duration)
-		return
+	# Bleed + Poison → Infection (только если флаг включён)
+	if RunManager.is_bleed_poison_interaction_enabled:
+		if (last_status == DataManager.Status.BLEED and new_status == DataManager.Status.POISON) or \
+		   (last_status == DataManager.Status.POISON and new_status == DataManager.Status.BLEED):
+			_handle_bleed_poison_infection(target, last_status, new_status, stacks, duration)
+			return
 	
-	# Poison + Burn → BLISTER
-	if (last_status == DataManager.Status.POISON and new_status == DataManager.Status.BURN) or \
-	   (last_status == DataManager.Status.BURN and new_status == DataManager.Status.POISON):
-		_handle_poison_burn_blister(target, last_status, new_status, stacks, duration)
-		return
+	# Poison + Burn → Blister (только если флаг включён)
+	if RunManager.is_poison_burn_interaction_enabled:
+		if (last_status == DataManager.Status.POISON and new_status == DataManager.Status.BURN) or \
+		   (last_status == DataManager.Status.BURN and new_status == DataManager.Status.POISON):
+			_handle_poison_burn_blister(target, last_status, new_status, stacks, duration)
+			return
 	
-	# Bleed + Cold → Гангрена
-	if (last_status == DataManager.Status.BLEED and new_status == DataManager.Status.COLD) or \
-	   (last_status == DataManager.Status.COLD and new_status == DataManager.Status.BLEED):
-		_handle_bleed_cold_gangrene(target, new_status, stacks, duration)
-		return
+	# Bleed + Cold → Gangrene (только если флаг включён)
+	if RunManager.is_bleed_cold_interaction_enabled:
+		if (last_status == DataManager.Status.BLEED and new_status == DataManager.Status.COLD) or \
+		   (last_status == DataManager.Status.COLD and new_status == DataManager.Status.BLEED):
+			_handle_bleed_cold_gangrene(target, new_status, stacks, duration)
+			return
 	
 	# 4. Если ни одно взаимодействие не подошло — просто накладываем
 	target._add_status_direct(status_resource, stacks, duration, caster)
@@ -206,41 +210,33 @@ func _handle_poison_burn_blister(target, status_a: DataManager.Status, status_b:
 		# Обновляем длительность (максимум)
 		existing_data.duration = max(existing_data.duration, poison_duration)
 		
-		# Обновляем параметры взрыва
-		blister_data.burn_stacks_on_create += burn_stacks
-		blister_data.poison_duration_on_create = max(blister_data.poison_duration_on_create, poison_duration)
-		
 		SignalManager.log_message.emit("Чёрный пузырь усилился! Прочность: %d, Длительность: %d ходов." % [blister_data.current_health, existing_data.duration])
 		return
 	
 	# Создаём новый BLISTER
 	var blister_status = DataManager.get_status_resource(DataManager.Status.BLISTER)
 	if blister_status:
-		# Создаём копию статуса
 		var status_copy = blister_status.duplicate_for_instance()
 		status_copy.is_ticking = true
-		status_copy.tick_interval = poison_duration  # тикнет один раз в конце
+		status_copy.tick_interval = poison_duration
 		
-		# Создаём tick_effect для Блистера
+		var initial_health = burn_stacks * DataManager.BLISTER_DENSITY
+		
+		# tick_effect с кастомным скриптом для взрыва при истечении
 		var tick_effect = EffectEntry.new()
 		tick_effect.category = DataManager.EffectCategory.CUSTOM
 		tick_effect.target = DataManager.EffectTarget.SELF
 		tick_effect.custom_script = preload("res://scripts/effects/blister_explosion.gd")
-		
-		# Сохраняем параметры в эффекте
-		tick_effect.value = burn_stacks * DataManager.BLISTER_DENSITY  # current_health
-		tick_effect.base_value = burn_stacks * poison_duration  # burn_amount для взрыва
-		tick_effect.amount = burn_stacks  # burn_stacks_on_create
 		
 		status_copy.tick_effect = tick_effect
 		
 		# Накладываем статус
 		target._add_status_direct(status_copy, 1, poison_duration, target)
 		
-		# Сохраняем данные в активном статусе для поглощения урона
+		# Сохраняем данные в активном статусе
 		var blister_data = {
-			"max_health": burn_stacks * DataManager.BLISTER_DENSITY,
-			"current_health": burn_stacks * DataManager.BLISTER_DENSITY,
+			"max_health": initial_health,
+			"current_health": initial_health,
 			"burn_stacks_on_create": burn_stacks,
 			"poison_duration_on_create": poison_duration,
 		}
@@ -248,7 +244,13 @@ func _handle_poison_burn_blister(target, status_a: DataManager.Status, status_b:
 		if status_data:
 			status_data["blister_data"] = blister_data
 		
-		SignalManager.log_message.emit("Чёрный пузырь! Прочность: %d, Длительность: %d ходов." % [blister_data.max_health, poison_duration])
+		# 🆕 Принудительно обновляем UI после добавления blister_data
+		if target is EnemyInstance:
+			SignalManager.enemy_status_changed.emit(target)
+		else:
+			SignalManager.player_status_changed.emit(target)
+		
+		SignalManager.log_message.emit("Чёрный пузырь! Прочность: %d, Длительность: %d ходов." % [initial_health, poison_duration])
 
 
 func _handle_bleed_poison_infection(target, status_a: DataManager.Status, status_b: DataManager.Status, new_stacks: int, new_duration: int):

@@ -40,12 +40,14 @@ func get_enemy_ui() -> EnemyUI:
 
 
 func init(floor_level: int = 1):
-	var scale_multiplier = _calculate_scale(floor_level)
-	var flat_bonus = (floor_level - 1) * 3  # 🆕 +3 HP за каждый этаж после первого
+	# 🆕 Игнорируем переданный floor_level, берём актуальный из FloorManager
+	var actual_floor = FloorManager.current_floor
+	
+	var scale_multiplier = _calculate_scale(actual_floor)
+	var flat_bonus = (actual_floor - 1) * 3  # +3 HP за каждый этаж после первого
 	
 	var scaled_max_health = int(resource.base_max_health * scale_multiplier) + flat_bonus
 	
-	# Используем self, а не stats
 	set_flat(DataManager.FlatStat.MAX_HEALTH, scaled_max_health)
 	set_flat(DataManager.FlatStat.HEALTH, scaled_max_health)
 	base_strength = int(resource.base_strength * scale_multiplier)
@@ -230,6 +232,11 @@ func get_active_statuses_for_ui() -> Array[Dictionary]:
 			# 🆕 Добавляем effect_per_stack, если есть
 			if status_data.has("effect_per_stack"):
 				data["effect_per_stack"] = status_data["effect_per_stack"]
+			
+			# 🆕 Добавляем blister_data (для BLISTER)
+			if status_data.has("blister_data"):
+				data["blister_data"] = status_data["blister_data"]
+			
 			result.append(data)
 	return result
 

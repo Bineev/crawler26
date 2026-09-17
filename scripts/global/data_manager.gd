@@ -852,11 +852,14 @@ const CRY_OF_DESPAIR_HEAL_TIER_1: int = 5
 const CRY_OF_DESPAIR_HEAL_TIER_2: int = 10
 const CRY_OF_DESPAIR_HEAL_TIER_3: int = 15
 
-
+const BASE_HEAL_AMOUNT: int = 10
 
 const ENEMY_STEP_DELAY : float = 1
 const STATUS_TRIGGER_DELAY : float = 1
 const PLAYER_STATUS_TRIGGER_DELAY : float = 1.2
+
+const BLISTER_DENSITY: int = 2              # сколько HP пузыря за 1 стак Burn
+const BLISTER_DIVIDER: float = 0.5          # делитель для расчёта Burn при сбитии
 
 const CHEST_BREAK_CHANCE: float = 0.5  # 50% шанс взлома
 ## ============================================================

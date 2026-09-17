@@ -444,6 +444,10 @@ func _update_icons(target : Node):
 			icon_data["effect_per_stack"] = status_data["effect_per_stack"]
 			# Также добавляем в status_data для тултипа
 			status_data["effect_per_stack"] = status_data["effect_per_stack"]
+			
+		# 🆕 Добавляем blister_data (для BLISTER)
+		if status_data.has("blister_data"):
+			icon_data["blister_data"] = status_data["blister_data"]
 		
 		var icon = STATUS_ICON_SCENE.instantiate() as StatusIcon
 		status_container.add_child(icon)
