@@ -162,17 +162,18 @@ func _load_settings():
 		var sfx_volume = config.get_value("audio", "sfx_volume", 0.8)
 		_set_bus_volume("SFX", sfx_volume)
 		
-		# Загружаем язык
-		var language = config.get_value("locale", "language", "en")
-		TranslationServer.set_locale(language)
-		
-		print("Settings loaded: Music=", music_volume, " SFX=", sfx_volume, " Language=", language)
+		# 🆕 Загружаем язык, только если он сохранён (иначе оставляем текущий)
+		if config.has_section_key("locale", "language"):
+			var language = config.get_value("locale", "language")
+			TranslationServer.set_locale(language)
+			print("Settings loaded: Music=", music_volume, " SFX=", sfx_volume, " Language=", language)
+		else:
+			print("Settings loaded: Music=", music_volume, " SFX=", sfx_volume, " (language not set)")
 	else:
-		# Если файла нет — ставим значения по умолчанию
+		# 🆕 Если файла нет — ставим значения по умолчанию, но НЕ трогаем локаль
 		_set_bus_volume("Music", 0.8)
 		_set_bus_volume("SFX", 0.8)
-		TranslationServer.set_locale("en")
-		print("No settings file found, using defaults")
+		print("No settings file found, using defaults (language kept as-is)")
 
 
 func _set_bus_volume(bus_name: String, value: float):

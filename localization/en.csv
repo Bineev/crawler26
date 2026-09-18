@@ -403,8 +403,8 @@ upgrade_card_confirm,Upgrade
 "artifact_troll_blade_lore","A crude blade made from a troll's icy teeth. Its black frost turns blood to crystal and wounds to rot."
 
 "artifact_imp_blade_name","Imp Blade"
-"artifact_imp_blade_desc","Interaction of Poison and Burn creates Blister. Blister absorbs damage; when destroyed, inflicts Burn on all enemies; otherwise explodes."
-"artifact_imp_blade_lore","A blade forged from the claw of a fire imp. Its edge is covered in black soot, and its hilt is wrapped in leather. On impact, poison boils, turning the wound into Blister."
+"artifact_imp_blade_desc","Interaction of Poison and Burn triggers a Chemical Explosion. The explosion instantly deals damage to all enemies equal to half the delayed Poison and Burn damage."
+"artifact_imp_blade_lore","A blade forged from the claw of a fire imp. Its edge is covered in black soot, and its hilt is wrapped in leather. On impact, poison boils, turning the wound into an instant burst."
 
 "artifact_plague_amulet_name","Plague Amulet"
 "artifact_plague_amulet_desc","Interaction of Bleed and Poison creates Infection. Infection deals damage each turn."

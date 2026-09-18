@@ -59,11 +59,11 @@ func handle_interaction(target, new_status: DataManager.Status, stacks: int, dur
 			_handle_bleed_poison_infection(target, last_status, new_status, stacks, duration)
 			return
 	
-	# Poison + Burn → Blister (только если флаг включён)
+	# Poison + Burn → Химический взрыв (только если флаг включён)
 	if RunManager.is_poison_burn_interaction_enabled:
 		if (last_status == DataManager.Status.POISON and new_status == DataManager.Status.BURN) or \
 		   (last_status == DataManager.Status.BURN and new_status == DataManager.Status.POISON):
-			_handle_poison_burn_blister(target, last_status, new_status, stacks, duration)
+			_handle_poison_burn_explosion(target, last_status, new_status, stacks, duration)
 			return
 	
 	# Bleed + Cold → Gangrene (только если флаг включён)
@@ -95,20 +95,42 @@ func _handle_burn_cold(target, new_status: DataManager.Status, stacks: int, dura
 		return 0
 
 
-# ===== POISON + BURN (Химический взрыв) =====
-func _handle_poison_burn_explosion(target, status_a: DataManager.Status, status_b: DataManager.Status, new_stacks: int):
-	# Получаем стаки существующего статуса
-	var existing_stacks = target.get_status_stacks(status_a)
-	var poison_stacks = existing_stacks if status_a == DataManager.Status.POISON or status_b == DataManager.Status.POISON else target.get_status_stacks(DataManager.Status.POISON)
+func _handle_poison_burn_explosion(target, status_a: DataManager.Status, status_b: DataManager.Status, new_stacks: int, new_duration: int):
+	# Получаем стаки и длительность обоих статусов
+	var poison_stacks = target.get_status_stacks(DataManager.Status.POISON)
 	var poison_duration = target.active_statuses.get(DataManager.Status.POISON, {}).get("duration", 0)
+	var burn_stacks = target.get_status_stacks(DataManager.Status.BURN)
+	var burn_duration = target.active_statuses.get(DataManager.Status.BURN, {}).get("duration", 0)
+	
+	# Если новый статус — BURN, используем переданные значения
+	if status_b == DataManager.Status.BURN:
+		burn_stacks = new_stacks
+		burn_duration = new_duration
+	elif status_b == DataManager.Status.POISON:
+		poison_stacks = new_stacks
+		poison_duration = new_duration
+	
+	# Считаем отложенный урон
+	var burn_total = burn_stacks * burn_duration * DataManager.BURN_BASE_DAMAGE_PER_STACK
+	var poison_total = poison_stacks * poison_duration * DataManager.POISON_BASE_DAMAGE_PER_STACK
+	
+	# 🆕 Урон взрыва = половина суммы отложенного урона
+	var explosion_damage = int((burn_total + poison_total) / 2.0)
 	
 	# Удаляем оба статуса
 	target.remove_status(DataManager.Status.POISON)
 	target.remove_status(DataManager.Status.BURN)
 	
-	var damage = poison_stacks * poison_duration
-	target.take_damage(damage, true)
-	SignalManager.log_message.emit("Химический взрыв! %d урона." % damage)
+	# 🆕 Наносим урон всем врагам (игнорирует блок)
+	var all_enemies = BattleManager.get_enemies()
+	var enemies_hit = 0
+	
+	for enemy in all_enemies:
+		if is_instance_valid(enemy) and enemy.is_alive():
+			enemy.take_damage(explosion_damage, true, target, true)
+			enemies_hit += 1
+	
+	SignalManager.log_message.emit("Химический взрыв! %d урона всем врагам (%d целей)." % [explosion_damage, enemies_hit])
 
 
 # ===== BLEED + COLD (Гангрена) =====

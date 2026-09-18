@@ -130,7 +130,7 @@ func _setup_ui():
 		"ru":
 			language_option.selected = 1
 		_:
-			language_option.selected = 0
+			language_option.selected = 1  # 🆕 fallback на русский
 	
 	# Отступы между элементами VBox
 	vbox.add_theme_constant_override("separation", 20)
@@ -154,12 +154,14 @@ func _load_volume_settings():
 	
 	var music_volume = 0.8
 	var sfx_volume = 0.8
-	var language = "en"
+	var language = TranslationServer.get_locale()  # 🆕 дефолт — текущая локаль
 	
 	if err == OK:
 		music_volume = config.get_value("audio", "music_volume", 0.8)
 		sfx_volume = config.get_value("audio", "sfx_volume", 0.8)
-		language = config.get_value("locale", "language", "en")
+		# 🆕 Берём язык из конфига, только если он там есть
+		if config.has_section_key("locale", "language"):
+			language = config.get_value("locale", "language")
 	
 	music_slider.value = music_volume
 	sfx_slider.value = sfx_volume
@@ -167,13 +169,15 @@ func _load_volume_settings():
 	_set_bus_volume("Music", music_volume)
 	_set_bus_volume("SFX", sfx_volume)
 	
+	# 🆕 Обновляем UI выбора языка
 	match language:
 		"en":
 			language_option.selected = 0
 		"ru":
 			language_option.selected = 1
 		_:
-			language_option.selected = 0
+			language_option.selected = 1  # fallback на русский
+	
 	TranslationServer.set_locale(language)
 
 

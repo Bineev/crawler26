@@ -63,7 +63,7 @@ func _setup_ui():
 		"ru":
 			language_option.selected = 1
 		_:
-			language_option.selected = 0
+			language_option.selected = 1  # 🆕 fallback на русский
 	# Подписываемся на нажатия
 	start_button.pressed.connect(_on_start_pressed)
 	settings_button.pressed.connect(_on_settings_pressed)
